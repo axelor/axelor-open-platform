@@ -20,11 +20,13 @@ package com.axelor.meta.web;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
@@ -45,7 +47,6 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
-import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
@@ -58,6 +59,7 @@ import com.google.common.io.Files;
 import com.google.inject.Inject;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -70,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
@@ -274,14 +278,13 @@ public class MetaController {
     }
   }
 
-  private void exportI18n(String module, URL file) throws IOException {
+  private void exportI18n(String module, URL file, Path path) throws IOException {
 
     String name = Path.of(file.getFile()).getFileName().toString();
     if (!name.startsWith("messages_")) {
       return;
     }
 
-    Path path = ActionExport.getExportPath().toPath().resolve("i18n");
     String lang = StringUtils.normalizeLanguageTag(name.substring(9, name.length() - 4));
     Path target = path.resolve(Path.of(module, "src/main/resources/i18n", name));
 
@@ -321,17 +324,52 @@ public class MetaController {
     }
   }
 
+  private void zipDirectory(Path sourceDir, Path zipFilePath) throws IOException {
+    try (var fos = java.nio.file.Files.newOutputStream(zipFilePath);
+        var zos = new ZipOutputStream(fos);
+        var files = java.nio.file.Files.walk(sourceDir)) {
+      files
+          .filter(file -> !java.nio.file.Files.isDirectory(file))
+          .forEach(
+              file -> {
+                var zipEntry = new ZipEntry(sourceDir.relativize(file).toString());
+                try {
+                  zos.putNextEntry(zipEntry);
+                  java.nio.file.Files.copy(file, zos);
+                  zos.closeEntry();
+                } catch (IOException e) {
+                  throw new UncheckedIOException(e);
+                }
+              });
+    }
+  }
+
   public void exportI18n(ActionRequest request, ActionResponse response) {
-    for (String module : ModuleManager.getResolution()) {
-      for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
-        try {
-          exportI18n(module, file);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
+    Path outputDir = null;
+
+    try {
+      outputDir = TempFiles.createTempDir("export-i18n-out-");
+
+      for (String module : ModuleManager.getResolution()) {
+        for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
+          exportI18n(module, file, outputDir);
         }
       }
+
+      Path zipFile = TempFiles.createTempDir("export-i18n-").resolve("i18n.zip");
+      zipDirectory(outputDir, zipFile);
+      response.setExportFile(zipFile);
+    } catch (Exception e) {
+      response.setError(e.getMessage());
+    } finally {
+      try {
+        if (outputDir != null && java.nio.file.Files.exists(outputDir)) {
+          FileUtils.deleteDirectory(outputDir);
+        }
+      } catch (IOException e) {
+        log.error("Failed to clean up temporary i18n export directory.", e);
+      }
     }
-    response.setInfo(I18n.get("Export complete."));
   }
 
   public void setThemeSelectable(ActionRequest request, ActionResponse response) {
