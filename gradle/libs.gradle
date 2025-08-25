@@ -111,7 +111,7 @@ libs.hibernate = [
 ]
 
 // Caching libs
-libs.ehcache = "org.ehcache:ehcache:3.10.8"
+libs.ehcache = "org.ehcache:ehcache:3.11.0"
 libs.redisson = [
   "org.redisson:redisson:${versions.redisson}",
   dependencies.create("org.redisson:redisson-hibernate-6:${versions.redisson}") {

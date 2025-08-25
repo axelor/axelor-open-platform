@@ -54,3 +54,4 @@ description: |
   * Upgrade to Jakarta Mail 2.1 and Jakarta Activation 2.1
   * Upgrade Hibernate Validator from 6.2.5.Final to 8.0.3.Final
   * Upgrade Infinispan from 13.0.22 to 15.2.5.Final
+  * Upgrade Ehcache from 3.10.8 to 3.11.0
