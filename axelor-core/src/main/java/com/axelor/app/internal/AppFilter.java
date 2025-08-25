@@ -54,6 +54,18 @@ public class AppFilter implements Filter {
     return BASE_URL.get();
   }
 
+  public static void setBaseURL(String baseUrl) {
+    BASE_URL.set(baseUrl);
+  }
+
+  public static Locale getLanguage() {
+    return LANGUAGE.get();
+  }
+
+  public static void setLanguage(Locale language) {
+    LANGUAGE.set(language);
+  }
+
   public static Locale getLocale() {
     User user = AuthUtils.getUser();
     if (user != null && user.getLanguage() != null) {

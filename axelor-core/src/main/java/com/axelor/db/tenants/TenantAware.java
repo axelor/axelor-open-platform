@@ -18,7 +18,9 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
+import java.util.Locale;
 
 /**
  * A Thread implementation that makes a thread tenant-aware by setting the tenant configuration
@@ -38,7 +40,13 @@ public class TenantAware extends Thread {
   /** The tenant host */
   private String tenantHost;
 
-  /** Whatever to start a new transaction */
+  /* request base url */
+  private String baseUrl;
+
+  /* request language */
+  private Locale language;
+
+  /** Whether to start a new transaction */
   private boolean withTransaction;
 
   /**
@@ -50,6 +58,10 @@ public class TenantAware extends Thread {
     super(task);
     this.tenantId = TenantResolver.currentTenantIdentifier();
     this.tenantHost = TenantResolver.currentTenantHost();
+
+    this.baseUrl = AppFilter.getBaseURL();
+    this.language = AppFilter.getLanguage();
+
     this.withTransaction = true;
   }
 
@@ -76,7 +88,7 @@ public class TenantAware extends Thread {
   }
 
   /**
-   * Whatever the task should run inside a new transaction
+   * Whether the task should run inside a new transaction
    *
    * @param withTransaction false to not open a transaction, else true
    * @return this
@@ -91,6 +103,12 @@ public class TenantAware extends Thread {
     String currentId = TenantResolver.CURRENT_TENANT.get();
     String currentHost = TenantResolver.CURRENT_HOST.get();
     TenantResolver.setCurrentTenant(tenantId, tenantHost);
+
+    String currentBaseUrl = AppFilter.getBaseURL();
+    Locale currentLocale = AppFilter.getLanguage();
+    AppFilter.setBaseURL(baseUrl);
+    AppFilter.setLanguage(language);
+
     try {
       if (withTransaction) {
         JPA.runInTransaction(super::run);
@@ -99,6 +117,9 @@ public class TenantAware extends Thread {
       }
     } finally {
       TenantResolver.setCurrentTenant(currentId, currentHost);
+
+      AppFilter.setBaseURL(currentBaseUrl);
+      AppFilter.setLanguage(currentLocale);
     }
   }
 }

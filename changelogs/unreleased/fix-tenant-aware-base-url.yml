@@ -1,0 +1,3 @@
+---
+title: Fix null base url when using TenantAware
+type: fix
