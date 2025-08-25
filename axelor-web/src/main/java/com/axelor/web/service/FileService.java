@@ -68,14 +68,18 @@ public class FileService extends AbstractService {
     if (StringUtils.isBlank(name)) {
       return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
-    final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
-    if (!file.isFile()) {
+    final java.nio.file.Path exportPath = ActionExport.getExportPath().toPath();
+    final java.nio.file.Path file = exportPath.resolve(name).normalize();
+    if (!file.startsWith(exportPath) || !java.nio.file.Files.isRegularFile(file)) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
-    return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+    return javax.ws.rs.core.Response.ok(file.toFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header(
             "Content-Disposition",
-            ContentDisposition.attachment().filename(file.getName()).build().toString())
+            ContentDisposition.attachment()
+                .filename(file.getFileName().toString())
+                .build()
+                .toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
