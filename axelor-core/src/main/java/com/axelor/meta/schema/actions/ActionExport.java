@@ -63,17 +63,10 @@ public class ActionExport extends Action {
   private static final String TEMPLATE_DIR =
       AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
 
-  @XmlAttribute(name = "download")
-  private Boolean download;
-
   @XmlAttribute private Boolean attachment;
 
   @XmlElement(name = "export")
   private List<Export> exports;
-
-  public Boolean getDownload() {
-    return download;
-  }
 
   public Boolean getAttachment() {
     return attachment;
@@ -174,8 +167,7 @@ public class ActionExport extends Action {
         String file = doExport(export, handler);
         result.put("exportFile", file);
 
-        // Force either attachment or download
-        if (Boolean.TRUE.equals(getAttachment()) || Boolean.FALSE.equals(getDownload())) {
+        if (Boolean.TRUE.equals(getAttachment())) {
           Long id = (Long) handler.getContext().get("id");
           if (id != null) {
             Class<? extends Model> modelClass =

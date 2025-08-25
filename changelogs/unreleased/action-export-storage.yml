@@ -7,4 +7,5 @@ description: |
   This is no longer the case: the export files have to be either downloaded or attached to current record.
 
   - Add `attachment="true|false"` attribute to attach the exported file to current object.
+  - Remove `download` attribute: direct downloading is default
   - Remove `output` attribute.

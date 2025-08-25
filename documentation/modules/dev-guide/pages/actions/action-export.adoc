@@ -22,7 +22,6 @@ The `<action-export>` can be used to export records.
 | Name | Description
 
 | *name* | name of the action
-| download | whether to download the exported files
 | attachment | whether to attach the exported file to current record
 |===
 
