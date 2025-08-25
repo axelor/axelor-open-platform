@@ -38,13 +38,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class EntityGenerator {
   private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
   private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
 
-  private static final Map<String, Entity> mergedEntities = new HashMap<>();
+  private static final Map<String, Entity> mergedEntities = new ConcurrentHashMap<>();
   private static final Set<String> MODEL_FIELD_NAMES = Set.of("archived");
   private static final Set<String> AUDITABLE_MODEL_FIELD_NAMES =
       Set.of("createdOn", "updatedOn", "createdBy", "updatedBy");
