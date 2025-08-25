@@ -1,0 +1,11 @@
+---
+title: Remove `data.export.dir` setting
+type: remove
+description: |
+  Another consequence of supporting multiple storage providers
+  is the removal of export directory setting `data.export.dir`.
+  If you used it, you should migrate your code to create temporary files
+  or directories instead, using `com.axelor.file.temp.TempFiles`,
+  then download or attach the files somewhere for the users to access.
+
+  Related ActionExport#getExportPath is also removed.

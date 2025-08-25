@@ -272,7 +272,7 @@ public class ActionResponse extends Response {
   }
 
   /**
-   * Set the file path relative to the data export directory.
+   * Set the file path relative to the data upload temporary directory.
    *
    * <p>The client will initiate downloading the exported file.
    *

@@ -117,7 +117,6 @@ public interface AvailableAppSettings {
   String FILE_UPLOAD_WHITELIST_TYPES = "data.upload.allowlist.types";
   String FILE_UPLOAD_BLACKLIST_TYPES = "data.upload.blocklist.types";
 
-  String DATA_EXPORT_DIR = "data.export.dir";
   String DATA_EXPORT_MAX_SIZE = "data.export.max-size";
   String DATA_EXPORT_FETCH_SIZE = "data.export.fetch-size";
   String DATA_EXPORT_ENCODING = "data.export.encoding";

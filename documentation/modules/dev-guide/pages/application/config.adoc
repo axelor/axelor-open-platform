@@ -269,7 +269,6 @@ Choose the right option by environment :
 | `data.upload.allowlist.types` | allowlist content type can be used to allow file upload with matching content |
 | `data.upload.blocklist.types` | blocklist content type can be used to block file upload with matching content |
 | `data.export.encoding` | data export encoding | UTF-8
-| `data.export.dir` | storage path for export action | \{user.home}/.axelor/data-export
 | `data.export.max-size` | maximum number of records to export, -1 means unlimited | -1
 | `data.export.fetch-size` | export fetch size | 500
 | `data.export.separator` | default export separator | ';'
