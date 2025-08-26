@@ -100,26 +100,14 @@ public class TenantAware extends Thread {
 
   @Override
   public void run() {
-    String currentId = TenantResolver.CURRENT_TENANT.get();
-    String currentHost = TenantResolver.CURRENT_HOST.get();
     TenantResolver.setCurrentTenant(tenantId, tenantHost);
-
-    String currentBaseUrl = AppFilter.getBaseURL();
-    Locale currentLocale = AppFilter.getLanguage();
     AppFilter.setBaseURL(baseUrl);
     AppFilter.setLanguage(language);
 
-    try {
-      if (withTransaction) {
-        JPA.runInTransaction(super::run);
-      } else {
-        super.run();
-      }
-    } finally {
-      TenantResolver.setCurrentTenant(currentId, currentHost);
-
-      AppFilter.setBaseURL(currentBaseUrl);
-      AppFilter.setLanguage(currentLocale);
+    if (withTransaction) {
+      JPA.runInTransaction(super::run);
+    } else {
+      super.run();
     }
   }
 }
