@@ -16,7 +16,11 @@ const { plugins, ...conf } = viteConfig as ViteUserConfig;
 // replace react plugin
 plugins[0] = react({
   babel: {
-    plugins: [jotaiDebugLabel, jotaiReactRefresh],
+    plugins: [
+      jotaiDebugLabel,
+      jotaiReactRefresh,
+      "babel-plugin-react-compiler",
+    ],
   },
 });
 

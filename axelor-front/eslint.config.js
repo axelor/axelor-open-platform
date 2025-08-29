@@ -25,6 +25,7 @@ export default tseslint.config(
     rules: {
       // https://react.dev/reference/rules/rules-of-hooks
       ...reactHooks.configs.recommended.rules,
+      "react-hooks/react-compiler": "warn",
       // Validate that components can safely be updated with fast refresh.
       "react-refresh/only-export-components": [
         "warn",
