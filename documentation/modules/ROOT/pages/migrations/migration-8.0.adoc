@@ -458,7 +458,7 @@ Path file = TempFiles.createTempDir().resolve(name); // random temporary directo
 response.setExportFile(file); // path automatically relativized to data upload temporary directory
 ----
 
-The removal of `data.export.dir` also affects `action-export` and i18 exports.
+The removal of `data.export.dir` also affects `action-export` and i18n exports.
 
 === `action-export` file storage
 
@@ -489,9 +489,9 @@ You can choose to attach the export file to the current record using the new `at
 
 Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] for details.
 
-=== i18 exports
+=== i18n exports
 
-i18 exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
+i18n exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
 
 == BIRT 4.4.2 to BIRT 4.20.0
 
