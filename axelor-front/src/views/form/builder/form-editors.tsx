@@ -12,7 +12,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useEditor, useSelector } from "@/hooks/use-relation";
+import { useEditor, useEditorInTab, useSelector } from "@/hooks/use-relation";
+import { usePermitted } from "@/hooks/use-permitted";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -277,7 +278,9 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const model = schema.target!;
 
   const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
+  const isPermitted = usePermitted(model, perms);
   const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const hasValue = useAtomValue(
@@ -329,19 +332,35 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   const handleEdit = useAtomCallback(
     useCallback(
-      (get, set, readonly: boolean = false, record?: DataRecord) => {
+      async (get, set, _readonly: boolean = false, _record?: DataRecord) => {
+        const $record = _record ?? get(valueAtom);
+
+        if (!(await isPermitted($record, _readonly))) {
+          return;
+        }
+
+        if (showEditorInTab) {
+          return showEditorInTab($record, _readonly);
+        }
+
         showEditor({
           model,
           title: title ?? "",
-          onSelect: (record) => {
-            set(valueAtom, record, true);
-          },
-          record: record ?? get(valueAtom),
-          readonly,
+          onSelect: (record) => set(valueAtom, record, true),
+          record: $record,
+          readonly: _readonly,
           viewName: formViewName,
         });
       },
-      [model, formViewName, showEditor, title, valueAtom],
+      [
+        model,
+        formViewName,
+        isPermitted,
+        showEditor,
+        showEditorInTab,
+        title,
+        valueAtom,
+      ],
     ),
   );
 
