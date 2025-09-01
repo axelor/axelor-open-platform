@@ -62,8 +62,13 @@ public class RedissonCacheNativeBuilder<K, V>
    * RedissonCacheBuilder}.
    */
   @Override
-  public CacheBuilder<K, V> removalListener(RemovalListener<K, V> removalListener) {
+  public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> removalListener(
+      RemovalListener<? super K1, ? super V1> removalListener) {
     super.removalListener(removalListener);
-    return removalListener != null ? new RedissonCacheBuilder<>(this) : this;
+
+    @SuppressWarnings("unchecked")
+    var self = (CacheBuilder<K1, V1>) this;
+
+    return removalListener != null ? new RedissonCacheBuilder<>(self) : self;
   }
 }

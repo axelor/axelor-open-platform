@@ -42,7 +42,7 @@ public abstract class CacheBuilder<K, V> {
 
   private boolean weakValues;
 
-  private RemovalListener<K, V> removalListener;
+  private RemovalListener<? super K, ? super V> removalListener;
 
   private static final CacheProviderInfo cacheProviderInfo =
       CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
@@ -217,8 +217,9 @@ public abstract class CacheBuilder<K, V> {
     return this;
   }
 
-  protected RemovalListener<K, V> getRemovalListener() {
-    return removalListener;
+  @SuppressWarnings("unchecked")
+  protected <K1 extends K, V1 extends V> RemovalListener<K1, V1> getRemovalListener() {
+    return (RemovalListener<K1, V1>) removalListener;
   }
 
   /**
@@ -228,9 +229,14 @@ public abstract class CacheBuilder<K, V> {
    * @param removalListener the listener instance
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> removalListener(RemovalListener<K, V> removalListener) {
-    this.removalListener = removalListener;
-    return this;
+  public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> removalListener(
+      RemovalListener<? super K1, ? super V1> removalListener) {
+
+    @SuppressWarnings("unchecked")
+    var self = (CacheBuilder<K1, V1>) this;
+    self.removalListener = removalListener;
+
+    return self;
   }
 
   /**
