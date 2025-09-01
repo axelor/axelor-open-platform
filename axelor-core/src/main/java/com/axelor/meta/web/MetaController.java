@@ -346,6 +346,7 @@ public class MetaController {
 
   public void exportI18n(ActionRequest request, ActionResponse response) {
     Path outputDir = null;
+    Path zipFile = null;
 
     try {
       outputDir = TempFiles.createTempDir("export-i18n-out-");
@@ -356,15 +357,19 @@ public class MetaController {
         }
       }
 
-      Path zipFile = TempFiles.createTempDir("export-i18n-").resolve("i18n.zip");
+      String fileName = "i18n.zip";
+      zipFile = TempFiles.createTempFile("export-i18n-", null);
       zipDirectory(outputDir, zipFile);
-      response.setExportFile(zipFile);
+      response.setExportFile(zipFile, fileName);
     } catch (Exception e) {
       response.setError(e.getMessage());
     } finally {
       try {
         if (outputDir != null && java.nio.file.Files.exists(outputDir)) {
           FileUtils.deleteDirectory(outputDir);
+        }
+        if (zipFile != null) {
+          java.nio.file.Files.deleteIfExists(zipFile);
         }
       } catch (IOException e) {
         log.error("Failed to clean up temporary i18n export directory.", e);

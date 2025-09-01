@@ -437,6 +437,9 @@ Another consequence of supporting multiple storage providers is the removal of e
 
 If you used data export dir, you need to migrate your code to create temporary files or directories, then download or attach the files somewhere for the users to access.
 
+In the case of `ActionResponse.setExportFile`, it is no longer necessary to specify a file path relative to export directory.
+Now, the specified file path (either `String` or `Path`) will be copied to a dedicated temporary file for pending export.
+
 [source,java]
 ----
 // ❌ Old code using `data.export.dir`
@@ -450,12 +453,21 @@ response.setExportFile(name); // file name must be relative to export path
 
 [source,java]
 ----
+// ✅ New code without using a temporary file
+Path path = /* path to a non-temporary file */;
+// Set export file to be downloaded
+response.setExportFile(path); // path filename is used if name is not specified as second parameter
+----
+
+[source,java]
+----
 // ✅ New code using a temporary file
-Path file = TempFiles.createTempDir().resolve(name); // random temporary directory and preserve file name
-// Write to file
+Path path = TempFiles.createTempFile();
+// Write to temporary file
 // (...)
 // Set export file to be downloaded
-response.setExportFile(file); // path automatically relativized to data upload temporary directory
+response.setExportFile(path, name); // path filename is used if name is not specified
+Files.deleteIfExists(path); // Safe to delete temporary file, as it has now been copied
 ----
 
 The removal of `data.export.dir` also affects `action-export` and i18n exports.

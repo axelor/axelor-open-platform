@@ -259,9 +259,10 @@ export class DefaultActionExecutor implements ActionExecutor {
           const url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
           await download(url, data.attached.fileName);
         }
-      } else {
-        const link = "ws/files/data-export";
-        await download(link, data.exportFile);
+      } else if (data.exportToken) {
+        const params = new URLSearchParams({ token: data.exportToken });
+        const url = `ws/files/data-export?${params}`;
+        await download(url, data.exportFile);
       }
     }
 

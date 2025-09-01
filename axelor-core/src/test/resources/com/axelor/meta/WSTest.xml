@@ -7,7 +7,7 @@
     <action name="CapitalCity" template="data/ws-test/ws-CountryInfoService.tmpl"/>
   </action-ws>
 
-  <action-export name="export.sale.order" output="${name}/${date}${time}" download="true">
+  <action-export name="export.sale.order">
     <export name="${name}.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
     <export name="${name}-customer-copy.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
   </action-export>

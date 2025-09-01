@@ -24,7 +24,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.validate.validator.Alert;
 import com.axelor.meta.schema.actions.validate.validator.Error;
@@ -272,29 +271,60 @@ public class ActionResponse extends Response {
   }
 
   /**
-   * Set the file path relative to the data upload temporary directory.
+   * Set the file path to be exported.
    *
-   * <p>The client will initiate downloading the exported file.
+   * <p>The file path is copied to a dedicated temporary file for pending export.
    *
-   * <p>Make sure the specified path is relative to the data upload temporary directory.
+   * <p>The client will initiate downloading the export file.
    *
-   * @param path the relative path string to the exported file
+   * @param path the path to the export file
    */
   public void setExportFile(String path) {
-    set("exportFile", path);
+    setExportFile(Path.of(path));
   }
 
   /**
-   * Set the file path relative to the data upload temporary directory.
+   * Set the file path to be exported.
    *
-   * <p>The client will initiate downloading the exported file.
+   * <p>The file path is copied to a dedicated temporary file for pending export.
    *
-   * <p>This ensures that the path is relative to the data upload temporary directory.
+   * <p>The client will initiate downloading the export file.
    *
-   * @param path the path to the exported file
+   * @param path the path to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(String path, String fileName) {
+    setExportFile(Path.of(path), fileName);
+  }
+
+  /**
+   * Set the file path to be exported.
+   *
+   * <p>The file path is copied to a dedicated temporary file for pending export.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
    */
   public void setExportFile(Path path) {
-    setExportFile(TempFiles.getTempPath().relativize(path).toString());
+    setExportFile(path, null);
+  }
+
+  /**
+   * Set the file path to be exported.
+   *
+   * <p>The file path is copied to a dedicated temporary file for pending export.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(Path path, String fileName) {
+    var name = StringUtils.notBlank(fileName) ? fileName : path.getFileName().toString();
+    var token = Beans.get(PendingExportService.class).add(path);
+    set("exportFile", name);
+    set("exportToken", token);
   }
 
   /**

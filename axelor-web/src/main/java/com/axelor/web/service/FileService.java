@@ -27,6 +27,7 @@ import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
+import com.axelor.rpc.PendingExportService;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -36,15 +37,18 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -61,31 +65,74 @@ import java.util.UUID;
 @Tag(name = "DMS")
 public class FileService extends AbstractService {
 
-  @Inject private MetaFiles files;
+  private final MetaFiles files;
+  private final PendingExportService pendingExportService;
+
+  @Inject
+  public FileService(MetaFiles files, PendingExportService pendingExportService) {
+    this.files = files;
+    this.pendingExportService = pendingExportService;
+  }
+
+  @HEAD
+  @Path("data-export")
+  @Hidden
+  public jakarta.ws.rs.core.Response checkExportFile(
+      @QueryParam("token") final String token, @QueryParam("fileName") final String name) {
+    if (StringUtils.isBlank(token)) {
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+    }
+
+    var export = pendingExportService.get(token);
+
+    if (export == null) {
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
+    var fileName = StringUtils.isBlank(name) ? export.getFileName().toString() : name;
+
+    return createExportResponseBuilder(fileName).build();
+  }
 
   @GET
   @Path("data-export")
   @Hidden
-  public jakarta.ws.rs.core.Response downloadExportFile(@QueryParam("fileName") final String name) {
-    if (StringUtils.isBlank(name)) {
+  public jakarta.ws.rs.core.Response downloadExportFile(
+      @QueryParam("token") final String token, @QueryParam("fileName") final String name) {
+    if (StringUtils.isBlank(token)) {
       return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
 
-    var file = TempFiles.findTempFile(name).normalize();
+    var export = pendingExportService.remove(token);
 
-    if (!file.startsWith(TempFiles.getTempPath()) || !java.nio.file.Files.isRegularFile(file)) {
+    if (export == null) {
       return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
-    return jakarta.ws.rs.core.Response.ok(file.toFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE)
-        .header(
-            "Content-Disposition",
-            ContentDisposition.attachment()
-                .filename(file.getFileName().toString())
-                .build()
-                .toString())
-        .header("Content-Transfer-Encoding", "binary")
+    StreamingOutput stream =
+        output -> {
+          try (var is = Files.newInputStream(export)) {
+            is.transferTo(output);
+            output.flush();
+          } finally {
+            Files.deleteIfExists(export);
+          }
+        };
+
+    var fileName = StringUtils.isBlank(name) ? export.getFileName().toString() : name;
+
+    return createExportResponseBuilder(fileName)
+        .entity(stream)
+        .type(MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .build();
+  }
+
+  private ResponseBuilder createExportResponseBuilder(String fileName) {
+    return jakarta.ws.rs.core.Response.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.attachment().filename(fileName).build().toString())
+        .header("Content-Transfer-Encoding", "binary");
   }
 
   @GET

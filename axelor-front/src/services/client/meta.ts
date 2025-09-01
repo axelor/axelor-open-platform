@@ -340,6 +340,7 @@ export type ActionOptions = {
 export type ActionResult = {
   pending?: string;
   exportFile?: string;
+  exportToken?: string;
   signal?: string;
   signalData?: any;
   info?: {

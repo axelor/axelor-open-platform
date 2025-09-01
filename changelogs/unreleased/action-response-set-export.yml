@@ -1,0 +1,14 @@
+---
+title: Implement token-based download for ActionResponse#setExport
+type: change
+description: |
+  Data export process now requires a token param instead of a file path relative to the export directory.
+  ActionResponse#setExport has been updated and overloaded accordingly:
+
+  - `ActionResponse#setExport(String path)`
+  - `ActionResponse#setExport(String path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(Path, String name)`
+
+  The file path is copied to a dedicated temporary file for pending export.
+  `path` filename is used for download name if `name` is not specified as second parameter.
