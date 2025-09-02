@@ -7,6 +7,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
 import format from "@/utils/format";
+import { useDisableWheelScroll } from "@/hooks/use-disable-wheel-scroll";
 import { useViewContext } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
@@ -40,7 +41,7 @@ export function Decimal(props: FieldProps<string | number>) {
     [isDecimal, stepAttrs],
   );
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputElement, setInputElement] = useDisableWheelScroll();
   const timerRef = useRef<number>();
 
   const parse = useCallback(
@@ -168,11 +169,11 @@ export function Decimal(props: FieldProps<string | number>) {
         clearTimer();
         return;
       }
-      if (inputRef.current) inputRef.current.focus();
+      if (inputElement) inputElement.focus();
       increment(step);
       setTimer(() => increment(step, true));
     },
-    [increment, step, setTimer, clearTimer],
+    [increment, step, inputElement, setTimer, clearTimer],
   );
 
   const handleDown = useCallback(
@@ -182,11 +183,11 @@ export function Decimal(props: FieldProps<string | number>) {
         clearTimer();
         return;
       }
-      if (inputRef.current) inputRef.current.focus();
+      if (inputElement) inputElement.focus();
       increment(-step);
       setTimer(() => increment(-step, true));
     },
-    [increment, step, setTimer, clearTimer],
+    [increment, step, inputElement, setTimer, clearTimer],
   );
 
   const text = useMemo(
@@ -215,9 +216,11 @@ export function Decimal(props: FieldProps<string | number>) {
             className={styles.numberInput}
             autoFocus={focus}
             type="number"
+            min={min}
+            max={max}
             step={step}
             id={uid}
-            ref={inputRef}
+            ref={setInputElement}
             placeholder={placeholder}
             value={textValue ?? ""}
             invalid={invalid}

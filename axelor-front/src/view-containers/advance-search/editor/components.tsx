@@ -1,6 +1,7 @@
 import React, {
   ChangeEventHandler,
   ComponentProps,
+  forwardRef,
   JSXElementConstructor,
   useCallback,
   useMemo,
@@ -20,23 +21,26 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { Field, Property, Schema } from "@/services/client/meta.types";
 import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
 import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
+import { useDisableWheelScroll } from "@/hooks/use-disable-wheel-scroll";
 import { getFieldType } from "./utils";
 
 import styles from "./components.module.css";
 
-function TextField(
-  props: ComponentProps<typeof Input> & {
+const TextField = forwardRef<
+  HTMLInputElement,
+  ComponentProps<typeof Input> & {
     onChange: (value: any) => void;
-  },
-) {
+  }
+>(function TextField(props, ref) {
   return (
     <Input
+      ref={ref}
       {...props}
       value={props.value ?? ""}
       onChange={(e) => props.onChange?.(e.target.value)}
     />
   );
-}
+});
 
 function DateField(props: ComponentProps<typeof DateComponent>) {
   const schema = useRef({ type: "date" }).current;
@@ -44,7 +48,8 @@ function DateField(props: ComponentProps<typeof DateComponent>) {
 }
 
 function NumberField(props: ComponentProps<typeof TextField>) {
-  return <TextField {...props} type="number" />;
+  const [, setRef] = useDisableWheelScroll();
+  return <TextField ref={setRef} {...props} type="number" />;
 }
 
 function Select({
