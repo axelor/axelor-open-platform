@@ -8,7 +8,8 @@ description: |
   - `ActionResponse#setExport(String path)`
   - `ActionResponse#setExport(String path, String name)`
   - `ActionResponse#setExport(Path path, String name)`
-  - `ActionResponse#setExport(Path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(InputStream stream, String name)`
 
   The file path is copied to a dedicated temporary file for pending export.
   `path` filename is used for download name if `name` is not specified as second parameter.

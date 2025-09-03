@@ -10,6 +10,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.validate.validator.Alert;
 import com.axelor.meta.schema.actions.validate.validator.Error;
@@ -18,6 +19,10 @@ import com.axelor.meta.schema.actions.validate.validator.Notify;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -308,8 +313,28 @@ public class ActionResponse extends Response {
    */
   public void setExportFile(Path path, String fileName) {
     var name = StringUtils.notBlank(fileName) ? fileName : path.getFileName().toString();
-    var token = Beans.get(PendingExportService.class).add(path);
-    set("exportFile", name);
+    var fullPath = path.isAbsolute() ? path : TempFiles.getTempPath().resolve(path);
+
+    try (var stream = Files.newInputStream(fullPath)) {
+      setExportFile(stream, name);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  /**
+   * Set the file stream to be exported.
+   *
+   * <p>This creates a pending export file from the given stream.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param stream the stream to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(InputStream stream, String fileName) {
+    var token = Beans.get(PendingExportService.class).add(stream);
+    set("exportFile", fileName);
     set("exportToken", token);
   }
 

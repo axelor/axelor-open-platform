@@ -13,7 +13,6 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.file.store.FileStoreFactory;
 import com.axelor.file.store.Store;
-import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaFiles;
@@ -25,10 +24,11 @@ import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
 import com.google.common.base.MoreObjects;
-import com.google.common.io.Files;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -38,7 +38,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class ActionExport extends Action {
   @XmlElement(name = "export")
   private List<Export> exports;
 
-  private static record PendingExport(Path path, String name) {}
+  private static record PendingExport(InputStream stream, String name) {}
 
   public Boolean getAttachment() {
     return attachment;
@@ -106,17 +105,14 @@ public class ActionExport extends Action {
       }
 
       name = FileUtils.safeFileName(name);
-      Path output = TempFiles.createTempFile("export-", null);
 
-      String contents = null;
+      String contents = handler.template(engine, reader);
 
-      contents = handler.template(engine, reader);
+      InputStream stream = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
 
-      Files.asCharSink(output.toFile(), StandardCharsets.UTF_8).write(contents);
+      log.info("export name: {}", name);
 
-      log.info("file saved: {}", output);
-
-      return new PendingExport(output, name);
+      return new PendingExport(stream, name);
     } finally {
       if (reader != null) {
         reader.close();
@@ -147,10 +143,10 @@ public class ActionExport extends Action {
         continue;
       }
       final Map<String, Object> result = new HashMap<>();
-      Path exportPath = null;
+      InputStream exportStream = null;
       try {
         PendingExport pendingExport = doExport(export, handler);
-        exportPath = pendingExport.path();
+        exportStream = pendingExport.stream();
         String exportName = pendingExport.name();
         result.put("exportFile", exportName);
 
@@ -160,11 +156,11 @@ public class ActionExport extends Action {
             Class<? extends Model> modelClass =
                 handler.getContext().getContextClass().asSubclass(Model.class);
             Model model = JPA.em().find(modelClass, id);
-            MetaFile attachedMetaFile = createAttachment(model, exportPath, exportName);
+            MetaFile attachedMetaFile = createAttachment(model, exportStream, exportName);
             result.put("attached", attachedMetaFile);
           }
         } else {
-          String token = Beans.get(PendingExportService.class).add(exportPath);
+          String token = Beans.get(PendingExportService.class).add(exportStream);
           result.put("exportToken", token);
         }
 
@@ -176,27 +172,26 @@ public class ActionExport extends Action {
         result.putAll(validateBuilder.build());
         return result;
       } finally {
-        if (exportPath != null) {
-          deleteIfExists(exportPath);
-        }
+        close(exportStream);
       }
     }
     return null;
   }
 
-  private MetaFile createAttachment(Model model, Path exportPath, String fileName) {
-    try (var is = java.nio.file.Files.newInputStream(exportPath)) {
-      var dmsFile = Beans.get(MetaFiles.class).attach(is, fileName, model);
+  private MetaFile createAttachment(Model model, InputStream exportStream, String fileName) {
+    try {
+      var dmsFile = Beans.get(MetaFiles.class).attach(exportStream, fileName, model);
       return dmsFile.getMetaFile();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
-  private boolean deleteIfExists(Path path) {
+  private void close(Closeable closeable) {
     try {
-      java.nio.file.Files.deleteIfExists(path);
-      return true;
+      if (closeable != null) {
+        closeable.close();
+      }
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

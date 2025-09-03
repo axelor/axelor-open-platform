@@ -46,6 +46,9 @@ import com.google.common.io.Files;
 import com.google.inject.Inject;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -314,29 +317,38 @@ public class MetaController {
     }
   }
 
-  private void zipDirectory(Path sourceDir, Path zipFilePath) throws IOException {
-    try (var fos = java.nio.file.Files.newOutputStream(zipFilePath);
-        var zos = new ZipOutputStream(fos);
-        var files = java.nio.file.Files.walk(sourceDir)) {
-      files
-          .filter(file -> !java.nio.file.Files.isDirectory(file))
-          .forEach(
-              file -> {
-                var zipEntry = new ZipEntry(sourceDir.relativize(file).toString());
-                try {
-                  zos.putNextEntry(zipEntry);
-                  java.nio.file.Files.copy(file, zos);
-                  zos.closeEntry();
-                } catch (IOException e) {
-                  throw new UncheckedIOException(e);
-                }
-              });
-    }
+  private InputStream zipDirectory(Path sourceDir) {
+    var input = new PipedInputStream();
+
+    Thread.ofVirtual()
+        .start(
+            () -> {
+              try (var output = new PipedOutputStream(input);
+                  var zos = new ZipOutputStream(output);
+                  var files = java.nio.file.Files.walk(sourceDir)) {
+                files
+                    .filter(file -> !java.nio.file.Files.isDirectory(file))
+                    .forEach(
+                        file -> {
+                          var zipEntry = new ZipEntry(sourceDir.relativize(file).toString());
+                          try {
+                            zos.putNextEntry(zipEntry);
+                            java.nio.file.Files.copy(file, zos);
+                            zos.closeEntry();
+                          } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                          }
+                        });
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+            });
+
+    return input;
   }
 
   public void exportI18n(ActionRequest request, ActionResponse response) {
     Path outputDir = null;
-    Path zipFile = null;
 
     try {
       outputDir = TempFiles.createTempDir("export-i18n-out-");
@@ -348,18 +360,15 @@ public class MetaController {
       }
 
       String fileName = "i18n.zip";
-      zipFile = TempFiles.createTempFile("export-i18n-", null);
-      zipDirectory(outputDir, zipFile);
-      response.setExportFile(zipFile, fileName);
+      try (InputStream stream = zipDirectory(outputDir)) {
+        response.setExportFile(stream, fileName);
+      }
     } catch (Exception e) {
       response.setError(e.getMessage());
     } finally {
       try {
         if (outputDir != null && java.nio.file.Files.exists(outputDir)) {
           FileUtils.deleteDirectory(outputDir);
-        }
-        if (zipFile != null) {
-          java.nio.file.Files.deleteIfExists(zipFile);
         }
       } catch (IOException e) {
         log.error("Failed to clean up temporary i18n export directory.", e);

@@ -11,6 +11,7 @@ import com.axelor.file.temp.TempFiles;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,16 +49,17 @@ public class PendingExportService {
   /**
    * Adds a pending export file.
    *
-   * @param path the path to the export file
+   * <p>Creates a temporary file from the given stream and returns the token associated with it.
+   *
+   * @param stream the stream to the export file
    * @return the token associated with the pending export file
    */
-  public String add(Path path) {
-    var fullPath = path.isAbsolute() ? path : TempFiles.getTempPath().resolve(path);
-
+  public String add(InputStream stream) {
     Path tempFile;
+
     try {
       tempFile = TempFiles.createTempFile("pending-", null);
-      Files.copy(fullPath, tempFile, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
