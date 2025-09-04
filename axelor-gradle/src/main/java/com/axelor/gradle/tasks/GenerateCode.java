@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.gradle.api.DefaultTask;
@@ -68,12 +67,6 @@ public class GenerateCode extends DefaultTask {
 
   public void setUseTestSources(Boolean useTestSources) {
     this.useTestSources = useTestSources;
-  }
-
-  private Function<String, String> formatter;
-
-  public void setFormatter(Function<String, String> formatter) {
-    this.formatter = formatter;
   }
 
   public static File getInputMainDir(Project project) {
@@ -199,17 +192,13 @@ public class GenerateCode extends DefaultTask {
   private EntityGenerator buildMainGenerator(Project project) {
     final File domainPath = getInputMainDir(project);
     final File targetPath = getMainJavaOutputDir(project);
-    return formatter != null
-        ? new EntityGenerator(domainPath, targetPath, formatter)
-        : new EntityGenerator(domainPath, targetPath);
+    return new EntityGenerator(domainPath, targetPath);
   }
 
   private EntityGenerator buildTestGenerator(Project project) {
     final File domainPath = getInputTestDir(project);
     final File targetPath = getTestJavaOutputDir(project);
-    return formatter != null
-        ? new EntityGenerator(domainPath, targetPath, formatter)
-        : new EntityGenerator(domainPath, targetPath);
+    return new EntityGenerator(domainPath, targetPath);
   }
 
   @TaskAction
