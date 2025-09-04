@@ -30,13 +30,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ResolvedArtifact;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
@@ -44,7 +45,8 @@ import org.gradle.api.tasks.util.PatternSet;
 
 public class GenerateCode extends DefaultTask {
 
-  public static final String TASK_NAME = "generateCode";
+  public static final String MAIN_TASK_NAME = "generateCode";
+  public static final String TEST_TASK_NAME = "generateTestCode";
   public static final String TASK_DESCRIPTION =
       "Generate code for domain models from xml definitions.";
   public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
@@ -56,6 +58,17 @@ public class GenerateCode extends DefaultTask {
   private static final String DIR_OUTPUT_TEST_JAVA = "src-gen/test/java";
 
   private static final String DIR_OUTPUT_MAIN_RESOURCES = "src-gen/main/resources";
+
+  private Boolean useTestSources = Boolean.FALSE;
+
+  @Input
+  public Boolean getUseTestSources() {
+    return useTestSources;
+  }
+
+  public void setUseTestSources(Boolean useTestSources) {
+    this.useTestSources = useTestSources;
+  }
 
   private Function<String, String> formatter;
 
@@ -92,22 +105,24 @@ public class GenerateCode extends DefaultTask {
     return AxelorUtils.findAxelorProjects(getProject()).stream()
         .flatMap(
             project ->
-                Arrays.asList(getMainJavaOutputDir(project), getTestJavaOutputDir(project))
-                    .stream())
+                useTestSources
+                    ? Stream.of(getMainJavaOutputDir(project), getTestJavaOutputDir(project))
+                    : Stream.of(getMainJavaOutputDir(project)))
         .collect(Collectors.toList());
   }
 
   @InputFiles
   public List<File> getInputDirectories() {
-    return Arrays.asList(getInputMainDir(getProject()), getInputTestDir(getProject()));
+    return useTestSources
+        ? List.of(getInputMainDir(getProject()), getInputTestDir(getProject()))
+        : List.of(getInputMainDir(getProject()));
   }
 
   @OutputDirectories
   public List<File> getOutputDirectories() {
-    return Arrays.asList(
-        getMainJavaOutputDir(getProject()),
-        getTestJavaOutputDir(getProject()),
-        getMainResourceOutputDir(getProject()));
+    return useTestSources
+        ? List.of(getTestJavaOutputDir(getProject()))
+        : List.of(getMainJavaOutputDir(getProject()), getMainResourceOutputDir(getProject()));
   }
 
   private void generateInfo(AxelorExtension extension, List<ResolvedArtifact> artifacts)
@@ -208,25 +223,24 @@ public class GenerateCode extends DefaultTask {
     List<ResolvedArtifact> axelorArtifacts = AxelorUtils.findAxelorArtifacts(getProject());
 
     // generate module info
-    generateInfo(extension, axelorArtifacts);
+    if (!useTestSources) {
+      generateInfo(extension, axelorArtifacts);
+    }
 
-    // Generate code for main sources
-    generateCodeForSourceSet(project, axelorArtifacts, true);
-
-    // Generate code for test sources
-    generateCodeForSourceSet(project, axelorArtifacts, false);
+    // Generate code for sources
+    generateCodeForSourceSet(project, axelorArtifacts);
   }
 
-  private void generateCodeForSourceSet(
-      Project project, List<ResolvedArtifact> axelorArtifacts, boolean isMain) throws IOException {
-    final File inputDir = isMain ? getInputMainDir(project) : getInputTestDir(project);
+  private void generateCodeForSourceSet(Project project, List<ResolvedArtifact> axelorArtifacts)
+      throws IOException {
+    final File inputDir = getUseTestSources() ? getInputTestDir(project) : getInputMainDir(project);
 
     // Only generate if the input directory exists and contains domain files
     if (!inputDir.exists() || !inputDir.isDirectory()) {
       getLogger()
           .info(
               "Skipping {} code generation - input directory does not exist: {}",
-              isMain ? "main" : "test",
+              useTestSources ? "test" : "main",
               inputDir.getAbsolutePath());
       return;
     }
@@ -237,7 +251,7 @@ public class GenerateCode extends DefaultTask {
       getLogger()
           .info(
               "Skipping {} code generation - no domain files found in: {}",
-              isMain ? "main" : "test",
+              useTestSources ? "test" : "main",
               inputDir.getAbsolutePath());
       return;
     }
@@ -245,15 +259,15 @@ public class GenerateCode extends DefaultTask {
     getLogger()
         .info(
             "Starting {} code generation from: {}",
-            isMain ? "main" : "test",
+            useTestSources ? "test" : "main",
             inputDir.getAbsolutePath());
 
     // Start code generation
     final EntityGenerator generator =
-        isMain ? buildMainGenerator(project) : buildTestGenerator(project);
+        !useTestSources ? buildMainGenerator(project) : buildTestGenerator(project);
 
     // For test generation, also add main domains as lookup source
-    if (!isMain && getInputMainDir(project).exists()) {
+    if (useTestSources && getInputMainDir(project).exists()) {
       getLogger().debug("Adding main domains as lookup source for test generation");
       generator.addLookupSource(buildMainGenerator(project));
     }
@@ -274,6 +288,6 @@ public class GenerateCode extends DefaultTask {
     }
 
     generator.start();
-    getLogger().info("Completed {} code generation", isMain ? "main" : "test");
+    getLogger().info("Completed {} code generation", useTestSources ? "test" : "main");
   }
 }

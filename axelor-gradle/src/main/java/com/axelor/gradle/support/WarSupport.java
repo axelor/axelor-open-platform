@@ -45,7 +45,7 @@ public class WarSupport extends AbstractSupport {
             COPY_WEBAPP_TASK_NAME,
             CopyWebapp.class,
             task -> {
-              task.dependsOn(GenerateCode.TASK_NAME);
+              task.dependsOn(GenerateCode.MAIN_TASK_NAME);
               task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
             });
 

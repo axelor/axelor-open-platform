@@ -53,7 +53,8 @@ public class EclipseSupport extends AbstractSupport {
     project.afterEvaluate(
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-            eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.MAIN_TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.TEST_TASK_NAME);
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
             // Also run eclipseJdt in included builds

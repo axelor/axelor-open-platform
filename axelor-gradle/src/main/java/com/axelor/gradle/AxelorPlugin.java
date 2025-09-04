@@ -32,7 +32,6 @@ import com.axelor.gradle.tasks.EncryptTextTask;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
-import java.io.File;
 import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -101,9 +100,9 @@ public class AxelorPlugin implements Plugin<Project> {
 
     // run generateCode on included builds
     AxelorUtils.findIncludedBuildProjects(project).stream()
-        .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
+        .map(included -> included.getTasks().findByName(GenerateCode.MAIN_TASK_NAME))
         .filter(Objects::nonNull)
-        .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
+        .forEach(task -> project.getTasks().getByName(GenerateCode.MAIN_TASK_NAME).dependsOn(task));
 
     // run processResources on included builds
     AxelorUtils.findIncludedBuildProjects(project).stream()
@@ -146,12 +145,15 @@ public class AxelorPlugin implements Plugin<Project> {
             });
 
     Task compileTask = project.getTasks().findByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+    Task compileTestTask = project.getTasks().findByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME);
     Task resourcesTask = project.getTasks().findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+
+    // generate code task for main sourceSet
     Task generateCodeTask =
         project
             .getTasks()
             .register(
-                GenerateCode.TASK_NAME,
+                GenerateCode.MAIN_TASK_NAME,
                 GenerateCode.class,
                 task -> {
                   task.setDescription(GenerateCode.TASK_DESCRIPTION);
@@ -159,8 +161,23 @@ public class AxelorPlugin implements Plugin<Project> {
                 })
             .get();
 
+    // generate code task for test sourceSet
+    Task generateTestCodeTask =
+        project
+            .getTasks()
+            .register(
+                GenerateCode.TEST_TASK_NAME,
+                GenerateCode.class,
+                task -> {
+                  task.setDescription(GenerateCode.TASK_DESCRIPTION);
+                  task.setGroup(GenerateCode.TASK_GROUP);
+                  task.setUseTestSources(Boolean.TRUE);
+                })
+            .get();
+
     // add dependencies to optimize up-to-date checks
     dependsOn(compileTask, generateCodeTask);
+    dependsOn(compileTestTask, generateTestCodeTask);
     dependsOn(resourcesTask, generateCodeTask);
     project.afterEvaluate(
         p -> {
@@ -170,7 +187,10 @@ public class AxelorPlugin implements Plugin<Project> {
                     if (d == p) {
                       return;
                     }
-                    dependsOn(generateCodeTask, d.getTasks().findByName(GenerateCode.TASK_NAME));
+                    dependsOn(
+                        generateCodeTask, d.getTasks().findByName(GenerateCode.MAIN_TASK_NAME));
+                    dependsOn(
+                        generateTestCodeTask, d.getTasks().findByName(GenerateCode.MAIN_TASK_NAME));
                     dependsOn(compileTask, d.getTasks().findByName(JavaPlugin.CLASSES_TASK_NAME));
                   });
         });

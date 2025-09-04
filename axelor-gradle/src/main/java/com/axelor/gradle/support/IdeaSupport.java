@@ -32,12 +32,12 @@ public class IdeaSupport extends AbstractSupport {
     project.afterEvaluate(
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-            project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.TASK_NAME);
+            project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.MAIN_TASK_NAME);
             project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
             project
                 .getTasks()
                 .getByName(
-                    GenerateCode.TASK_NAME,
+                    GenerateCode.MAIN_TASK_NAME,
                     task -> {
                       project
                           .getExtensions()
