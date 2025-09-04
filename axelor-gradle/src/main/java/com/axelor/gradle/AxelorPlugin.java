@@ -51,15 +51,6 @@ public class AxelorPlugin implements Plugin<Project> {
   public static final String AXELOR_APP_GROUP = "axelor application";
   public static final String AXELOR_BUILD_GROUP = "axelor build";
 
-  public static File getClassOutputDir(Project project, String sourceType) {
-    return project
-        .getLayout()
-        .getBuildDirectory()
-        .dir("classes/" + sourceType + "/main")
-        .get()
-        .getAsFile();
-  }
-
   @Override
   public void apply(Project project) {
 
