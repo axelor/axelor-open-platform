@@ -269,11 +269,7 @@ public class GenerateCode extends DefaultTask {
                     .matching(new PatternSet().include("**/domains/**"))
                     .getFiles()));
       } else {
-        // Add both main and test generators for lookup from sub-projects
         generator.addLookupSource(buildMainGenerator(sub));
-        if (getInputTestDir(sub).exists()) {
-          generator.addLookupSource(buildTestGenerator(sub));
-        }
       }
     }
 
