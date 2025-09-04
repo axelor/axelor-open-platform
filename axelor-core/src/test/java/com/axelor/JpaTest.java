@@ -58,6 +58,7 @@ public abstract class JpaTest extends JpaSupport {
     }
   }
 
+  @Transactional
   protected void fixture(String name) {
     try {
       fixture.load(name, JPA::model, bean -> JPA.manage((Model) bean));
