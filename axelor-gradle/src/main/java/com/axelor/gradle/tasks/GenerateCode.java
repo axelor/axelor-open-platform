@@ -224,27 +224,6 @@ public class GenerateCode extends DefaultTask {
       throws IOException {
     final File inputDir = getUseTestSources() ? getInputTestDir(project) : getInputMainDir(project);
 
-    // Only generate if the input directory exists and contains domain files
-    if (!inputDir.exists() || !inputDir.isDirectory()) {
-      getLogger()
-          .info(
-              "Skipping {} code generation - input directory does not exist: {}",
-              useTestSources ? "test" : "main",
-              inputDir.getAbsolutePath());
-      return;
-    }
-
-    // Check if there are any domain files
-    File[] domainFiles = inputDir.listFiles((dir, name) -> name.endsWith(".xml"));
-    if (domainFiles == null || domainFiles.length == 0) {
-      getLogger()
-          .info(
-              "Skipping {} code generation - no domain files found in: {}",
-              useTestSources ? "test" : "main",
-              inputDir.getAbsolutePath());
-      return;
-    }
-
     getLogger()
         .info(
             "Starting {} code generation from: {}",
