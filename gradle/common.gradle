@@ -25,9 +25,6 @@ configurations.all {
 
   resolutionStrategy {
     force libs.slf4j_api
-    force "org.apache.shiro:shiro-core:${libsVersions.shiro}:jakarta"
-    force "org.apache.shiro:shiro-web:${libsVersions.shiro}:jakarta"
-    force "org.apache.shiro:shiro-guice:${libsVersions.shiro}:jakarta"
   }
 }
 

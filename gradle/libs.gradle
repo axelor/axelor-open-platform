@@ -249,10 +249,15 @@ libs.jackson_libs = [
 // Apache Shiro
 libs.apache_shiro = [
   "org.apache.shiro:shiro-core:${versions.shiro}:jakarta",
-  "org.apache.shiro:shiro-web:${versions.shiro}:jakarta",
+  dependencies.create("org.apache.shiro:shiro-web:${versions.shiro}:jakarta") {
+      // we use jakarta classifier
+      exclude group: 'org.apache.shiro', module: 'shiro-core'
+  },
   dependencies.create("org.apache.shiro:shiro-guice:${versions.shiro}:jakarta") {
       exclude group: 'javax.annotation', module: 'javax.annotation-api'
       exclude group: 'com.google.inject', module: 'guice'
+      // we use jakarta classifier
+      exclude group: 'org.apache.shiro', module: 'shiro-core'
   },
   "org.apache.shiro:shiro-jcache:${versions.shiro}"
 ]
