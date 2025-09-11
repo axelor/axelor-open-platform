@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ResolvedArtifact;
@@ -95,9 +94,12 @@ public class GenerateCode extends DefaultTask {
 
   @InputFiles
   public List<File> getLookupFiles() {
+    if (useTestSources) {
+      return new ArrayList<>();
+    }
     return AxelorUtils.findAxelorProjects(getProject()).stream()
-            .map(GenerateCode::getMainJavaOutputDir)
-            .collect(Collectors.toList());
+        .map(GenerateCode::getMainJavaOutputDir)
+        .collect(Collectors.toList());
   }
 
   @InputFiles
@@ -218,7 +220,7 @@ public class GenerateCode extends DefaultTask {
 
   private void generateCodeForSourceSet(Project project, List<ResolvedArtifact> axelorArtifacts)
       throws IOException {
-    final File inputDir = getUseTestSources() ? getInputTestDir(project) : getInputMainDir(project);
+    final File inputDir = useTestSources ? getInputTestDir(project) : getInputMainDir(project);
 
     getLogger()
         .info(
@@ -230,24 +232,20 @@ public class GenerateCode extends DefaultTask {
     final EntityGenerator generator =
         !useTestSources ? buildMainGenerator(project) : buildTestGenerator(project);
 
-    // For test generation, also add main domains as lookup source
-    if (useTestSources && getInputMainDir(project).exists()) {
-      getLogger().debug("Adding main domains as lookup source for test generation");
-      generator.addLookupSource(buildMainGenerator(project));
-    }
-
-    // Add lookup generators from dependencies
-    for (ResolvedArtifact artifact : axelorArtifacts) {
-      final Project sub = AxelorUtils.findProject(project, artifact);
-      if (sub == null) {
-        generator.addLookupSource(
-            EntityGenerator.forFiles(
-                project
-                    .zipTree(artifact.getFile())
-                    .matching(new PatternSet().include("**/domains/**"))
-                    .getFiles()));
-      } else {
-        generator.addLookupSource(buildMainGenerator(sub));
+    if (!useTestSources) {
+      // Add lookup generators from dependencies. Allow to extend domains from others modules
+      for (ResolvedArtifact artifact : axelorArtifacts) {
+        final Project sub = AxelorUtils.findProject(project, artifact);
+        if (sub == null) {
+          generator.addLookupSource(
+              EntityGenerator.forFiles(
+                  project
+                      .zipTree(artifact.getFile())
+                      .matching(new PatternSet().include("**/domains/**"))
+                      .getFiles()));
+        } else {
+          generator.addLookupSource(buildMainGenerator(sub));
+        }
       }
     }
 
