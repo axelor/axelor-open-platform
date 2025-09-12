@@ -55,4 +55,4 @@ description: |
   * Upgrade Hibernate Validator from 6.2.5.Final to 8.0.3.Final
   * Upgrade Infinispan from 13.0.22 to 15.2.6.Final
   * Upgrade Ehcache from 3.10.8 to 3.11.1
-  * Upgrade Undertow from 2.3.13.Final to 2.3.19.Final
+  * Upgrade Undertow from 2.2.37.Final to 2.3.19.Final
