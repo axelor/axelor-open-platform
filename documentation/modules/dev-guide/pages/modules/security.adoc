@@ -376,7 +376,7 @@ auth.provider.keycloak.secret = 233d1690-4498-490c-a60d-5d12bb685557
 # provider authentication realm
 auth.provider.keycloak.realm = demo-app
 # Keycloak server base URI
-auth.provider.keycloak.base-uri = http://localhost:8083/auth
+auth.provider.keycloak.base-uri = http://localhost:8083/
 
 # Google
 # Client: org.pac4j.oidc.client.GoogleOidcClient
