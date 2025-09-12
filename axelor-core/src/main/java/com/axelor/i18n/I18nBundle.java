@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {
@@ -27,12 +28,18 @@ public class I18nBundle extends ResourceBundle {
 
   private boolean loaded;
 
+  private static final Map<String, AxelorCache<String, String>> messagesCaches =
+      new ConcurrentHashMap<>();
+
   public I18nBundle(Locale locale) {
     this.locale = locale;
-    messages = CacheBuilder.newBuilder(locale.toLanguageTag()).build();
+    String languageTag = locale.toLanguageTag();
+    messages = CacheBuilder.newBuilder(languageTag).build();
 
     // With distributed cache, we may have messages previously loaded.
     loaded = messages.estimatedSize() > 0;
+
+    messagesCaches.put(languageTag, messages);
   }
 
   @Override
@@ -114,5 +121,11 @@ public class I18nBundle extends ResourceBundle {
 
   public static void invalidate() {
     ResourceBundle.clearCache();
+
+    for (var cache : messagesCaches.values()) {
+      cache.invalidateAll();
+    }
+
+    messagesCaches.clear();
   }
 }
