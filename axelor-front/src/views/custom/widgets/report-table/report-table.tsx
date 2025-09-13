@@ -3,7 +3,6 @@ import { forwardRef, useCallback, useEffect, useMemo } from "react";
 
 import { DataRecord } from "@/services/client/data.types";
 import {
-  CustomView,
   Field,
   GridView,
   Property,
@@ -22,6 +21,8 @@ import {
 import format from "@/utils/format";
 import { i18n } from "@/services/client/i18n";
 import { getFieldValue } from "@/utils/data-record";
+import { useTemplateContext } from "@/hooks/use-parser";
+import { useViewMeta } from "@/view-containers/views/scope";
 
 function formatRecord(column: Field, value: any, record: any) {
   if (column.translatable && toKebabCase(column.type) === "string") {
@@ -48,18 +49,18 @@ function getSortValue(column: Field, record: DataRecord) {
 
 export const ReportTable = forwardRef(function ReportTable(
   {
-    context,
     columns,
     sums,
-    view,
   }: {
-    view?: CustomView;
-    context: Record<string, any>;
     columns?: string;
     sums?: string;
   },
-  ref,
+  _,
 ) {
+  const {
+    meta: { view },
+  } = useViewMeta();
+  const context = useTemplateContext();
   const [state, setState] = useGridState();
   const records = useMemo(() => context.data || [], [context]);
 
@@ -103,8 +104,7 @@ export const ReportTable = forwardRef(function ReportTable(
   }, [sums, columns, view, defaultColumnNames]);
 
   const onExport = useCallback(async () => {
-    const view = gridView;
-    const { items = [] } = view;
+    const { items = [] } = gridView;
 
     const header = items.map((col) => col.title);
     let content = "data:text/csv;charset=utf-8," + header.join(";") + "\n";
@@ -121,15 +121,15 @@ export const ReportTable = forwardRef(function ReportTable(
         });
       content += row.join(";") + "\n";
     });
-    const name = (view.title || "export").toLowerCase().replace(/ /g, "_");
+    const name = (gridView.title || "export").toLowerCase().replace(/ /g, "_");
     download(encodeURI(content), name + ".csv");
   }, [records, gridView]);
 
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {
-    setDashletHandlers((state) => ({
-      ...state,
+    setDashletHandlers((_state) => ({
+      ..._state,
       view: gridView,
       onExport,
     }));

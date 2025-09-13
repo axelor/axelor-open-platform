@@ -1,3 +1,199 @@
+## 7.4.3 (2025-07-17)
+
+#### Feature
+
+* Improve template rendering
+
+  <details>
+  
+  Previously, the React template component was being remounted entirely whenever the record context changed.
+  This caused visible UI flicker and unnecessary teardown/re-initialization of the component,
+  even when only the record data was updated.
+  
+  This fix ensures that the template component now mounts only once, and instead of remounting,
+  it will re-render efficiently in response to changes in the record context. This preserves component in dom by react 
+  and eliminates the flicker, resulting in a smoother user experience during form changes.
+  
+  This impacts all fields viewers, label/static/help widgets, fields tooltip, kanban/cards/calendar/custom views.
+  
+  </details>
+
+* Add React template support for ReportBox and ReportTable templates
+
+#### Fix
+
+* Fix o2m header gets hidden on scroll
+* Fixes how the form context is prepared
+
+  <details>
+  
+  The way from context was prepared was creating issues. The form context is a concatenation of the action view 
+  context values and the view/record values. But it was created in the wrong order : instead of appending view/record 
+  context values first and then the action view context values, it is now the reverse. The view/record context values 
+  should be priority over action view context values.
+  
+  Means that if passing some data in action view context that can have the same names as the view/record context 
+  values, the latter will have priority.
+  
+  This fixes an issue with chart/search views search-field requests : the model was coming from the action view instead 
+  of the form itself. In case of chart and search views (without `search-form`), the model is by default 
+  `com.axelor.script.ScriptBindings`.
+  
+  </details>
+
+* Fix box-shadow styles for nested panels
+* Fix evaluate readonlyIf attribute in form view
+* Fix handle save action in editable grid line
+
+  <details>
+  
+  When a "save" action occurs from a button inside an grid line, the save is now handle by the main record
+  whatever if the grid is in edit or non-edit mode. It also ensure data integrity and correct state updates.
+  The following sequence occurs :
+  
+  1. In case of non-edit grid mode, trigger the onChange of the current field, if any input is currently 
+  focused and value changed.
+  2. Trigger the onClick action of the button to update the line data.
+  3. As soon as a "save" action is detected, commit the line to trigger the onChange of the relational field.
+  4. Finally, the save action of the main record is triggered with the updated grid data.
+  5. Continue any pending action after the save.
+  
+  It is not recommended to update the record after the save. action-view/report/validate can still occurs.
+  
+  </details>
+
+* Fix and improve NavMenu theming
+
+  <details>
+  
+  This fix few styles issues on NavMenu. As part of the changes, it also comes 
+  with improvements on NavMenu theming capabilities.
+  
+  </details>
+
+
+## 7.4.2 (2025-06-26)
+
+#### Feature
+
+* Add processing indicators on login and reset/forgot password buttons
+* Provide better error message when filter name is already in use
+
+#### Fix
+
+* Fix sync selection of collection in action context
+* Avoid full recomputation of extended views after view hotswap
+
+  <details>
+  
+  Modifying a view XML file that doesn't contain view extensions
+  incorrectly triggered a recomputation of all extended views.
+  
+  </details>
+
+* Fix interpolation in error notification
+* Fix missed resources to watch in view watcher
+
+  <details>
+  
+  Finding paths was not thread-safe and could occasionally cause missing paths to watch.
+  
+  </details>
+
+* Fix refresh-tab signal on active tab view only
+
+  <details>
+  
+  `refresh-tab` signal should be applied on active tab view, not on active view.
+  Means that popups are excluded and only active tab view is reloaded (whatever view type is).
+  
+  </details>
+
+
+## 7.4.1 (2025-06-10)
+
+#### Feature
+
+* Allow to provide additional java mail properties
+
+  <details>
+  
+  Allow to provide additional java mail properties for smtp and imap from
+  properties file. Any java mail properties can be added using
+  `mail.<protocol>.properties.` prefix. 
+  
+  For example : `mail.smtp.properties.mail.smtp.ssl.trust = <host-name-of-mail-server>`
+  
+  </details>
+
+* Add selection or enum type in field help popover
+* Add parent field in dms view details
+
+#### Fix
+
+* Fix prevent executing multiple time the same action if already in progress
+
+  <details>
+  
+  It will prevent executing multiple time the same action if already in progress. 
+  Mostly related to save click in form view or popup dialog buttons.
+  
+  </details>
+
+* Fix saving customized grid view
+* Fixed the order of actions on the buttons in the grid customize popup
+
+  <details>
+  
+  In the grid customization popup, the reset and save buttons should
+  first trigger the process. Then, if the action completes, close the
+  popup. So that in case of error, the popup doesn't close prematurely.
+  
+  </details>
+
+* Fix calling repository populate on read web service
+
+  <details>
+  
+  read record by id using GET method (`ws/rest/<model>/<id>`), should
+  call the entity repository like any other web services that returns
+  data.
+  
+  </details>
+
+* Fix grid rendering issue on sorting
+
+  <details>
+  
+  Avoid grid unmount/mount during search requests causing some grid state resetting (scroll positions, ...)
+  
+  </details>
+
+* Fix pass context to o2m inline editable widget
+* Fix set default country in phone widget
+* Fix menuitem schema causing wrong reload on overridden menuitem
+* Fix mask input on date picker input
+
+  <details>
+  
+  On widgets using a mask (date/time,...), previously adding characters causes existing characters to advance. And 
+  deleting characters causes existing characters to move back. Now adding or deleting characters will not affect the 
+  positions of existing characters.
+  
+  On date/datetime, it also validates date parts (days/months/years) for valid inputs.
+  
+  </details>
+
+* Fix can* attributes evaluation on form view
+
+  <details>
+  
+  can* attributes (`canNew`, `canEdit`, ...) on form view allow javascript 
+  expressions and should be evaluated against the associated context.
+  
+  </details>
+
+
 ## 7.4.0 (2025-05-15)
 
 #### Feature

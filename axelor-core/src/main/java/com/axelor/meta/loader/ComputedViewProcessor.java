@@ -130,9 +130,10 @@ public class ComputedViewProcessor {
             .bind("name", baseView.getName());
 
     if (ObjectUtils.isEmpty(extendsViews)) {
-      computedViewQuery.remove();
-      LOG.debug(
-          "No extends views found for {}: remove existing computed views.", baseView.getName());
+      if (computedViewQuery.remove() > 0) {
+        LOG.debug(
+            "No view extensions found for {}: removed existing computed view.", baseView.getName());
+      }
       return null;
     }
 

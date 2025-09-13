@@ -7,9 +7,13 @@ import {
   Field,
   JsonField,
 } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
+import { ActionResult } from "@/services/client/meta";
+import { DataRecord } from "@/services/client/data.types";
 import { useCanDirty, useFormEditableScope } from "@/views/form/builder/scope";
+import { legacyClassNames } from "@/styles/legacy";
 import { processContextValues } from "@/views/form/builder/utils";
+import { executeWithoutQueue } from "@/view-containers/action";
+
 import { GridCellProps } from "../../builder/types";
 import { useButtonProps } from "./utils";
 
@@ -42,9 +46,27 @@ export function Button(props: GridCellProps) {
         if (!confirmed) return;
       }
       if (!onClick) return;
+
+      let values: Partial<DataRecord> = {};
+
+      async function handleSave() {
+        const fieldNames = Object.keys(values || {});
+
+        if (fieldNames.length) {
+          const _dirty =
+            record._dirty || fieldNames.some((key) => canDirty(key));
+
+          const res = await onUpdate?.({ ...record, ...values, _dirty });
+
+          values = {};
+
+          return res;
+        }
+      }
+
       await commitEditableWidgets();
       await actionExecutor.waitFor();
-      const res = await actionExecutor.execute(onClick, {
+      await actionExecutor.execute(onClick, {
         context: {
           ...processContextValues(record),
           selected: true,
@@ -55,22 +77,20 @@ export function Button(props: GridCellProps) {
             $$id: undefined,
           }),
         },
+        handle: async (result: ActionResult) => {
+          if (result?.values) {
+            values = { ...values, ...result.values };
+          }
+          if (result?.save) {
+            await executeWithoutQueue(handleSave);
+            values = {};
+          }
+          return Promise.resolve();
+        },
       });
-      const values = res?.reduce?.(
-        (obj, { values }) => ({
-          ...obj,
-          ...values,
-        }),
-        {},
-      );
 
-      const fieldNames = Object.keys(values || {});
-
-      if (fieldNames.length) {
-        const _dirty =
-          record._dirty || fieldNames.some((name) => canDirty(name));
-        onUpdate?.({ ...record, ...values, _dirty });
-      }
+      // if any values updates are pending then save to record
+      await handleSave();
     }
   }
 

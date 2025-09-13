@@ -27,9 +27,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 public class MenuItem extends SimpleWidget {
 
-  @XmlAttribute(name = "id")
-  private String xmlId;
-
   @XmlAttribute private String parent;
 
   @XmlAttribute private String icon;
@@ -64,14 +61,6 @@ public class MenuItem extends SimpleWidget {
 
   @XmlAttribute(name = "has-tag")
   private Boolean hasTag;
-
-  public String getXmlId() {
-    return xmlId;
-  }
-
-  public void setXmlId(String xmlId) {
-    this.xmlId = xmlId;
-  }
 
   public String getParent() {
     return parent;

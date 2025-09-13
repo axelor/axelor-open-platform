@@ -155,6 +155,7 @@ public interface AvailableAppSettings {
   String MAIL_SMTP_TIMEOUT = "mail.smtp.timeout";
   String MAIL_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connection-timeout";
   String MAIL_SMTP_FROM = "mail.smtp.from";
+  String MAIL_SMTP_PROPERTIES_PREFIX = "mail.smtp.properties.";
 
   String MAIL_IMAP_HOST = "mail.imap.host";
   String MAIL_IMAP_PORT = "mail.imap.port";
@@ -163,6 +164,7 @@ public interface AvailableAppSettings {
   String MAIL_IMAP_CHANNEL = "mail.imap.channel";
   String MAIL_IMAP_TIMEOUT = "mail.imap.timeout";
   String MAIL_IMAP_CONNECTION_TIMEOUT = "mail.imap.connection-timeout";
+  String MAIL_IMAP_PROPERTIES_PREFIX = "mail.imap.properties.";
 
   String LOGGING_PATH = "logging.path";
   String LOGGING_CONFIG = "logging.config";

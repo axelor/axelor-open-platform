@@ -174,23 +174,30 @@ db.default.url = jdbc:postgresql://localhost:5432/my-database <2>
 db.default.user = username <3>
 db.default.password = secret <4>
 ----
-<1> hbm2ddl option, (update, create, create-drop or validate)
+<1> automatic schema generation option
 <2> the jdbc url to connect to
 <3> user name to be used to connect to the database server
 <4> user password to authenticate the user
 
-If you want to use {url-mysql}[MySQL] use following settings:
+If you want to use {url-mysql}[MySQL], update the JDBC URL : `db.default.url = jdbc:mysql://localhost:3306/my_database`.
 
-[source,properties]
-----
-# Database settings
-# ~~~~~
-# See hibernate documentation for connection parameters
-db.default.ddl = update
-db.default.url = jdbc:mysql://localhost:3306/my_database
-db.default.user = username
-db.default.password = secret
-----
+The `db.default.ddl` configuration property is used to customize the Hibernate database schema generation process, and
+it can take the following values:
+
+- _none_ : Does not perform any schema generation or validation
+- _create_ – Creates the database schema from scratch. This will drop any existing tables and recreate them based on
+the mappings defined in the Hibernate configuration.
+- _create-drop_ – Creates the database schema and drops it when the SessionFactory is closed.
+- _validate_ – Validates the database schema against the mappings defined in the Hibernate configuration.
+This will check that the database schema is in sync with the mappings, but it will not make any changes to the schema.
+- _update_ – Updates the database schema to reflect any changes made to the mappings defined in the Hibernate
+configuration. This will add new tables or columns, but it will not drop any existing tables or columns.
+
+Choose the right option by environment :
+
+- Production: `none` or `validate` for stability.
+- Development: `update` is the go-to for flexibility.
+- Testing: `create` or `create-drop` gives you fresh data every test.
 
 == Other Settings
 
@@ -281,6 +288,7 @@ db.default.password = secret
 | `mail.smtp.timeout` | smtp socket read timeout | 60000
 | `mail.smtp.connection-timeout` | smtp socket connection timeout | 60000
 | `mail.smtp.from` | default from attribute |
+| `mail.smtp.properties.<java-mail-property>` | additional java mail properties |
 | `mail.imap.host` | imap server host |
 | `mail.imap.port` | imap server port |
 | `mail.imap.user` | imap login username |
@@ -288,6 +296,7 @@ db.default.password = secret
 | `mail.imap.channel` | imap encryption channel (starttls or ssl) |
 | `mail.imap.timeout` | imap socket read timeout | 60000
 | `mail.imap.connection-timeout` | imap socket connection timeout | 60000
+| `mail.imap.properties.<java-mail-property>` | additional java mail properties |
 |===
 
 All specified path can use special variables:

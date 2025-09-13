@@ -1,14 +1,13 @@
-import { FunctionComponent, MouseEvent, useCallback, useMemo } from "react";
+import { MouseEvent, useCallback, useMemo } from "react";
 
 import { ClickAwayListener, Divider, Popper } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { SchedulerEvent } from "@/components/scheduler";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataRecord } from "@/services/client/data.types";
 import { moment } from "@/services/client/l10n";
 
-import { useTemplateContext } from "@/hooks/use-parser";
-import { EvalContextOptions } from "@/hooks/use-parser/context";
+import { TemplateRenderer, usePrepareTemplateContext } from "@/hooks/use-parser";
 import { CalendarView } from "@/services/client/meta.types";
 import { MetaData } from "@/services/client/meta";
 
@@ -22,10 +21,7 @@ export type PopoverProps = {
   onEdit?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
   onClose: () => void;
-  Template?: FunctionComponent<{
-    context: DataContext;
-    options?: EvalContextOptions;
-  }>;
+  template?: string;
   fields?: MetaData["fields"];
   onRefresh?: () => Promise<void>;
 };
@@ -38,7 +34,7 @@ export function Popover({
   onEdit,
   onDelete,
   onClose,
-  Template,
+  template,
   fields,
   onRefresh,
 }: PopoverProps) {
@@ -77,7 +73,7 @@ export function Popover({
   const {
     context,
     options: { execute },
-  } = useTemplateContext(record, { view, onRefresh });
+  } = usePrepareTemplateContext(record, { view, onRefresh });
 
   // Close popover after clicking on link or button on template.
   const handleTemplateClick = useCallback(
@@ -118,12 +114,13 @@ export function Popover({
               <div className={styles.icon} />
               <div className={styles.subtitle}>{subtitle}</div>
             </div>
-            {Template && (
+            {template && (
               <div
                 className={styles.template}
                 onClickCapture={handleTemplateClick}
               >
-                <Template
+                <TemplateRenderer
+                  template={template}
                   context={context}
                   options={{
                     execute,

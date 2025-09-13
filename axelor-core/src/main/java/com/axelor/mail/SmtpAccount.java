@@ -109,10 +109,6 @@ public class SmtpAccount implements MailAccount {
     props.setProperty("mail.smtp.connectiontimeout", "" + connectionTimeout);
     props.setProperty("mail.smtp.timeout", "" + timeout);
 
-    if (properties != null) {
-      props.putAll(properties);
-    }
-
     props.setProperty("mail.smtp.host", host);
     props.setProperty("mail.smtp.port", port);
     props.setProperty("mail.smtp.auth", "" + authenticating);
@@ -131,10 +127,6 @@ public class SmtpAccount implements MailAccount {
       }
     }
 
-    if (!authenticating) {
-      return Session.getInstance(props);
-    }
-
     if (MailConstants.CHANNEL_STARTTLS.equalsIgnoreCase(channel)) {
       props.setProperty("mail.smtp.starttls.enable", "true");
     }
@@ -144,14 +136,21 @@ public class SmtpAccount implements MailAccount {
       props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
     }
 
-    final Authenticator authenticator =
-        new Authenticator() {
+    Authenticator authenticator = null;
+    if (authenticating) {
+      authenticator =
+          new Authenticator() {
 
-          @Override
-          protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(user, password);
-          }
-        };
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+              return new PasswordAuthentication(user, password);
+            }
+          };
+    }
+
+    if (properties != null) {
+      props.putAll(properties);
+    }
 
     return Session.getInstance(props, authenticator);
   }

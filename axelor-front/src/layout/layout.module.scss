@@ -52,17 +52,7 @@
   grid-area: sidebar;
   display: flex;
   flex: 0 0 auto;
-  color: var(--ax-theme-shell-sidebar-color);
-  background-color: var(--ax-theme-shell-sidebar-bg);
-  padding: var(--ax-theme-shell-sidebar-padding);
-  border-right: var(--ax-theme-shell-sidebar-border);
-}
-
-[dir="rtl"] {
-  .sidebar {
-    border-right: none;
-    border-left: var(--ax-theme-shell-sidebar-border);
-  }
+  background-color: inherit;
 }
 
 .tabs {

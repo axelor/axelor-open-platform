@@ -13,6 +13,7 @@ import { LoadingCache } from "@/utils/cache";
 import { toKebabCase } from "@/utils/names";
 import { getFieldServerType, getWidget } from "../form/builder/utils";
 import { ViewData } from "@/services/client/meta";
+import { toTopLevelItem } from "@/services/client/meta-utils";
 
 const cache = new LoadingCache<Promise<MenuItem[]>>();
 
@@ -25,7 +26,7 @@ export async function fetchMenus(parent?: string) {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data ?? [] : [];
+      return status === 0 ? (data ?? []) : [];
     }
 
     return [];
@@ -64,7 +65,7 @@ export function prepareSearchFields(fields?: SearchField[]) {
       field.type = "MANY_TO_ONE";
       field.canNew = "false";
       field.canEdit = "false";
-      if(field.multiple) {
+      if (field.multiple) {
         field.type = "ONE_TO_MANY";
         field.widget = "tag-select";
       }
@@ -126,12 +127,11 @@ export function prepareSearchFormMeta<T extends View>(meta: ViewData<T>) {
       type: "form",
       model,
       items: [
-        {
+        toTopLevelItem({
           colSpan: 12,
           name,
           type: "panel",
           title,
-          showFrame: true,
           items: (() => {
             const items = searchFields.map((field) => ({
               ...field,
@@ -140,7 +140,7 @@ export function prepareSearchFormMeta<T extends View>(meta: ViewData<T>) {
             items.forEach(processSearchField);
             return items;
           })(),
-        },
+        }),
       ],
     },
     fields: fields as Record<string, Property>,

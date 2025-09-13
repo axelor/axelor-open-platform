@@ -230,17 +230,12 @@ export function useViewSwitch() {
 }
 
 /**
- * This hook can be used to keep track of view specific state in tab.
+ * This hook can be used to set props of specific view state in tab.
  *
  */
-export function useViewProps() {
+export function useSetViewProps() {
   const tab = useViewTab();
-  const { type, props } = useSelectViewState(
-    useCallback(({ type, props }) => ({ type, props }), []),
-  );
-
-  const state = props?.[type];
-  const setState = useAtomCallback(
+  return useAtomCallback(
     useCallback(
       (get, set, setter: SetStateAction<TabProps>) => {
         const state = get(tab.state);
@@ -262,8 +257,31 @@ export function useViewProps() {
       [tab.state],
     ),
   );
+}
+
+/**
+ * This hook can be used to keep track of view specific state in tab.
+ *
+ */
+export function useViewProps() {
+  const viewState = useSelectViewState(
+    useCallback(({ type, props }) => ({ type, props }), []),
+  );
+
+  const state = viewState.props?.[viewState.type];
+  const setState = useSetViewProps();
 
   return [state, setState] as const;
+}
+
+/**
+ * This hook can be used to keep track of particular view specific state prop in tab.
+ *
+ */
+export function useViewProp<T>(propName: keyof TabProps) {
+  return useSelectViewState(
+    useCallback((state) => state.props?.[state.type]?.[propName], [propName]),
+  ) as T;
 }
 
 export function useViewDirtyAtom() {

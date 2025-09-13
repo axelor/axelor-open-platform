@@ -15,13 +15,11 @@ import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { usePerms } from "@/hooks/use-perms";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { diff, extractDummy } from "@/services/client/data-utils";
-import { parseExpression } from "@/hooks/use-parser/utils";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { SaveOptions } from "@/services/client/data";
@@ -31,12 +29,19 @@ import {
   FormWidgetProviders,
   FormWidgetsHandler,
 } from "@/views/form/builder/form-providers";
-import { Layout, fetchRecord, showErrors, useGetErrors } from "@/views/form";
+import {
+  Layout,
+  fetchRecord,
+  showErrors,
+  useFormPerms,
+  useGetErrors,
+} from "@/views/form";
 import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
 import { useViewConfirmDirty, useViewTab } from "@/view-containers/views/scope";
 import { useGridExpandableContext, useGridContext } from "./scope";
+import { useSingleClickHandler } from "@/hooks/use-button";
 import formStyles from "@/views/form/form.module.scss";
 import styles from "./expandable.module.scss";
 
@@ -88,8 +93,6 @@ export function ExpandableFormView({
   const { selectAtom: selectStateAtom } = useGridExpandableContext();
   const { id: tabId } = useViewTab();
   const setSelectState = useSetAtom(selectStateAtom);
-
-  const { hasButton } = usePerms(meta.view, meta.perms);
 
   const ds = useMemo(
     () => new DataStore(meta.view.model!, {}),
@@ -153,6 +156,11 @@ export function ExpandableFormView({
     useFormHandlers(meta, editorRecord, {
       formAtom: editorAtom,
     });
+
+  const {
+    hasButton,
+    attrs: { readonly: readonlyExclusive },
+  } = useFormPerms(meta.view, meta.perms, { recordHandler });
 
   const formReady = useAtomValue(
     useMemo(() => selectAtom(formAtom, (state) => state.ready), [formAtom]),
@@ -407,6 +415,20 @@ export function ExpandableFormView({
     if (record) doOnLoad(record, { fromAction: true });
   }, [record, doOnLoad]);
 
+  const handleUpdateClick = useSingleClickHandler(
+    useCallback(() => {
+      doSave({
+        shouldClose: isCollection,
+      });
+    }, [doSave, isCollection]),
+  );
+
+  const handleSaveClick = useSingleClickHandler(
+    useCallback(() => {
+      doSave();
+    }, [doSave]),
+  );
+
   useEffect(() => {
     // auto save whenever form is dirty
     if (formDirty && record && isTreeGrid) {
@@ -479,19 +501,6 @@ export function ExpandableFormView({
     }
   }, [formSelect, setSelectState]);
 
-  const [readonlyExclusive, setReadonlyExclusive] = useState(
-    Boolean(schema.readonlyIf),
-  );
-
-  useEffect(() => {
-    const readonlyIf = schema.readonlyIf;
-    if (!readonlyIf) return;
-    return recordHandler.subscribe((rec) => {
-      const value = Boolean(parseExpression(readonlyIf)(rec));
-      setReadonlyExclusive(() => value);
-    });
-  }, [recordHandler, schema.readonlyIf]);
-
   const canSave = hasButton("save");
   const canEdit = hasButton("edit") && !readonlyExclusive;
   const formReadonly = !canEdit || (!edit && readonly);
@@ -558,11 +567,7 @@ export function ExpandableFormView({
                     <Button
                       size="sm"
                       variant="primary"
-                      onClick={() =>
-                        doSave?.({
-                          shouldClose: isCollection,
-                        })
-                      }
+                      onClick={handleUpdateClick}
                     >
                       {i18n.get("Update")}
                     </Button>
@@ -577,9 +582,9 @@ export function ExpandableFormView({
                     <Button
                       size="sm"
                       variant="primary"
-                      onClick={() => {
+                      onClick={(e) => {
                         if (edit) {
-                          doSave?.();
+                          handleSaveClick(e);
                         } else {
                           setEdit(true);
                         }

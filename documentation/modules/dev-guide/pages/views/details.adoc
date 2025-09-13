@@ -1,8 +1,8 @@
-= Master Details
+= Details View
 :toc:
 :toc-title:
 
-The master-details view shows grid and form views side-by-side as single view. It can be defined
+The details view shows grid and form views side-by-side as a single view. It can be defined
 using `action-view` using a view parameter `details-view`.
 
 [source,xml]
@@ -16,8 +16,25 @@ using `action-view` using a view parameter `details-view`.
 ----
 <1> the grid view used by this action
 <2> the form view used by this action
-<3> `details-view` params configures grid view to show details view on right side
-<4> `details-view-mode` params configures how to show details view either as `overlay` (default - in form of popup) or `inline` (it will show side by side to grid)
+<3> `details-view` params configures the grid view to show details view on the right side
+<4> `details-view-mode` params configures how to show details view either as `overlay` (default - in form of popup)
+or `inline` (it will show side by side to grid)
 
-We can also provide alternative form view by specifying view name as `details-view` param value,
-like `<view-param name="details-view" value="another-form-view" />`.
+== Alternative form view
+
+We can also provide alternative form view by specifying view name as `details-view` param value, like:
+
+[source,xml]
+----
+<view-param name="details-view" value="another-form-view" />
+----
+
+== Grid width
+
+When `details-view-mode` is set to `inline`, you can also customize the grid width by adding the `grid-width` param value:
+
+[source,xml]
+----
+<view-param name="details-view-mode" value="inline" />
+<view-param name="grid-width" value="25%" />
+----

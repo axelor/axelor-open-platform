@@ -3,17 +3,23 @@ import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useTemplate } from "@/hooks/use-parser";
+import { TemplateRenderer } from "@/hooks/use-parser";
 import { DataRecord } from "@/services/client/data.types";
 import { custom } from "@/services/client/meta";
 import { CustomView } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+import {
+  useViewContext,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 import { ViewProps } from "../types";
 import { ReportBox } from "./widgets/report-box";
 import { ReportTable } from "./widgets/report-table";
 import styles from "./custom.module.scss";
+
+export const CUSTOM_COMPONENTS = { ReportBox, ReportTable };
 
 export function Custom({ meta }: ViewProps<CustomView>) {
   const { dashlet } = useViewTab();
@@ -45,15 +51,14 @@ export function Custom({ meta }: ViewProps<CustomView>) {
     }
   }, [dashlet, view, onRefresh, setDashletHandlers]);
 
-  const Template = useTemplate(view.template!);
   const options = useMemo(
     () => ({
       components: {
         "report-box": (props: any) => <ReportBox {...props} />,
-        "report-table": (props: any) => <ReportTable {...props} view={view} />,
+        "report-table": (props: any) => <ReportTable {...props} />,
       },
     }),
-    [view]
+    [],
   );
 
   // register tab:refresh
@@ -62,7 +67,11 @@ export function Custom({ meta }: ViewProps<CustomView>) {
   return (
     <Box d="flex" flexGrow={1} className={styles.container}>
       <Box d="flex" className={legacyClassNames(view.css)} flexGrow={1}>
-        <Template context={dataContext} options={options} />
+        <TemplateRenderer
+          template={view.template!}
+          context={dataContext}
+          options={options}
+        />
       </Box>
     </Box>
   );

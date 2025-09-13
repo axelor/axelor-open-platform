@@ -103,6 +103,9 @@ available as `first`.
 
 == Built-in templates
 
+NOTE: React template support for the following templates has been added in version _7.4.3_. If you use a previous
+version, use the legacy templates.
+
 Two template tags are built in:
 
 === report-box
@@ -131,8 +134,10 @@ Example usage:
   <dataset type="rpc">com.axelor.sale.web.SaleOrderController:reportMonthly</dataset>
   <template>
   <![CDATA[
-  <report-box icon='search' label='Total sales' value='first.total'
-    percent='first.percent' up='first.up' tag='first.tag' tag-css='first.tagCss'/>
+  <>
+  <ReportBox icon="search" label="Total sales" value="first.total"
+    percent="first.percent" up="first.up" tag="first.tag" tag-css="first.tagCss"/>
+  </>
   ]]>
   </template>
 </custom>
@@ -164,7 +169,8 @@ image::custom-view-report-box.png[Sample report box]
 
 === report-table
 
-This template renders the dataset as a table. It uses field metadata for formatting and can use any widgets supported on `grid` view. It also supports sorting by columns.
+This template renders the dataset as a table. It uses field metadata for formatting and can use any widgets supported
+on `grid` view. It also supports sorting by columns.
 
 Static attributes:
 
@@ -193,7 +199,9 @@ Example usage:
   </dataset>
   <template>
   <![CDATA[
-  <report-table sums='total'/>
+  <>
+  <ReportTable sums="total"/>
+  </>
   ]]>
   </template>
 </custom>

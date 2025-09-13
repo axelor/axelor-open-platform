@@ -3,6 +3,7 @@ export type Task<T> = () => Promise<T>;
 export class TaskQueue {
   #queue: Task<any>[] = [];
   #running = false;
+  #paused = false;
   #waiting: Promise<void> | undefined;
   #finished: (() => void) | undefined;
 
@@ -28,10 +29,19 @@ export class TaskQueue {
   }
 
   add<T>(task: Task<T>) {
+    if (this.#paused) return task();
     return new Promise<T>((resolve, reject) => {
       this.#queue.push(() => task().then(resolve).catch(reject));
       this.#run();
     });
+  }
+
+  pause() {
+    this.#paused = true;
+  }
+
+  resume() {
+    this.#paused = false;
   }
 
   wait() {

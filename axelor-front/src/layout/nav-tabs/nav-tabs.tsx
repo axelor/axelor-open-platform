@@ -344,9 +344,11 @@ function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
           const state = get(tab.state);
           const isEditable =
             state.type === "form" &&
-            Boolean(state.props?.form?.readonly) === false;
+            state.props?.form?.displayMode === "edit";
           const canAutoReload = !document.hidden && !isEditable;
-          canAutoReload && onRefresh(activeTabId);
+          if (canAutoReload) {
+            onRefresh(activeTabId);
+          }
         }
       },
       [tab?.id, tab?.state, onRefresh],

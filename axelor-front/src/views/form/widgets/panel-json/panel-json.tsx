@@ -3,13 +3,15 @@ import { useMemo } from "react";
 import { Schema } from "@/services/client/meta.types";
 
 import { GridLayout, WidgetProps } from "../../builder";
+import { toTopLevelItem } from "@/services/client/meta-utils";
 
 function processEditor(schema: Schema) {
-  const items = schema.items?.map((item) => ({
-    colSpan: 12,
-    showFrame: true,
-    ...item,
-  }));
+  const items = schema.items?.map((item) =>
+    toTopLevelItem({
+      colSpan: 12,
+      ...item,
+    }),
+  );
 
   return { ...schema, items, layout: undefined, flexbox: undefined };
 }

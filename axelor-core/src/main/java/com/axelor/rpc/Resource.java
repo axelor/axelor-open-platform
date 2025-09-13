@@ -501,8 +501,6 @@ public class Resource<T extends Model> {
 
     final Repository repo = JpaRepository.of(model);
     final List<Object> jsonData = new ArrayList<>();
-    final boolean populate =
-        request.getContext() != null && request.getContext().get("_populate") != Boolean.FALSE;
 
     final JpaSecurity jpaSecurity = security.get();
     for (Object item : data) {
@@ -515,9 +513,7 @@ public class Resource<T extends Model> {
         if (User.class.isAssignableFrom(model)) {
           map.remove("password");
         }
-        if (populate) {
-          item = repo.populate(map, request.getContext());
-        }
+        item = repo.populate(map, request.getContext());
         Translator.applyTranslatables(map, model);
       }
       jsonData.add(item);
@@ -1002,13 +998,16 @@ public class Resource<T extends Model> {
     security.get().check(JpaSecurity.CAN_READ, model, id);
 
     Request request = newRequest(null, id);
-    Response response = new Response();
-    List<Object> data = Lists.newArrayList();
+    final Response response = new Response();
+    final List<Object> data = Lists.newArrayList();
 
     firePreRequestEvent(RequestEvent.READ, request);
 
-    Model entity = JPA.find(model, id);
-    if (entity != null) data.add(entity);
+    final Repository<?> repository = JpaRepository.of(model);
+    final Model entity = repository.find(id);
+    if (entity != null) {
+      data.add(repository.populate(toMap(entity, request), request.getContext()));
+    }
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 

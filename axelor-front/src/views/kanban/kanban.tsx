@@ -6,20 +6,11 @@ import uniq from "lodash/uniq";
 import getValue from "lodash/get";
 import isObject from "lodash/isObject";
 import setValue from "lodash/set";
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useTemplate } from "@/hooks/use-parser";
-import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { isLegacyTemplate } from "@/hooks/use-parser/utils";
 import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
@@ -627,8 +618,6 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return isValidSequence($sequenceBy);
   }, [fields, sequenceBy]);
 
-  const Template = useTemplate(view.template!);
-
   const components = useMemo(
     () => ({
       Card: ({ record }: { record: KanbanRecord }) => (
@@ -637,11 +626,11 @@ export function Kanban(props: ViewProps<KanbanView>) {
           fields={fields}
           record={record}
           onRefresh={onRefresh}
-          Template={Template}
+          template={view.template!}
         />
       ),
     }),
-    [view, fields, Template, onRefresh],
+    [view, fields, onRefresh],
   );
 
   const canNew = hasButton("new");
@@ -725,20 +714,17 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
 function KanbanCard({
   view,
+  template,
   fields,
   record,
   onRefresh,
-  Template,
 }: {
   record: KanbanRecord;
   view: KanbanView;
+  template: string;
   context?: DataContext;
   fields?: MetaData["fields"];
   onRefresh?: () => Promise<any>;
-  Template: FunctionComponent<{
-    context: DataContext;
-    options?: EvalContextOptions;
-  }>;
 }) {
   const { template: templateString } = view;
   const divRef = useRef<any>(null);
@@ -802,7 +788,7 @@ function KanbanCard({
         )}
       >
         <CardTemplate
-          component={Template}
+          template={template}
           view={view}
           fields={fields}
           record={record! as DataRecord}
@@ -824,7 +810,7 @@ function KanbanCard({
             minWidth: 200,
           }}
         >
-          <Panel header={popoverData.title}>
+          <Panel header={popoverData.title} style={{ boxShadow: "none" }}>
             <Box>
               {popoverData.body && (
                 <div

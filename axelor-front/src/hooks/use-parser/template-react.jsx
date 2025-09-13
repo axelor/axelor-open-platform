@@ -32,6 +32,7 @@ import {
 
 import { Icon } from "@/components/icon";
 import { TextLink as Link } from "@/components/text-link";
+import { CUSTOM_COMPONENTS } from "@/views/custom";
 
 import { legacyClassNames } from "@/styles/legacy";
 import { LoadingCache } from "@/utils/cache";
@@ -67,6 +68,7 @@ const COMPONENTS = {
   TableRow,
   Icon,
   legacyClassNames,
+  ...CUSTOM_COMPONENTS,
 };
 
 function createContext(context) {

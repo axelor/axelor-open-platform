@@ -1,30 +1,51 @@
 import { AdornedInput, Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { forwardRef, useEffect } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import { MaskedInput } from "./mask-input";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
-const CHAR_MASK: Record<string, RegExp> = {
-  M: /[0-1]/,
-  H: /[0-2]/,
-  m: /[0-5]/,
-  s: /[0-5]/,
+const CHAR_MASK: Record<string, (RegExp | ((ch: string) => RegExp))[]> = {
+  M: [/[0-1]/, (prev) => (prev === "1" ? /[0-2]/ : /\d/)],
+  D: [/[0-3]/, (prev) => (prev === "3" ? /[0-1]/ : /\d/)],
+  H: [/[0-2]/, (prev) => (prev === "2" ? /[0-4]/ : /\d/)],
+  m: [/[0-5]/],
+  s: [/[0-5]/],
 };
 
-function getMaskFromFormat(str: string) {
-  const mask = [];
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i];
-    if ([" ", "/", ":", "-", "."].includes(ch)) {
-      mask.push(ch);
+const SEPARATORS = new Set([" ", "/", ":", "-", "."]);
+
+function getMaskFromFormat(
+  value: string,
+  format: string,
+  placeholderChar = "_",
+) {
+  const mask: (string | RegExp)[] = [];
+
+  for (let i = 0; i < format.length; i++) {
+    const char = format[i];
+
+    if (SEPARATORS.has(char)) {
+      mask.push(char);
+      continue;
+    }
+
+    const rules = CHAR_MASK[char];
+    if (!rules) {
+      mask.push(/\d/);
+      continue;
+    }
+
+    if (format.indexOf(char) === i) {
+      mask.push(rules[0] as RegExp);
+    } else if (rules.length > 1 && typeof rules[1] === "function") {
+      const prevChar = value[i - 1];
+      mask.push(prevChar !== placeholderChar ? rules[1](prevChar) : /\d/);
     } else {
-      if (CHAR_MASK[ch] && str.indexOf(ch) === i) {
-        mask.push(CHAR_MASK[ch]);
-      } else {
-        mask.push(/\d/);
-      }
+      mask.push(/\d/);
     }
   }
-  return mask;
+
+  return mask as RegExp[];
 }
 
 export const DateInput = forwardRef<any, any>(
@@ -42,9 +63,10 @@ export const DateInput = forwardRef<any, any>(
     ref,
   ) => {
     const { name, eventOnBlur: onBlur, onChange, onFocus } = props;
-
+    const mountRef = useRef(false);
     function handleBlur({ target: { name, value } }: any) {
-      if (open) return;
+      const changed = value !== inputValue;
+      if (open || !changed) return;
       const event = {
         target: { name, value: value?.includes?.("_") ? "" : value },
       };
@@ -57,19 +79,27 @@ export const DateInput = forwardRef<any, any>(
         onOpen(true);
       }
       setTimeout(() => {
-        onKeyDown && onKeyDown(e);
+        onKeyDown?.(e);
       }, 100);
     }
 
     // sync date input with inputValue
-    useEffect(() => {
-      onChange?.({
-        target: {
-          name,
-          value: inputValue,
-        },
-      });
+    useAsyncEffect(async () => {
+      if (mountRef.current) {
+        onChange?.({
+          target: {
+            name,
+            value: inputValue,
+          },
+        });
+      }
+      mountRef.current = true;
     }, [name, inputValue, onChange]);
+
+    const mask = useCallback(
+      (value: string) => getMaskFromFormat(value, format),
+      [format],
+    );
 
     return (
       <AdornedInput
@@ -84,7 +114,7 @@ export const DateInput = forwardRef<any, any>(
         onKeyDown={open ? onKeyDown : handleKeyDown}
         onFocus={onFocus}
         onBlur={handleBlur}
-        mask={getMaskFromFormat(format)}
+        mask={mask}
         ref={ref}
         InputComponent={MaskedInput}
         endAdornment={

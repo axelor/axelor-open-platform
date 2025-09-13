@@ -17,6 +17,7 @@ import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
 import { SearchOptions, SearchPage } from "@/services/client/data";
 import { ActionView, GridView } from "@/services/client/meta.types";
+import { useSingleClickHandler } from "../use-button";
 
 export type SelectorOptions = {
   model: string;
@@ -263,6 +264,8 @@ function Footer({
     onClose(true);
   }, [handler.data, onSelect, onClose]);
 
+  const handleOk = useSingleClickHandler(handleConfirm);
+
   useEffect(() => {
     setHandler((popup) => ({ ...popup, close: handleCancel }));
   }, [setHandler, handleCancel]);
@@ -287,7 +290,7 @@ function Footer({
         <Button variant="secondary" onClick={handleCancel}>
           {i18n.get("Close")}
         </Button>
-        <Button variant="primary" onClick={handleConfirm}>
+        <Button variant="primary" onClick={handleOk}>
           {i18n.get("OK")}
         </Button>
       </Box>

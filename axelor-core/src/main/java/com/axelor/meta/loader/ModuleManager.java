@@ -156,13 +156,17 @@ public class ModuleManager {
   }
 
   private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
-    Beans.get(AuditableRunner.class)
-        .run(
-            () -> {
-              moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
-              moduleList.forEach(m -> viewLoader.doLast(m, update));
-            });
-    viewLoader.terminate(update);
+    viewLoader.initialize();
+    try {
+      Beans.get(AuditableRunner.class)
+          .run(
+              () -> {
+                moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
+                moduleList.forEach(m -> viewLoader.doLast(m, update));
+              });
+    } finally {
+      viewLoader.terminate();
+    }
   }
 
   public boolean isLoadData() {

@@ -40,6 +40,7 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
+import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,11 +57,13 @@ import org.slf4j.LoggerFactory;
 
 public class MailMessageRepository extends JpaRepository<MailMessage> {
 
-  @Inject private MetaFiles files;
+  @Inject private MetaFiles metaFiles;
 
   @Inject private MailService mailService;
 
   @Inject private MetaAttachmentRepository attachmentRepo;
+
+  @Inject private MailFlagsRepository flagsRepo;
 
   private Logger log = LoggerFactory.getLogger(MailMessageRepository.class);
 
@@ -134,7 +137,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
     for (MetaAttachment attachment : attachments) {
       try {
-        files.delete(attachment);
+        metaFiles.delete(attachment);
       } catch (IOException e) {
         throw new PersistenceException(e);
       }
@@ -189,7 +192,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
     // mark root as unread
     if (root != null && AuthUtils.getUser() != null) {
-      Beans.get(MailFlagsRepository.class)
+      flagsRepo
           .all()
           .filter("self.message.id = :mid and self.user.id != :uid")
           .bind("mid", root.getId())
@@ -258,17 +261,15 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
     // Attach files if any
     if (ObjectUtils.notEmpty(files)) {
-      final MetaAttachmentRepository repo = Beans.get(MetaAttachmentRepository.class);
 
       for (MetaFile file : files) {
-
         MetaAttachment attachment = new MetaAttachment();
 
         attachment.setObjectId(message.getId());
         attachment.setObjectName(message.getClass().getName());
         attachment.setMetaFile(file);
 
-        repo.save(attachment);
+        attachmentRepo.save(attachment);
       }
     }
 
@@ -282,8 +283,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     if (message == null || message.getId() == null) {
       return new ArrayList<>();
     }
-    final MetaAttachmentRepository repoAttachments = Beans.get(MetaAttachmentRepository.class);
-    return repoAttachments
+
+    return attachmentRepo
         .all()
         .filter(
             "self.objectId = ? AND self.objectName = ?",
@@ -299,15 +300,12 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     final Map<String, Object> details = Resource.toMap(message, fields);
     final List<Object> files = new ArrayList<>();
 
-    final MailService mailService = Beans.get(MailService.class);
-    final MailFlagsRepository repoFlags = Beans.get(MailFlagsRepository.class);
-
-    final MailFlags flags = repoFlags.findBy(message, AuthUtils.getUser());
+    final MailFlags flags = flagsRepo.findBy(message, AuthUtils.getUser());
     final List<MetaAttachment> attachments = findAttachments(message);
 
     for (MetaAttachment attachment : attachments) {
       final Map<String, Object> fileInfo = Resource.toMapCompact(attachment.getMetaFile());
-      fileInfo.put("fileIcon", Beans.get(MetaFiles.class).fileTypeIcon(attachment.getMetaFile()));
+      fileInfo.put("fileIcon", metaFiles.fileTypeIcon(attachment.getMetaFile()));
       files.add(fileInfo);
     }
 
@@ -320,7 +318,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     if (MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
         || MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)) {
       eventText = I18n.get("added comment");
-      details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
+      details.put("$canDelete", Objects.equal(message.getCreatedBy(), AuthUtils.getUser()));
     }
 
     final MailAddress email = message.getFrom();

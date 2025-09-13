@@ -23,7 +23,12 @@ import { GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
-import { FieldProps, usePermission, usePrepareContext } from "../../builder";
+import { useGridColumnNames } from "@/views/grid/builder/scope";
+import {
+  FieldProps,
+  usePermission,
+  usePrepareWidgetContext,
+} from "../../builder";
 import { nextId } from "../../builder/utils";
 import styles from "./one-to-many.edit.module.scss";
 
@@ -98,7 +103,7 @@ export function OneToManyEdit({
   const parentModel = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
-  const getContext = usePrepareContext(formAtom);
+  const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
   const { focus, domain } = attrs;
@@ -124,6 +129,11 @@ export function OneToManyEdit({
     });
   }, [views, gridView, model]);
 
+  const columnNames = useGridColumnNames({
+    view: meta?.view ?? schema,
+    fields: meta?.fields ?? schema.fields,
+  });
+
   const onSearch = useCallback(
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
@@ -135,8 +145,10 @@ export function OneToManyEdit({
           limit: -1,
           offset: 0,
           sortBy: sortBy?.split?.(","),
+          fields: columnNames,
           filter: {
             ...options?.filter,
+            _archived: true,
             _domain: "self.id in (:_field_ids)",
             _domainContext: {
               _model: model,
@@ -156,7 +168,7 @@ export function OneToManyEdit({
         );
       }
     },
-    [dataStore, model, name, parentId, parentModel, sortBy, value],
+    [dataStore, model, name, parentId, parentModel, sortBy, value, columnNames],
   );
 
   const focusInput = useCallback(() => {
@@ -200,6 +212,9 @@ export function OneToManyEdit({
         record,
         readonly,
         viewName: formView,
+        context: {
+          _parent: getContext(),
+        },
         ...(form && {
           view: { ...form },
         }),
@@ -212,6 +227,7 @@ export function OneToManyEdit({
       model,
       views,
       formView,
+      getContext,
       setValue,
       showEditor,
       isManyToMany,
@@ -341,7 +357,12 @@ export function OneToManyEdit({
         ]}
       />
 
-      <Popper open={popup} target={inputRef.current} placement="bottom-start">
+      <Popper
+        className={styles.popper}
+        open={popup}
+        target={inputRef.current}
+        placement="bottom-start"
+      >
         <Box d="flex">
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box d="flex">

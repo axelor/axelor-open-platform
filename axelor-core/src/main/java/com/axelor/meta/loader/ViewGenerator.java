@@ -71,30 +71,22 @@ public class ViewGenerator {
     }
   }
 
-  private List<Long> findForCompute(Collection<String> names, boolean update) {
-    final boolean namesEmpty = ObjectUtils.isEmpty(names);
+  private List<Long> findForCompute(Collection<String> names) {
     return JPA.em()
         .createQuery(
             "SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                + "((self.name IN :names OR :namesEmpty = TRUE) "
-                + "AND (:update = TRUE OR NOT EXISTS ("
-                + "SELECT computedView FROM MetaView computedView "
-                + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
+                + "self.name IN :names "
                 + "AND COALESCE(self.extension, FALSE) = FALSE "
                 + "AND COALESCE(self.computed, FALSE) = FALSE "
                 + "AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) "
                 + "IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other "
                 + "LEFT JOIN other.groups otherGroup "
                 + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
-                + "GROUP BY other.name, otherGroup) "
-                + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
-                + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE) "
-                + "GROUP BY self "
+                + "GROUP BY other.name, otherGroup.id) "
+                + "GROUP BY self.id "
                 + "ORDER BY self.id",
             Long.class)
-        .setParameter("update", update)
-        .setParameter("names", namesEmpty ? ImmutableSet.of("") : names)
-        .setParameter("namesEmpty", namesEmpty)
+        .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
         .getResultList();
   }
 
@@ -179,21 +171,9 @@ public class ViewGenerator {
     return view;
   }
 
-  public long process(Collection<String> names, boolean update) {
-    final long count = process(findForCompute(names, update));
+  public long process(Collection<String> names) {
+    List<Long> viewsIds = findForCompute(names);
 
-    if (count == 0L && ObjectUtils.notEmpty(names)) {
-      metaViewRepo
-          .all()
-          .filter("self.name IN :names AND self.computed = TRUE")
-          .bind("names", names)
-          .remove();
-    }
-
-    return count;
-  }
-
-  private long process(List<Long> viewsIds) {
     if (ObjectUtils.isEmpty(viewsIds)) {
       return 0L;
     }
@@ -255,6 +235,7 @@ public class ViewGenerator {
     // each of the same size (the final list may be smaller)
     for (List<Long> items : splitList(viewsIds, CHUNK_SIZE)) {
       count += generateComputedView(JPA.findByIds(MetaView.class, items));
+      JPA.flush();
       JPA.clear();
     }
 

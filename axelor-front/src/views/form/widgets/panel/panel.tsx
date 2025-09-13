@@ -8,7 +8,8 @@ import {
   clsx,
 } from "@axelor/ui";
 
-import { MenuItem } from "@/services/client/meta.types";
+import { MenuItem, Schema } from "@/services/client/meta.types";
+import { isTopLevelItem } from "@/services/client/meta-utils";
 
 import {
   FieldLabel,
@@ -21,6 +22,16 @@ import { useFormScope } from "../../builder/scope";
 import { useWidgetAttrsAtomByName } from "../../builder/atoms";
 
 import styles from "./panel.module.scss";
+
+export function usePanelClass(schema: Schema) {
+  return useMemo(
+    () =>
+      clsx(styles.panelBox, {
+        [styles.topLevel]: isTopLevelItem(schema),
+      }),
+    [schema],
+  );
+}
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
@@ -100,6 +111,8 @@ export function Panel(props: WidgetProps) {
     return res;
   }, [actionExecutor, schema.menu?.items]);
 
+  const panelClass = usePanelClass(schema);
+
   const isEmptyPanel =
     schema.items?.length === 1 &&
     schema.items?.every(
@@ -131,7 +144,7 @@ export function Panel(props: WidgetProps) {
       collapsible={hasHeader && canCollapse}
       collapsed={collapseIf && collapsed == null ? true : collapsed}
       setCollapsed={toggleCollapse}
-      className={clsx(styles.panel, {
+      className={clsx(styles.panel, panelClass, {
         [styles.noFrame]: showFrame === false,
         [styles.hasHeader]: hasHeader,
         [styles.hasFrame]: showFrame === true,

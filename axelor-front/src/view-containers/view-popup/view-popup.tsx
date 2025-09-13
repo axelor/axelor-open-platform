@@ -13,6 +13,7 @@ import {
   dialogs,
 } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
+import { useSingleClickHandler } from "@/hooks/use-button";
 import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -290,11 +291,13 @@ function Footer({
         });
       }
       handleClose(rec);
-    } catch (e) {
+    } catch {
       // TODO: show error
     }
   }, [handleClose, handler]);
-  
+
+  const handleOk = useSingleClickHandler(handleConfirm);
+
   useEffect(() => {
     setHandler((popup) => ({ ...popup, close: handleCancel }));
   }, [handleCancel, setHandler]);
@@ -315,7 +318,7 @@ function Footer({
         {i18n.get("Close")}
       </Button>
       {popupCanSave && (
-        <Button variant="primary" onClick={handleConfirm}>
+        <Button variant="primary" onClick={handleOk}>
           {i18n.get("OK")}
         </Button>
       )}

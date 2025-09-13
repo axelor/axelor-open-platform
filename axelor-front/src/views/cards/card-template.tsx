@@ -1,22 +1,18 @@
-import { FunctionComponent } from "react";
+import { useMemo } from "react";
 
-import { useTemplateContext } from "@/hooks/use-parser";
-import { EvalContextOptions } from "@/hooks/use-parser/context";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { TemplateRenderer, usePrepareTemplateContext } from "@/hooks/use-parser";
+import { DataRecord } from "@/services/client/data.types";
 import { MetaData } from "@/services/client/meta";
 import { CardsView, KanbanView } from "@/services/client/meta.types";
 
 export function CardTemplate({
-  component: TemplateComponent,
+  template,
   record,
   view,
   fields,
   onRefresh,
 }: {
-  component: FunctionComponent<{
-    context: DataContext;
-    options?: EvalContextOptions;
-  }>;
+  template: string;
   view: CardsView | KanbanView;
   record: DataRecord;
   fields?: MetaData["fields"];
@@ -25,15 +21,11 @@ export function CardTemplate({
   const {
     context,
     options: { execute },
-  } = useTemplateContext(record, { view, onRefresh });
+  } = usePrepareTemplateContext(record, { view, onRefresh });
+
+  const options = useMemo(() => ({ execute, fields }), [execute, fields]);
 
   return (
-    <TemplateComponent
-      context={context}
-      options={{
-        execute,
-        fields,
-      }}
-    />
+    <TemplateRenderer template={template} context={context} options={options} />
   );
 }

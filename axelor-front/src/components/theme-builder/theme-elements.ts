@@ -424,41 +424,6 @@ export const elements: ThemeElement[] = [
         ],
       },
       {
-        name: "Sidebar",
-        props: [
-          {
-            name: "Color",
-            path: "components.Shell.sidebar.color",
-            type: "color",
-          },
-          {
-            name: "Background",
-            path: "components.Shell.sidebar.bg",
-            type: "color",
-          },
-          {
-            name: "Padding",
-            path: "components.Shell.sidebar.padding",
-            cssProperty: "padding",
-          },
-          {
-            name: "Border width",
-            path: "components.Shell.sidebar.border.width",
-            cssProperty: "border-width",
-          },
-          {
-            name: "Border color",
-            path: "components.Shell.sidebar.border.color",
-            type: "color",
-          },
-          {
-            name: "Border style",
-            path: "components.Shell.sidebar.border.style",
-            cssProperty: "border-style",
-          },
-        ],
-      },
-      {
         name: "View toolbar",
         props: [
           {
@@ -470,6 +435,11 @@ export const elements: ThemeElement[] = [
             name: "Background",
             path: "components.Shell.view.toolbar.bg",
             type: "color",
+          },
+          {
+            name: "Gap",
+            path: "components.Shell.view.toolbar.gap",
+            cssProperty: "gap",
           },
           {
             name: "Padding",
@@ -1290,10 +1260,35 @@ export const elements: ThemeElement[] = [
         name: "Menu",
         props: [
           {
+            name: "Color",
+            path: "components.NavMenu.color",
+            type: "color",
+          },
+          {
             name: "Background",
             path: "components.NavMenu.bg",
             type: "color",
           },
+          {
+            name: "Width",
+            path: "components.NavMenu.width",
+            cssProperty: "width",
+          },
+          {
+            name: "Border right",
+            path: "components.NavMenu.borderRight",
+            cssProperty: "border",
+          },
+          {
+            name: "Margin",
+            path: "components.NavMenu.margin",
+            cssProperty: "margin",
+          },
+        ],
+      },
+      {
+        name: "Hover menu",
+        props: [
           {
             name: "Border width",
             path: "components.NavMenu.border.width",
@@ -1310,14 +1305,14 @@ export const elements: ThemeElement[] = [
             type: "color",
           },
           {
+            name: "Border radius",
+            path: "components.NavMenu.border.radius",
+            cssProperty: "border-radius",
+          },
+          {
             name: "Shadow",
             path: "components.NavMenu.shadow",
             cssProperty: "box-shadow",
-          },
-          {
-            name: "Width",
-            path: "components.NavMenu.width",
-            cssProperty: "width",
           },
           {
             name: "zIndex",
@@ -1338,6 +1333,11 @@ export const elements: ThemeElement[] = [
             name: "Background",
             path: "components.NavMenu.header.bg",
             type: "color",
+          },
+          {
+            name: "Padding",
+            path: "components.NavMenu.header.padding",
+            cssProperty: "padding",
           },
         ],
       },
@@ -1395,7 +1395,7 @@ export const elements: ThemeElement[] = [
         name: "Item",
         props: [
           {
-            name: "Radius",
+            name: "Border radius",
             path: "components.NavMenu.item.border.radius",
             cssProperty: "border-radius",
           },

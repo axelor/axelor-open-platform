@@ -253,7 +253,7 @@ export const contextAtom = atom(
     actionView?: ActionView,
   ): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
-      const { meta, model, record, context: _context, parent } = get(formAtom);
+      const { meta, model, record, context: _context, statesByName, parent } = get(formAtom);
 
       let context: DataContext = {
         ..._context,
@@ -261,6 +261,18 @@ export const contextAtom = atom(
         ...record,
         _model: model,
       };
+
+      // set selected flag for o2m/m2m fields
+      for (const name in statesByName) {
+        const { selected } = statesByName[name];
+        if (selected && Array.isArray(context[name])) {
+          context[name] = context[name].map((value: DataRecord) =>
+            value.id && selected.includes(value.id)
+              ? { ...value, selected: true }
+              : value,
+          );
+        }
+      }
 
       const { view } = meta;
       const json = view.json ?? false;
@@ -278,8 +290,8 @@ export const contextAtom = atom(
       })();
 
       context = {
-        ...processContextValues(context, meta),
         ...createContextParams(ctxView, ctxAction),
+        ...processContextValues(context, meta),
       };
 
       if (parent) {

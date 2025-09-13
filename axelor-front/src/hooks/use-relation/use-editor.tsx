@@ -20,6 +20,7 @@ import { showErrors } from "@/views/form";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
 import { initTab } from "../use-tabs";
+import { useSingleClickHandler } from "../use-button";
 
 export type EditorOptions = {
   model: string;
@@ -240,6 +241,8 @@ function Footer({
     ),
   );
 
+  const handleOk = useSingleClickHandler(handleConfirm);
+
   useEffect(() => {
     setHandler((popup) => ({ ...popup, close: handleClose }));
   }, [setHandler, handleClose]);
@@ -268,7 +271,7 @@ function Footer({
             {i18n.get("Close")}
           </Button>
           {hasOk && popupCanSave && (
-            <Button variant="primary" onClick={handleConfirm}>
+            <Button variant="primary" onClick={handleOk}>
               {i18n.get("OK")}
             </Button>
           )}

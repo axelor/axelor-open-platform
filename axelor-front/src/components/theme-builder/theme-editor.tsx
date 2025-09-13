@@ -44,6 +44,7 @@ interface ThemeDesignerProps {
 
 const cssPropertyExamples: Record<string, string> = {
   padding: "ex: 4px 8px, 0.25rem 0.5rem",
+  margin: "ex: 4px 8px, 0.25rem 0.5rem",
   gap: "ex: 16px, 1rem",
   height: "ex: 100px, 100%",
   width: "ex: 100px, 100%",
@@ -53,6 +54,7 @@ const cssPropertyExamples: Record<string, string> = {
   "box-shadow": "ex: 0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
   "row-gap": "ex: 1rem, 16px",
   "column-gap": "ex: 1rem, 16px",
+  "border": "ex: 1px solid #eee",
   "border-width": "ex: 1px, 0.625rem",
   "border-style": "ex: solid, dashed, dotted",
   "border-radius": "ex: 6px, 0.375rem, 15%",

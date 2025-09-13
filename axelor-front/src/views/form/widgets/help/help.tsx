@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { ReactNode, useMemo } from "react";
 
-import { useTemplate } from "@/hooks/use-parser";
+import { TemplateRenderer } from "@/hooks/use-parser";
 import { session } from "@/services/client/session";
 import { Alert } from "@axelor/ui";
 
@@ -25,7 +25,10 @@ export function HelpComponent({
     }
 
     if (css) {
-      if (session?.info?.application?.mode != "prod" && css.includes("alert-")) {
+      if (
+        session?.info?.application?.mode != "prod" &&
+        css.includes("alert-")
+      ) {
         console.warn(
           'Help widget `css` property is deprecated, use `variant` ("success" | "danger" | "warning" | "info") instead',
         );
@@ -52,10 +55,9 @@ export function Help(props: WidgetProps) {
   const { text, css, variant } = schema;
   const { record } = useAtomValue(formAtom);
 
-  const Template = useTemplate(text);
   return (
     <HelpComponent
-      text={<Template context={record} />}
+      text={<TemplateRenderer context={record} template={text} />}
       css={css}
       variant={variant as any}
     />

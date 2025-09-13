@@ -67,7 +67,7 @@ export function useGridColumnNames({
   return useMemo(
     () =>
       uniq(
-        [...view.items!, ...(parseOrderBy(view.orderBy) ?? [])].reduce(
+        [...(view.items ?? []), ...(parseOrderBy(view.orderBy) ?? [])].reduce(
           (names, item) => {
             const field = fields?.[item.name!];
             if ((item as JsonField).jsonField) {

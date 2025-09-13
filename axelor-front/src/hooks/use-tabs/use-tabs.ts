@@ -51,8 +51,16 @@ export type TabProps = {
   canNew?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  /**
+   * Indicates if requesting to open the view in readonly or in edit mode. This 
+   * doesn't mean that the views will be displayed in the desired mode; it also 
+   * depends on action params / perms / ...
+   */
   readonly?: boolean;
-  recordId?: boolean;
+  /**
+   * For form views, whatever if the view is in read or edit mode.
+   */
+  displayMode?: "read" | "edit";
   showSingle?: boolean;
   dataStore?: DataStore;
   gridState?: GridState;

@@ -23,8 +23,19 @@
   },
   "components": {
     "Shell": {
-      "sidebar": {
-        "bg": "#F8F8FF"
+      "view": {
+        "toolbar": {
+          "gap": "0.25rem",
+          "padding": "0.25rem",
+          "border": {
+            "color": "var(--bs-border-color)",
+            "style": "solid",
+            "width": "1px"
+          }
+        },
+        "content": {
+          "padding": "0"
+        }
       }
     },
     "Panel": {
@@ -54,10 +65,17 @@
       }
     },
     "NavMenu": {
+      "bg": "#F8F8FF",
+      "border": {
+        "radius": "1rem"
+      },
       "item": {
         "border": {
           "radius": "1rem"
         }
+      },
+      "header": {
+        "padding": "0.5rem"
       },
       "item_hover": {
         "bg": "var(--bs-primary-bg-subtle)"
@@ -74,6 +92,9 @@
       },
       "icon_active": {
         "color": "white"
+      },
+      "buttons": {
+        "bg": "transparent"
       }
     },
     "NavTabs": {
