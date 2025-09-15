@@ -5,6 +5,20 @@ buildscript {
   }
 }
 
+def getHeaderFile = { Project p, String style ->
+    def fileName = style == null ? "header.txt" : "header-${style}.txt"
+    def paths = [
+        "src/license", ".", p.getRootDir().getPath() + "/gradle/license", p.getRootDir().getPath()
+    ]
+    for (def path : paths) {
+        final File file = p.file(path + "/" + fileName);
+        if (file.exists()) {
+            return file;
+        }
+    }
+    return null
+}
+
 /////
 // Root project (including buildSrc)
 /////
@@ -20,6 +34,7 @@ spotless {
       include 'buildSrc/src/*/java/**/*.java'
     }
     googleJavaFormat()
+    licenseHeaderFile(getHeaderFile(project, null))
   }
   format 'misc', {
     target fileTree(projectDir) {
@@ -55,8 +70,25 @@ configure(subprojects - project(':axelor-front')) { p ->
         include 'src/*/java/**/*.java'
       }
       googleJavaFormat()
+      licenseHeaderFile(getHeaderFile(project, null))
     }
-    format 'misc', {
+    format("javaInfoFiles") {
+        // separate extension due to https://github.com/diffplug/spotless/issues/532
+        target fileTree(p.projectDir) {
+            include 'src/*/java/**/module-info.java'
+            include 'src/*/java/**/package-info.java'
+        }
+
+        licenseHeaderFile(getHeaderFile(project, null), "(package|import|module|@|/\\*\\*)")
+      }
+    format('xsd') {
+        target fileTree(p.projectDir) {
+            include 'src/**/*.xsd'
+        }
+        licenseHeaderFile(getHeaderFile(project, "xml"), "<((!DOCTYPE)|[A-Za-z]+)")
+            .skipLinesMatching("^<\\?xml.*\\?>\$")
+    }
+    format('misc') {
       target fileTree(p.projectDir) {
         include '*.gradle'
         include 'src/**/*.html'
@@ -88,9 +120,6 @@ configure([rootProject] + (subprojects - project(':axelor-front'))) {
   tasks.register('formatCode') {
     description = "Add license and format code."
     group = "Axelor"
-    if (tasks.findByName('licenseFormat')) {
-      dependsOn 'licenseFormat'
-    }
     dependsOn'spotlessApply'
   }
 }

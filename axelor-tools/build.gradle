@@ -5,7 +5,6 @@ apply plugin: 'java-library'
 dependencies {
   implementation project(':axelor-common')
   implementation libs.guava
-  implementation libs.plugin_license
   implementation libs.commons_csv
   implementation libs.snakeyaml
   implementation libs.jakarta_jaxb

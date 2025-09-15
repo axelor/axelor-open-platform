@@ -372,15 +372,6 @@ libs.jsoup = "org.jsoup:jsoup:1.21.2"
 // StringTemplate
 libs.ST4 = "org.antlr:ST4:4.3.4"
 
-// gradle plugins
-libs.plugin_license = [
-    dependencies.create("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1") {
-        exclude group: "com.mycila.xmltool", module: "xmltool"
-    },
-    // Relocated artifact and use latest
-    "com.mycila:mycila-xmltool:4.4.ga"
-]
-
 // jakarta EL API and impl
 libs.tomcat_jakarta_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcat}"
 // embeded tomcat

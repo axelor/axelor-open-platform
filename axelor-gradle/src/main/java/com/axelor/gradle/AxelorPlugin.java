@@ -22,7 +22,6 @@ import com.axelor.gradle.support.DuplicatedClassSupport;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
-import com.axelor.gradle.support.LicenseSupport;
 import com.axelor.gradle.support.PublishSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
@@ -60,7 +59,6 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project.getPlugins().apply(JavaSupport.class);
     project.getPlugins().apply(PublishSupport.class);
-    project.getPlugins().apply(LicenseSupport.class);
     project.getPlugins().apply(DuplicatedClassSupport.class);
 
     if (project.getPlugins().hasPlugin(EclipsePlugin.class)) {

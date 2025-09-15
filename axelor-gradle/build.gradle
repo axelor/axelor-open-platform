@@ -24,7 +24,6 @@ dependencies {
 
   implementation libs.guava
   implementation libs.commons_csv
-  implementation libs.plugin_license
   implementation libs.jakarta_annotation
   implementation libs.caffeine
 

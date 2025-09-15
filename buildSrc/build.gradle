@@ -24,7 +24,6 @@ dependencies {
   implementation libs.asm
   implementation libs.commons_csv
   implementation libs.apache_tika_core
-  implementation libs.plugin_license
   implementation libs.snakeyaml
   implementation libs.jakarta_jaxb
   implementation libs.eclipselink_moxy
