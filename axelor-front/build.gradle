@@ -23,7 +23,6 @@ tasks.register("buildFront", PnpmTask) {
     outputs.dir('dist')
     inputs.files('package.json', 'pnpm-lock.yaml')
     inputs.dir('src')
-    inputs.dir('public')
 
     dependsOn 'installFrontDeps'
     args = ["run", "build"]

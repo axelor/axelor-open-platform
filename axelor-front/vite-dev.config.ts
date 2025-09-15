@@ -34,8 +34,7 @@ const proxyAll: ProxyOptions = {
       req.url.startsWith(base + "@id/") ||
       req.url.startsWith(base + "@vite/") ||
       req.url.startsWith(base + "node_modules/") ||
-      /\/theme\/([^.]+)\.json/.test(req.url) ||
-      req.url.startsWith(base + "js/libs/monaco-editor/vs/")
+      /\/theme\/([^.]+)\.json/.test(req.url)
     ) {
       return req.url;
     }

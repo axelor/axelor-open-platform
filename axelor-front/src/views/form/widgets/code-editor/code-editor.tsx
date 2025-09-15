@@ -8,7 +8,12 @@ import { useAppSettings } from "@/hooks/use-app-settings";
 
 import styles from "./code-editor.module.scss";
 
-loader.config({ paths: { vs: "js/libs/monaco-editor/vs" } });
+const monacoPath = import.meta.env.MONACO_PATH;
+
+if (monacoPath) {
+  const baseUrl = location.origin + location.pathname.replace(/\/$/, "");
+  loader.config({ paths: { vs: `${baseUrl}/${monacoPath}` } });
+}
 
 export function CodeEditorComponent(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;
