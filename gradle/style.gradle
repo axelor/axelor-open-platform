@@ -48,7 +48,11 @@ spotless {
     endWithNewline()
   }
   format 'markdown', {
-    target '**/*.md'
+    target fileTree(projectDir) {
+        include '*.md'
+        include 'changelogs/*.md'
+        include 'documentation/*.md'
+    }
     leadingTabsToSpaces(2)
     endWithNewline()
   }
