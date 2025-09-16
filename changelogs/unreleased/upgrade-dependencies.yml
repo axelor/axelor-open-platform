@@ -5,7 +5,7 @@ description: |
   Here is the list of backend dependencies upgraded :
 
   * Upgrade to Guice 7 (Jakarta EE 9)
-  * Upgrade Hibernate from 5.6.x to 6.6.27.Final
+  * Upgrade Hibernate from 5.6.x to 6.6.29.Final
   * Upgrade BIRT from 4.4.2 to 4.20.0
 
   Many of your reports will likely have rendering changes or may even be broken due to numerous emitter improvements/changes in BIRT.
