@@ -92,7 +92,7 @@ libs.graal_js = [
 ]
 
 // jakarta libs
-libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2"
+libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
 libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:6.0.0"
 libs.jakarta_mail = [
 	"org.eclipse.angus:jakarta.mail:2.0.4",
