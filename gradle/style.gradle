@@ -36,11 +36,17 @@ spotless {
     googleJavaFormat()
     licenseHeaderFile(getHeaderFile(project, null))
   }
+  groovyGradle {
+    target fileTree(projectDir) {
+        include '*.gradle'
+        include 'gradle/*.gradle'
+    }
+    greclipse()
+  }
   format 'misc', {
     target fileTree(projectDir) {
       include '.gitignore'
-      include '*.gradle'
-      include 'gradle/*.gradle'
+
       include 'documentation/*.yml'
     }
     leadingTabsToSpaces(2)
@@ -76,6 +82,13 @@ configure(subprojects - project(':axelor-front')) { p ->
       googleJavaFormat()
       licenseHeaderFile(getHeaderFile(project, null))
     }
+    groovyGradle {
+        target fileTree(projectDir) {
+            include '*.gradle'
+            include 'gradle/*.gradle'
+        }
+        greclipse()
+    }
     format("javaInfoFiles") {
         // separate extension due to https://github.com/diffplug/spotless/issues/532
         target fileTree(p.projectDir) {
@@ -94,7 +107,6 @@ configure(subprojects - project(':axelor-front')) { p ->
     }
     format('misc') {
       target fileTree(p.projectDir) {
-        include '*.gradle'
         include 'src/**/*.html'
         include 'src/**/*.js'
         include 'src/**/*.css'
