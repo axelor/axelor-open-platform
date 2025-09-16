@@ -1,8 +1,8 @@
 buildscript {
-  repositories repos
-  dependencies {
-    classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:1.3.1")
-  }
+	repositories repos
+	dependencies {
+		classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:1.3.1")
+	}
 }
 
 description = 'Gradle plugin for integrating Axelor'
@@ -10,54 +10,54 @@ description = 'Gradle plugin for integrating Axelor'
 apply plugin: 'com.gradle.plugin-publish'
 
 configurations {
-  tomcat
-  tomcat.transitive = false
-  provided
-  provided.transitive = false
-  database
-  database.transitive = false
+	tomcat
+	tomcat.transitive = false
+	provided
+	provided.transitive = false
+	database
+	database.transitive = false
 }
 
 dependencies {
-  implementation project(':axelor-common')
-  implementation project(':axelor-tools')
+	implementation project(':axelor-common')
+	implementation project(':axelor-tools')
 
-  implementation libs.guava
-  implementation libs.commons_csv
-  implementation libs.jakarta_annotation
-  implementation libs.caffeine
+	implementation libs.guava
+	implementation libs.commons_csv
+	implementation libs.jakarta_annotation
+	implementation libs.caffeine
 
-  tomcat project(":axelor-tomcat")
+	tomcat project(":axelor-tomcat")
 
-  provided libs.jakarta_servlet
+	provided libs.jakarta_servlet
 }
 
 gradlePlugin {
-  website = "https://github.com/axelor/axelor-open-platform"
-  vcsUrl = "https://github.com/axelor/axelor-open-platform.git"
-  plugins {
-    axelorPlugin {
-      id = "com.axelor.app"
-      implementationClass = "com.axelor.gradle.AxelorPlugin"
-      displayName = "Axelor Gradle plugin"
-      description = "Gradle plugin for integrating Axelor"
-      tags.addAll('axelor', 'java', 'platform')
-    }
-  }
+	website = "https://github.com/axelor/axelor-open-platform"
+	vcsUrl = "https://github.com/axelor/axelor-open-platform.git"
+	plugins {
+		axelorPlugin {
+			id = "com.axelor.app"
+			implementationClass = "com.axelor.gradle.AxelorPlugin"
+			displayName = "Axelor Gradle plugin"
+			description = "Gradle plugin for integrating Axelor"
+			tags.addAll('axelor', 'java', 'platform')
+		}
+	}
 }
 
 def generateLibsList(config) {
-  def outDir = project.layout.buildDirectory.dir("resources/main/com/axelor/gradle").get().asFile
-  def outFile = new File(outDir, "${config}-libs.txt")
-  outDir.mkdirs()
-  outFile.text = ""
-  configurations.getByName(config).dependencies.each {
-    outFile << "${it.group}:${it.name}:${it.version}\n"
-  }
+	def outDir = project.layout.buildDirectory.dir("resources/main/com/axelor/gradle").get().asFile
+	def outFile = new File(outDir, "${config}-libs.txt")
+	outDir.mkdirs()
+	outFile.text = ""
+	configurations.getByName(config).dependencies.each {
+		outFile << "${it.group}:${it.name}:${it.version}\n"
+	}
 }
 
 classes.doLast {
-  generateLibsList "tomcat"
-  generateLibsList "database"
-  generateLibsList "provided"
+	generateLibsList "tomcat"
+	generateLibsList "database"
+	generateLibsList "provided"
 }

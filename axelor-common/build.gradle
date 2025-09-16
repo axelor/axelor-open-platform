@@ -3,26 +3,26 @@ description = 'Axelor\'s common APIs'
 apply plugin: 'java'
 
 dependencies {
-  implementation libs.guava
-  implementation libs.asm
-  implementation libs.commons_csv
-  implementation libs.apache_tika_core
-  implementation libs.snakeyaml
-  implementation libs.jakarta_annotation
+	implementation libs.guava
+	implementation libs.asm
+	implementation libs.commons_csv
+	implementation libs.apache_tika_core
+	implementation libs.snakeyaml
+	implementation libs.jakarta_annotation
 }
 
 configurations {
-  runtime.exclude module: 'jsr305'
+	runtime.exclude module: 'jsr305'
 }
 
 void writeManifest(File dir, boolean force) {
-  if (force || dir.exists()) {
-    jar.manifest.writeTo(file("${dir}/META-INF/MANIFEST.MF"))
-  }
+	if (force || dir.exists()) {
+		jar.manifest.writeTo(file("${dir}/META-INF/MANIFEST.MF"))
+	}
 }
 
 afterEvaluate {
-  writeManifest(project.layout.buildDirectory.dir("resources/main").get().asFile, true)
-  writeManifest(file("${projectDir}/bin/main"), false) // to eclipse output dir
-  writeManifest(file("${projectDir}/out/production/resources"), false) // to intellij output dir
+	writeManifest(project.layout.buildDirectory.dir("resources/main").get().asFile, true)
+	writeManifest(file("${projectDir}/bin/main"), false) // to eclipse output dir
+	writeManifest(file("${projectDir}/out/production/resources"), false) // to intellij output dir
 }

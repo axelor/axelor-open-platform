@@ -3,6 +3,6 @@ description = 'Support for running Axelor in embedded Tomcat server'
 apply plugin: 'java'
 
 dependencies {
-  implementation libs.commons_cli
-  implementation libs.tomcat_embed
+	implementation libs.commons_cli
+	implementation libs.tomcat_embed
 }

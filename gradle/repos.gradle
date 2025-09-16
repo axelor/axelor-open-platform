@@ -1,20 +1,19 @@
 def repos = {
-  mavenCentral() {
-    content {
-      excludeGroup 'com.axelor'
-    }
-  }
-  maven {
-    url = 'https://plugins.gradle.org/m2/'
-    content {
-      excludeGroup 'com.axelor'
-    }
-  }
+	mavenCentral() {
+		content {
+			excludeGroup 'com.axelor'
+		}
+	}
+	maven {
+		url = 'https://plugins.gradle.org/m2/'
+		content {
+			excludeGroup 'com.axelor'
+		}
+	}
 
-  maven {
-    url = 'https://repository.axelor.com/nexus/repository/maven-public/'
-  }
-
+	maven {
+		url = 'https://repository.axelor.com/nexus/repository/maven-public/'
+	}
 }
 
 ext.repos = repos
@@ -23,6 +22,6 @@ repositories repos
 buildscript.repositories repos
 
 allprojects {
-  repositories repos
-  buildscript.repositories repos
+	repositories repos
+	buildscript.repositories repos
 }

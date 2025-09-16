@@ -1,22 +1,25 @@
 buildscript {
-  repositories repos
-  dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:7.2.1"
-  }
+	repositories repos
+	dependencies {
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:7.2.1"
+	}
 }
 
 def getHeaderFile = { Project p, String style ->
-    def fileName = style == null ? "header.txt" : "header-${style}.txt"
-    def paths = [
-        "src/license", ".", p.getRootDir().getPath() + "/gradle/license", p.getRootDir().getPath()
-    ]
-    for (def path : paths) {
-        final File file = p.file(path + "/" + fileName);
-        if (file.exists()) {
-            return file;
-        }
-    }
-    return null
+	def fileName = style == null ? "header.txt" : "header-${style}.txt"
+	def paths = [
+		"src/license",
+		".",
+		p.getRootDir().getPath() + "/gradle/license",
+		p.getRootDir().getPath()
+	]
+	for (def path : paths) {
+		final File file = p.file(path + "/" + fileName);
+		if (file.exists()) {
+			return file;
+		}
+	}
+	return null
 }
 
 /////
@@ -26,42 +29,42 @@ def getHeaderFile = { Project p, String style ->
 apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
 spotless {
-  enforceCheck = false
+	enforceCheck = false
 
-  java {
-    target fileTree(projectDir) {
-      // buildSrc java files
-      include 'buildSrc/src/*/java/**/*.java'
-    }
-    googleJavaFormat()
-    licenseHeaderFile(getHeaderFile(project, null))
-  }
-  groovyGradle {
-    target fileTree(projectDir) {
-        include '*.gradle'
-        include 'gradle/*.gradle'
-    }
-    greclipse()
-  }
-  format 'misc', {
-    target fileTree(projectDir) {
-      include '.gitignore'
+	java {
+		target fileTree(projectDir) {
+			// buildSrc java files
+			include 'buildSrc/src/*/java/**/*.java'
+		}
+		googleJavaFormat()
+		licenseHeaderFile(getHeaderFile(project, null))
+	}
+	groovyGradle {
+		target fileTree(projectDir) {
+			include '*.gradle'
+			include 'gradle/*.gradle'
+		}
+		greclipse()
+	}
+	format 'misc', {
+		target fileTree(projectDir) {
+			include '.gitignore'
 
-      include 'documentation/*.yml'
-    }
-    leadingTabsToSpaces(2)
-    trimTrailingWhitespace()
-    endWithNewline()
-  }
-  format 'markdown', {
-    target fileTree(projectDir) {
-        include '*.md'
-        include 'changelogs/*.md'
-        include 'documentation/*.md'
-    }
-    leadingTabsToSpaces(2)
-    endWithNewline()
-  }
+			include 'documentation/*.yml'
+		}
+		leadingTabsToSpaces(2)
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'markdown', {
+		target fileTree(projectDir) {
+			include '*.md'
+			include 'changelogs/*.md'
+			include 'documentation/*.md'
+		}
+		leadingTabsToSpaces(2)
+		endWithNewline()
+	}
 }
 
 /////
@@ -70,61 +73,60 @@ spotless {
 
 configure(subprojects - project(':axelor-front')) { p ->
 
-  apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
+	apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
-  spotless {
-    enforceCheck = false
+	spotless {
+		enforceCheck = false
 
-    java {
-      target fileTree(p.projectDir) {
-        include 'src/*/java/**/*.java'
-      }
-      googleJavaFormat()
-      licenseHeaderFile(getHeaderFile(project, null))
-    }
-    groovyGradle {
-        target fileTree(projectDir) {
-            include '*.gradle'
-            include 'gradle/*.gradle'
-        }
-        greclipse()
-    }
-    format("javaInfoFiles") {
-        // separate extension due to https://github.com/diffplug/spotless/issues/532
-        target fileTree(p.projectDir) {
-            include 'src/*/java/**/module-info.java'
-            include 'src/*/java/**/package-info.java'
-        }
+		java {
+			target fileTree(p.projectDir) {
+				include 'src/*/java/**/*.java'
+			}
+			googleJavaFormat()
+			licenseHeaderFile(getHeaderFile(project, null))
+		}
+		groovyGradle {
+			target fileTree(projectDir) {
+				include '*.gradle'
+				include 'gradle/*.gradle'
+			}
+			greclipse()
+		}
+		format("javaInfoFiles") {
+			// separate extension due to https://github.com/diffplug/spotless/issues/532
+			target fileTree(p.projectDir) {
+				include 'src/*/java/**/module-info.java'
+				include 'src/*/java/**/package-info.java'
+			}
 
-        licenseHeaderFile(getHeaderFile(project, null), "(package|import|module|@|/\\*\\*)")
-      }
-    format('xsd') {
-        target fileTree(p.projectDir) {
-            include 'src/**/*.xsd'
-        }
-        licenseHeaderFile(getHeaderFile(project, "xml"), "<((!DOCTYPE)|[A-Za-z]+)")
-            .skipLinesMatching("^<\\?xml.*\\?>\$")
-    }
-    format('misc') {
-      target fileTree(p.projectDir) {
-        include 'src/**/*.html'
-        include 'src/**/*.js'
-        include 'src/**/*.css'
-        include 'src/**/*.xml'
-        include 'src/**/*.xsd'
-        include 'src/**/*.jsp'
-        exclude 'src/**/webapp/lib/*'
-        if (p.name == 'axelor-tomcat') {
-          // Exclude tomcat configs files
-          exclude 'src/main/resources/conf/*'
-        }
-      }
-      leadingTabsToSpaces(2)
-      trimTrailingWhitespace()
-      endWithNewline()
-    }
-  }
-
+			licenseHeaderFile(getHeaderFile(project, null), "(package|import|module|@|/\\*\\*)")
+		}
+		format('xsd') {
+			target fileTree(p.projectDir) {
+				include 'src/**/*.xsd'
+			}
+			licenseHeaderFile(getHeaderFile(project, "xml"), "<((!DOCTYPE)|[A-Za-z]+)")
+					.skipLinesMatching("^<\\?xml.*\\?>\$")
+		}
+		format('misc') {
+			target fileTree(p.projectDir) {
+				include 'src/**/*.html'
+				include 'src/**/*.js'
+				include 'src/**/*.css'
+				include 'src/**/*.xml'
+				include 'src/**/*.xsd'
+				include 'src/**/*.jsp'
+				exclude 'src/**/webapp/lib/*'
+				if (p.name == 'axelor-tomcat') {
+					// Exclude tomcat configs files
+					exclude 'src/main/resources/conf/*'
+				}
+			}
+			leadingTabsToSpaces(2)
+			trimTrailingWhitespace()
+			endWithNewline()
+		}
+	}
 }
 
 /////
@@ -133,9 +135,9 @@ configure(subprojects - project(':axelor-front')) { p ->
 
 configure([rootProject] + (subprojects - project(':axelor-front'))) {
 
-  tasks.register('formatCode') {
-    description = "Add license and format code."
-    group = "Axelor"
-    dependsOn'spotlessApply'
-  }
+	tasks.register('formatCode') {
+		description = "Add license and format code."
+		group = "Axelor"
+		dependsOn'spotlessApply'
+	}
 }
