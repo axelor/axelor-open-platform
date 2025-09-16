@@ -48,7 +48,7 @@ description: |
   * Upgrade to Resteasy 6 (Jakarta EE 10)
   * Upgrade to Quartz 2.5
   * Upgrade to Logback 1.5
-  * Switch from org.fusesource.jansi to org.jline:jansi 3.30.5
+  * Switch from org.fusesource.jansi to org.jline:jansi 3.30.6
   * Upgrade to Jakarta XML Binding 4.0
   * Upgrade to Jakarta WebSocket 2.0
   * Upgrade to Jakarta Mail 2.1 and Jakarta Activation 2.1
