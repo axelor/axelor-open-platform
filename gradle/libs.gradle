@@ -299,7 +299,7 @@ libs.commons_csv = [
 // BIRT Runtime
 
 def birt_module = { name ->
-	dependencies.create("org.eclipse.birt:${name}:4.20.0") {
+	dependencies.create("org.eclipse.birt:${name}:4.21.0") {
 		exclude module: "jetty-servlet-api"
 		exclude module: "xml-apis"
 	}
