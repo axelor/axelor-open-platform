@@ -70,7 +70,7 @@
     "@types/react-text-mask": "^5.4.14",
     "@types/react-transition-group": "^4.4.12",
     "@types/swagger-ui-react": "^5.18.0",
-    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitejs/plugin-legacy": "7.1.0",
     "@vitejs/plugin-react": "^4.7.0",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "eslint": "^9.35.0",
