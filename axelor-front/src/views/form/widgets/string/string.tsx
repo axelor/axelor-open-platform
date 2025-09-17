@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Fragment, useCallback, useMemo } from "react";
+import { Fragment, useCallback, useMemo, type JSX } from "react";
 
 import { AdornedInput, clsx } from "@axelor/ui";
 

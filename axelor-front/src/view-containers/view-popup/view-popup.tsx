@@ -1,7 +1,7 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type JSX } from "react";
 
 import { clsx, Box, Button, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";

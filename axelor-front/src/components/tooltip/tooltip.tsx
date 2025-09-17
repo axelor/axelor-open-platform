@@ -1,4 +1,4 @@
-import { SyntheticEvent, cloneElement } from "react";
+import { SyntheticEvent, cloneElement, type JSX } from "react";
 
 import { Box, Popper, ClickAwayListener, usePopperTrigger } from "@axelor/ui";
 

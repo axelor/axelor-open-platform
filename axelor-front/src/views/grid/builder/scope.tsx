@@ -15,6 +15,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  type JSX,
 } from "react";
 import isEqual from "lodash/isEqual";
 import uniq from "lodash/uniq";

@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from "react";
 
 import {
   Box,

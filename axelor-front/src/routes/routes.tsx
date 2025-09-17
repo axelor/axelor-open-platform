@@ -4,6 +4,7 @@ import {
   RouterProvider,
   useLocation,
 } from "react-router";
+import { type JSX } from "react";
 
 import { useSession } from "@/hooks/use-session";
 import { Swagger } from "@/routes/swagger";
