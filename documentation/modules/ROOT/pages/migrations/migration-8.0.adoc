@@ -534,9 +534,9 @@ Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] 
 
 i18n exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
 
-== BIRT 4.4.2 to BIRT 4.20.0
+== BIRT 4.4.2 to BIRT 4.21.0
 
-http://www.eclipse.org/birt[BIRT] reporting engine 4.20.0 includes _numerous_ improvements/changes.
+http://www.eclipse.org/birt[BIRT] reporting engine 4.21.0 includes _numerous_ improvements/changes.
 That means that many of your existing reports will likely have rendering changes or may even be broken and will need to be manually fixed.
 
 `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but is enabled by default.
