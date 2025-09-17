@@ -5,7 +5,7 @@ import { ProxyOptions, loadEnv, mergeConfig } from "vite";
 import { ViteUserConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
-let env = loadEnv("dev", process.cwd(), "");
+const env = loadEnv("dev", process.cwd(), "");
 let base = env.VITE_PROXY_CONTEXT ?? "/";
 
 base = base.endsWith("/") ? base : `${base}/`;
@@ -16,11 +16,7 @@ const { plugins, ...conf } = viteConfig as ViteUserConfig;
 // replace react plugin
 plugins[0] = react({
   babel: {
-    plugins: [
-      jotaiDebugLabel,
-      jotaiReactRefresh,
-      "babel-plugin-react-compiler",
-    ],
+    plugins: [jotaiDebugLabel, jotaiReactRefresh],
   },
 });
 

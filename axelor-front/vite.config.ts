@@ -8,11 +8,7 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   base: "./",
   plugins: [
-    react({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
-    }),
+    react(),
     svgr({
       svgrOptions: {
         icon: true,
