@@ -160,10 +160,10 @@ importers:
         version: 5.18.0
       '@vitejs/plugin-legacy':
         specifier: ^7.1.0
-        version: 7.1.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))(terser@5.43.1)
+        version: 7.1.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))(terser@5.44.0)
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))
+        version: 4.7.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))
       babel-plugin-react-compiler:
         specifier: 19.1.0-rc.3
         version: 19.1.0-rc.3
@@ -192,8 +192,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       terser:
-        specifier: ^5.43.1
-        version: 5.43.1
+        specifier: ^5.44.0
+        version: 5.44.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -202,13 +202,13 @@ importers:
         version: 8.44.0(eslint@9.35.0)(typescript@5.8.3)
       vite:
         specifier: npm:rolldown-vite@latest
-        version: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1)
+        version: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0)
       vite-plugin-svgr:
         specifier: ^4.3.0
-        version: 4.3.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))(rollup@4.46.1)(typescript@5.8.3)
+        version: 4.3.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))(rollup@4.46.1)(typescript@5.8.3)
       vitest:
         specifier: ^3.2.4
-        version: 3.2.4(@types/node@22.18.5)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1)
+        version: 3.2.4(@types/node@22.18.5)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0)
 
 packages:
 
@@ -3732,8 +3732,8 @@ packages:
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
-  terser@5.43.1:
-    resolution: {integrity: sha512-+6erLbBm0+LROX2sPXlUYx/ux5PyE9K/a92Wrt6oA+WDAoFTdpHE5tCYCI5PNzq2y8df4rA+QgHLJuR4jNymsg==}
+  terser@5.44.0:
+    resolution: {integrity: sha512-nIVck8DK+GM/0Frwd+nIhZ84pR/BX7rmXMfYwyg+Sri5oGVE99/E3KvXqpC2xHFxyqXyGHTKBSioxxplrO4I4w==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -6095,7 +6095,7 @@ snapshots:
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
 
-  '@vitejs/plugin-legacy@7.1.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))(terser@5.43.1)':
+  '@vitejs/plugin-legacy@7.1.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))(terser@5.44.0)':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/plugin-transform-dynamic-import': 7.27.1(@babel/core@7.28.0)
@@ -6109,12 +6109,12 @@ snapshots:
       magic-string: 0.30.17
       regenerator-runtime: 0.14.1
       systemjs: 6.15.1
-      terser: 5.43.1
-      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1)
+      terser: 5.44.0
+      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.7.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))':
+  '@vitejs/plugin-react@4.7.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.0)
@@ -6122,7 +6122,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1)
+      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -6134,13 +6134,13 @@ snapshots:
       chai: 5.2.1
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1))':
+  '@vitest/mocker@3.2.4(vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0))':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1)
+      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -7739,7 +7739,7 @@ snapshots:
       glob: 11.0.3
       package-json-from-dist: 1.0.1
 
-  rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1):
+  rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0):
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       lightningcss: 1.30.1
@@ -7752,7 +7752,7 @@ snapshots:
       esbuild: 0.25.8
       fsevents: 2.3.3
       sass: 1.77.8
-      terser: 5.43.1
+      terser: 5.44.0
 
   rolldown@1.0.0-beta.36:
     dependencies:
@@ -8016,7 +8016,7 @@ snapshots:
 
   tabbable@6.2.0: {}
 
-  terser@5.43.1:
+  terser@5.44.0:
     dependencies:
       '@jridgewell/source-map': 0.3.10
       acorn: 8.15.0
@@ -8170,13 +8170,13 @@ snapshots:
     dependencies:
       react: 19.1.1
 
-  vite-node@3.2.4(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1):
+  vite-node@3.2.4(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1)
+      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -8191,18 +8191,18 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-svgr@4.3.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1))(rollup@4.46.1)(typescript@5.8.3):
+  vite-plugin-svgr@4.3.0(rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0))(rollup@4.46.1)(typescript@5.8.3):
     dependencies:
       '@rollup/pluginutils': 5.2.0(rollup@4.46.1)
       '@svgr/core': 8.1.0(typescript@5.8.3)
       '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@5.8.3))
-      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.43.1)
+      vite: rolldown-vite@7.1.8(@types/node@22.18.5)(esbuild@0.25.8)(sass@1.77.8)(terser@5.44.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
       - typescript
 
-  vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1):
+  vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0):
     dependencies:
       esbuild: 0.25.8
       fdir: 6.4.6(picomatch@4.0.3)
@@ -8215,13 +8215,13 @@ snapshots:
       fsevents: 2.3.3
       lightningcss: 1.30.1
       sass: 1.77.8
-      terser: 5.43.1
+      terser: 5.44.0
 
-  vitest@3.2.4(@types/node@22.18.5)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1):
+  vitest@3.2.4(@types/node@22.18.5)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1))
+      '@vitest/mocker': 3.2.4(vite@7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -8239,8 +8239,8 @@ snapshots:
       tinyglobby: 0.2.14
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1)
-      vite-node: 3.2.4(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.43.1)
+      vite: 7.0.6(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0)
+      vite-node: 3.2.4(@types/node@22.18.5)(lightningcss@1.30.1)(sass@1.77.8)(terser@5.44.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.18.5

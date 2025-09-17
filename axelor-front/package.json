@@ -81,7 +81,7 @@
     "rimraf": "^6.0.1",
     "sass": "1.77.8",
     "svgo": "^4.0.0",
-    "terser": "^5.43.1",
+    "terser": "^5.44.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.44.0",
     "vite": "npm:rolldown-vite@latest",
