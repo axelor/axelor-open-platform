@@ -41,7 +41,7 @@
     "jotai": "^2.12.5",
     "jotai-immer": "^0.4.1",
     "jsdom": "^26.1.0",
-    "libphonenumber-js": "^1.12.10",
+    "libphonenumber-js": "^1.12.17",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.52.2",
     "parse5": "^8.0.0",
