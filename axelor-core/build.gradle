@@ -3,91 +3,91 @@ description = 'Axelor\'s core functionalities'
 apply plugin: com.axelor.gradle.AxelorPlugin
 
 axelor {
-	title = "Axelor Core"
-	description = project.description
+  title = "Axelor Core"
+  description = project.description
 }
 
 dependencies {
-	implementation libs.asm
+  implementation libs.asm
 
-	testImplementation project(":axelor-test")
+  testImplementation project(":axelor-test")
 
-	api project(":axelor-common")
+  api project(":axelor-common")
 
-	api libs.slf4j_api
+  api libs.slf4j_api
 
-	api libs.groovy
+  api libs.groovy
 
-	api libs.guava
-	api libs.guice
-	api libs.guice_servlet
-	api libs.guice_persist
+  api libs.guava
+  api libs.guice
+  api libs.guice_servlet
+  api libs.guice_persist
 
-	implementation libs.byte_buddy
+  implementation libs.byte_buddy
 
-	testImplementation libs.jdbc_hsqldb
-	implementation libs.jdbc_postgres
-	implementation libs.jdbc_mysql
+  testImplementation libs.jdbc_hsqldb
+  implementation libs.jdbc_postgres
+  implementation libs.jdbc_mysql
 
-	api libs.hibernate
+  api libs.hibernate
 
-	implementation libs.caffeine
-	implementation libs.redisson
+  implementation libs.caffeine
+  implementation libs.redisson
 
-	implementation libs.flywaydb
+  implementation libs.flywaydb
 
-	api libs.resteasy
-	api libs.resteasy_guice
-	api libs.jackson_libs
+  api libs.resteasy
+  api libs.resteasy_guice
+  api libs.jackson_libs
 
-	api libs.ST4
-	api libs.apache_shiro
-	api libs.xstream
-	api libs.commons_csv
+  api libs.ST4
+  api libs.apache_shiro
+  api libs.xstream
+  api libs.commons_csv
 
-	api libs.jakarta_servlet
-	api libs.jakarta_mail
-	api libs.jakarta_jaxb
-	api libs.graal_js
-	api libs.jakarta_annotation
+  api libs.jakarta_servlet
+  api libs.jakarta_mail
+  api libs.jakarta_jaxb
+  api libs.graal_js
+  api libs.jakarta_annotation
 
-	implementation libs.tomcat_jakarta_el
+  implementation libs.tomcat_jakarta_el
 
-	implementation libs.jsoup
+  implementation libs.jsoup
 
-	api libs.quartz
+  api libs.quartz
 
-	implementation libs.eclipselink_moxy
+  implementation libs.eclipselink_moxy
 
-	// pac4j
-	implementation libs.pac4j
+  // pac4j
+  implementation libs.pac4j
 
-	// BIRT
-	api libs.birt_runtime
+  // BIRT
+  api libs.birt_runtime
 
-	implementation libs.commons_jxpath
+  implementation libs.commons_jxpath
 
-	implementation libs.jasypt
+  implementation libs.jasypt
 
-	implementation libs.minio
+  implementation libs.minio
 
-	testImplementation libs.greenmail
-	testImplementation libs.unboundid_ldapsdk
+  testImplementation libs.greenmail
+  testImplementation libs.unboundid_ldapsdk
 
-	testImplementation libs.hazelcast
-	testImplementation libs.infinispan
-	testImplementation libs.ehcache
-	// Embedded Redis server for Redis test
-	testImplementation "org.signal:embedded-redis:0.9.1"
-	testImplementation 'org.awaitility:awaitility:4.3.0'
+  testImplementation libs.hazelcast
+  testImplementation libs.infinispan
+  testImplementation libs.ehcache
+  // Embedded Redis server for Redis test
+  testImplementation "org.signal:embedded-redis:0.9.1"
+  testImplementation 'org.awaitility:awaitility:4.3.0'
 }
 
 test {
-	// Avoid Warnings for Reflective Access in `AppSettingsTest`
-	jvmArgs = [
-		"--add-opens",
-		"java.base/java.util=ALL-UNNAMED",
-		"--add-opens",
-		"java.base/java.lang=ALL-UNNAMED"
-	]
+  // Avoid Warnings for Reflective Access in `AppSettingsTest`
+  jvmArgs = [
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED"
+  ]
 }

@@ -5,10 +5,10 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 buildscript {
-	apply from: "gradle/repos.gradle"
-	dependencies {
-		classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
-	}
+  apply from: "gradle/repos.gradle"
+  dependencies {
+    classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
+  }
 }
 
 apply plugin: "eclipse"
@@ -18,202 +18,202 @@ apply plugin: com.axelor.gradle.support.ChangelogSupport
 apply from: "version.gradle"
 
 def gitGitRevision(p) {
-	def gitFolder = "$p.projectDir/.git/"
-	if( !new File(gitFolder).exists() ) {
-		gitFolder = "$rootProject.projectDir/.git/"
-	}
-	if( !new File(gitFolder).exists() ) {
-		return null
-	}
+  def gitFolder = "$p.projectDir/.git/"
+  if( !new File(gitFolder).exists() ) {
+    gitFolder = "$rootProject.projectDir/.git/"
+  }
+  if( !new File(gitFolder).exists() ) {
+    return null
+  }
 
-	def head = new File(gitFolder + "HEAD").text.split(":")
-	def isCommit = head.length == 1
+  def head = new File(gitFolder + "HEAD").text.split(":")
+  def isCommit = head.length == 1
 
-	if(isCommit) return head[0].trim()
+  if(isCommit) return head[0].trim()
 
-	def refPath = head[1].trim()
-	def refHead = new File(gitFolder + refPath)
+  def refPath = head[1].trim()
+  def refHead = new File(gitFolder + refPath)
 
-	if (refHead.exists()) {
-		return refHead.text.trim()
-	}
+  if (refHead.exists()) {
+    return refHead.text.trim()
+  }
 
-	def packedRefsFile = new File(gitFolder + "packed-refs")
+  def packedRefsFile = new File(gitFolder + "packed-refs")
 
-	if (packedRefsFile.exists()) {
-		def packedRefs = packedRefsFile.text
-		def matcher = packedRefs =~ /(?m)^([0-9a-f]+) ${refPath}$/
-		if (matcher.find()) {
-			return matcher.group(1)
-		}
-	}
+  if (packedRefsFile.exists()) {
+    def packedRefs = packedRefsFile.text
+    def matcher = packedRefs =~ /(?m)^([0-9a-f]+) ${refPath}$/
+    if (matcher.find()) {
+      return matcher.group(1)
+    }
+  }
 
-	return null
+  return null
 }
 
 configure(subprojects - project(':axelor-front')) {
-	apply from: "${rootDir}/gradle/libs.gradle"
-	apply from: "${rootDir}/gradle/common.gradle"
-	apply from: "${rootDir}/gradle/jacoco.gradle"
+  apply from: "${rootDir}/gradle/libs.gradle"
+  apply from: "${rootDir}/gradle/common.gradle"
+  apply from: "${rootDir}/gradle/jacoco.gradle"
 
-	apply plugin: com.axelor.gradle.support.JavaSupport
-	apply plugin: com.axelor.gradle.support.EclipseSupport
-	apply plugin: com.axelor.gradle.support.PublishSupport
-	apply plugin: com.axelor.gradle.support.DuplicatedClassSupport
-	apply plugin: 'com.adarshr.test-logger'
-	apply plugin: 'signing'
+  apply plugin: com.axelor.gradle.support.JavaSupport
+  apply plugin: com.axelor.gradle.support.EclipseSupport
+  apply plugin: com.axelor.gradle.support.PublishSupport
+  apply plugin: com.axelor.gradle.support.DuplicatedClassSupport
+  apply plugin: 'com.adarshr.test-logger'
+  apply plugin: 'signing'
 
-	group = "com.axelor"
-	version = rootProject.version
+  group = "com.axelor"
+  version = rootProject.version
 
-	testlogger {
-		theme = 'mocha'
-		slowThreshold = 3000
-	}
+  testlogger {
+    theme = 'mocha'
+    slowThreshold = 3000
+  }
 
-	afterEvaluate {
-		test {
-			useJUnitPlatform()
-		}
-	}
+  afterEvaluate {
+    test {
+      useJUnitPlatform()
+    }
+  }
 
-	jar {
-		manifest {
-			def gitRev = gitGitRevision(project);
-			attributes(
-					'Build-Jdk-Spec': System.properties['java.specification.version'],
-					'Build-Jdk': System.properties['java.version'],
-					'Build-Date': ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")),
-					'Implementation-Title': project.name,
-					'Implementation-Version': project.version,
-					'Implementation-Vendor': 'Axelor',
-					'Implementation-Vendor-Id': 'com.axelor',
-					'Implementation-Vendor-Url': 'http://axelor.com',
-					'Specification-Title': project.name,
-					'Specification-Version': project.version,
-					'Specification-Vendor': 'Axelor')
-			if (gitRev) {
-				attributes['Implementation-Build'] = gitRev
-			}
-		}
+  jar {
+    manifest {
+      def gitRev = gitGitRevision(project);
+      attributes(
+          'Build-Jdk-Spec': System.properties['java.specification.version'],
+          'Build-Jdk': System.properties['java.version'],
+          'Build-Date': ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")),
+          'Implementation-Title': project.name,
+          'Implementation-Version': project.version,
+          'Implementation-Vendor': 'Axelor',
+          'Implementation-Vendor-Id': 'com.axelor',
+          'Implementation-Vendor-Url': 'http://axelor.com',
+          'Specification-Title': project.name,
+          'Specification-Version': project.version,
+          'Specification-Vendor': 'Axelor')
+      if (gitRev) {
+        attributes['Implementation-Build'] = gitRev
+      }
+    }
 
-		from("${rootDir}") {
-			include "LICENSE"
-			into "META-INF"
-		}
-	}
+    from("${rootDir}") {
+      include "LICENSE"
+      into "META-INF"
+    }
+  }
 
-	def centralPortalBundleName = "centralPortalBundle.zip"
-	def centralPortalUrlPath = project.layout.buildDirectory.dir('central')
+  def centralPortalBundleName = "centralPortalBundle.zip"
+  def centralPortalUrlPath = project.layout.buildDirectory.dir('central')
 
-	project.afterEvaluate {
-		publishing {
-			publications.all {
-				pom {
-					name = 'Axelor AOP - ' + project.name
-					description = project.description
-					url = 'https://github.com/axelor/axelor-open-platform'
+  project.afterEvaluate {
+    publishing {
+      publications.all {
+        pom {
+          name = 'Axelor AOP - ' + project.name
+          description = project.description
+          url = 'https://github.com/axelor/axelor-open-platform'
 
-					organization {
-						name = 'Axelor'
-						url = 'https://axelor.com'
-					}
+          organization {
+            name = 'Axelor'
+            url = 'https://axelor.com'
+          }
 
-					licenses {
-						license {
-							name = 'GNU Affero General Public License version 3'
-							url = 'https://www.gnu.org/licenses/agpl-3.0.html'
-							distribution = 'repo'
-						}
-					}
+          licenses {
+            license {
+              name = 'GNU Affero General Public License version 3'
+              url = 'https://www.gnu.org/licenses/agpl-3.0.html'
+              distribution = 'repo'
+            }
+          }
 
-					developers {
-						developer {
-							id = "axelor-team"
-							name = "Axelor Team"
-							email = 'it@axelor.com'
-						}
-					}
+          developers {
+            developer {
+              id = "axelor-team"
+              name = "Axelor Team"
+              email = 'it@axelor.com'
+            }
+          }
 
-					scm {
-						url = "https://github.com/axelor/axelor-open-platform"
-						connection = "scm:git:https://github.com/axelor/axelor-open-platform.git"
-						developerConnection = "scm:git:ssh://git@github.com/axelor/axelor-open-platform.git"
-					}
-				}
-			}
-			repositories {
-				maven {
-					name = "CentralPortal"
-					url = centralPortalUrlPath
-				}
-			}
-		}
+          scm {
+            url = "https://github.com/axelor/axelor-open-platform"
+            connection = "scm:git:https://github.com/axelor/axelor-open-platform.git"
+            developerConnection = "scm:git:ssh://git@github.com/axelor/axelor-open-platform.git"
+          }
+        }
+      }
+      repositories {
+        maven {
+          name = "CentralPortal"
+          url = centralPortalUrlPath
+        }
+      }
+    }
 
-		def signingKey = findProperty("signingKey")
-		def signingPassword = findProperty("signingPassword")
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
 
-		signing {
-			required = { rootProject.finalRelease }
-			useInMemoryPgpKeys(signingKey, signingPassword)
-			sign publishing.publications
-		}
-	}
+    signing {
+      required = { rootProject.finalRelease }
+      useInMemoryPgpKeys(signingKey, signingPassword)
+      sign publishing.publications
+    }
+  }
 
-	tasks.register("centralPortalBundle", Zip) {
-		description = "Create central portal bundle"
-		group = "publishing"
+  tasks.register("centralPortalBundle", Zip) {
+    description = "Create central portal bundle"
+    group = "publishing"
 
-		dependsOn(project.name == "axelor-gradle"
-				? "publishPluginMavenPublicationToCentralPortalRepository"
-				: "publishMavenJavaPublicationToCentralPortalRepository")
+    dependsOn(project.name == "axelor-gradle"
+        ? "publishPluginMavenPublicationToCentralPortalRepository"
+        : "publishMavenJavaPublicationToCentralPortalRepository")
 
-		from(centralPortalUrlPath)
-		exclude("**/maven-metadata*.*")
-		archiveFileName.set(centralPortalBundleName)
-		destinationDirectory.set(project.layout.buildDirectory)
-	}
+    from(centralPortalUrlPath)
+    exclude("**/maven-metadata*.*")
+    archiveFileName.set(centralPortalBundleName)
+    destinationDirectory.set(project.layout.buildDirectory)
+  }
 
-	tasks.register("uploadToCentralPortal", CentralPortalUploadTask) {
-		description = "Publish artifact to central portal"
-		group = "publishing"
+  tasks.register("uploadToCentralPortal", CentralPortalUploadTask) {
+    description = "Publish artifact to central portal"
+    group = "publishing"
 
-		dependsOn(centralPortalBundle)
+    dependsOn(centralPortalBundle)
 
-		username = project.findProperty("centralPortalUserName")
-		password = project.findProperty("centralPortalToken")
-		autoPublish = false
-		archiveFile = project.layout.buildDirectory.file(centralPortalBundleName)
-		publicationName = project.name + "-" + project.version
-	}
+    username = project.findProperty("centralPortalUserName")
+    password = project.findProperty("centralPortalToken")
+    autoPublish = false
+    archiveFile = project.layout.buildDirectory.file(centralPortalBundleName)
+    publicationName = project.name + "-" + project.version
+  }
 }
 
 tasks.register("updateVersion", com.axelor.gradle.tasks.UpdateVersion) {
-	description = "Update version text in source files."
-	group = "Axelor"
-	processFiles = fileTree(projectDir) {
-		include '**/src/**/resources/**/*.xml'
-		include '**/src/**/resources/domain-models.xsd'
-		include '**/src/**/resources/object-views.xsd'
-		include '**/src/**/resources/data-import.xsd'
-		include '**/src/**/data/**/*.xml'
-		include '**/data/**/*config.xml'
-	}
+  description = "Update version text in source files."
+  group = "Axelor"
+  processFiles = fileTree(projectDir) {
+    include '**/src/**/resources/**/*.xml'
+    include '**/src/**/resources/domain-models.xsd'
+    include '**/src/**/resources/object-views.xsd'
+    include '**/src/**/resources/data-import.xsd'
+    include '**/src/**/data/**/*.xml'
+    include '**/data/**/*config.xml'
+  }
 }
 
 changelog {
-	version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "")
-	output.set(file("CHANGELOG.md"))
-	inputPath.set(file("changelogs/unreleased"))
-	types.set([
-		"Feature",
-		"Change",
-		"Deprecate",
-		"Remove",
-		"Fix",
-		"Security"
-	])
-	header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
+  version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "")
+  output.set(file("CHANGELOG.md"))
+  inputPath.set(file("changelogs/unreleased"))
+  types.set([
+    "Feature",
+    "Change",
+    "Deprecate",
+    "Remove",
+    "Fix",
+    "Security"
+  ])
+  header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
 }
 
 apply from: "gradle/javadoc.gradle"

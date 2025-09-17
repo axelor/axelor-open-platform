@@ -3,33 +3,33 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 java {
-	withJavadocJar()
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+  withJavadocJar()
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
 dependencies {
-	testImplementation libs.junit_jupiter
-	testRuntimeOnly libs.junit_launcher
+  testImplementation libs.junit_jupiter
+  testRuntimeOnly libs.junit_launcher
 
-	if (project.name != "axelor-tomcat") {
-		implementation libs.slf4j_logback
-	}
+  if (project.name != "axelor-tomcat") {
+    implementation libs.slf4j_logback
+  }
 }
 
 configurations.all {
-	exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-	exclude group: 'org.glassfish.jaxb', module: 'jaxb-runtime'
-	exclude group: 'commons-logging', module: 'commons-logging'
+  exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+  exclude group: 'org.glassfish.jaxb', module: 'jaxb-runtime'
+  exclude group: 'commons-logging', module: 'commons-logging'
 
-	resolutionStrategy {
-		force libs.slf4j_api
-	}
+  resolutionStrategy {
+    force libs.slf4j_api
+  }
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
-	options.compilerArgs = ['-Xlint:-options']
-	options.incremental = true
+  options.encoding = 'UTF-8'
+  options.compilerArgs = ['-Xlint:-options']
+  options.incremental = true
 }

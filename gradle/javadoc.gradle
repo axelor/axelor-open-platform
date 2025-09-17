@@ -1,13 +1,13 @@
 def projectsToSkipJavadocs = ext.projectsToSkipJavadocs = [
-	'axelor-gradle',
-	'axelor-tomcat',
-	'axelor-tools',
-	'axelor-web',
-	'axelor-front'
+  'axelor-gradle',
+  'axelor-tomcat',
+  'axelor-tools',
+  'axelor-web',
+  'axelor-front'
 ]
 
 def projectsIncludeInJavadocs = subprojects.findAll {
-	return !projectsToSkipJavadocs.contains( it.name )
+  return !projectsToSkipJavadocs.contains( it.name )
 }
 
 /////
@@ -16,43 +16,43 @@ def projectsIncludeInJavadocs = subprojects.findAll {
 
 tasks.register("generateDocs", Javadoc) {
 
-	description = "Generate API docs."
-	group = "Axelor"
+  description = "Generate API docs."
+  group = "Axelor"
 
-	dependsOn {
-		projectsIncludeInJavadocs.collect {
-			it.tasks.named("jar")
-		}
-	}
+  dependsOn {
+    projectsIncludeInJavadocs.collect {
+      it.tasks.named("jar")
+    }
+  }
 
-	destinationDir = project.layout.buildDirectory.dir("docs").get().asFile
-	failOnError = false
+  destinationDir = project.layout.buildDirectory.dir("docs").get().asFile
+  failOnError = false
 
-	source = projectsIncludeInJavadocs.sourceSets.main.allJava
-	classpath = files(projectsIncludeInJavadocs.sourceSets.main.compileClasspath + projectsIncludeInJavadocs.sourceSets.main.output)
+  source = projectsIncludeInJavadocs.sourceSets.main.allJava
+  classpath = files(projectsIncludeInJavadocs.sourceSets.main.compileClasspath + projectsIncludeInJavadocs.sourceSets.main.output)
 
-	// exclude internal packages
-	exclude '**/internal/**'
-	exclude '**/org/jboss/logging/**'
+  // exclude internal packages
+  exclude '**/internal/**'
+  exclude '**/org/jboss/logging/**'
 
-	options {
-		encoding = "UTF-8"
-		memberLevel = JavadocMemberLevel.PROTECTED
-		links = [
-			'https://docs.oracle.com/en/java/javase/21/docs/api',
-			'https://google.github.io/guice/api-docs/7.0.0/javadoc/',
-			'https://guava.dev/releases/33.4.8-jre/api/docs/',
-			'https://docs.jboss.org/hibernate/orm/6.6/javadocs/',
-			'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.5.0'
-		]
-	}
+  options {
+    encoding = "UTF-8"
+    memberLevel = JavadocMemberLevel.PROTECTED
+    links = [
+      'https://docs.oracle.com/en/java/javase/21/docs/api',
+      'https://google.github.io/guice/api-docs/7.0.0/javadoc/',
+      'https://guava.dev/releases/33.4.8-jre/api/docs/',
+      'https://docs.jboss.org/hibernate/orm/6.6/javadocs/',
+      'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.5.0'
+    ]
+  }
 
-	// Remove or comment this to see warnings
-	options.addStringOption('Xdoclint:none', '-quiet')
+  // Remove or comment this to see warnings
+  options.addStringOption('Xdoclint:none', '-quiet')
 
-	doFirst {
-		title = "Axelor Open Platform $version API"
-	}
+  doFirst {
+    title = "Axelor Open Platform $version API"
+  }
 }
 
 /////
@@ -61,16 +61,16 @@ tasks.register("generateDocs", Javadoc) {
 
 configure(subprojects - project(':axelor-front')) { p ->
 
-	javadoc {
+  javadoc {
 
-		exclude '**/internal/**'
-		exclude '**/org/jboss/logging/**'
+    exclude '**/internal/**'
+    exclude '**/org/jboss/logging/**'
 
-		options {
-			encoding = "UTF-8"
-			memberLevel = JavadocMemberLevel.PROTECTED
-		}
+    options {
+      encoding = "UTF-8"
+      memberLevel = JavadocMemberLevel.PROTECTED
+    }
 
-		options.addStringOption('Xdoclint:none', '-quiet')
-	}
+    options.addStringOption('Xdoclint:none', '-quiet')
+  }
 }

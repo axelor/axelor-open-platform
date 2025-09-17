@@ -4,27 +4,27 @@ apply plugin: "java-library"
 
 dependencies {
 
-	api libs.junit_jupiter
-	api libs.junit_launcher
-	api project(":axelor-common")
+  api libs.junit_jupiter
+  api libs.junit_launcher
+  api project(":axelor-common")
 
-	implementation libs.guice
-	implementation libs.guice_servlet
-	implementation libs.guice_persist
+  implementation libs.guice
+  implementation libs.guice_servlet
+  implementation libs.guice_persist
 
-	implementation libs.jdbc_hsqldb
-	implementation libs.jdbc_postgres
-	implementation libs.hibernate
-	implementation libs.tomcat_jakarta_el
+  implementation libs.jdbc_hsqldb
+  implementation libs.jdbc_postgres
+  implementation libs.hibernate
+  implementation libs.tomcat_jakarta_el
 
-	compileOnly libs.tomcat_jakarta_el
-	compileOnly libs.jakarta_servlet
-	api libs.websocket_api
+  compileOnly libs.tomcat_jakarta_el
+  compileOnly libs.jakarta_servlet
+  api libs.websocket_api
 
-	implementation libs.resteasy
-	implementation libs.resteasy_guice
-	implementation libs.resteasy_client
-	implementation libs.resteasy_server
-	implementation libs.jackson_libs
-	implementation libs.snakeyaml
+  implementation libs.resteasy
+  implementation libs.resteasy_guice
+  implementation libs.resteasy_client
+  implementation libs.resteasy_server
+  implementation libs.jackson_libs
+  implementation libs.snakeyaml
 }
