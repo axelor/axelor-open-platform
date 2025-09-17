@@ -120,6 +120,10 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   vibration: "mobile_vibrate",
   // 2025-07-17
   filter_hdr: "landscape",
+  // 2025-08-09
+  nights_stay: "partly_cloudy_night",
+  // 2025-08-20
+  sign_language_2: "sign_language",
 };
 
 export type IconProps = {
