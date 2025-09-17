@@ -70,7 +70,7 @@
     "@types/react-text-mask": "^5.4.14",
     "@types/react-transition-group": "^4.4.12",
     "@types/swagger-ui-react": "^5.18.0",
-    "@vitejs/plugin-legacy": "^7.1.0",
+    "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^4.7.0",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "eslint": "^9.35.0",
@@ -85,7 +85,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.44.0",
     "vite": "npm:rolldown-vite@latest",
-    "vite-plugin-svgr": "^4.3.0",
+    "vite-plugin-svgr": "^4.5.0",
     "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
