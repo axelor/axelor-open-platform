@@ -46,7 +46,7 @@
     "monaco-editor": "^0.52.2",
     "parse5": "^8.0.0",
     "react": "^19.1.1",
-    "react-datepicker": "^8.4.0",
+    "react-datepicker": "^8.7.0",
     "react-dom": "^19.1.1",
     "react-error-boundary": "^6.0.0",
     "react-grid-layout": "1.4.3",
