@@ -254,7 +254,7 @@ dependencies, and most of the time we want to exclude them. The plugin checks wh
 configuration provide the same classes.
 
 The plugin is automatically applied by the `AxelorPlugin`. If the module isn't an Axelor module, plugin can be
-manually applied : `apply plugin: com.axelor.gradle.support.ChangelogSupport`
+manually applied : `apply plugin: com.axelor.gradle.support.DuplicatedClassSupport`
 
 Plugin can be configured with the following properties :
 
