@@ -5,6 +5,7 @@
 package com.axelor.web.servlet;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.common.StringUtils;
 import jakarta.inject.Singleton;
@@ -19,7 +20,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Calendar;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +45,13 @@ public class NoCacheFilter implements Filter {
           "/*.png",
           "/*.jpg");
 
-  private static final String CACHE_BUSTER_PARAM = "" + Calendar.getInstance().getTimeInMillis();
+  private static final String CACHE_BUSTER_PARAM =
+      URLEncoder.encode(
+          AppSettings.get()
+              .get(
+                  AvailableAppSettings.APPLICATION_VERSION,
+                  String.valueOf(System.currentTimeMillis())),
+          StandardCharsets.UTF_8);
 
   private boolean production;
 
