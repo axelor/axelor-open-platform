@@ -373,6 +373,35 @@ Key changes to be aware of:
 
 For more details about Shiro's session management, see the https://shiro.apache.org/session-management.html[Shiro Session Management documentation].
 
+== API key authentication
+
+API key authentication allows clients to authenticate API requests without maintaining a session. This is particularly
+useful for server-to-server communication and automated scripts. See usage xref:dev-guide:web-services/auth.adoc[here].
+
+Run the following SQL script to create the table :
+
+```sql
+create table auth_user_token (
+    id           bigint not null primary key,
+    archived     boolean,
+    version      integer,
+    created_on   timestamp(6),
+    updated_on   timestamp(6),
+    expires_at   timestamp(6) not null,
+    last_used_at timestamp(6),
+    name         varchar(255) not null,
+    token_digest varchar(255) not null,
+    token_key    varchar(255) not null constraint uk_2yewhucjnwii7ljwbnt3bj3ll unique,
+    created_by   bigint constraint fk_o7822fne5ugastp3rtdqom43v references auth_user,
+    updated_by   bigint constraint fk_3yyw8xkkmkygcjayajg21jfvr references auth_user,
+    owner        bigint       not null constraint fk_3nsst639s8kn304497trbed5q references auth_user
+);
+
+create index auth_user_token_owner_idx on auth_user_token (owner);
+```
+
+To make it available for users, permissions need to be configured for the `com.axelor.auth.db.UserToken` object.
+
 == S3-Compatible Object Storage
 
 We now support an S3-compatible object storage service for storing uploaded files.

@@ -9,12 +9,16 @@ import static com.axelor.meta.loader.ModuleManager.isInstalled;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.UserToken;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.Dashlet;
 import com.axelor.meta.schema.views.Help;
+import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.SimpleWidget;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -42,6 +46,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
@@ -165,6 +170,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       if (AuthUtils.isAdmin(user) || isBlank(object) || isBlank(field)) {
         return true;
       }
+      if (!isUserTokenAvailable(widget)) {
+        return false;
+      }
       final MetaPermissions perms = Beans.get(MetaPermissions.class);
       // hide o2m/m2m or dotted o2o/m2o if not readable at all
       if (!perms.isRelatedReadable(object, field, item)) {
@@ -191,6 +199,27 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       }
 
       return Boolean.TRUE.equals(rule.getCanRead());
+    }
+
+    /**
+     * Determines whether the UserToken feature is available for the current user. Availability is
+     * based on permissions.
+     *
+     * @param widget the widget
+     * @return {@code true} if UserToken feature is available {@code false} otherwise
+     */
+    private boolean isUserTokenAvailable(AbstractWidget widget) {
+      if (!Objects.equals(widget.getModel(), User.class.getName())) {
+        return true;
+      }
+      if ((widget instanceof Dashlet
+              && "activeUserTokenPanel".equals(((SimpleWidget) widget).getName()))
+          || (widget instanceof PanelField
+              && "$manageUserTokens".equals(((SimpleWidget) widget).getName()))) {
+        return Beans.get(JpaSecurity.class)
+            .isPermitted(JpaSecurity.CAN_READ, UserToken.class.asSubclass(Model.class));
+      }
+      return true;
     }
 
     @Override

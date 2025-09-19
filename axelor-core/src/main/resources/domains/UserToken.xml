@@ -6,7 +6,7 @@
   <module name="auth" package="com.axelor.auth.db" />
 
   <entity name="UserToken" cacheable="true" repository="abstract">
-    <string name="name" title="Name" required="true" />
+    <string name="name" title="Name" required="true" index="false"/>
     <datetime name="expiresAt" title="Expires" required="true" />
     <string name="tokenKey" unique="true" required="true" password="true" readonly="true" />
     <string name="tokenDigest" title="Token" required="true" password="true" readonly="true" />

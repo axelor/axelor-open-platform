@@ -48,7 +48,7 @@
         </panel>
         <help>user.password.pattern-title</help>
       </panel>
-      <panel-dashlet action="action.view.show.active.tokens" colSpan="12" canNew="true"/>
+      <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true"/>
     </panel>
     <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
@@ -74,8 +74,8 @@
           <help>user.password.pattern-title</help>
       </panel>
       <panel>
-        <field name="$manageAPIKeys" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
-        <panel-dashlet name="activeUserTokenPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageAPIKeys"/>
+        <field name="$manageUserTokens" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
+        <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageUserTokens"/>
       </panel>
     </panel>
   </form>
