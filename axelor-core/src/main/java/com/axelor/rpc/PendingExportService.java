@@ -6,6 +6,7 @@ package com.axelor.rpc;
 
 import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.event.RemovalCause;
+import com.axelor.common.StringUtils;
 import com.axelor.file.temp.TempFiles;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Singleton;
@@ -27,15 +28,15 @@ import java.util.UUID;
 @Singleton
 public class PendingExportService {
 
-  private static final Map<String, Path> pendingExports =
+  private static final Map<String, String> pendingExports =
       CacheBuilder.newBuilder("pendingExports")
           .expireAfterWrite(Duration.ofMinutes(5))
           .removalListener(
-              (String token, Path path, RemovalCause cause) -> {
+              (String token, String filePath, RemovalCause cause) -> {
                 // Delete if it has expired (unconsumed export)
                 if (cause == RemovalCause.EXPIRED) {
                   try {
-                    Files.deleteIfExists(path);
+                    Files.deleteIfExists(Path.of(filePath));
                   } catch (IOException e) {
                     throw new UncheckedIOException(e);
                   }
@@ -62,8 +63,9 @@ public class PendingExportService {
     }
 
     var token = UUID.randomUUID().toString();
+    var tempFilePath = tempFile.normalize().toAbsolutePath().toString();
 
-    if (pendingExports.putIfAbsent(token, tempFile) != null) {
+    if (pendingExports.putIfAbsent(token, tempFilePath) != null) {
       // Should never happen.
       throw new IllegalStateException("Duplicate token: " + token);
     }
@@ -93,7 +95,12 @@ public class PendingExportService {
     return filterRegularFile(pendingExports.remove(token));
   }
 
-  private @Nullable Path filterRegularFile(Path path) {
+  private @Nullable Path filterRegularFile(@Nullable String filePath) {
+    if (StringUtils.isBlank(filePath)) {
+      return null;
+    }
+
+    var path = Path.of(filePath);
     return Files.isRegularFile(path) ? path : null;
   }
 }
