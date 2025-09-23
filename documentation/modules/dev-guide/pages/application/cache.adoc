@@ -4,6 +4,8 @@
 
 The {page-component-title} provides a generic caching interface that wraps various cache implementations, providing a unified API for caching operations. The API aims to stay close to Google's Guava Cache and Caffeine, while adding support for potentially distributed caching.
 
+See xref:dev-guide:application/config.adoc#global-and-component-specific-cache-configurations[Global and Component-specific Cache Configurations] for application configuration details.
+
 == AxelorCache Interface
 
 The `AxelorCache` interface offers a range of methods for managing cached data:
@@ -68,6 +70,9 @@ private static final AxelorCache<String, Action> ACTIONS =
 ----
 
 Here, the cache is configured with a maximum size of 1000 entries and uses weak references for values. The `XMLViews::findAction` loader dynamically loads actions not present in the cache.
+
+NOTE: In case of distributed caching, you need to make sure cache keys/values are serializable by the underlying cache implementation.
+For example, when using Redisson, keys/values should be serializable by its codec, the default codec being `org.redisson.codec.Kryo5Codec`.
 
 == DistributedFactory
 
