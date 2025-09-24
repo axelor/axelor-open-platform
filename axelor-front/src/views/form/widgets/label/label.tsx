@@ -1,16 +1,20 @@
+import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 
-import { TemplateRenderer } from "@/hooks/use-parser";
 import { legacyClassNames } from "@/styles/legacy";
+import { sanitize } from "@/utils/sanitize";
 import { WidgetProps } from "../../builder";
 
-export function Label({ formAtom, widgetAtom }: WidgetProps) {
+export function Label({ widgetAtom }: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
   const { title = "", css } = attrs;
-  const { record } = useAtomValue(formAtom);
+
+  const text = useMemo(() => title && sanitize(title), [title]);
+
   return (
-    <label className={legacyClassNames(css)}>
-      <TemplateRenderer context={record} template={title} />
-    </label>
+    <label
+      className={legacyClassNames(css)}
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
   );
 }
