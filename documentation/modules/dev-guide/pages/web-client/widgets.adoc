@@ -414,6 +414,17 @@ The following attribute is supported:
 
 * `height`: specify the visible height of the text area, in lines. Default to 5.
 
+== Label
+
+This widget is used to display static text.
+
+[source,xml]
+----
+<label title="Some help text goes here...."/>
+----
+
+image::widgets/label.png[]
+
 == Help
 
 This widget is used to show static help information in form view.
