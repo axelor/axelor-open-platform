@@ -2,7 +2,9 @@ import DOMPurify from "dompurify";
 import { createElement, memo, useMemo } from "react";
 
 export function sanitize(text: string) {
-  return DOMPurify.sanitize(text);
+  return DOMPurify.sanitize(text, {
+    FORBID_TAGS: ['style'],
+  });
 }
 
 export function unaccent(value: string) {
