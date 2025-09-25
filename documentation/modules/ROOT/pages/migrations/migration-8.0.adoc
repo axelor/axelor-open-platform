@@ -721,6 +721,18 @@ The plugin on which support was provided is no longer maintained. This is now ap
 There are many Gradle plugins that can do the job. https://plugins.gradle.org/search?term=license+header[List] is
 available on the Gradle plugin portal. The awesome https://plugins.gradle.org/plugin/com.diffplug.gradle.spotless[Spotless] formatting plugin provides support for adding license headers.
 
+== Deprecate Angular support
+
+To easily migrate from previous versions, v7 was built with legacy Angular evaluations and templates support. This
+compatibility layer was intended as a temporary bridge to help move from Angular to React. Since React is now fully
+stable and supported, we encourage completing migration to React.
+
+What this means:
+
+- Legacy Angular support will be removed in an upcoming major release.
+- Any remaining Angular-based templates or evaluations will stop working once this removal takes place.
+- To ensure a smooth upgrade path, please migrate your codebase to React as soon as possible.
+
 == Dropped deprecated features
 
 Some features that were marked as deprecated in previous versions are now dropped :
