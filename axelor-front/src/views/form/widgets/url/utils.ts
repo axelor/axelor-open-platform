@@ -1,6 +1,9 @@
+const isJavaScriptProtocol =
+  /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+
 export function isValidUrl(url?: string | null) {
   // DOMPurify sanitizes HTML content, but not standalone URLs.
-  if (!url || url.trim().startsWith("javascript:")) {
+  if (!url || isJavaScriptProtocol.test(url)) {
     return false;
   }
 
