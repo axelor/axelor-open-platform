@@ -402,7 +402,7 @@ create index auth_user_token_owner_idx on auth_user_token (owner);
 
 
 To make API key authentication available for users, permissions must be set on `com.axelor.auth.db.UserToken` object
-with domain `self.owner = ?` and domain parameter `__user__`, with at least create, read, write and remove accesses.
+with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, write and remove accesses.
 
 == Multi-factor authentication
 
@@ -440,7 +440,7 @@ CREATE INDEX auth_mfa_owner_idx ON auth_mfa USING btree (owner);
 ----
 
 To make multi-factor authentication available for users, permissions must be set on `com.axelor.auth.db.MFA` object
-with domain `self.owner = ?` and domain parameter `__user__`, with at least create, read, and write accesses.
+with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, and write accesses.
 
 == S3-Compatible Object Storage
 

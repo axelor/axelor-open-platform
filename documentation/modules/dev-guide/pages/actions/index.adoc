@@ -91,7 +91,7 @@ The EL expressions can use following predefined helper functions:
 * `as(Object, Class)` - cast the object as the given class (generally, casting is automatic in EL but useful to convert context to a model class)
 * `str(Object)` - convert object to string (if null, returns empty string "")
 * `imp(String)` - import a class by name
-* `__repo__(Class)` - get the repository of the given model class
+* `\\__repo__(Class)` - get the repository of the given model class
 * `fmt:text(String, Object...)` - string format helper
 
 Some examples:
