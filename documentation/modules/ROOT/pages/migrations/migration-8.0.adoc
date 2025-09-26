@@ -400,7 +400,9 @@ create table auth_user_token (
 create index auth_user_token_owner_idx on auth_user_token (owner);
 ```
 
-To make it available for users, permissions need to be configured for the `com.axelor.auth.db.UserToken` object.
+
+To make API key authentication available for users, permissions must be set on `com.axelor.auth.db.UserToken` object
+with domain `self.owner = ?` and domain parameter `__user__`, with at least create, read, write and remove accesses.
 
 == Multi-factor authentication
 

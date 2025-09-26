@@ -48,7 +48,7 @@
         </panel>
         <help>user.password.pattern-title</help>
       </panel>
-      <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true"/>
+      <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" if="__repo__(UserToken).isPermitted()"/>
     </panel>
       <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
         <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
@@ -77,7 +77,7 @@
           <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
           <help>user.password.pattern-title</help>
       </panel>
-      <panel>
+      <panel if="__repo__(UserToken).isPermitted()">
         <field name="$manageUserTokens" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
         <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageUserTokens"/>
       </panel>

@@ -5,7 +5,9 @@
 package com.axelor.auth.db.repo;
 
 import com.axelor.auth.db.UserToken;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Query;
+import com.axelor.inject.Beans;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,5 +32,9 @@ public class UserTokenRepository extends AbstractUserTokenRepository {
   @Override
   public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
     return protectedFieldsProcessor.validate(json, context);
+  }
+
+  public boolean isPermitted() {
+    return Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, UserToken.class);
   }
 }
