@@ -298,7 +298,7 @@
 "Link","Lien",,
 "Login","Identifiant",,
 "Low","Bas",,
-"MFA_EMAIL_BODY","<p>Bonjour, {0}</p><p>{1} <strong>{2}</strong></p><p>Ce code expirera dans {3} minutes.</p><p>Si vous n'êtes pas à l’origine de cette demande, veuillez ignorer cet e-mail.</p><p>Cordialement,</p>",,
+"MFA_EMAIL_BODY","<p>Bonjour, {0}</p><p>{1}</p><p><strong>{2}</strong></p><p>Ce code expirera dans {3} minutes.</p><p>Si vous n’êtes pas à l’origine de cette demande, nous vous recommandons de changer votre mot de passe et de contacter votre administrateur immédiatement.</p><p>Cordialement,</p>",,
 "MFA_EMAIL_BODY_CODE","Voici votre code de vérification pour vous connecter sur {0} :",,
 "MFA_EMAIL_BODY_CODE_CONFIRM","Voici votre code de vérification pour confirmer votre adresse e-mail sur {0} :",,
 "MFA_EMAIL_SUBJECT","Votre code de vérification pour {0}",,
