@@ -448,9 +448,7 @@ const FormContainer = memo(function FormContainer({
   const dataStoreViewProp = useViewProp<DataStore>("dataStore");
 
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
-    useFormHandlers(meta, defaultRecord, {
-      context: action?.context,
-    });
+    useFormHandlers(meta, defaultRecord);
   const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
 
   const showConfirmDirty = useViewConfirmDirty();
