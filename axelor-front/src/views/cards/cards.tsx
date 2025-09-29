@@ -58,8 +58,8 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const getActionContext = useCallback(
     () => ({
-      ...getViewContext(true),
       ...createContextParams(view, action),
+      ...getViewContext(true),
     }),
     [getViewContext, view, action],
   );
