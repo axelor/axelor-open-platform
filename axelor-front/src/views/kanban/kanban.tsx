@@ -95,8 +95,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const getActionContext = useCallback(
     () => ({
-      ...getContext(),
       ...createContextParams(view, action),
+      ...getContext(),
     }),
     [view, action, getContext],
   );

@@ -1,0 +1,7 @@
+---
+title: Fix pass action context in panel-dashlet edit form
+type: fix
+description: |
+  When a form view is opened through the `panel-dashlet` `edit icon` in a `tab view`,
+  the newly opened form view (in tab) record should be treated as the `_parent`,
+  and the original panel-dashlet record should be passed as a nested `_parent` within it.
