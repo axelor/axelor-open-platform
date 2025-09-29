@@ -18,6 +18,7 @@
 *** xref:modules/reports.adoc[Reports]
 *** xref:modules/scheduler.adoc[Scheduler]
 *** xref:modules/messaging.adoc[Messaging]
+*** xref:modules/global-search.adoc[Global Search]
 *** xref:modules/i18n.adoc[Internationalization]
 *** xref:modules/kotlin.adoc[Kotlin Support]
 *** xref:modules/scala.adoc[Scala Support]
