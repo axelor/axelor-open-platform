@@ -49,6 +49,7 @@ import org.ldaptive.PooledConnectionFactory;
 import org.ldaptive.SearchOperation;
 import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchResponse;
+import org.ldaptive.SearchScope;
 import org.ldaptive.ad.handler.ObjectGuidHandler;
 import org.ldaptive.ad.handler.ObjectSidHandler;
 import org.ldaptive.auth.Authenticator;
@@ -77,6 +78,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
 
   private final String groupsDn;
   private final String groupFilter;
+  private final boolean usersSearchSubtree;
 
   protected static final String FILTER_FORMAT = "(%s=%s)";
 
@@ -128,6 +130,12 @@ public class AxelorLdapProfileService extends LdapProfileService {
             .map(Long::parseLong)
             .map(Duration::ofSeconds)
             .orElse(null);
+
+    usersSearchSubtree =
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_USER_SEARCH_SUBTREE))
+            .filter(StringUtils::notBlank)
+            .map(Boolean::parseBoolean)
+            .orElse(false);
 
     final SaslConfig saslConfig = getSaslConfig(authenticationType);
     final SslConfig sslConfig;
@@ -241,6 +249,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
       final SearchDnResolver searchDnResolver = new SearchDnResolver(factory);
       searchDnResolver.setBaseDn(usersDn);
       searchDnResolver.setUserFilter(userFilter);
+      searchDnResolver.setSubtreeSearch(usersSearchSubtree);
       dnResolver = searchDnResolver;
     } else {
       final String format =
@@ -359,6 +368,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
     final SearchRequest request =
         new SearchRequest(
             getUsersDn(), String.format(FILTER_FORMAT, getIdAttribute(), profile.getId()));
+    request.setSearchScope(usersSearchSubtree ? SearchScope.SUBTREE : SearchScope.ONELEVEL);
     final SearchResponse response;
 
     try {
