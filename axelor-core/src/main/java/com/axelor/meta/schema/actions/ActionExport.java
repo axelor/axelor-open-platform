@@ -54,8 +54,6 @@ public class ActionExport extends Action {
   @XmlElement(name = "export")
   private List<Export> exports;
 
-  private static record PendingExport(InputStream stream, String name) {}
-
   public Boolean getAttachment() {
     return attachment;
   }
@@ -65,59 +63,87 @@ public class ActionExport extends Action {
   }
 
   protected PendingExport doExport(Export export, ActionHandler handler) throws IOException {
-    Store store = FileStoreFactory.getStore();
     String templatePath = handler.evaluate(export.template).toString();
-    File template;
 
-    if (store.hasFile(templatePath)) {
-      template = store.getFile(templatePath);
-    } else {
-      // if not found, search the template directory
-      template = FileUtils.getFile(TEMPLATE_DIR, templatePath);
-    }
-
-    Reader reader = null;
-
-    try {
-      if (template.isFile()) {
-        reader = new FileReader(template);
-      }
-
-      if (reader == null) {
-        InputStream is = ResourceUtils.getResourceStream(templatePath);
-        if (is == null) {
-          throw new FileNotFoundException("No such template: " + templatePath);
-        }
-        reader = new InputStreamReader(is);
-      }
-
-      String name = export.getName();
-
-      if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
-        name = handler.evaluate(toExpression(name, true)).toString();
-      }
-
+    try (Reader reader = createTemplateReader(templatePath)) {
+      String name = resolveExportName(export, handler);
       log.info("export {} as {}", templatePath, name);
 
-      Templates engine = new StringTemplates('$', '$');
-      if ("groovy".equals(export.engine)) {
-        engine = new GroovyTemplates();
-      }
-
-      name = FileUtils.safeFileName(name);
-
-      String contents = handler.template(engine, reader);
+      String contents = handler.template(createTemplateEngine(export), reader);
 
       InputStream stream = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
-
-      log.info("export name: {}", name);
-
       return new PendingExport(stream, name);
-    } finally {
-      if (reader != null) {
-        reader.close();
-      }
     }
+  }
+
+  /**
+   * Create a template engine based on the export engine.
+   *
+   * @param export the export definition
+   * @return the template engine
+   */
+  private Templates createTemplateEngine(Export export) {
+    if ("groovy".equals(export.engine)) {
+      return new GroovyTemplates();
+    }
+
+    return new StringTemplates('$', '$');
+  }
+
+  /**
+   * Resolve the export name.
+   *
+   * @param export the export definition
+   * @param handler the action handler
+   * @return the resolved export name
+   */
+  private String resolveExportName(Export export, ActionHandler handler) {
+    String name = export.getName();
+
+    if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
+      name = handler.evaluate(toExpression(name, true)).toString();
+    }
+
+    return FileUtils.safeFileName(name);
+  }
+
+  /**
+   * Find the template file.
+   *
+   * @param templatePath the template path
+   * @return the template file
+   */
+  private File findTemplateFile(String templatePath) {
+    Store store = FileStoreFactory.getStore();
+
+    if (store.hasFile(templatePath)) {
+      return store.getFile(templatePath);
+    }
+
+    // if not found, search the template directory
+    return FileUtils.getFile(TEMPLATE_DIR, templatePath);
+  }
+
+  /**
+   * Create the template reader.
+   *
+   * @param templatePath the template path
+   * @return the template reader
+   * @throws IOException if an I/O error occurs
+   */
+  private Reader createTemplateReader(String templatePath) throws IOException {
+    File templateFile = findTemplateFile(templatePath);
+
+    if (templateFile.isFile()) {
+      return new FileReader(templateFile);
+    }
+
+    InputStream resourceStream = ResourceUtils.getResourceStream(templatePath);
+    if (resourceStream == null) {
+      throw new FileNotFoundException("No such template: " + templatePath);
+    }
+
+    return new InputStreamReader(resourceStream);
   }
 
   @Override
