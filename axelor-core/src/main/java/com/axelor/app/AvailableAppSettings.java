@@ -199,6 +199,7 @@ public interface AvailableAppSettings {
 
   String AUTH_LDAP_GROUP_BASE = "auth.ldap.group.base";
   String AUTH_LDAP_GROUP_FILTER = "auth.ldap.group.filter";
+  String AUTH_LDAP_GROUP_SEARCH_SUBTREE = "auth.ldap.group.search.subtree";
 
   String AUTH_LDAP_SERVER_SSL_TRUST_STORE_PATH = "auth.ldap.server.ssl.trust-store.path";
   String AUTH_LDAP_SERVER_SSL_TRUST_STORE_PASSWORD = "auth.ldap.server.ssl.trust-store.password";

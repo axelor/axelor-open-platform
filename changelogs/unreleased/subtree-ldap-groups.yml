@@ -1,0 +1,7 @@
+---
+title: Add LDAP support to subtree search for groups
+type: feature
+description: |
+  By default, search scope to locate groups is `onlevel`: only the level immediately below the base DN. Use new 
+  property `auth.ldap.group.search.subtree = true | false`, to update the search scope to `subtree` if needed (search 
+  subtree below the base DN and includes the base DN level).

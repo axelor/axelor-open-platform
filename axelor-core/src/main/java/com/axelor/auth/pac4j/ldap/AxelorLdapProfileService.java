@@ -79,6 +79,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
   private final String groupsDn;
   private final String groupFilter;
   private final boolean usersSearchSubtree;
+  private final boolean groupsSearchSubtree;
 
   protected static final String FILTER_FORMAT = "(%s=%s)";
 
@@ -133,6 +134,11 @@ public class AxelorLdapProfileService extends LdapProfileService {
 
     usersSearchSubtree =
         Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_USER_SEARCH_SUBTREE))
+            .filter(StringUtils::notBlank)
+            .map(Boolean::parseBoolean)
+            .orElse(false);
+    groupsSearchSubtree =
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_GROUP_SEARCH_SUBTREE))
             .filter(StringUtils::notBlank)
             .map(Boolean::parseBoolean)
             .orElse(false);
@@ -319,6 +325,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
     final SearchRequest request =
         new SearchRequest(
             groupsDn, filter, AxelorLdapGroupDefinition.ATTRIBUTES.stream().toArray(String[]::new));
+    request.setSearchScope(groupsSearchSubtree ? SearchScope.SUBTREE : SearchScope.ONELEVEL);
     final SearchOperation search = new SearchOperation(getConnectionFactory());
     final SearchResponse response;
 
@@ -433,6 +440,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
   protected String setGroup(LdapProfile profile, String filter) throws LdapException {
     final SearchRequest request =
         new SearchRequest(groupsDn, filter, AxelorLdapGroupDefinition.NAME);
+    request.setSearchScope(groupsSearchSubtree ? SearchScope.SUBTREE : SearchScope.ONELEVEL);
     final SearchOperation search = new SearchOperation(getConnectionFactory());
     final SearchResponse response = search.execute(request);
     final LdapEntry entry = response.getEntry();
