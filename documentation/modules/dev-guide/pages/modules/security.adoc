@@ -810,6 +810,9 @@ auth.ldap.user.filter = (uid={0})
 # user identifier attribute: uid / cn
 auth.ldap.user.id-attribute = uid
 
+# Enable subtree search for users (true by default)
+auth.ldap.user.search.subtree = true
+
 # template to search groups by user identifier
 auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
 -----

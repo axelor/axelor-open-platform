@@ -1,0 +1,6 @@
+---
+title: Add LDAP support to subtree search for users
+type: feature
+description: |
+  By default, search scope to locate users is `subtree`: search whole subtree of base DN. Use new property 
+  `auth.ldap.user.search.subtree = true | false`, to update the search scope to `onelevel` if needed.

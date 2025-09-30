@@ -220,6 +220,7 @@ public interface AvailableAppSettings {
   String AUTH_LDAP_USER_DN_FORMAT = "auth.ldap.user.dn-format";
   String AUTH_LDAP_USER_ID_ATTRIBUTE = "auth.ldap.user.id-attribute";
   String AUTH_LDAP_USER_USERNAME_ATTRIBUTE = "auth.ldap.user.username-attribute";
+  String AUTH_LDAP_USER_SEARCH_SUBTREE = "auth.ldap.user.search.subtree";
 
   String AUTH_LDAP_GROUP_BASE = "auth.ldap.group.base";
   String AUTH_LDAP_GROUP_FILTER = "auth.ldap.group.filter";
