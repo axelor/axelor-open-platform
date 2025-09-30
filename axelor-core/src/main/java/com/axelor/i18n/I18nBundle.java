@@ -13,33 +13,27 @@ import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {
 
-  private final Locale locale;
-  private final AxelorCache<String, String> messages;
+  private final String languageTag;
 
-  private boolean loaded;
+  private static final AxelorCache<String, Map<String, String>> messages =
+      CacheBuilder.newBuilder("messages").build(I18nBundle::loadMessages);
 
-  private static final Map<String, AxelorCache<String, String>> messagesCaches =
-      new ConcurrentHashMap<>();
+  private static final Logger log = LoggerFactory.getLogger(I18nBundle.class);
 
   public I18nBundle(Locale locale) {
-    this.locale = locale;
-    String languageTag = locale.toLanguageTag();
-    messages = CacheBuilder.newBuilder(languageTag).build();
-
-    // With distributed cache, we may have messages previously loaded.
-    loaded = messages.estimatedSize() > 0;
-
-    messagesCaches.put(languageTag, messages);
+    this.languageTag = locale.toLanguageTag();
   }
 
   @Override
@@ -47,7 +41,7 @@ public class I18nBundle extends ResourceBundle {
     if (StringUtils.isBlank(key)) {
       return key;
     }
-    final String result = load().get(key);
+    final String result = getMessages().get(key);
     if (StringUtils.isBlank(result)) {
       return key;
     }
@@ -56,12 +50,12 @@ public class I18nBundle extends ResourceBundle {
 
   @Override
   protected Set<String> handleKeySet() {
-    return load().keySet();
+    return getMessages().keySet();
   }
 
   @Override
   public Enumeration<String> getKeys() {
-    return Collections.enumeration(load().keySet());
+    return Collections.enumeration(getMessages().keySet());
   }
 
   @Override
@@ -69,63 +63,57 @@ public class I18nBundle extends ResourceBundle {
     return handleKeySet().contains(key);
   }
 
-  private Map<String, String> load() {
-    return loaded ? messages.asMap() : doLoad();
+  private Map<String, String> getMessages() {
+    return messages.get(languageTag);
   }
 
-  private synchronized Map<String, String> doLoad() {
+  private static Map<String, String> loadMessages(String languageTag) {
     final EntityManager em;
 
     try {
       em = JPA.em();
     } catch (Throwable e) {
-      return messages.asMap();
+      log.error("Failed to obtain entity manager", e);
+      return Collections.emptyMap();
     }
 
-    final String lang = locale.toLanguageTag();
-    final String baseLang = locale.getLanguage();
-    final int limit = 100;
+    final String language = Locale.forLanguageTag(languageTag).getLanguage();
+    final int limit = 1000;
     final TypedQuery<Object[]> query =
         em.createQuery(
                 """
-                SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END) \
-                FROM MetaTranslation self \
-                LEFT JOIN MetaTranslation base ON base.key = self.key AND base.language = :baseLang \
-                WHERE self.message IS NOT NULL AND self.language IN (:lang, :baseLang) \
-                GROUP BY self.key \
-                ORDER BY self.key""",
+                SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END)
+                FROM MetaTranslation self
+                LEFT JOIN MetaTranslation base ON base.key = self.key AND base.language = :baseLang
+                WHERE self.message IS NOT NULL AND self.language IN (:lang, :baseLang)
+                GROUP BY self.key
+                ORDER BY self.key
+                """,
                 Object[].class)
-            .setParameter("lang", lang)
-            .setParameter("baseLang", baseLang)
+            .setParameter("lang", languageTag)
+            .setParameter("baseLang", language)
             .setFlushMode(FlushModeType.COMMIT)
             .setMaxResults(limit);
 
     int offset = 0;
     List<Object[]> results;
 
-    // Clear the cache that might be stored externally
-    messages.invalidateAll();
+    Map<String, String> loadedMessages = new HashMap<>();
 
     do {
       query.setFirstResult(offset);
       results = query.getResultList();
       for (final Object[] result : results) {
-        messages.put((String) result[0], (String) result[1]);
+        loadedMessages.put((String) result[0], (String) result[1]);
       }
       offset += limit;
     } while (results.size() >= limit);
 
-    this.loaded = true;
-    return messages.asMap();
+    return loadedMessages;
   }
 
   public static void invalidate() {
     ResourceBundle.clearCache();
-
-    for (var cache : messagesCaches.values()) {
-      cache.invalidateAll();
-    }
-
-    messagesCaches.clear();
+    messages.invalidateAll();
   }
 }
