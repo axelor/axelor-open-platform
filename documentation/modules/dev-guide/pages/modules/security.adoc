@@ -807,8 +807,14 @@ You may tweak user and group search if needed for your LDAP server.
 # template to search users by user identifier
 auth.ldap.user.filter = (uid={0})
 
-# user identifier attribute: uid / cn
+# define the user DN format
+auth.ldap.user.dn-format =
+
+# user identifier attribute: uid / cn (default to `uid`)
 auth.ldap.user.id-attribute = uid
+
+# define the username attribute (default to `uid`)
+auth.ldap.user.username-attribute = uid
 
 # Enable subtree search for users (true by default)
 auth.ldap.user.search.subtree = false
