@@ -826,6 +826,11 @@ auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
 auth.ldap.group.search.subtree = true
 -----
 
+NOTE: Perform DN resolution for users by specifying either `auth.ldap.user.filter` _or_ `auth.ldap.user.dn-format`.
+If you specify neither, it will fall back to formatter built from `auth.ldap.user.id-attribute` and `auth.ldap.user.base`
+(e.g., `uid=%s,ou=users,dc=example,dc=com`) where `%s` will be assigned the user identifier value.
+Also, `auth.ldap.user.search.subtree` is applicable when using `auth.ldap.user.filter` only.
+
 :ldap-profile-service: https://github.com/pac4j/pac4j/blob/master/pac4j-ldap/src/main/java/org/pac4j/ldap/profile/service/LdapProfileService.java[LdapProfileService]
 
 If you configure the system user, the {ldap-profile-service} will be able to create, update, and remove profiles.
