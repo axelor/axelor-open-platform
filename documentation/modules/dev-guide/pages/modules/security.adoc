@@ -815,6 +815,9 @@ auth.ldap.user.search.subtree = true
 
 # template to search groups by user identifier
 auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
+
+# Enable subtree search for groups (true by default)
+auth.ldap.group.search.subtree = true
 -----
 
 :ldap-profile-service: https://github.com/pac4j/pac4j/blob/master/pac4j-ldap/src/main/java/org/pac4j/ldap/profile/service/LdapProfileService.java[LdapProfileService]
