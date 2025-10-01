@@ -23,6 +23,7 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -73,6 +74,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.hibernate.Transaction;
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -447,6 +449,24 @@ final class AuditTracker {
   }
 
   private Object getValue(
+      Map<String, Object> values,
+      Function<String, Map<String, Object>> jsonValues,
+      FieldTracking field,
+      Property property) {
+    Object value = getValueInternal(values, jsonValues, field, property);
+
+    // If value is not in the L1 cache (may be it's cleared), it may cause lazy initialization error
+    if (value instanceof Model && value instanceof HibernateProxy && !JPA.em().contains(value)) {
+      Long id = ((Model) value).getId();
+      if (id != null) {
+        return JPA.em().getReference(EntityHelper.getEntityClass(value), id);
+      }
+    }
+
+    return value;
+  }
+
+  private Object getValueInternal(
       Map<String, Object> values,
       Function<String, Map<String, Object>> jsonValues,
       FieldTracking field,
