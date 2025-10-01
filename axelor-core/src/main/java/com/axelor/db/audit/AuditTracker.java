@@ -62,6 +62,7 @@ import java.util.function.Function;
 import org.hibernate.FlushMode;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -445,6 +446,26 @@ public class AuditTracker implements BeforeTransactionCompletionProcess {
   }
 
   private Object getValue(
+      Map<String, Object> values,
+      Function<String, Map<String, Object>> jsonValues,
+      FieldTracking field,
+      Property property) {
+    Object value = getValueInternal(values, jsonValues, field, property);
+
+    // If value is not in the L1 cache (may be it's cleared), it may cause lazy initialization error
+    if (value instanceof Model model
+        && value instanceof HibernateProxy
+        && !JPA.em().contains(value)) {
+      Long id = model.getId();
+      if (id != null) {
+        return JPA.em().getReference(EntityHelper.getEntityClass(value), id);
+      }
+    }
+
+    return value;
+  }
+
+  private Object getValueInternal(
       Map<String, Object> values,
       Function<String, Map<String, Object>> jsonValues,
       FieldTracking field,

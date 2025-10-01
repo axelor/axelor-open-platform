@@ -4,6 +4,7 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,6 +20,7 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.db.AuditCheck;
 import com.google.inject.persist.Transactional;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -149,5 +151,32 @@ public class AuditTest extends JpaTest {
     assertNotEquals(0, messages.size());
     assertTrue(
         messages.stream().anyMatch(x -> AuditCheck.class.getName().equals(x.getRelatedModel())));
+  }
+
+  @Test
+  @Order(6)
+  void testClear() {
+    EntityManager em = getEntityManager();
+    assertDoesNotThrow(
+        () -> {
+          JPA.runInTransaction(
+              () -> {
+                AuditCheck entity = new AuditCheck();
+                entity.setName("testClear");
+                User user = JpaRepository.of(User.class).all().fetchOne();
+                assertNotNull(user);
+                entity.setUser(user);
+                em.persist(entity);
+
+                em.flush();
+                em.clear();
+
+                entity = em.find(AuditCheck.class, entity.getId());
+                entity.setEmail("test@example.com");
+
+                em.flush();
+                em.clear();
+              });
+        });
   }
 }

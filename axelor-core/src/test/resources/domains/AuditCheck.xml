@@ -9,11 +9,13 @@
     <string name="name"/>
     <string name="email"/>
     <string name="empSeq" sequence="seq.emp.id"/>
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User"/>
 
     <track>
       <field name="name"/>
       <field name="email" on="ALWAYS"/>
       <field name="empSeq" on="CREATE"/>
+      <field name="user"/>
       <message if="email?.contains('example.com')" on="ALWAYS">Invalid email?</message>
     </track>
 

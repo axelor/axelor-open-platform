@@ -1,0 +1,6 @@
+---
+title: Fix audit tracking issue when L1 cache is cleared
+type: fix
+description: |
+  When a tracked value is lazy proxy and is not in L1 cache, it will
+  give lazy initialization error.
