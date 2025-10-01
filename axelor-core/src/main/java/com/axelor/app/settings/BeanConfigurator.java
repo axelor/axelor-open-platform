@@ -236,9 +236,18 @@ public class BeanConfigurator {
 
     // Fallback to class instantiation (eg. `Beans.get(Class.forName(string))`)
     try {
-      return Beans.get(findClass(valueStr));
+      return getInstance(findClass(valueStr));
     } catch (Exception e) {
       throw new IllegalArgumentException(String.format("Can't convert \"%s\" to %s", value, type));
+    }
+  }
+
+  // Try injection and fall back to constructor in case Guice is not initialized
+  private static Object getInstance(Class<?> klass) throws ReflectiveOperationException {
+    try {
+      return Beans.get(klass);
+    } catch (Exception e) {
+      return klass.getConstructor().newInstance();
     }
   }
 
