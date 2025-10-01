@@ -4,18 +4,14 @@
  */
 package com.axelor.auth.pac4j.local;
 
-import static com.axelor.auth.pac4j.AxelorProfileManager.AVAILABLE_MFA_METHODS;
-import static com.axelor.auth.pac4j.AxelorProfileManager.FULLY_AUTHENTICATED;
-import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_PROFILE;
 import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_USER_NAME;
 
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
-import com.axelor.auth.MFAService;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Objects;
 import java.util.Optional;
 import org.pac4j.core.context.CallContext;
@@ -26,7 +22,6 @@ import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
 
 public class AxelorAuthenticator implements Authenticator {
@@ -42,11 +37,13 @@ public class AxelorAuthenticator implements Authenticator {
       "New password must be different." /*)*/;
   public static final String NEW_PASSWORD_DOES_NOT_MATCH_PATTERN = /*$$(*/
       "New password does not match pattern." /*)*/;
-  public static final String MISSING_2FA_USERNAME = /*$$(*/
-      "Authentication session expired. Please log in again." /*)*/;
-  public static final String INVALID_2FA_CODE = /*$$(*/
-      "The verification code you entered is incorrect." /*)*/;
-  @Inject MFAService mfaService;
+
+  private final MfaAuthenticator mfaAuthenticator;
+
+  @Inject
+  public AxelorAuthenticator(MfaAuthenticator mfaAuthenticator) {
+    this.mfaAuthenticator = mfaAuthenticator;
+  }
 
   @Override
   public Optional<Credentials> validate(CallContext ctx, Credentials inputCredentials) {
@@ -60,23 +57,18 @@ public class AxelorAuthenticator implements Authenticator {
 
     final UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) inputCredentials;
 
+    var mfaCredentials = mfaAuthenticator.getMfaCredentials(credentials);
+    if (mfaCredentials.isPresent()) {
+      return mfaAuthenticator.validate(ctx, mfaCredentials.get());
+    }
+
     final String username = credentials.getUsername();
     final String password = credentials.getPassword();
     final String newPassword =
         credentials instanceof AxelorFormCredentials axelorFormCredentials
             ? axelorFormCredentials.getNewPassword()
             : null;
-    final String mfaCode =
-        credentials instanceof AxelorFormCredentials axelorFormCredentials
-            ? axelorFormCredentials.getMfaCode()
-            : null;
-    final String mfaMethod =
-        credentials instanceof AxelorFormCredentials axelorFormCredentials
-            ? axelorFormCredentials.getMfaMethod()
-            : null;
-    if (mfaCode != null && mfaMethod != null) {
-      return validateMfaCode(ctx, mfaCode, mfaMethod);
-    }
+
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
       throw new BadCredentialsException(INCOMPLETE_CREDENTIALS);
     }
@@ -139,53 +131,5 @@ public class AxelorAuthenticator implements Authenticator {
     credentials.setUserProfile(profile);
 
     return Optional.of(credentials);
-  }
-
-  private Optional<Credentials> validateMfaCode(CallContext ctx, String mfaCode, String mfaMethod) {
-
-    if (StringUtils.isBlank(mfaCode) || StringUtils.isBlank(mfaMethod)) {
-      throw new BadCredentialsException(INCOMPLETE_CREDENTIALS);
-    }
-
-    final var context = ctx.webContext();
-    final var sessionStore = ctx.sessionStore();
-
-    final var storedUsername =
-        sessionStore
-            .get(context, PENDING_USER_NAME)
-            .map(Object::toString)
-            .orElseThrow(() -> new CredentialsException(MISSING_2FA_USERNAME));
-
-    final User user = AuthUtils.getUser(storedUsername);
-
-    if (!mfaService.verifyCode(user, mfaCode, mfaMethod)) {
-      throw new CredentialsException(INVALID_2FA_CODE);
-    }
-
-    sessionStore.set(context, PENDING_USER_NAME, null);
-    sessionStore.set(context, AVAILABLE_MFA_METHODS, null);
-    sessionStore.set(context, FULLY_AUTHENTICATED, true);
-
-    UserProfile profile = null;
-    var pendingProfile = sessionStore.get(context, PENDING_PROFILE);
-
-    if (pendingProfile.isPresent()) {
-      sessionStore.set(context, PENDING_PROFILE, null);
-      if (pendingProfile.get() instanceof UserProfile userProfile) {
-        profile = userProfile;
-      }
-    }
-
-    if (profile == null) {
-      profile = new CommonProfile();
-      profile.setId(storedUsername);
-      profile.addAttribute(Pac4jConstants.USERNAME, storedUsername);
-    }
-
-    final AxelorFormCredentials finalCredentials =
-        new AxelorFormCredentials(storedUsername, null, null, mfaCode, mfaMethod);
-    finalCredentials.setUserProfile(profile);
-
-    return Optional.of(finalCredentials);
   }
 }
