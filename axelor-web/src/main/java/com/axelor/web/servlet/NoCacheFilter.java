@@ -71,7 +71,7 @@ public class NoCacheFilter implements Filter {
     final boolean busted = req.getParameterMap().containsKey(CACHE_BUSTER_PARAM);
 
     // TODO: Move messages.js to another appropriate endpoint
-    if ("/js/messages.js".equals(uri)) {
+    if (uri.equals(req.getContextPath() + "/js/messages.js")) {
       // Exclude messages.js from caching
       chain.doFilter(request, response);
       return;
