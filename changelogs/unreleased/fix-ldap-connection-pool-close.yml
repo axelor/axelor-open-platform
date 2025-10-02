@@ -1,0 +1,16 @@
+---
+title: Fix closing LDAP connection pool when shutting down Tomcat
+type: fix
+description: |
+  With Runtime.getRuntime().addShutdownHook(),
+  closing LDAP connection pool will attempt to log something
+  after the web application has already been stopped.
+
+  Instead, now observing ShutdownEvent,
+  ensuring we close LDAP connection pool within application lifecycle.
+
+  Fixes various NoClassDefFoundError, such as:
+
+  java.lang.NoClassDefFoundError: ch/qos/logback/classic/spi/ThrowableProxy
+  Caused by: java.lang.ClassNotFoundException: Illegal access: this web application instance has been stopped already.
+  Caused by: java.lang.IllegalStateException: Illegal access: this web application instance has been stopped already.
