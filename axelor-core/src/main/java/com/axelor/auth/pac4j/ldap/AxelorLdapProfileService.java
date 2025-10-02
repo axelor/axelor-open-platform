@@ -9,9 +9,12 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jProfileService;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.event.Observes;
+import com.axelor.events.ShutdownEvent;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.io.Closeable;
 import java.lang.invoke.MethodHandles;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -59,7 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class AxelorLdapProfileService extends LdapProfileService {
+public class AxelorLdapProfileService extends LdapProfileService implements Closeable {
 
   private final String groupsDn;
   private final String groupFilter;
@@ -213,14 +216,6 @@ public class AxelorLdapProfileService extends LdapProfileService {
     }
 
     final PooledConnectionFactory factory = new PooledConnectionFactory(config);
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () -> {
-                  if (factory.isInitialized()) {
-                    factory.close();
-                  }
-                }));
     if (initializer != null) {
       factory.setActivator(
           conn -> {
@@ -264,6 +259,20 @@ public class AxelorLdapProfileService extends LdapProfileService {
     setUsernameAttribute(usernameAttribute);
     setPasswordAttribute(AxelorLdapProfileDefinition.PASSWORD);
     setProfileDefinition(new AxelorLdapProfileDefinition());
+  }
+
+  protected void onAppShutdown(@Observes ShutdownEvent event) {
+    close();
+  }
+
+  @Override
+  public void close() {
+    final ConnectionFactory factory = getConnectionFactory();
+    if (factory instanceof PooledConnectionFactory pooledConnectionFactory
+        && pooledConnectionFactory.isInitialized()) {
+      pooledConnectionFactory.close();
+      logger.info("LDAP connection pool closed");
+    }
   }
 
   @Override
