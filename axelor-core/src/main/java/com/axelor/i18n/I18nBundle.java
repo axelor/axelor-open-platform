@@ -11,9 +11,13 @@ import com.axelor.db.JPA;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +33,8 @@ public class I18nBundle extends ResourceBundle {
 
   private static final AxelorCache<String, Map<String, String>> messages =
       CacheBuilder.newBuilder("messages").build(I18nBundle::loadMessages);
+  private static final AxelorCache<String, String> hashes =
+      CacheBuilder.newBuilder("hashes").build(I18nBundle::computeHash);
 
   private static final Logger log = LoggerFactory.getLogger(I18nBundle.class);
 
@@ -79,7 +85,7 @@ public class I18nBundle extends ResourceBundle {
 
     final String language = Locale.forLanguageTag(languageTag).getLanguage();
     final int limit = 1000;
-    final TypedQuery<Object[]> query =
+    final TypedQuery<String[]> query =
         em.createQuery(
                 """
                 SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END)
@@ -89,22 +95,22 @@ public class I18nBundle extends ResourceBundle {
                 GROUP BY self.key
                 ORDER BY self.key
                 """,
-                Object[].class)
+                String[].class)
             .setParameter("lang", languageTag)
             .setParameter("baseLang", language)
             .setFlushMode(FlushModeType.COMMIT)
             .setMaxResults(limit);
 
     int offset = 0;
-    List<Object[]> results;
+    List<String[]> results;
 
     Map<String, String> loadedMessages = new HashMap<>();
 
     do {
       query.setFirstResult(offset);
       results = query.getResultList();
-      for (final Object[] result : results) {
-        loadedMessages.put((String) result[0], (String) result[1]);
+      for (final String[] result : results) {
+        loadedMessages.put(result[0], result[1]);
       }
       offset += limit;
     } while (results.size() >= limit);
@@ -112,8 +118,38 @@ public class I18nBundle extends ResourceBundle {
     return loadedMessages;
   }
 
+  private static String computeHash(String languageTag) {
+    MessageDigest messageDigest;
+    try {
+      messageDigest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+
+    messages.get(languageTag).entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .forEach(
+            entry -> {
+              messageDigest.update(entry.getKey().getBytes(StandardCharsets.UTF_8));
+              messageDigest.update(entry.getValue().getBytes(StandardCharsets.UTF_8));
+            });
+
+    return HexFormat.of().formatHex(messageDigest.digest());
+  }
+
+  /**
+   * Returns the messages hash for the given locale.
+   *
+   * @param locale the locale
+   * @return the messages hash
+   */
+  public static String getHash(Locale locale) {
+    return hashes.get(locale.toLanguageTag());
+  }
+
   public static void invalidate() {
     ResourceBundle.clearCache();
     messages.invalidateAll();
+    hashes.invalidateAll();
   }
 }

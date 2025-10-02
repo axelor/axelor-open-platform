@@ -72,7 +72,7 @@ public class NoCacheFilter implements Filter {
 
     // TODO: Move messages.js to another appropriate endpoint
     if (uri.equals(req.getContextPath() + "/js/messages.js")) {
-      // Exclude messages.js from caching
+      // Cache managed I18nServlet
       chain.doFilter(request, response);
       return;
     }
