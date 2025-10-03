@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import set from "lodash/set";
+import setImmutableValue from "lodash/fp/set";
 
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
@@ -22,7 +22,7 @@ export function ManyToOne(props: GridColumnProps) {
         if (key.startsWith(prefix)) {
           const fieldName = key.slice(prefix.length);
           const fieldValue = record[key];
-          return set(_value, fieldName, fieldValue);
+          return setImmutableValue(fieldName, fieldValue, _value);
         }
         return _value;
       },
