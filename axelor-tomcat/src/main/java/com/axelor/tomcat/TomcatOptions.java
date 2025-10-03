@@ -23,6 +23,8 @@ public class TomcatOptions {
 
   private int maxThreads;
 
+  private int cacheMaxSize = 100 * 1024; // 100M
+
   private List<Path> roots = new ArrayList<>();
 
   private List<Path> classes = new ArrayList<>();
@@ -96,6 +98,14 @@ public class TomcatOptions {
 
   public void setMaxThreads(int maxThreads) {
     this.maxThreads = maxThreads;
+  }
+
+  public int getCacheMaxSize() {
+    return cacheMaxSize;
+  }
+
+  public void setCacheMaxSize(int cacheMaxSize) {
+    this.cacheMaxSize = cacheMaxSize;
   }
 
   public List<Path> getRoots() {

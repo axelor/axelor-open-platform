@@ -34,6 +34,9 @@ public class RunCommand implements CliCommand {
   @Option(names = "--max-threads", description = "Set the maximum number of worker threads.")
   private int maxThreads;
 
+  @Option(names = "--cache-max-size", description = "Set the maximum cache size for resources.")
+  private int cacheMaxSize;
+
   @Option(names = "--help", usageHelp = true, hidden = true)
   private boolean help;
 
@@ -77,6 +80,11 @@ public class RunCommand implements CliCommand {
       if (maxThreads > 0) {
         args.add("--max-threads");
         args.add(String.valueOf(maxThreads));
+      }
+
+      if (cacheMaxSize > 0) {
+        args.add("--cache-max-size");
+        args.add(String.valueOf(cacheMaxSize));
       }
 
       // add webapp

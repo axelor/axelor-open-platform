@@ -75,6 +75,8 @@ public class TomcatServer {
     final StandardContext context = (StandardContext) tomcat.addWebapp(contextPath, docBase);
     final StandardRoot resources = new StandardRoot();
 
+    resources.setCacheMaxSize(options.getCacheMaxSize());
+
     context.setParentClassLoader(getClass().getClassLoader());
     context.setResources(resources);
     context.setUnpackWAR(false);

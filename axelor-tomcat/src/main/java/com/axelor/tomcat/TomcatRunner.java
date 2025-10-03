@@ -42,6 +42,9 @@ public class TomcatRunner implements Runnable {
   @Option(names = "--max-threads", description = "Set the maximum number of worker threads.")
   private int maxThreads;
 
+  @Option(names = "--cache-max-size", description = "Set the maximum cache size for resources.")
+  private int cacheMaxSize;
+
   @Option(
       names = "--extra-classes",
       split = ",",
@@ -90,6 +93,9 @@ public class TomcatRunner implements Runnable {
 
     settings.setProxyUrl(proxyUrl);
     settings.setMaxThreads(maxThreads);
+    if (cacheMaxSize > 0) {
+      settings.setCacheMaxSize(cacheMaxSize);
+    }
 
     settings.setContextPath(
         Optional.ofNullable(contextPath).orElse(props.getProperty("contextPath", "")));
