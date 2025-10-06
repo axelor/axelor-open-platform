@@ -75,7 +75,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalDate o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
@@ -85,7 +85,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalDateTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
@@ -95,7 +95,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
