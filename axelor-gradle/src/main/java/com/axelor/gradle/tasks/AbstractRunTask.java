@@ -23,9 +23,9 @@ import org.gradle.api.tasks.options.Option;
 
 public abstract class AbstractRunTask extends JavaExec {
 
-  @Option(option = "config", description = "specify the appliction config file path.")
+  @Option(option = "config", description = "specify the application config file path.")
   public void setConfig(String config) {
-    this.jvmArgs("-Daxelor.config", config);
+    this.jvmArgs("-Daxelor.config=" + config);
   }
 
   @Internal
@@ -61,7 +61,7 @@ public abstract class AbstractRunTask extends JavaExec {
     try {
       Files.createDirectories(manifestJar.toPath().getParent());
     } catch (IOException e) {
-      throw new GradleException("Unexpected error occured.", e);
+      throw new GradleException("Unexpected error occurred.", e);
     }
 
     attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
@@ -76,7 +76,7 @@ public abstract class AbstractRunTask extends JavaExec {
     try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(manifestJar), manifest)) {
       return manifestJar;
     } catch (IOException e) {
-      throw new GradleException("Unexpected error occured.", e);
+      throw new GradleException("Unexpected error occurred.", e);
     }
   }
 
