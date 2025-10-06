@@ -54,7 +54,7 @@ public class TomcatRunner implements Runnable {
   @Option(names = "--extra-libs", split = ",", description = "Specify additional libraries.")
   private List<Path> extraLibs;
 
-  @Option(names = "--port", description = "The tomcat port nunber.", defaultValue = "8080")
+  @Option(names = "--port", description = "The tomcat port number.", defaultValue = "8080")
   private Integer port;
 
   private static List<String> getList(Properties props, String key) {

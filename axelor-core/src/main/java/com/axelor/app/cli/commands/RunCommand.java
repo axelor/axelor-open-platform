@@ -19,7 +19,7 @@ import picocli.CommandLine.Option;
 @Command(name = "run", description = "Run the application.")
 public class RunCommand implements CliCommand {
 
-  @Option(names = "--port", description = "The tomcat port nunber.", defaultValue = "8080")
+  @Option(names = "--port", description = "The tomcat port number.", defaultValue = "8080")
   private Integer port;
 
   @Option(names = "--base-dir", description = "The tomcat base directory.")
