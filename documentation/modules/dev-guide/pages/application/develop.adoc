@@ -9,17 +9,37 @@ In this chapter, we will see how to develop axelor applications effectively.
 Please check the xref:getting-started:index.adoc[getting started guide] for
 pre-requisites and configuring your favourite IDE.
 
-== Run in Debug mode
+== Run the application
 
-You can run the application in debug mode during development like this:
+The embedded server is easiest way to run the application during development.
+
+Run the following command in terminal:
 
 [source,sh]
 ----
-$ ./gradlew --no-daemon run --debug-jvm
+$ ./gradlew --no-daemon run
 ----
 
-This will start the app in debug mode waiting for debugger on `5005` port. Attach your
+IMPORTANT: always execute run task with gradle using `--no-daemon` to avoid application clean up issues (known gradle problem)
+
+After a few seconds, you should see some logs and at the end something like this:
+
+[source,text]
+----
+...
+Ready to serve...
+
+Running at http://localhost:8080/axelor-demo
+----
+
+Open the given link in your browser and log in
+
+The run task accepts the following command line options:
+
+* `--port <number>` : alternative port, default to 8080
+* `--debug-jvm` : start application in debug mode waiting for debugger on `5005` port. Attach your
 favourite Java debugger on this port to start debugging.
+* `--config <path>` : specify the application config file path
 
 == XML Hotswap
 
