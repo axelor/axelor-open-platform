@@ -45,6 +45,28 @@ The reports should only use `JDBC Data Source` to create data sets for the repor
 The {page-component-title} applications utilizes the internal hibernate connection to
 configure the report data sources.
 
+== Files storage
+
+To support any file storage system (local, s3, ...), a utility function has been created to deal with files included in
+reports (images, etc…).
+
+Use dynamic images to allow blob images to be inserted into the report. With the onCreate event script, set the image
+data.
+
+[source,js]
+----
+var imgData = com.axelor.report.tool.ImageTool.getImageBytes(row["<my_file_id>"], true);
+
+this.altText = "";
+if (imgData != null) {
+  this.data = imgData;
+}
+----
+
+`com.axelor.report.tool.ImageTool.getImageBytes(Long metaFileId, boolean cache)` accept as first
+parameter the id of the `MetaFile` and as second parameter whether to cache the file (see `data.object-storage.cache.*`
+properties).
+
 == Action Report
 
 Reports can be executed using a special xml action `action-report`.

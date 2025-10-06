@@ -486,6 +486,13 @@ if (store.hasFile(filePath)) {
 }
 ----
 
+WARNING: As explained, switching the storage type in the configuration does not automatically make existing code
+compatible with object storage. The application should not access files directly using system APIs. Instead, always
+use the provided storage APIs (`MetaFiles`/`FileStoreFactory`) to manage files. These APIs ensure compatibility with
+both file system and object storage backends. If you are using BIRT reports (or any other report templates) that were
+originally designed for the local file system, you may need to adapt them to use the storage abstraction layer instead of
+relying on local file paths. More details xref:dev-guide:modules/reports.adoc[here].
+
 Temporary file management was moved from `com.axelor.meta.MetaFiles` to `com.axelor.file.temp.TempFiles`
 and will use the new `data.upload.temp-dir` property:
 
