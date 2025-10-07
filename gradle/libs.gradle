@@ -160,7 +160,7 @@ libs.flywaydb = [
 ]
 
 // eclipselink
-libs.eclipselink_moxy = dependencies.create("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7") {
+libs.eclipselink_moxy = dependencies.create("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.8") {
   exclude group: 'org.eclipse.angus'
 }
 
