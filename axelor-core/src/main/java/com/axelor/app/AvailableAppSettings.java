@@ -95,6 +95,7 @@ public interface AvailableAppSettings {
 
   String TEMPLATE_SEARCH_DIR = "template.search-dir";
 
+  String DATA_STORE_PROVIDER = "data.store.provider";
   String DATA_UPLOAD_DIR = "data.upload.dir";
   String DATA_UPLOAD_TEMP_DIR = "data.upload.temp-dir";
   String FILE_UPLOAD_SIZE = "data.upload.max-size";

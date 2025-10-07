@@ -66,6 +66,13 @@ data.object-storage.cache.clean-frequency =
 | cache.clean-frequency | Number of hits from which the cache is cleaned, -1 means disabled  | 1000
 |===
 
+NOTE: This is a generic implementation that supports S3 compatible object storage service only. It is built on top of
+the MinIO Java Client, which implements the standard S3 API. As a result, it should work seamlessly with most object
+storage providers that expose an S3-compatible interface. It is not tied to any specific cloud provider and does not
+rely on proprietary extensions. It focuses on portability and standard S3 functionality such as object upload,
+download, deletion. See xref:custom-store[Custom Store] bellow create your own implementation of the Store interface to
+integrate non–S3-compatible storage service.
+
 ==== Credentials provider chain
 
 When `access-key` and `secret-key` are not specified, an AWS credentials provider chain will be used instead.
@@ -98,6 +105,12 @@ data.object-storage.aws-config.profile =
 |===
 
 All the AWS-specific properties are usually left empty, unless you have special requirements.
+
+[#custom-store]
+=== Custom Store
+
+`data.store.provider` property allows setting FQN of a `Store` implementation so that a custom storage system can be used. The
+class should implement `com.axelor.file.store.Store` and has a no-arg constructor.
 
 == Temp files
 

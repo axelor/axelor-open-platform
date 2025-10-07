@@ -277,6 +277,7 @@ Choose the right option by environment :
 | `data.export.collections.separator` | export separator for collections fields | ` \| `
 | `data.export.locale` | define a fixed locale for all exports |
 | `data.import.demo-data` | whether to import demo data for the application | true
+| `data.store.provider` | FQN of a `Store` implementation |
 | `template.search-dir` | template storage path for groovy template | \{user.home}/.axelor/templates
 | `cors.allow-origin` | comma-separated list of origins to allow | '*'
 | `cors.allow-credentials` | whether credentials are supported | true
