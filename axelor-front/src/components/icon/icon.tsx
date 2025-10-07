@@ -124,6 +124,9 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   nights_stay: "partly_cloudy_night",
   // 2025-08-20
   sign_language_2: "sign_language",
+  // 2025-09-19
+  motion_photos_off: "motion_sensor_idle",
+  transcribe: "record_voice_over",
 };
 
 export type IconProps = {

@@ -20,7 +20,7 @@
     "svgo": "svgo --multipass src/assets/*.svg"
   },
   "dependencies": {
-    "@axelor/ui": "0.5.5",
+    "@axelor/ui": "0.5.6",
     "@babel/standalone": "^7.28.4",
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.19",
