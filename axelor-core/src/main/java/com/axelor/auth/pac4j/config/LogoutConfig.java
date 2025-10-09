@@ -4,6 +4,7 @@
  */
 package com.axelor.auth.pac4j.config;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorCallbackLogic;
 import com.axelor.auth.pac4j.AxelorCsrfAuthorizer;
@@ -34,8 +35,7 @@ public class LogoutConfig extends BaseConfig {
       AxelorCsrfMatcher csrfMatcher,
       AxelorSecurityLogic securityLogic,
       AxelorCallbackLogic callbackLogic,
-      AxelorLogoutLogic logoutLogic,
-      AuthPac4jInfo info) {
+      AxelorLogoutLogic logoutLogic) {
 
     super(
         clients,
@@ -51,7 +51,7 @@ public class LogoutConfig extends BaseConfig {
           if (action instanceof WithLocationAction withLocationAction
               && AuthPac4jInfo.isXHR(context)) {
             final String url = withLocationAction.getLocation();
-            if (Objects.equals(url, info.getBaseUrl())) {
+            if (Objects.equals(url, AppSettings.get().getBaseURL())) {
               action = NoContentAction.INSTANCE;
             } else {
               context.setResponseHeader(

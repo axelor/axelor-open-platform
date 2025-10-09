@@ -7,6 +7,7 @@ package com.axelor.auth.pac4j;
 import static com.axelor.auth.pac4j.AxelorProfileManager.AVAILABLE_MFA_METHODS;
 import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_USER_NAME;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
 import com.axelor.auth.db.MFAMethod;
@@ -92,7 +93,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
     }
 
     return super.perform(
-        config, pac4jInfo.getBaseUrl(), inputRenewSession, defaultClient, parameters);
+        config, AppSettings.get().getBaseURL(), inputRenewSession, defaultClient, parameters);
   }
 
   /**

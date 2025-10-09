@@ -29,20 +29,17 @@ public class AuthPac4jInfo {
 
   private Authenticator authenticator;
 
-  public String getBaseUrl() {
-    return AppSettings.get().getBaseURL();
-  }
-
   /**
    * Return the main callback endpoint for users authentication
    *
    * @return url form where the users are authenticated
    */
   public String getCallbackUrl() {
-    String authCallbackUrl = AppSettings.get().get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
+    AppSettings settings = AppSettings.get();
+    String authCallbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
     if (StringUtils.isBlank(authCallbackUrl)) {
       authCallbackUrl =
-          UriBuilder.from(Optional.ofNullable(getBaseUrl()).orElse(""))
+          UriBuilder.from(Optional.ofNullable(settings.getBaseURL()).orElse(""))
               .addPath("/callback")
               .toUri()
               .toString();
@@ -59,7 +56,7 @@ public class AuthPac4jInfo {
     final AppSettings settings = AppSettings.get();
     String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_DEFAULT_URL, null);
     if (StringUtils.isBlank(authLogoutUrl)) {
-      authLogoutUrl = getBaseUrl();
+      authLogoutUrl = settings.getBaseURL();
       if (StringUtils.isBlank(authLogoutUrl)) {
         authLogoutUrl = ".";
       }

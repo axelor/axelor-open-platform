@@ -4,8 +4,8 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
 import com.axelor.common.UriBuilder;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.lang.invoke.MethodHandles;
 import org.pac4j.core.context.WebContext;
@@ -21,13 +21,6 @@ public class ErrorHandler {
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-  private final AuthPac4jInfo pac4jInfo;
-
-  @Inject
-  public ErrorHandler(AuthPac4jInfo pac4jInfo) {
-    this.pac4jInfo = pac4jInfo;
-  }
 
   public Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
@@ -47,7 +40,7 @@ public class ErrorHandler {
     }
 
     final var errorUriBuilder =
-        UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null);
+        UriBuilder.from(AppSettings.get().getBaseURL()).addQueryParam("error", null);
     context
         .getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
         .ifPresent(
