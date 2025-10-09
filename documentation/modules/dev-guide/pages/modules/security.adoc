@@ -607,12 +607,13 @@ auth.provider.saml.private-key-password = open-platform-demo-passwd
 auth.provider.saml.identity-provider-metadata-path = http://localhost:9012/simplesaml/saml2/idp/metadata.php
 # path to SP metadata
 auth.provider.saml.service-provider-metadata-path = path/to/sp-metadata.xml
-# full callback URL for proper SP metadata generation
-auth.provider.saml.callback-url = https://example.com/my-axelor-app/callback
+# SP entity ID
+auth.provider.saml.service-provider-entity-id = sp.test.pac4j
 -----
 
+NOTE: Proper SP metadata generation requires a full callback URL. This means you must set either `application.base-url` (so that callback URL can be computed as `application.base-url` + "/callback") or `auth.callback-url`.
+
 By default, the SAML client will accept assertions based on a previous authentication for one hour, but you can change that behavior.
-The service provider entity ID defaults to `auth.callback-url` + "?client_name=SAML2Client", but you can customize it.
 
 .axelor-config.properties
 [source,properties]
@@ -621,8 +622,6 @@ The service provider entity ID defaults to `auth.callback-url` + "?client_name=S
 #
 # accept assertions based on a previous authentication for one hour by default
 auth.provider.saml.maximum-authentication-lifetime = 3600
-# custom SP entity ID
-auth.provider.saml.service-provider-entity-id = sp.test.pac4j
 -----
 
 You can control aspects of the authentication request such as forced and/or passive authentication.
