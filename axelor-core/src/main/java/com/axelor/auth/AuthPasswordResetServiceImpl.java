@@ -11,9 +11,7 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.PasswordResetTokenRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
-import com.axelor.db.tenants.TenantConfig;
 import com.axelor.db.tenants.TenantModule;
-import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
 import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailAddress;
@@ -21,7 +19,6 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailService;
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.invoke.MethodHandles;
@@ -30,7 +27,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -210,7 +206,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
   protected String createResetUrl(User user) {
     final var url =
         new StringBuilder()
-            .append("%s/#/reset-password?token=%s".formatted(getBaseUrl(true), createToken(user)));
+            .append("%s/#/reset-password?token=%s".formatted(getBaseUrl(), createToken(user)));
     final var httpRequest = getHttpRequest();
     final var headerTenantId = httpRequest.getHeader("X-Tenant-ID");
 
@@ -284,52 +280,14 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
    *
    * @return the base URL
    */
-  protected String getBaseUrl(boolean trimSlash) {
-    var url =
-        settings.isProduction()
-            ? settings.get(AvailableAppSettings.APPLICATION_BASE_URL)
-            : settings.getBaseURL();
-    final var tenantId = TenantResolver.currentTenantIdentifier();
-
-    if (StringUtils.notBlank(tenantId)
-        && !Objects.equals(tenantId, TenantConfig.DEFAULT_TENANT_ID)) {
-      final var tenantBaseUrl = getTenantBaseUrl(tenantId);
-      if (StringUtils.notBlank(tenantBaseUrl)) {
-        url = tenantBaseUrl;
-      }
-    }
+  protected String getBaseUrl() {
+    var url = settings.getBaseURL();
 
     if (StringUtils.isBlank(url)) {
       throw new IllegalArgumentException("Application base URL is not set");
     }
 
-    if (trimSlash && url != null && url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
-
     return url;
-  }
-
-  protected String getBaseUrl() {
-    return getBaseUrl(false);
-  }
-
-  @Nullable
-  protected String getTenantBaseUrl(String tenantId) {
-    final var hostsKey = "db.%s.hosts".formatted(tenantId);
-    final var hostsValue = settings.get(hostsKey);
-    if (StringUtils.notBlank(hostsValue)) {
-      final var hosts = Arrays.asList(hostsValue.split("\\s*,\\s*"));
-      if (!hosts.isEmpty()) {
-        final var host = hosts.getFirst();
-        if (StringUtils.notBlank(host)) {
-          final var httpRequest = getHttpRequest();
-          return "%s://%s%s".formatted(httpRequest.getScheme(), host, httpRequest.getContextPath());
-        }
-      }
-    }
-
-    return null;
   }
 
   protected HttpServletRequest getHttpRequest() {
