@@ -52,7 +52,7 @@ export function MFA() {
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>
       <MFAForm
         shadow
-        state={{ ...routeState, params }}
+        state={{ ...routeState }}
         onBackToLogin={handleBackToLogin}
       />
       <AlertsProvider />

@@ -7,7 +7,6 @@ package com.axelor.auth.pac4j.ldap;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jProfileService;
-import com.axelor.auth.pac4j.local.MfaAuthenticator;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.event.Observes;
@@ -69,8 +68,6 @@ public class AxelorLdapProfileService extends LdapProfileService implements Clos
   private final String groupFilter;
   private final boolean usersSearchSubtree;
   private final boolean groupsSearchSubtree;
-
-  @Inject private MfaAuthenticator mfaAuthenticator;
 
   protected static final String FILTER_FORMAT = "(%s=%s)";
 
@@ -297,11 +294,6 @@ public class AxelorLdapProfileService extends LdapProfileService implements Clos
 
   @Override
   public Optional<Credentials> validate(CallContext ctx, Credentials credentials) {
-    var mfaCredentials = mfaAuthenticator.getMfaCredentials(credentials);
-    if (mfaCredentials.isPresent()) {
-      return mfaAuthenticator.validate(ctx, mfaCredentials.get());
-    }
-
     if (Optional.ofNullable(credentials)
         .filter(UsernamePasswordCredentials.class::isInstance)
         .map(UsernamePasswordCredentials.class::cast)

@@ -5,6 +5,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
+import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
@@ -12,6 +13,7 @@ import org.pac4j.core.context.WebContextHelper;
 import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.jee.context.JEEContext;
 
+@Singleton
 public class AxelorUrlResolver extends DefaultUrlResolver {
 
   public AxelorUrlResolver() {}

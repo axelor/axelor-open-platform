@@ -23,7 +23,7 @@ import {
   mfaSession,
   sendEmailVerificationCode,
 } from "@/services/client/mfa";
-import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "@/routes/login";
+import { CLIENT_NAME_PARAM } from "@/routes/login";
 import styles from "./mfa-form.module.scss";
 
 function getTimeoutOfEmailRetryByUser(username: string) {
@@ -44,7 +44,6 @@ export function MFAForm({
     methods?: MFAMethod[];
     username?: string;
     emailRetryAfter?: string;
-    params?: URLSearchParams;
     tenant?: string;
   };
   shadow?: boolean;
@@ -53,31 +52,13 @@ export function MFAForm({
 }) {
   const session = useSession();
   const { copyright } = useAppSettings();
-  const {
-    methods = [],
-    username = "",
-    emailRetryAfter,
-    params: _params,
-    tenant,
-  } = state ?? {};
+  const { methods = [], username = "", emailRetryAfter, tenant } = state ?? {};
 
   const availableMethods: MFAMethod[] = [...methods, "RECOVERY"];
 
-  const params = useMemo(() => {
-    const defaultClient = session.data?.authentication?.defaultClient;
-
-    if (defaultClient && defaultClient !== FORM_CLIENT_NAME) {
-      const mfaParams = new URLSearchParams(_params);
-      mfaParams.set(CLIENT_NAME_PARAM, FORM_CLIENT_NAME);
-      return mfaParams;
-    }
-
-    return _params;
-  }, [_params, session.data?.authentication?.defaultClient]);
-
   const [mfaCode, setMFACode] = useState("");
   const [mfaMethod, setMFAMethod] = useState<MFAMethod>(
-    mfaSession.MFAMethod.get(username) ?? (availableMethods?.[0] as MFAMethod),
+    mfaSession.MFAMethod.get(username) ?? availableMethods?.[0],
   );
   const [showOptions, setShowOptions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,6 +134,9 @@ export function MFAForm({
         setIsSubmitting(true);
 
         try {
+          const params = new URLSearchParams({
+            [CLIENT_NAME_PARAM]: "MfaClient",
+          });
           const info = await session.login(
             { username, mfaCode, mfaMethod },
             { params, tenant },
@@ -178,7 +162,6 @@ export function MFAForm({
         username,
         mfaCode,
         mfaMethod,
-        params,
         tenant,
         showAlert,
         onBackToLogin,

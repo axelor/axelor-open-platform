@@ -42,7 +42,7 @@ public class AxelorFormClient extends FormClient {
       setLoginUrl(LOGIN_URL);
       setAuthenticatorIfUndefined(authPac4jInfo.getAuthenticator());
       setCredentialsExtractor(Beans.get(FormExtractor.class));
-      setUrlResolver(new AxelorUrlResolver());
+      setUrlResolver(Beans.get(AxelorUrlResolver.class));
     }
 
     super.internalInit(forceReinit);

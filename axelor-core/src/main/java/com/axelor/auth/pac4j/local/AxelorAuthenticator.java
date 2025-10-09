@@ -11,7 +11,6 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import jakarta.inject.Inject;
 import java.util.Objects;
 import java.util.Optional;
 import org.pac4j.core.context.CallContext;
@@ -38,13 +37,6 @@ public class AxelorAuthenticator implements Authenticator {
   public static final String NEW_PASSWORD_DOES_NOT_MATCH_PATTERN = /*$$(*/
       "New password does not match pattern." /*)*/;
 
-  private final MfaAuthenticator mfaAuthenticator;
-
-  @Inject
-  public AxelorAuthenticator(MfaAuthenticator mfaAuthenticator) {
-    this.mfaAuthenticator = mfaAuthenticator;
-  }
-
   @Override
   public Optional<Credentials> validate(CallContext ctx, Credentials inputCredentials) {
     if (inputCredentials == null) {
@@ -56,11 +48,6 @@ public class AxelorAuthenticator implements Authenticator {
     }
 
     final UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) inputCredentials;
-
-    var mfaCredentials = mfaAuthenticator.getMfaCredentials(credentials);
-    if (mfaCredentials.isPresent()) {
-      return mfaAuthenticator.validate(ctx, mfaCredentials.get());
-    }
 
     final String username = credentials.getUsername();
     final String password = credentials.getPassword();

@@ -7,6 +7,7 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.local.AxelorApiKeyClient;
+import com.axelor.auth.pac4j.local.MfaClient;
 import com.axelor.inject.Beans;
 import com.google.inject.ImplementedBy;
 import com.google.inject.Provider;
@@ -46,6 +47,9 @@ public abstract class ClientListService implements Provider<List<Client>> {
   protected void init() {
     // API key auth
     clients.add(Beans.get(AxelorApiKeyClient.class));
+
+    // MFA client
+    clients.add(Beans.get(MfaClient.class));
 
     // Basic auth
 
