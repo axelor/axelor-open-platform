@@ -7,6 +7,8 @@ package com.axelor.app;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.app.settings.SettingsBuilder;
 import com.axelor.common.StringUtils;
+import com.axelor.db.tenants.TenantResolver;
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,23 +109,50 @@ public final class AppSettings {
   }
 
   /**
-   * Get the application base URL.
+   * Retrieves the base URL for the application.
    *
-   * <p>This method tries to calculate the base url from current http request. If the method is
-   * called outside of http request scope, it returns the value of <code>application.base-url</code>
-   * configuration setting.
+   * <p>The base URL is determined through the following order:<br>
+   * 1. If a tenant identifier is resolved and its corresponding host is available, that host is
+   * used.<br>
+   * 2. If no tenant-specific host is found, the application base URL from the <code>
+   * application.base-url</code> configuration setting is used.<br>
+   * 3. If neither are available, the base URL is retrieved from the current http request.<br>
    *
-   * @return application base url
+   * @return the resolved base URL for the application
    */
   public String getBaseURL() {
-    String url = AppFilter.getBaseURL();
+    String url = null;
+    String tenantId = TenantResolver.currentTenantIdentifier();
+
+    if (tenantId != null) {
+      url = getTenantBaseUrl(tenantId);
+    }
+
     if (url == null) {
       url = get(AvailableAppSettings.APPLICATION_BASE_URL);
     }
+
+    if (url == null) {
+      url = AppFilter.getBaseURL();
+    }
+
     if (StringUtils.notBlank(url) && url.endsWith("/")) {
       url = url.substring(0, url.length() - 1);
     }
+
     return url;
+  }
+
+  @Nullable
+  protected String getTenantBaseUrl(String tenantId) {
+    var host = TenantResolver.currentTenantHost();
+
+    if (StringUtils.isBlank(host)) {
+      return null;
+    }
+
+    var scheme = isProduction() ? "https" : "http";
+    return scheme + "://" + host;
   }
 
   public boolean isProduction() {

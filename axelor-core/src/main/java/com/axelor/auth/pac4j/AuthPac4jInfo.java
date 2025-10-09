@@ -41,7 +41,11 @@ public class AuthPac4jInfo {
   public String getCallbackUrl() {
     String authCallbackUrl = AppSettings.get().get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
     if (StringUtils.isBlank(authCallbackUrl)) {
-      authCallbackUrl = UriBuilder.from(getBaseUrl()).addPath("/callback").toUri().toString();
+      authCallbackUrl =
+          UriBuilder.from(Optional.ofNullable(getBaseUrl()).orElse(""))
+              .addPath("/callback")
+              .toUri()
+              .toString();
     }
     return authCallbackUrl;
   }

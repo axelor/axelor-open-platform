@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 /** The tenant identifier resolver. */
-public class TenantResolver implements CurrentTenantIdentifierResolver {
+public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
 
   static final ThreadLocal<String> CURRENT_HOST = new ThreadLocal<>();
   static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
