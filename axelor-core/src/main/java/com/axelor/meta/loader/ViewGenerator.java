@@ -5,9 +5,9 @@
 package com.axelor.meta.loader;
 
 import com.axelor.common.ObjectUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
@@ -183,7 +183,8 @@ public class ViewGenerator {
               index ->
                   futures.add(
                       executor.submit(
-                          new TenantAware(() -> counts[index] = generate(subLists.get(index))))));
+                          ContextAware.of()
+                              .build(() -> counts[index] = generate(subLists.get(index))))));
     } finally {
       executor.shutdown();
     }

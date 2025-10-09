@@ -1,0 +1,6 @@
+---
+title: Deprecate `TenantAware` and `AuditableRunner`
+type: deprecate
+description: |
+  This is replaced by a generic context propagation system based on ContextState and ContextAware* wrappers.
+  Use `ContextAwareRunnable` or `ContextAwareCallable` instead.

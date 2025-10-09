@@ -4,8 +4,8 @@
  */
 package com.axelor.db;
 
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.db.tenants.TenantResolver;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -32,8 +32,6 @@ public class ParallelTransactionExecutor {
 
   private final String tenantId;
 
-  private final String tenantHost;
-
   private final int numWorkers;
 
   private final ExecutorService workerPool;
@@ -54,10 +52,7 @@ public class ParallelTransactionExecutor {
    * processors.
    */
   public ParallelTransactionExecutor() {
-    this(
-        TenantResolver.currentTenantIdentifier(),
-        TenantResolver.currentTenantHost(),
-        DBHelper.getMaxWorkers());
+    this(TenantResolver.currentTenantIdentifier(), DBHelper.getMaxWorkers());
   }
 
   /**
@@ -66,22 +61,19 @@ public class ParallelTransactionExecutor {
    */
   /**
    * @param tenantId
-   * @param tenantHost
    */
-  public ParallelTransactionExecutor(String tenantId, String tenantHost) {
-    this(tenantId, tenantHost, DBHelper.getMaxWorkers());
+  public ParallelTransactionExecutor(String tenantId) {
+    this(tenantId, DBHelper.getMaxWorkers());
   }
 
   /**
    * Instantiates a parallel transaction executor with the specified number of workers.
    *
    * @param tenantId
-   * @param tenantHost
    * @param numWorkers
    */
-  public ParallelTransactionExecutor(String tenantId, String tenantHost, int numWorkers) {
+  public ParallelTransactionExecutor(String tenantId, int numWorkers) {
     this.tenantId = tenantId;
-    this.tenantHost = tenantHost;
     this.numWorkers = numWorkers;
     workerPool = Executors.newFixedThreadPool(numWorkers);
     workerFutures = new ArrayList<>(numWorkers);
@@ -133,8 +125,7 @@ public class ParallelTransactionExecutor {
 
     for (int i = 0; i < numWorkers; ++i) {
       workerFutures.add(
-          workerPool.submit(
-              new TenantAware(this::runCommands).tenantId(tenantId).tenantHost(tenantHost)));
+          workerPool.submit(ContextAware.of().withTenantId(tenantId).build(this::runCommands)));
     }
   }
 

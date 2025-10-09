@@ -5,6 +5,8 @@
 package com.axelor.db.tenants;
 
 import com.axelor.app.internal.AppFilter;
+import com.axelor.concurrent.ContextAwareCallable;
+import com.axelor.concurrent.ContextAwareRunnable;
 import com.axelor.db.JPA;
 import java.util.Locale;
 
@@ -17,6 +19,8 @@ import java.util.Locale;
  * information during thread execution.
  *
  * <p>By default, it will run the task inside a new transaction.
+ *
+ * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
  */
 public class TenantAware extends Thread {
 

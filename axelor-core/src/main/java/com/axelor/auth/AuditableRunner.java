@@ -6,11 +6,17 @@ package com.axelor.auth;
 
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.concurrent.ContextAwareCallable;
+import com.axelor.concurrent.ContextAwareRunnable;
 import jakarta.inject.Inject;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-/** This class can be used to run batch jobs that requires to keep track of audit logs. */
+/**
+ * This class can be used to run batch jobs that requires to keep track of audit logs.
+ *
+ * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
+ */
 public class AuditableRunner {
 
   static final ThreadLocal<User> batchUser = new ThreadLocal<>();

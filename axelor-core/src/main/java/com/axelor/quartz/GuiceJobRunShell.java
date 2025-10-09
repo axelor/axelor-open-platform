@@ -7,7 +7,7 @@ package com.axelor.quartz;
 import static org.quartz.utils.Key.DEFAULT_GROUP;
 
 import com.axelor.common.StringUtils;
-import com.axelor.db.tenants.TenantAware;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.tenants.TenantConfig;
 import com.axelor.db.tenants.TenantConfigProvider;
 import com.axelor.inject.Beans;
@@ -69,10 +69,12 @@ public class GuiceJobRunShell extends JobRunShell {
     if (config != null && Boolean.TRUE.equals(config.getActive())) {
       // JobRunShell may re-use same thread from the pool, so run the task in a new
       // thread to ensure the task is always run with a proper tenant id.
-      TenantAware task = new TenantAware(this::superRun).tenantId(tenantId).withTransaction(false);
-      task.start();
+      Runnable task =
+          ContextAware.of().withTransaction(false).withTenantId(tenantId).build(this::superRun);
+      Thread t = new Thread(task);
+      t.start();
       try {
-        task.join();
+        t.join();
       } catch (InterruptedException e) {
         handleError(e);
       }

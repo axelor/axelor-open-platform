@@ -4,8 +4,8 @@
  */
 package com.axelor.meta.loader;
 
-import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.AuthService;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -13,6 +13,7 @@ import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.cache.DistributedFactory;
 import com.axelor.common.ObjectUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.i18n.I18n;
@@ -160,12 +161,15 @@ public class ModuleManager {
   private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
     viewLoader.initialize();
     try {
-      Beans.get(AuditableRunner.class)
-          .run(
+      ContextAware.of()
+          .withTransaction(false)
+          .withUser(AuthUtils.getUser("admin"))
+          .build(
               () -> {
                 moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
                 moduleList.forEach(m -> viewLoader.doLast(m, update));
-              });
+              })
+          .run();
     } finally {
       viewLoader.terminate();
     }

@@ -89,9 +89,9 @@ to some external database).
 
 == Multi-threading
 
-Any multi-threaded or multi-process task, should run with a special helper `com.axelor.db.tenants.TenantAware`.
+Any multithreaded or multiprocess tasks should be wrapped to enable execution within a context-aware environment.
 
-Suppose you have following code that executes a task using a separate background process:
+Suppose you have the following code that executes a task using a separate background process:
 
 [source,java]
 .process task
@@ -102,39 +102,43 @@ executor.submit(() -> {
 });
 ----
 
-It will not work as expected as the current tenant context is not available outside the current thread.
+It will not work as expected as the current tenant context is not available outside the current thread. Also, it will
+not set current admin running the process.
 
-It can be fixed with following changes:
+It can be fixed with the following changes:
 
 [source,java]
 .tenant aware process task
 -----
 final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
-executor.submit(new TenantAware(() -> {
-  // work with database
-}));
+executor.submit(ContextAware.of().build(
+  () -> {
+    // work with database
+  }
+));
 -----
 
-Now the task will have the current tenant context.
+Now the task will have the current tenant and current user context.
 
-IMPORTANT: The `TenantAware` thread will run the task inside a new transaction by default.
-If this is not the expected behaviour, you can disable it with `.withTransaction(false)`
+IMPORTANT: The `ContextAware*` system will run the task inside a new transaction by default.
+If this is not the expected behavior, you can disable it with `.withTransaction(false)`
 before starting the thread.
 
 However, if the process is not started from a web request (directly or indirectly),
-you have to pass the desired tenant id manually. Otherwise, it will assume a default tenant.
+you have to pass the desired tenant id and user manually. Otherwise, it will assume a default tenant and no user.
 
 [source,java]
 .tenant aware process task
 -----
 final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
-executor.submit(new TenantAware(() -> {
-  // work with database
-})
-.tenantId("some-tenant"));
+executor.submit(ContextAware.of().withTenantId("some-tenant").withUser(AuthUtils.getUser("admin")).build(
+  () -> {
+    // work with database
+  }
+));
 -----
 
-Same way, you have to change and tasks running in different threads:
+The same way, you have to change and tasks running in different threads:
 
 [source,java]
 .threaded task
@@ -151,17 +155,14 @@ should be changed to:
 [source,java]
 .tenant aware threaded task
 -----
-Thread task = new TenantAware(() -> {
-  // work with database
-});
+Thread task = new Thread(ContextAware.of().build(
+  () -> {
+    // work with database
+  }
+));
 
 task.start();
 -----
-
-The `TenantAware` is a subclass of `java.lang.Thread`.
-
-IMPORTANT: if the thread or process is not started from a web request, we have to
-set the tenant id manually somehow using `TenantAware#tenantId(String)` method.
 
 == Authentication
 

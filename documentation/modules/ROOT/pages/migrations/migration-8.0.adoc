@@ -402,7 +402,7 @@ create index auth_user_token_owner_idx on auth_user_token (owner);
 
 
 To make API key authentication available for users, permissions must be set on `com.axelor.auth.db.UserToken` object
-with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, write and remove accesses.
+with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, write, and remove accesses.
 
 == Multi-factor authentication
 
@@ -580,6 +580,66 @@ Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] 
 === i18n exports
 
 i18n exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
+
+== New context propagation system
+
+The new context propagation system is used to propagate context across threads and tasks submission. This is an
+all-in-one system combining `TenantAware` and `AuditableRunner` behaviors.
+
+The main issue is to propagate in threads and tasks all information's coming from HTTP requests (only available in
+servlet environments). Are concerned: the current user, tenant, locale, language and base URL. Some can be
+determined by application properties, some logic can be dependent from the request. The system is now able to propagate
+all current context information in threads and tasks. It also allows manually defining them in (case of scheduling /
+batching).
+
+`ContextAwareRunnable` or `ContextAwareCallable` can be used to propagate context
+information. This should be used over deprecated `TenantAware` and `AuditableRunner`.
+
+Migrate from `TenantAware` :
+
+[source,java]
+----
+// ❌ Old code
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(new TenantAware(() -> {
+  // work with database
+})
+.tenantId("some-tenant"));
+
+// ✅ New code
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(ContextAware.of().withTenantId("some-tenant")).build(
+  () -> {
+    // work with database
+  }
+);
+----
+
+Migrate from `AuditableRunner` :
+
+[source,java]
+----
+// ❌ Old code
+final AuditableRunner runner = Beans.get(AuditableRunner.class);
+final Callable<Boolean> job = () -> {
+  // process
+};
+runner.run(job);
+
+// ✅ New code
+final Callable<Boolean> job = () -> {
+  // process
+};
+ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).build(job).call();
+----
+
+IMPORTANT: The `AuditableRunner` first tries to set current authenticated user as audit user but if not found it will
+set admin user as the audit user. Also, it doesn't run the task inside a new transaction. With the new implementation,
+it no more sets the admin user as the audit user by default. In a non-servlet environment, you may have to provide the
+user you want the process runs with. Also, it opens a new translation by default. This can be disabled with
+`.withTransaction(false)`.
+
+See more details xref:dev-guide:application/multi-tenancy.adoc[here]
 
 == Scripting Policy
 

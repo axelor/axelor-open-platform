@@ -8,11 +8,11 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.PermissionRepository;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
@@ -249,59 +249,61 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
         .forEach(
             ids ->
                 executor.execute(
-                    new TenantAware(
-                        () -> {
-                          JPA.em()
-                              .createQuery(
-                                  """
-                                  UPDATE DMSPermission self SET self.value = :value \
+                    ContextAware.of()
+                        .build(
+                            () -> {
+                              JPA.em()
+                                  .createQuery(
+                                      """
+                                      UPDATE DMSPermission self SET self.value = :value \
                                   WHERE self.id IN :ids""")
-                              .setParameter("value", entity.getValue())
-                              .setParameter("ids", ids)
-                              .executeUpdate();
-                          JPA.flush();
-                          JPA.clear();
-                        })));
+                                  .setParameter("value", entity.getValue())
+                                  .setParameter("ids", ids)
+                                  .executeUpdate();
+                              JPA.flush();
+                              JPA.clear();
+                            })));
 
     Lists.partition(createPermissionFileIds, BATCH_SIZE)
         .forEach(
             ids ->
                 executor.execute(
-                    new TenantAware(
-                        () -> {
-                          final Group group =
-                              Optional.ofNullable(entity.getGroup())
-                                  .map(Group::getId)
-                                  .map(id -> JpaRepository.of(Group.class).find(id))
-                                  .orElse(null);
-                          final User user =
-                              Optional.ofNullable(entity.getUser())
-                                  .map(User::getId)
-                                  .map(id -> JpaRepository.of(User.class).find(id))
-                                  .orElse(null);
-                          final Permission permission =
-                              Optional.ofNullable(entity.getPermission())
-                                  .map(Permission::getId)
-                                  .map(id -> JpaRepository.of(Permission.class).find(id))
-                                  .orElse(null);
-                          JpaRepository.of(DMSFile.class)
-                              .all()
-                              .filter("self.id IN :ids")
-                              .bind("ids", ids)
-                              .fetch()
-                              .forEach(
-                                  file -> {
-                                    final DMSPermission dmsPermission = new DMSPermission();
-                                    dmsPermission.setValue(entity.getValue());
-                                    dmsPermission.setFile(file);
-                                    dmsPermission.setGroup(group);
-                                    dmsPermission.setUser(user);
-                                    dmsPermission.setPermission(permission);
-                                    JPA.em().persist(dmsPermission);
-                                  });
-                          JPA.flush();
-                          JPA.clear();
-                        })));
+                    ContextAware.of()
+                        .build(
+                            () -> {
+                              final Group group =
+                                  Optional.ofNullable(entity.getGroup())
+                                      .map(Group::getId)
+                                      .map(id -> JpaRepository.of(Group.class).find(id))
+                                      .orElse(null);
+                              final User user =
+                                  Optional.ofNullable(entity.getUser())
+                                      .map(User::getId)
+                                      .map(id -> JpaRepository.of(User.class).find(id))
+                                      .orElse(null);
+                              final Permission permission =
+                                  Optional.ofNullable(entity.getPermission())
+                                      .map(Permission::getId)
+                                      .map(id -> JpaRepository.of(Permission.class).find(id))
+                                      .orElse(null);
+                              JpaRepository.of(DMSFile.class)
+                                  .all()
+                                  .filter("self.id IN :ids")
+                                  .bind("ids", ids)
+                                  .fetch()
+                                  .forEach(
+                                      file -> {
+                                        final DMSPermission dmsPermission = new DMSPermission();
+                                        dmsPermission.setValue(entity.getValue());
+                                        dmsPermission.setFile(file);
+                                        dmsPermission.setGroup(group);
+                                        dmsPermission.setUser(user);
+                                        dmsPermission.setPermission(permission);
+                                        JPA.em().persist(dmsPermission);
+                                      });
+                              JPA.flush();
+                              JPA.clear();
+                            })));
   }
 
   private void recursiveRemoveHavingSamePermission(DMSPermission entity) {

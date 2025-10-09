@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
-import com.axelor.auth.AuditableRunner;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.inject.Beans;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.db.AuditCheck;
@@ -78,9 +78,8 @@ public class AuditTest extends JpaTest {
   @Test
   @Order(1)
   public void testInsert() {
-    AuditableRunner runner = Beans.get(AuditableRunner.class);
-
-    runner.run(() -> createEntity("Some NAME"));
+    final Runnable job = () -> createEntity("Some NAME");
+    ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).build(job).run();
 
     AuditCheck entity = Query.of(AuditCheck.class).fetchOne();
 
@@ -103,9 +102,8 @@ public class AuditTest extends JpaTest {
   @Test
   @Order(2)
   public void testUpdate() {
-    final AuditableRunner runner = Beans.get(AuditableRunner.class);
-
-    runner.run(() -> createEntity("Another NAME"));
+    final Runnable job = () -> createEntity("Another NAME");
+    ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).build(job).run();
 
     final AuditCheck entity =
         Query.of(AuditCheck.class).filter("self.name = ?", "Another NAME").fetchOne();
@@ -114,7 +112,8 @@ public class AuditTest extends JpaTest {
 
     final Integer lastVersion = entity.getVersion();
 
-    runner.run(() -> updateEntity(entity, "New NAME"));
+    final Runnable job2 = () -> updateEntity(entity, "New NAME");
+    ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).build(job2).run();
 
     final AuditCheck updatedEntity =
         Query.of(AuditCheck.class).filter("self.name = ?", "New NAME").fetchOne();

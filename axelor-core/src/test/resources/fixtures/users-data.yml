@@ -1,0 +1,15 @@
+- type: User
+  key: admin
+  properties:
+    code: admin
+    name: admin
+    email: admin@test.fr
+    password: admin1234
+
+- type: User
+  key: demo
+  properties:
+    code: demo
+    name: demo
+    email: demo@test.fr
+    password: demo1234

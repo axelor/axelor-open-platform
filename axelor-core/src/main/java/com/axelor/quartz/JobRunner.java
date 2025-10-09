@@ -9,9 +9,9 @@ import static org.quartz.utils.Key.DEFAULT_GROUP;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.db.tenants.TenantConfig;
 import com.axelor.db.tenants.TenantConfigProvider;
 import com.axelor.db.tenants.TenantModule;
@@ -361,14 +361,15 @@ public class JobRunner {
     try {
       executor
           .submit(
-              new TenantAware(
+              ContextAware.of()
+                  .withTenantId(group)
+                  .build(
                       () -> {
                         result.set(
                             JPA.em()
                                 .createQuery(META_SCHEDULE_QUERY, MetaSchedule.class)
                                 .getResultList());
-                      })
-                  .tenantId(group))
+                      }))
           .get();
     } catch (InterruptedException | ExecutionException e) {
       log.warn("Unable to find jobs, group: {}", group);
