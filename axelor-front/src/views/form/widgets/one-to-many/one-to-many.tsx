@@ -312,6 +312,7 @@ function OneToManyInner({
     lastSelectedIdsByServer: number[];
     serverSelectedIds: number[] | null;
     syncServerSelectionPending: boolean;
+    hasRefreshBeenCalled: boolean;
   }>({
     reorder: false,
     recordsSync: false,
@@ -321,6 +322,7 @@ function OneToManyInner({
     lastSelectedIdsByServer: [],
     serverSelectedIds: null,
     syncServerSelectionPending: false,
+    hasRefreshBeenCalled: false,
   });
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -507,12 +509,19 @@ function OneToManyInner({
                 .concat(newRecords);
             });
 
+            refs.current.hasRefreshBeenCalled = false;
+
             const result = await set(
               valueAtom,
               (refs.current.value = values),
               callOnChange,
               markDirty,
             );
+
+            // Check if a refresh was triggered during the onChange event.
+            // This can happen in scenarios where an action (e.g. save) is performed
+            // as part of the onChange handler. If so, exit early to avoid further updates.
+            if (refs.current.hasRefreshBeenCalled) return;
 
             const hasValueChanged =
               (result as unknown as ActionResult[])?.filter?.(
@@ -1607,11 +1616,12 @@ function OneToManyInner({
     fetchAndSetDetailRecord(selected);
   }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
 
-  const onRefresh = useCallback(() => {
+  const onFormRefresh = useCallback(() => {
+    refs.current.hasRefreshBeenCalled = true;
     resetValue();
   }, [resetValue]);
 
-  useFormRefresh(onRefresh);
+  useFormRefresh(onFormRefresh);
 
   const onDiscard = useCallback(
     (record: DataRecord) => {
