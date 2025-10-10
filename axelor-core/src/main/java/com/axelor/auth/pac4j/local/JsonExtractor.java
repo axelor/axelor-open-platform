@@ -46,6 +46,6 @@ public class JsonExtractor extends FormExtractor {
     if (username != null && password != null) {
       return Optional.of(new AxelorFormCredentials(username, password, newPassword, null, null));
     }
-    return Optional.of(new AxelorFormCredentials(null, null, null, mfaCode, mfaMethod));
+    return Optional.of(new AxelorFormCredentials(username, null, null, mfaCode, mfaMethod));
   }
 }

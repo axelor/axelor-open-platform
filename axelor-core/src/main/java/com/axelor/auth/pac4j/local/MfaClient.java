@@ -27,6 +27,12 @@ public class MfaClient extends IndirectClient {
       setAuthenticator(Beans.get(MfaAuthenticator.class));
       setCredentialsExtractor(Beans.get(FormExtractor.class));
       setUrlResolver(Beans.get(AxelorUrlResolver.class));
+      setRedirectionActionBuilderIfUndefined(
+          ctx -> {
+            var webContext = ctx.webContext();
+            var finalLoginUrl = getUrlResolver().compute(AxelorFormClient.LOGIN_URL, webContext);
+            return Optional.of(HttpActionHelper.buildRedirectUrlAction(webContext, finalLoginUrl));
+          });
     }
   }
 
