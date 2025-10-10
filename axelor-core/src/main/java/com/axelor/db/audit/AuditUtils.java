@@ -4,7 +4,6 @@
  */
 package com.axelor.db.audit;
 
-import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import java.util.Optional;
@@ -24,7 +23,7 @@ final class AuditUtils {
   }
 
   static User currentUser(SessionImplementor session) {
-    User user = AuditableRunner.batchUser();
+    User user = AuthUtils.getCurrentUser();
     if (user == null) {
       String code =
           Optional.ofNullable(AuthUtils.getSubject())

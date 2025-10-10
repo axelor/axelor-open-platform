@@ -21,18 +21,50 @@ import org.apache.shiro.subject.Subject;
 
 public class AuthUtils {
 
+  private static final ThreadLocal<User> CURRENT_USER = new ThreadLocal<>();
+
+  /** For internal use only. */
+  public static void setCurrentUser(User user) {
+    CURRENT_USER.set(user);
+  }
+
+  /** For internal use only. */
+  public static User getCurrentUser() {
+    return CURRENT_USER.get();
+  }
+
+  /** For internal use only. */
+  public static void removeCurrentUser() {
+    CURRENT_USER.remove();
+  }
+
   public static Subject getSubject() {
     try {
       return SecurityUtils.getSubject();
     } catch (UnavailableSecurityManagerException e) {
+      // ignore
     }
     return null;
   }
 
+  /**
+   * Retrieves the current user associated with the thread or session.
+   *
+   * <p>It first uses the current user stored in the thread-local (set for batch / audit purpose) if
+   * provided. Else it attempts to retrieve the user based on the principal associated with the
+   * current subject
+   *
+   * @return the current user if available; otherwise null
+   */
   public static User getUser() {
+    final User currentUser = CURRENT_USER.get();
+    if (currentUser != null) {
+      return getUser(currentUser.getCode());
+    }
     try {
       return getUser(getSubject().getPrincipal().toString());
     } catch (NullPointerException | InvalidSessionException e) {
+      // ignore
     }
     return null;
   }

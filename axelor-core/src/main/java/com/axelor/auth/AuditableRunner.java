@@ -19,8 +19,6 @@ import java.util.concurrent.Callable;
  */
 public class AuditableRunner {
 
-  static final ThreadLocal<User> batchUser = new ThreadLocal<>();
-
   private static final String DEFAULT_BATCH_USER = "admin";
 
   private UserRepository users;
@@ -36,7 +34,7 @@ public class AuditableRunner {
    * @return current user
    */
   public static User batchUser() {
-    return batchUser.get();
+    return AuthUtils.getCurrentUser();
   }
 
   /**
@@ -74,11 +72,11 @@ public class AuditableRunner {
       user = users.findByCode(DEFAULT_BATCH_USER);
     }
 
-    batchUser.set(user);
+    AuthUtils.setCurrentUser(user);
     try {
       return job.call();
     } finally {
-      batchUser.remove();
+      AuthUtils.removeCurrentUser();
     }
   }
 }
