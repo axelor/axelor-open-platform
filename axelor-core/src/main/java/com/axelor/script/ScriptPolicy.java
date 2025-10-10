@@ -132,21 +132,30 @@ class ScriptPolicy {
 
   public boolean allowed(Class<?> klass) {
     String pkg = klass.getPackageName();
+    Class<?> cls = getTopClass(klass);
 
-    if (denyClasses.stream().anyMatch(x -> x.isAssignableFrom(klass))
+    if (denyClasses.stream().anyMatch(x -> x.isAssignableFrom(cls))
         || denyPackages.stream().anyMatch(x -> match(x, pkg))) {
       return false;
     }
 
-    if (isAnnotationPresent(klass, ScriptAllowed.class)
-        || allowClasses.stream().anyMatch(x -> x.isAssignableFrom(klass))
+    if (isAnnotationPresent(cls, ScriptAllowed.class)
+        || allowClasses.stream().anyMatch(x -> x.isAssignableFrom(cls))
         || allowPackages.stream().anyMatch(x -> match(x, pkg))) {
       return true;
     }
 
-    return Model.class.isAssignableFrom(klass)
-        || Repository.class.isAssignableFrom(klass)
-        || ValueEnum.class.isAssignableFrom(klass);
+    return Model.class.isAssignableFrom(cls)
+        || Repository.class.isAssignableFrom(cls)
+        || ValueEnum.class.isAssignableFrom(cls);
+  }
+
+  private static Class<?> getTopClass(Class<?> klass) {
+    Class<?> current = klass;
+    while (current.getEnclosingClass() != null) {
+      current = current.getEnclosingClass();
+    }
+    return current;
   }
 
   private static boolean isAnnotationPresent(

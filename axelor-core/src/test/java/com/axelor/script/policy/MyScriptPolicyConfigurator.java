@@ -17,7 +17,6 @@ public class MyScriptPolicyConfigurator implements ScriptPolicyConfigurator {
       List<Class<?>> denyClasses) {
 
     allowClasses.add(AllowedByConfiguration.class);
-    allowClasses.add(AllowedByConfiguration.InnerAllowed.class);
     allowClasses.add(MyOtherService.class);
 
     denyClasses.add(DeniedByConfiguration.class);

@@ -17,10 +17,4 @@ public class AllowedByConfiguration {
       return "InnerAllowedByConfiguration";
     }
   }
-
-  public static class InnerDenied {
-    public static String myStaticMethod() {
-      return "InnerDeniedByDefault";
-    }
-  }
 }

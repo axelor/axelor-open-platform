@@ -64,11 +64,10 @@ class TestScriptPolicy {
         "InnerAllowedByAnnotation",
         helper.eval(
             "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerAllowed).myMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDenied).myMethod()"));
+    assertEquals(
+        "InnerDefault",
+        helper.eval(
+            "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDefault).myMethod()"));
 
     // Allowed by configuration
     assertEquals(
@@ -78,20 +77,16 @@ class TestScriptPolicy {
         "InnerAllowedByConfiguration",
         helper.eval(
             "com.axelor.script.policy.AllowedByConfiguration.InnerAllowed.myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "com.axelor.script.policy.AllowedByConfiguration.InnerDenied.myStaticMethod()"));
 
     // Denied by configuration
     assertThrows(
         IllegalArgumentException.class,
         () -> helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticMethod()"));
-    assertEquals(
-        "InnerAllowedByAnnotation",
-        helper.eval(
-            "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -199,11 +194,10 @@ class TestScriptPolicy {
         "InnerAllowedByAnnotation",
         helper.eval(
             "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerAllowed).myMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDenied).myMethod()"));
+    assertEquals(
+        "InnerDefault",
+        helper.eval(
+            "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDefault).myMethod()"));
 
     // Allowed by configuration
     assertEquals(
@@ -213,20 +207,16 @@ class TestScriptPolicy {
         "InnerAllowedByConfiguration",
         helper.eval(
             "com.axelor.script.policy.AllowedByConfiguration.InnerAllowed.myStaticMethod()"));
-    // assertThrows(
-    //     IllegalArgumentException.class,
-    //     () ->
-    //         helper.eval(
-    //             "com.axelor.script.policy.AllowedByConfiguration.InnerDenied.myStaticMethod()"));
 
     // denied by configuration
     assertThrows(
         IllegalArgumentException.class,
         () -> helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticMethod()"));
-    // assertEquals(
-    //     "InnerAllowedByAnnotation",
-    //     helper.eval(
-    //         "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -331,11 +321,10 @@ class TestScriptPolicy {
         "InnerAllowedByAnnotation",
         helper.eval(
             "__bean__(T('com.axelor.script.policy.AllowedByAnnotation$InnerAllowed')).myMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(T('com.axelor.script.policy.AllowedByAnnotation$InnerDenied')).myMethod()"));
+    assertEquals(
+        "InnerDefault",
+        helper.eval(
+            "__bean__(T('com.axelor.script.policy.AllowedByAnnotation$InnerDefault')).myMethod()"));
 
     // Allowed by configuration
     assertEquals(
@@ -345,20 +334,16 @@ class TestScriptPolicy {
         "InnerAllowedByConfiguration",
         helper.eval(
             "T('com.axelor.script.policy.AllowedByConfiguration$InnerAllowed').myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "T('com.axelor.script.policy.AllowedByConfiguration$InnerDenied').myStaticMethod()"));
 
     // Denied by configuration
     assertThrows(
         IllegalArgumentException.class,
         () -> helper.eval("T('com.axelor.script.policy$DeniedByConfiguration').myStaticMethod()"));
-    assertEquals(
-        "InnerAllowedByAnnotation",
-        helper.eval(
-            "T('com.axelor.script.policy.DeniedByConfiguration$InnerAllowed').myStaticMethod()"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "T('com.axelor.script.policy.DeniedByConfiguration$InnerAllowed').myStaticMethod()"));
     assertThrows(
         IllegalArgumentException.class,
         () ->

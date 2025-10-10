@@ -20,11 +20,8 @@ and/or via programmatic configuration.
 For best practice, you should prefer applying the rules on service
 interfaces, not implementations.
 
-Also note that if you aim for consistency across Groovy, Expression
-Language, and JavaScript, you should apply your rules on top-level classes
-and interfaces only (avoid rules on inner classes).
-Groovy and Expression Language can look up rules directly for the requested
-type, but JavaScript looks up the outer class only.
+You can apply rules on top-level classes and interfaces only.
+Nested/inner classes are checked against rules applied to their top-level classes.
 
 === Annotation-based Whitelisting
 

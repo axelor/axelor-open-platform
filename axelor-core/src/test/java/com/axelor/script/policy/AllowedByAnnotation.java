@@ -22,9 +22,9 @@ public class AllowedByAnnotation {
     }
   }
 
-  public static class InnerDenied {
+  public static class InnerDefault {
     public String myMethod() {
-      return "InnerDeniedByDefault";
+      return "InnerDefault";
     }
   }
 }
