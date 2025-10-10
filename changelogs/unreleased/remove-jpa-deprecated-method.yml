@@ -1,0 +1,3 @@
+---
+title: Remove deprecated method `JPA#withTransaction(Supplier)` in favor of `JPA#callInTransaction(Supplier)`
+type: remove

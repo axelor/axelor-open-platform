@@ -627,20 +627,6 @@ public final class JPA {
     }
   }
 
-  /**
-   * Run the given <code>task</code> inside a transaction that is committed after the task is
-   * completed and return the task result.
-   *
-   * @deprecated use {@link #callInTransaction(Supplier)}
-   * @param <T>
-   * @param task
-   * @return task result
-   */
-  @Deprecated(forRemoval = true)
-  public static <T> T withTransaction(Supplier<T> task) {
-    return callInTransaction(task);
-  }
-
   public static <T> T callInTransaction(Supplier<T> task) {
     final var holder =
         new Object() {
