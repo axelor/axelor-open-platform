@@ -2,4 +2,5 @@
 ** xref:install.adoc[Installation]
 ** xref:eclipse.adoc[Eclipse]
 ** xref:idea.adoc[IntelliJ IDEA]
+** xref:vscode.adoc[VSCode]
 ** xref:closing.adoc[What's Next?]
