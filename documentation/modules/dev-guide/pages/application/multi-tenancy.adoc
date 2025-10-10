@@ -172,7 +172,4 @@ Clients with session support should send `X-Tenant-ID` header with login request
 
 == Limitations
 
-Following features are disabled in multi-tenancy mode:
-
-* xref:modules/scheduler.adoc[Scheduler]
-* Schema generations
+Schema generation is disabled in multi-tenancy mode.
