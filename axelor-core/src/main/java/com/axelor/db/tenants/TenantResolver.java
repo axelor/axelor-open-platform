@@ -5,6 +5,9 @@
 package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
+import jakarta.annotation.Nullable;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +30,33 @@ public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
     if (!enabled) return;
     CURRENT_TENANT.set(tenantId);
     CURRENT_HOST.set(tenantHost);
+  }
+
+  public static void setCurrentTenant(String tenantId) {
+    if (!enabled) return;
+    CURRENT_TENANT.set(tenantId);
+    CURRENT_HOST.set(findTenantHost(tenantId));
+  }
+
+  @Nullable
+  private static String findTenantHost(String tenantId) {
+    var tenantConfigProvider = Beans.get(TenantConfigProvider.class);
+    var config =
+        tenantConfigProvider.find(tenantId == null ? TenantConfig.DEFAULT_TENANT_ID : tenantId);
+
+    if (config == null || Boolean.FALSE.equals(config.getActive())) {
+      return null;
+    }
+
+    var hostsValue = config.getTenantHosts();
+
+    if (StringUtils.isBlank(hostsValue)) {
+      return null;
+    }
+
+    var hosts = Arrays.asList(hostsValue.split("\\s*,\\s*"));
+
+    return hosts.isEmpty() ? null : hosts.get(0);
   }
 
   public static String currentTenantIdentifier() {
