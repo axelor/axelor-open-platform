@@ -83,7 +83,8 @@ The package name pattern can be like:
 - `java.time.*` - match all classes in this package and its immediate
   sub-packages
 
-NOTE: Denied classes/packages take precedence over allowed classes/packages.
+Package rules match by package name, while class rules match by inheritance.
+Denied classes/packages take precedence over allowed classes/packages.
 
 == Core Security Rules
 
@@ -91,12 +92,19 @@ These rules are added after any custom configuration.
 
 === Allowed
 
-- Java Core
+- Java Core Packages
   ** `java.lang`
   ** `java.util`
   ** `java.time.*`
   ** `java.text`
   ** `java.math`
+
+- Java Core Interfaces
+  ** `java.util.Map`,
+  ** `java.util.Map.Entry`,
+  ** `java.util.Iterator`,
+  ** `java.lang.Iterable`,
+  ** `java.lang.CharSequence`,
 
 - Java Persistence
   ** `jakarta.persistence.Query`

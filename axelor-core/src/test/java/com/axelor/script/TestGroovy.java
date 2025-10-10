@@ -235,6 +235,85 @@ public class TestGroovy extends ScriptTest {
   }
 
   @Test
+  void testGString() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("\" ${lastName} \".trim()");
+    assertEquals("NAME", result);
+  }
+
+  @Test
+  void testRange() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("(1..2).subList(0, 1).toList()");
+    assertEquals(List.of(1), result);
+  }
+
+  @Test
+  void testRangeIterator() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("(1..5).iterator().chop(2).toList()");
+    assertEquals(List.of(List.of(1, 2)), result);
+  }
+
+  @Test
+  void testTuple() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("new Tuple2(1, 2).subList(0, 1)");
+    assertEquals(List.of(1), result);
+  }
+
+  @Test
+  void testSequence() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def s = ((1..2) as Sequence)
+            s.add(3)
+            s
+            """);
+    assertEquals(List.of(1, 2, 3), result);
+  }
+
+  @Test
+  void testMapWithDefault() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def m = [:].withDefault { key -> key.toUpperCase() }
+            m.get('foo')
+            """);
+    assertEquals("FOO", result);
+  }
+
+  @Test
+  void testListWithDefault() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def l = [].withDefault { i -> i * 2 }
+            l.get(2)
+            """);
+    assertEquals(4, result);
+  }
+
+  @Test
+  void testClosure() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def first = { it.toUpperCase() }
+            def second = { it.reverse() }
+
+            second.call(first.call("abc"))
+            """);
+    assertEquals("CBA", result);
+  }
+
+  @Test
   public void testTimeout() {
     GroovyScriptHelper helper = new GroovyScriptHelper(context()).withTimeout(100);
     assertThrows(

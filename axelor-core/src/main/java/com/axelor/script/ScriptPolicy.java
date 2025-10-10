@@ -26,6 +26,13 @@ class ScriptPolicy {
   };
 
   private static final Class<?>[] ALLOW_CLASSES = {
+    // java
+    java.util.Map.class,
+    java.util.Map.Entry.class,
+    java.util.Iterator.class,
+    java.lang.Iterable.class,
+    java.lang.CharSequence.class,
+
     // axelor db classes
     com.axelor.db.Model.class,
     com.axelor.db.Query.class,
