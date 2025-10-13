@@ -303,12 +303,10 @@ function Footer({
   }, [handleCancel, setHandler]);
 
   useEffect(() => {
-    return handler.actionHandler?.subscribe(async (data) => {
+    return handler.actionHandler?.setCloseHandler(async () => {
       const { actionExecutor, getState } = handler;
       await actionExecutor?.wait();
-      if (data.type === "close") {
-        handleClose(getState?.()?.record);
-      }
+      handleClose(getState?.()?.record);
     });
   }, [handleClose, handler]);
 
