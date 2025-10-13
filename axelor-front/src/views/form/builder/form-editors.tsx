@@ -1057,6 +1057,7 @@ const RecordEditor = memo(function RecordEditor({
     });
 
   const { actionHandler: parentHandler } = useFormScope();
+  
   actionHandler.setSaveHandler(
     useCallback(
       async (record?: DataRecord) => parentHandler.save(record),
@@ -1072,6 +1073,11 @@ const RecordEditor = memo(function RecordEditor({
   actionHandler.setValidateHandler(
     useCallback(async () => parentHandler.validate(), [parentHandler]),
   );
+
+  actionHandler.setCloseHandler(
+    useCallback(async () => parentHandler.close(), [parentHandler]),
+  );
+
 
   const ds = useMemo(() => new DataStore(model), [model]);
   const load = useAtomCallback(

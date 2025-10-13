@@ -18,6 +18,8 @@ export class DefaultActionHandler implements ActionHandler {
 
   async setValues(values: DataRecord) {}
 
+  setCloseHandler(handler: () => Promise<void>) {}
+
   getContext() {
     return {};
   }
