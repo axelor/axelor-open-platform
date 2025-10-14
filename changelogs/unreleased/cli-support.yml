@@ -7,11 +7,11 @@ description: |
   `CliCommand` instances using service loader interface. A `database`
   command is added to perform various database related tasks.
   
-  The gradle plugin adds a new task `buildApp` to build application
+  The Gradle plugin adds a new task `buildApp` to build application
   distribution. The application bundle will be generated at
   `build/install/{project-name}` folder which includes extracted war
   application in the `app/` directory, launcher script dependencies in
-  the `lib/` directory, and executable scripts in the `bin/` directory.
+  the `lib/` directory and executable scripts in the `bin/` directory.
   
   The `axelor` script is an executable command line tool that can be used
   to execute various commands provided by the app: `./bin/axelor --help`

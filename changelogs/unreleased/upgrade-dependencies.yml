@@ -12,10 +12,10 @@ description: |
 
   `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but enabled by default.
 
-  BIRT has transitive dependency to Apache POI, upgraded from 3.9 to 5.4.0, that includes **breaking** changes:
+  BIRT has a transitive dependency to Apache POI, upgraded from 3.9 to 5.4.0, that includes **breaking** changes:
   https://poi.apache.org/changes.html
 
-  Also, the XML parser in BIRT has become more strict. Most notably, in your `fontsConfig.xml`,
+  Also, the XML parser in BIRT has become stricter. Most notably, in your `fontsConfig.xml`,
   you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
   Otherwise, your font configuration file will fail validation and will be ignored.
 

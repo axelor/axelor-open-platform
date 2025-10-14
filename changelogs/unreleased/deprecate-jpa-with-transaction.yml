@@ -1,5 +1,0 @@
----
-title: Rename JPA.withTransaction to JPA.callInTransaction
-type: deprecate
-description: |
-  JPA.withTransaction is now deprecated, but not removed yet.

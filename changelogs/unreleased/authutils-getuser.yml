@@ -1,5 +1,5 @@
 ---
-title: Update `AuthUtils#getUser()` to resolved the current user
+title: Update `AuthUtils#getUser()` to resolve the current user
 type: change
 description: |
   Initially, `the AuthUtils#getUser()` method is used to retrieve the current connected user. This is only available in

@@ -7,4 +7,4 @@ description: |
 
   This fixes preserving and removing of those fields.
 
-  When saved, all custom fields are explicitly present is view items.
+  When saved, all custom fields are explicitly present as view items.

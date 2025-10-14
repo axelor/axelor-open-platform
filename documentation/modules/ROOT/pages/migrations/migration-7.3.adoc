@@ -29,6 +29,7 @@ Check Gradle migration to update your builds : {gradle-8-0-8-7}[Upgrading your b
 
 NOTE: The workaround previously suggested for Gradle issue "javaToolchains incorrectly reports 'does not contain a java executable' on Debian and Ubuntu" (xref:migrations/migration-7.1.adoc#dependencies-upgrade[described in 7.1 migration guide]) is no longer needed since Gradle 8.8. If you had implemented this workaround, you can safely remove it.
 
+[#help-widget-variant-support]
 == Help widget variant support
 
 The help variant is extracted from the `css` attributes values. Now, help widget has a new attribute `variant` that

@@ -2,8 +2,7 @@
 title: Support global and component-specific cache configuration
 type: feature
 description: |
-  Cache can be configured for the whole application
-  or for a specific components (Hibernate, Shiro).
+  Cache can be configured for the whole application or for specific components (Hibernate, Shiro).
 
   ```properties
   # Global cache configuration applied to Hibernate, Shiro and internal components
