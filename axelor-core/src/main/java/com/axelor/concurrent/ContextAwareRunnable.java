@@ -8,9 +8,8 @@ import com.axelor.db.JPA;
 
 /**
  * A wrapper around a {@link Runnable} that enables execution within a context-aware environment.
- * This class extends {@link AbstractContextAware} to propagate contextual information such as
- * tenant and user details, as well as the base URL and language preferences, to the execution
- * thread of the task.
+ * This propagates contextual information such as tenant and user details, as well as the base URL
+ * and language preferences, to the execution thread of the task.
  */
 public final class ContextAwareRunnable implements Runnable {
 

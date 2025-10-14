@@ -9,9 +9,8 @@ import java.util.concurrent.Callable;
 
 /**
  * A wrapper around a {@link Callable} that enables execution within a context-aware environment.
- * This class extends {@link AbstractContextAware} to propagate contextual information such as
- * tenant and user details, as well as the base URL and language preferences, to the execution
- * thread of the task.
+ * This propagates contextual information such as tenant and user details, as well as the base URL
+ * and language preferences, to the execution thread of the task.
  *
  * @param <V> the result type of the enclosed {@link Callable}
  */
