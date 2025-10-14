@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
  *
  * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
  */
+@Deprecated
 public class AuditableRunner {
 
   private static final String DEFAULT_BATCH_USER = "admin";

@@ -22,6 +22,7 @@ import java.util.Locale;
  *
  * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
  */
+@Deprecated
 public class TenantAware extends Thread {
 
   /** The tenant identifier */
