@@ -1,9 +1,0 @@
----
-title: Re-implement run and database gradle tasks
-type: feature
-description: |
-  Re-implemented `run` and `database` gradle tasks as `JavaExec` tasks.
-  This allows running them with vscode java debugger.
-  
-  Also, as Gradle support in all major IDEs is now matured, the `run`
-  task should be the preferred way to debug axelor apps.

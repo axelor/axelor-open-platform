@@ -1,8 +1,0 @@
----
-title: Don't allow arbitrary file as template and export name in axelor-export
-type: security
-description: |
-  The template file should be either uploaded MetaFile or should be
-  within the `template.search-dir`.
-
-  Shouldn't be possible to have a "path" as export name (eg some/foo.xml).

@@ -1,3 +1,761 @@
+## 8.0.0 (2025-10-14)
+
+#### Feature
+
+* Implement `Tag` widget for M2O/O2O to render value as a tag element.
+* Add docx/xlsx/odt/ods to action-report supported formats
+* Lazy load popper to improve views rendering
+* Auto adaptive scale for grid aggregation
+
+  <details>
+  
+  Grid aggregation values had a hard coded scale to 2. Now, grid aggregation values have 
+  auto adaptive scale depending on values calculated and trailing zeros are removed.
+  
+  </details>
+
+* Rework axelor-export storage
+
+  <details>
+  
+  Exported files are now created as a temporary files instead of being saved to `data.export.dir` directory.
+  It used to be possible to disable downloading and have exported files only accessible in `data.export.dir` directory.
+  This is no longer the case: the export files have to be either downloaded or attached to the current record.
+  
+  - Add `attachment="true|false"` attribute to attach the exported file to the current object.
+  - Remove `download` attribute: direct downloading is default
+  - Remove `output` attribute.
+  
+  </details>
+
+* Add LDAP support to subtree search for users
+
+  <details>
+  
+  By default, search scope to locate users is `subtree`: search whole subtree of base DN. Use new property 
+  `auth.ldap.user.search.subtree = true | false`, to update the search scope to `onelevel` if needed.
+  
+  </details>
+
+* Add API key authentication via HTTP header
+
+  <details>
+  
+  Added support for authenticating API requests using API keys via the `API-KEY` HTTP header.
+  Introduced `UserToken` entity to manage API tokens per user, with secure token generation, hashing,
+  and expiration handling.
+  
+  Tokens can be created, revoked, and rotated from the User form.
+  
+  </details>
+
+* Implement new Fixture api
+
+  <details>
+  
+  The new `Fixture` api provides a more clean yaml format.
+  
+  For example:
+  
+  ```yaml
+  - type: User      # model
+    key: user:admin # unique key
+    properties:
+      name: Some Name
+      code: admin
+      role: role:1  # reference key
+      groups:
+        - group:1   # reference key
+        - group:2   # reference key
+  ```
+  
+  - `type` is the model name.
+  - `key` is a unique key for the fixture record.
+  - `properties` contains the fields of the model.
+  
+  The relationships are defined using reference keys.
+  
+  </details>
+
+* Cache version/hash-named static assets in production
+* Implement a new context propagation system across threads and tasks submission
+
+  <details>
+  
+  The new context propagation system is used to propagate context across threads and tasks submission. This is an all
+  in one system combining `TenantAware` and `AuditableRunner` behaviors.
+  
+  Main issue is to propagate in threads and tasks all information's coming from HTTP requests (only available in
+  servlet environments). Are concerned: the current user, tenant, locale, language and base URL. Some can be
+  determined by application properties, some logic can be dependent from the request. The system is now able to propagate
+  all current context information in threads and tasks. It also allows manually defining them in (case of scheduling /
+  batching).
+  
+  `ContextAwareRunnable` or `ContextAwareCallable` can be used to propagate context
+  information.
+  
+  Usage :
+  ```java
+  ContextAware.of()
+  .withTransaction(true) // true by default
+  .withUser(AuthUtils.getUser("admin"))
+  .withTenantId(myTenant)
+  .build(
+    () -> {
+      // Task code here
+    }
+  )
+  .run()
+  ```
+  
+  </details>
+
+* Re-implement run and database gradle tasks
+
+  <details>
+  
+  Re-implemented `run` and `database` gradle tasks as `JavaExec` tasks.
+  This allows running them with vscode java debugger.
+  
+  Also, as Gradle support in all major IDEs is now matured, the `run`
+  task should be the preferred way to debug axelor apps.
+  
+  </details>
+
+* Add checkDuplicateClasses gradle task
+
+  <details>
+  
+  Added a new `checkDuplicateClasses` gradle task to detect conflicting dependencies in application projects.
+  
+  The task analyzes runtime classpath dependencies and identifies duplicate classes between different
+  jar files, helping to prevent classpath conflicts that can cause runtime issues.
+  
+  Key features:
+  - Automatically excludes Axelor modules (which can have duplicate domain classes by design)
+  - Supports exclude patterns for specific libraries
+  
+  </details>
+
+* Support global and component-specific cache configuration
+
+  <details>
+  
+  Cache can be configured for the whole application or for specific components (Hibernate, Shiro).
+  
+  ```properties
+  # Global cache configuration applied to Hibernate, Shiro and internal components
+  # ~~~~~
+  # Global cache provider: default/caffeine/redisson
+  application.cache.provider = redisson
+  # Global cache configuration for specified provider: either on filesystem or resource in classpath
+  application.cache.config = redisson.yaml
+  
+  # Hibernate-specific cache configuration (takes precedence over global cache configuration)
+  # ~~~~~
+  #application.cache.hibernate.provider = redisson
+  #application.cache.hibernate.config = redisson.yaml
+  
+  # Shiro-specific cache configuration (takes precedence over global cache configuration)
+  # ~~~~~
+  #application.cache.shiro.provider = redisson
+  #application.cache.shiro.config = redisson.yaml
+  ```
+  
+  </details>
+
+* Add application bundle & CLI support
+
+  <details>
+  
+  The command line support can be used to implement custom commands
+  to perform various tasks. The command line runner will locate
+  `CliCommand` instances using service loader interface. A `database`
+  command is added to perform various database related tasks.
+  
+  The Gradle plugin adds a new task `buildApp` to build application
+  distribution. The application bundle will be generated at
+  `build/install/{project-name}` folder which includes extracted war
+  application in the `app/` directory, launcher script dependencies in
+  the `lib/` directory and executable scripts in the `bin/` directory.
+  
+  The `axelor` script is an executable command line tool that can be used
+  to execute various commands provided by the app: `./bin/axelor --help`
+  for more details.
+  
+  </details>
+
+* Add S3-Compatible Object Storage
+
+  <details>
+  
+  Added support for S3-compatible object storage for DMSFile/MetaFile.
+  The default implementation remains disk storage, but it can be switched to an S3-compatible service by configuring the `data.object-storage.*` properties.
+  This change introduces a storage abstraction layer (`FileStoreFactory`) that should be used instead of direct file system access to ensure compatibility with both storage types.
+  
+  </details>
+
+* Implement multi-tenancy support of quartz schedulers
+
+  <details>
+  
+  The app will now configure scheduled tasks per tenant during startup.  
+  Also added support to update/remove tasks per tenant at runtime.
+  
+  </details>
+
+* Add Multi-Factor Authentication (MFA) support
+
+  <details>
+  
+  Introduced Multi-Factor Authentication (MFA) as an optional security feature to enhance user account protection.
+  Supported MFA methods: 
+    - TOTP (Time-based One-Time Password) via authenticator apps.
+    - Email verification codes (with 5-minute validity)
+    - Recovery codes as backup authentication method
+  Users can configure, test, and enable MFA from their preferences, select a default MFA method, and
+  are prompted for a second-factor code during login once MFA is activated.
+  
+  </details>
+
+* Implement scripting policy check support
+
+  <details>
+  
+  A scripting policy has been introduced to control which Java classes are accessible from scripts (Groovy, Expression Language, JavaScript). By default, access to most application classes is now restricted.
+  
+  If your application uses scripts that call custom services or other classes, you will need to explicitly allow them. You can do this in two ways:
+  
+  *  Add the `@com.axelor.script.ScriptAllowed` annotation to your service interfaces or classes.
+  *  Implement the `com.axelor.script.ScriptPolicyConfigurator` interface to programmatically define allowed/denied packages and classes.
+  
+  Additionally, a script execution timeout has been introduced to prevent infinite loops, which defaults to 5 minutes. This can be configured globally or per script execution.
+  
+  `doInJpa` helper has been removed, as it allowed unrestricted database access.
+  To get a bean instance with policy check, `\\__bean__` helper has been introduced to replace unrestricted `com.axelor.inject.Beans.get` usage.
+  
+  Note that the scripting policy is also applied to Groovy template engines by using the same class scanner
+  and compiler configuration as for Groovy scripts. A side effect is that Groovy templates now use the same JPA class scanner.
+  
+  </details>
+
+* Add code generation support for test entities
+
+  <details>
+  
+  Test entities can now be generated from XML files. This enables using the 
+  same domain modeling approach for test entities as production code.
+  
+  </details>
+
+* Add LDAP support to subtree search for groups
+
+  <details>
+  
+  By default, search scope to locate groups is `subtree`: search whole subtree of base DN. Use new property 
+  `auth.ldap.group.search.subtree = true | false`, to update the search scope to `onelevel` if needed.
+  
+  </details>
+
+* Add show and copy button to form password widget in readonly
+
+  <details>
+  
+  Improve form password widget in readonly mode by showing the "show password" button
+  if there is any value and adding a copy button to copy the value to clipboard.
+  
+  </details>
+
+* Return MediaType when downloading a file
+
+  <details>
+  
+  When downloading a file, return the right `Content-Type`.
+  Only pdf/images and html files can be previewed in browser.
+  
+  </details>
+
+* Format bytes on system information page
+* Add AxelorCache caching interface supporting distributed caching
+
+  <details>
+  
+  The `AxelorCache` interface wraps various cache implementations.
+  
+  Supported implementations include:
+    - Caffeine (in-memory)
+    - Redisson (Redis/Valkey)
+  
+  The underlying implementation that is used depends on application configuration.
+  
+  Usage example:
+  
+  ```java
+  private static final AxelorCache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
+  ```
+  
+  Added `DistributedFactory`, which is a utility class that facilitates concurrency control in distributed cache environments.
+  It provides static methods to access distributed-aware synchronization primitives, such as locks and atomic longs.
+  
+  </details>
+
+* Add mass updatable fields even if not declared in grid view
+
+  <details>
+  
+  Currently, only fields declared in the grid view marked with the massUpdate attribute are updatable.
+  Now, fields in the entity, even if not declared in the grid view, will also be listed in the mass update popover.
+  
+  </details>
+
+#### Change
+
+* Download i18n export as zip file instead of using data.export.dir
+
+  <details>
+  
+  I18n exports are now downloaded as zip archive,
+  instead of being created in `data.export.dir` directory.
+  
+  </details>
+
+* Use Shiro 2 argon2id hash algorithm
+
+  <details>
+  
+  Use Shiro 2 default hash algorithm: argon2id
+  
+  To migrate passwords to the more secure algorithm, you can force users with old hashes
+  to change their passwords:
+  
+  ```sql
+  UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
+  ```
+  
+  When users set their new passwords, the new hash algorithm will be used.
+  
+  https://shiro.apache.org/blog/2024/02/apache-shiro-200-released.html
+  
+  </details>
+
+* Re-implemented audit tracking/fields support
+
+  <details>
+  
+  The old Interceptor based implementation has several limitations and couldn't work
+  in cases where persistence session is created manually.
+  
+  The new implementation uses event listener api and thus can have access to the session
+  for which the events are fired. Fixing, issues caused by persistent session created
+  manually.
+  
+  Also, new api handles multi-threading cases more effectively.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  * Upgrade to Guice 7 (Jakarta EE 9)
+  * Upgrade Hibernate from 5.6.x to 6.6.31.Final
+  * Upgrade BIRT from 4.4.2 to 4.21.0
+  
+  Many of your reports will likely have rendering changes or may even be broken due to numerous emitter improvements/changes in BIRT.
+  
+  `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but enabled by default.
+  
+  BIRT has a transitive dependency to Apache POI, upgraded from 3.9 to 5.4.0, that includes **breaking** changes:
+  https://poi.apache.org/changes.html
+  
+  Also, the XML parser in BIRT has become stricter. Most notably, in your `fontsConfig.xml`,
+  you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
+  Otherwise, your font configuration file will fail validation and will be ignored.
+  
+  * Upgrade Apache Tomcat from 9.0.x to 10.1.47
+  * Upgrade Junit5 from 5.11.4 to 5.13.4
+  * Upgrade Ldaptive from 2.3.2 to 2.4.2
+  * Upgrade jsoup from 1.18.3 to 1.21.2
+  * Upgrade pac4j from 5.7.x to 6.2.2, buji-pac4j from 8.1.x to 9.1.0, and jakartaee-pac4j from 7.1.x to 8.0.1
+  * Upgrade mysql-connector-j from 8.4.0 to 9.4.0
+  * Upgrade Postgresql JDBC from 42.7.4 to 42.7.8
+  * Upgrade Apache Tika from 2.9.x to 3.2.3
+  * Upgrade UnboundID LDAP SDK from 6.0.11 to 7.0.3
+  * Upgrade Woodstox from 6.7.0 to 7.1.1
+  * Update Swagger from 2.2.28 to 2.2.38
+  * Upgrade snakeyaml from 2.3 to 2.4
+  * Upgrade Shiro from 1.13.0 to 2.0.5
+  * Upgrade Redisson from 3.38.1 to 3.51.0
+  * Upgrade Jackson from 2.18.x to 2.19.2
+  * Upgrade HikariCP from 6.3.0 to 7.0.2
+  * Upgrade hazelcast from 5.3.7 to 5.5.0
+  * Upgrade guava from 33.3.1-jre to 33.4.8-jre
+  * Upgrade from Groovy 3 to Groovy 4
+  * Upgrade GraalJS from 22.3.5 to 24.2.2
+  * Upgrade Flyway from 9.22.3 to 11.11.2
+  * Upgrade Apache Commons JXPath from 1.3 to 1.4.0
+  * Upgrade commons-io from 2.18.0 to 2.20.0
+  * Upgrade commons-csv from 1.12.0 to 1.14.1
+  * Upgrade Caffeine from 3.1.6 to 3.2.2
+  * Update Byte Buddy from 1.15.11 to 1.17.7
+  * Upgrade ASM from 9.7.1 to 9.8
+  * Upgrade to Resteasy 6 (Jakarta EE 10)
+  * Upgrade to Quartz 2.5
+  * Upgrade to Logback 1.5
+  * Switch from org.fusesource.jansi to org.jline:jansi 3.30.6
+  * Upgrade to Jakarta XML Binding 4.0
+  * Upgrade to Jakarta WebSocket 2.0
+  * Upgrade to Jakarta Mail 2.1 and Jakarta Activation 2.1
+  * Upgrade Hibernate Validator from 6.2.5.Final to 8.0.3.Final
+  * Upgrade Infinispan from 13.0.22 to 15.2.6.Final
+  * Upgrade Ehcache from 3.10.8 to 3.11.1
+  * Upgrade Undertow from 2.2.37.Final to 2.3.19.Final
+  
+  </details>
+
+* Upgrade Gradle from 8.11.1 to 8.14.3
+* Remove Junit4 support
+
+  <details>
+  
+  JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support 
+  for JUnit Jupiter (JUnit 5) was introduced in v6.0. It is time to drop support for JUnit 4. Migrate your Junit tests 
+  to Junit5.
+  
+  </details>
+
+* Implement token-based download for ActionResponse#setExport
+
+  <details>
+  
+  Data export process now requires a token param instead of a file path relative to the export directory.
+  ActionResponse#setExport has been updated and overloaded accordingly:
+  
+  - `ActionResponse#setExport(String path)`
+  - `ActionResponse#setExport(String path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(InputStream stream, String name)`
+  
+  The file path is copied to a dedicated temporary file for pending export.
+  `path` filename is used for download name if `name` is not specified as second parameter.
+  
+  </details>
+
+* Migrate from Guava Cache to Caffeine for internal components
+* Update `AuthUtils#getUser()` to resolve the current user
+
+  <details>
+  
+  Initially, `the AuthUtils#getUser()` method is used to retrieve the current connected user. This is only available in
+  servlet environments. In case of non-servlet environments (batch/schedule/...), there is no connected user.
+  Now the method retrieves the current user associated with the thread or session (see context propagation system 
+  based on `ContextAware*` classes). It first uses the current user stored in the thread-local if provided. Else it 
+  attempts to retrieve the connected user if any.
+  
+  </details>
+
+* Deprecate `TagSelect` widget in favor of `Tags`.
+
+  <details>
+  
+  `TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it’s just a renaming of the widget 
+  name for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage 
+  will be removed in a next version.
+  
+  </details>
+
+* Upgrade from JDK 11 to JDK 21
+
+  <details>
+  
+  https://docs.oracle.com/en/java/javase/21/migrate/index.html
+  
+  </details>
+
+* Switch to Shiro native sessions
+
+  <details>
+  
+  We have switched from servlet-container sessions to Shiro native sessions. This change enables the use of Redis/Valkey server as a session store and simplifies the overall architecture by leveraging Shiro's `SessionDAO`.
+  
+  Key changes to be aware of:
+  
+  * By default, the session manager now uses in-memory Caffeine cache. This means that sessions are not persisted between application restarts.
+  * `HttpSessionListener` is no longer used. Instead, you can access active sessions via `AuthSessionService.getActiveSessions()` which uses the `SessionDAO`.
+  
+  For more details about Shiro's session management, see the https://shiro.apache.org/session-management.html[Shiro Session Management documentation].
+  
+  </details>
+
+* JEE Jakarta transition
+
+  <details>
+  
+  Move from Java EE to Jakarta EE. This include transition from the `javax` namespace to the `jakarta` namespace.
+  
+  </details>
+
+* Upgrade Spotless Gradle plugin from 6.25.0 to 7.0.4
+
+  <details>
+  
+  https://github.com/diffplug/spotless/blob/gradle/7.0.4/plugin-gradle/CHANGES.md#704---2025-05-27
+  
+  </details>
+
+* AppSettings#getBaseURL resolves as tenant host and app base url before request host
+
+  <details>
+  
+  In case of multi-tenancy, base url should favor tenant host.
+  Without multi-tenancy, base url should favor app config base url.
+  
+  Request host is now last fallback.
+  
+  </details>
+
+* Save/update/delete filters now by id instead of name
+
+  <details>
+  
+  Removed field `name` on MetaFilter.
+  Removed unique constraint on name, filterView,
+  and replaced it with index `meta_filter_filter_view_idx` on filterView.
+  
+  This allows different users to create filters with the same title.
+  
+  Database migration script:
+  
+  ```sql
+  ALTER TABLE meta_filter DROP COLUMN name;
+  CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+  ```
+  
+  </details>
+
+#### Deprecate
+
+* Deprecate `TenantAware` and `AuditableRunner`
+
+  <details>
+  
+  This is replaced by a generic context propagation system based on ContextState and ContextAware* wrappers.
+  Use `ContextAwareRunnable` or `ContextAwareCallable` instead.
+  
+  </details>
+
+#### Remove
+
+* Remove `data.export.dir` setting
+
+  <details>
+  
+  Another consequence of supporting multiple storage providers
+  is the removal of export directory setting `data.export.dir`.
+  If you used it, you should migrate your code to create temporary files
+  or directories instead, using `com.axelor.file.temp.TempFiles`,
+  then download or attach the files somewhere for the users to access.
+  
+  Related ActionExport#getExportPath is also removed.
+  
+  </details>
+
+* Remove `top` attribute in `menuitem`
+
+  <details>
+  
+  Top menu support has been removed since 7.0. To ensure compatibility, the attribute was still present in xsd.
+  
+  </details>
+
+* Remove `record.` prefix support in expressions/templates/EvalRefSelect
+
+  <details>
+  
+  Added for backward compatibility, accessing fields now no longer need `record.` prefix. Update your js expressions, 
+  templates and EvalRefSelect `x-eval-*` attributes according.
+  
+  </details>
+
+* Remove `MetaPermissions#isCollectionReadable` method
+* Remove method `JPA#withTransaction(Supplier)` in favor of `JPA#callInTransaction(Supplier)`
+* Remove built-in license header support
+
+  <details>
+  
+  As part of the AxelorPlugin, we historically provided built-in support to manage license headers. This support has been
+  removed and `licenseFormat`, `licenseCheck` and related tasks no longer exist. The plugin on which support was provided
+  is no longer maintained. This is now application or module responsibility to provide it.
+  
+  There are many Gradle plugins that can do the job. [List](https://plugins.gradle.org/search?term=license+header) is
+  available on the Gradle plugin portal. The awesome [Spotless](https://plugins.gradle.org/plugin/com.diffplug.gradle.spotless) 
+  formatting plugin provides support for adding license headers.
+  
+  </details>
+
+* Remove Gradle support for database management
+
+  <details>
+  
+  This removes Gradle support for database management (init/update/...) in favor of new CLI.
+  
+  </details>
+
+* Remove support of Font Awesome icons
+
+  <details>
+  
+  Use either Material Symbols and Bootstrap Icons.
+  
+  </details>
+
+* Remove deprecated web services
+
+  <details>
+  
+  Remove deprecated `ws/files/report/{link:.\*}` and `ws/files/data-export/{fileName:.*}` web services in favor of their 
+  equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
+  
+  </details>
+
+* Remove help `css` deprecated support
+
+  <details>
+  
+  Help widget `css` support is removed, use `variant` instead.
+  
+  </details>
+
+#### Fix
+
+* Fix StringTemplate not taking into account locale for LocalDate/LocalDateTome/LocalTime formatting
+* Render Label widget as static text instead of a template
+* Fix item count in grid group aggregation
+
+  <details>
+  
+  On a grid with multiple groups, the item count displayed on each level was incorrect.
+  
+  </details>
+
+* Fix prevents value change on number input via mouse wheel
+* Fix saving of custom attrs items in grid customization
+
+  <details>
+  
+  Custom attrs fields/buttons that were auto-added were not properly processed
+  when saving customization.
+  
+  This fixes preserving and removing of those fields.
+  
+  When saved, all custom fields are explicitly present as view items.
+  
+  </details>
+
+* Fix edit-window support and check perms in m2o editor
+* Fix audit tracking issue when L1 cache is cleared
+
+  <details>
+  
+  When a tracked value is lazy proxy and is not in L1 cache, it will
+  give lazy initialization error.
+  
+  </details>
+
+* Fix show download option in binary widget
+* Fix tree-grid border styles
+* Same context for form field and json field
+
+  <details>
+  
+  With this change custom field and form field are accessible through
+  same way, i.e. form field can directly be accessed and custom fields are 
+  accessed like `$attr.customFieldName` in both kinds of fields.
+  
+  </details>
+
+* Fix null base url when using TenantAware
+* Fix generateCode task spurious warning "track unknown field"
+
+  <details>
+  
+  When defining an entity in xml, extending an entity not available in project source (defined in dependencies),
+  that super entity was not available in lookup and caused spurious warning "track unknown field".
+  
+  Now make sure to compute lookup for any super classes if not present.
+  
+  </details>
+
+* Fix add $attachments to form action context
+* Fix styles for top level tree-grid
+* Allow selecting all custom fields when customizing grid columns
+
+  <details>
+  
+  When there are no custom fields in original grid view, all custom fields visible in grid are added to view.
+  
+  But in the case when there is at least one custom field defined in original view, only that custom field was listed 
+  in grid customization selector. Now all custom fields are listed, even those who aren't checked are visible in grid.
+  
+  </details>
+
+* Check MetaPermissionRule on mass update
+
+  <details>
+  
+  During massUpdate web service, if any fields are not allowed to be updated through 
+  MetaPermissionRule, return an exception and display it to the user.
+  
+  </details>
+
+* Add client side searching/sorting to fields selector grid
+* Fix closing LDAP connection pool when shutting down Tomcat
+
+  <details>
+  
+  With Runtime.getRuntime().addShutdownHook(),
+  closing LDAP connection pool will attempt to log something
+  after the web application has already been stopped.
+  
+  Instead, now observing ShutdownEvent,
+  ensuring we close LDAP connection pool within application lifecycle.
+  
+  Fixes various NoClassDefFoundError, such as:
+  
+  java.lang.NoClassDefFoundError: ch/qos/logback/classic/spi/ThrowableProxy
+  Caused by: java.lang.ClassNotFoundException: Illegal access: this web application instance has been stopped already.
+  Caused by: java.lang.IllegalStateException: Illegal access: this web application instance has been stopped already.
+  
+  </details>
+
+* Fix json fields in customized grid
+
+  <details>
+  
+  Fix json fields handling in customized grid leading to duplication issues.
+  
+  </details>
+
+* Validate image size against maximum upload size setting on html widget
+
+#### Security
+
+* Don't allow arbitrary file as template and export name in axelor-export
+
+  <details>
+  
+  The template file should be either uploaded MetaFile or should be
+  within the `template.search-dir`.
+  
+  Shouldn't be possible to have a "path" as export name (eg some/foo.xml).
+  
+  </details>
+
+
 ## 7.4.3 (2025-07-17)
 
 #### Feature

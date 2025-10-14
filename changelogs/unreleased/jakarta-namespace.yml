@@ -1,5 +1,0 @@
----
-title: JEE Jakarta transition
-type: change
-description : |
-  Move from Java EE to Jakarta EE. This include transition from the `javax` namespace to the `jakarta` namespace.

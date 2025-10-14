@@ -1,7 +1,0 @@
----
-title: Remove Junit4 support
-type: change
-description : |
-  JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support 
-  for JUnit Jupiter (JUnit 5) was introduced in v6.0. It is time to drop support for JUnit 4. Migrate your Junit tests 
-  to Junit5.

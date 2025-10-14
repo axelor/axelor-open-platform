@@ -1,6 +1,0 @@
----
-title: Check MetaPermissionRule on mass update
-type: fix
-description: |
-  During massUpdate web service, if any fields are not allowed to be updated through 
-  MetaPermissionRule, return an exception and display it to the user.

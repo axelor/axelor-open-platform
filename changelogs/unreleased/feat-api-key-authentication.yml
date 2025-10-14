@@ -1,9 +1,0 @@
----
-title: Add API key authentication via HTTP header
-type: feature
-description: |
-  Added support for authenticating API requests using API keys via the `API-KEY` HTTP header.
-  Introduced `UserToken` entity to manage API tokens per user, with secure token generation, hashing,
-  and expiration handling.
-
-  Tokens can be created, revoked, and rotated from the User form.

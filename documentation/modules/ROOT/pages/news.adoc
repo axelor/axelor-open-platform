@@ -5,6 +5,25 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 8.0
+
+The main highlights are :
+
+- Migration to Jakarta EE 10+ and Java 21 (LTS)
+- Add S3 Object Storage support for files management
+- Add cache management support
+- Add API key authentication via HTTP header
+- Add Multi-Factor Authentication (MFA) support
+- Implement scripting policy check support
+- Implement a new context propagation system across threads and tasks submission
+- Add application bundle & CLI support
+- Implement multi-tenancy support of quartz schedulers
+- Implement `Tag` widget for M2O/O2O to render value as a tag element.
+- Re-implemented audit tracking/fields support
+
+Please check the {github-repo-url}/blob/8.0/CHANGELOG.md[change log] for a detailed list of changes and
+the xref:ROOT:migrations/migration-8.0.adoc[8.0 migration guide].
+
 == 7.4
 
 This version is a transition to our new enterprise edition. It is focused on bringing new features such as studio

@@ -1,7 +1,0 @@
----
-title: Add S3-Compatible Object Storage
-type: feature
-description: |
-  Added support for S3-compatible object storage for DMSFile/MetaFile.
-  The default implementation remains disk storage, but it can be switched to an S3-compatible service by configuring the `data.object-storage.*` properties.
-  This change introduces a storage abstraction layer (`FileStoreFactory`) that should be used instead of direct file system access to ensure compatibility with both storage types.

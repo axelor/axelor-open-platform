@@ -1,7 +1,0 @@
----
-title: Deprecate `TagSelect` widget in favor of `Tags`.
-type: change
-description : |
-  `TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it’s just a renaming of the widget 
-  name for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage 
-  will be removed in a next version.

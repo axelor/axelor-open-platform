@@ -17,7 +17,7 @@ The command line application can be built with the following gradle command:
   $ ./gradlew buildApp
 ----
 
-The application bundle will be generated at `build/install/{project-name}` folder which includes
+The application bundle will be generated at `build/install/+{project-name}+` folder which includes
 extracted war application in the `app/` directory, launcher script dependencies in the `lib/`
 directory and executable scripts in the `bin/` directory.
 

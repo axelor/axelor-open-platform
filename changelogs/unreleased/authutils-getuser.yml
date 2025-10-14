@@ -1,9 +1,0 @@
----
-title: Update `AuthUtils#getUser()` to resolve the current user
-type: change
-description: |
-  Initially, `the AuthUtils#getUser()` method is used to retrieve the current connected user. This is only available in
-  servlet environments. In case of non-servlet environments (batch/schedule/...), there is no connected user.
-  Now the method retrieves the current user associated with the thread or session (see context propagation system 
-  based on `ContextAware*` classes). It first uses the current user stored in the thread-local if provided. Else it 
-  attempts to retrieve the connected user if any.

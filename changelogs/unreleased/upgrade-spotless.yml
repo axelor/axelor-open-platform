@@ -1,5 +1,0 @@
----
-title: Upgrade Spotless Gradle plugin from 6.25.0 to 7.0.4
-type: change
-description: |
-  https://github.com/diffplug/spotless/blob/gradle/7.0.4/plugin-gradle/CHANGES.md#704---2025-05-27

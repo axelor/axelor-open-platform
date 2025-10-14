@@ -1,6 +1,0 @@
----
-title: Implement multi-tenancy support of quartz schedulers
-type: feature
-description: |
-  The app will now configure scheduled tasks per tenant during startup.  
-  Also added support to update/remove tasks per tenant at runtime.

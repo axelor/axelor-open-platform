@@ -1,6 +1,0 @@
----
-title: Download i18n export as zip file instead of using data.export.dir
-type: change
-description: |
-  I18n exports are now downloaded as zip archive,
-  instead of being created in `data.export.dir` directory.

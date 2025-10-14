@@ -1,8 +1,0 @@
----
-title: Allow selecting all custom fields when customizing grid columns
-type: fix
-description: |
-  When there are no custom fields in original grid view, all custom fields visible in grid are added to view.
-
-  But in the case when there is at least one custom field defined in original view, only that custom field was listed 
-  in grid customization selector. Now all custom fields are listed, even those who aren't checked are visible in grid.

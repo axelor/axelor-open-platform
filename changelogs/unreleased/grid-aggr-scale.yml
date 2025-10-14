@@ -1,6 +1,0 @@
----
-title: Auto adaptive scale for grid aggregation
-type: feature
-description: |
-  Grid aggregation values had a hard coded scale to 2. Now, grid aggregation values have 
-  auto adaptive scale depending on values calculated and trailing zeros are removed.

@@ -1,8 +1,0 @@
----
-title: AppSettings#getBaseURL resolves as tenant host and app base url before request host
-type: change
-description: |
-  In case of multi-tenancy, base url should favor tenant host.
-  Without multi-tenancy, base url should favor app config base url.
-
-  Request host is now last fallback.

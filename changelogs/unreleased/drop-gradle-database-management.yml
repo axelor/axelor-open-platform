@@ -1,5 +1,0 @@
----
-title: Remove Gradle support for database management
-type: remove
-description: |
-  This removes Gradle support for database management (init/update/...) in favor of new CLI.
