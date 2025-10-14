@@ -532,6 +532,9 @@ public class I18nExtractor {
         for (int i = 0; i < line.length; i++) {
           if (StringUtils.isBlank(line[i])) {
             line[i] = null;
+          } else {
+            // Use CRLF also for cell content
+            line[i] = line[i].replaceAll("(?<!\r)\n", "\r\n");
           }
         }
       }
