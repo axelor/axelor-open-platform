@@ -1,0 +1,10 @@
+---
+title: Fix handling of end-of-lines in i18n messages
+type: fix
+description: |
+  CSV normalized end-of-lines to \r\n, between CSV records only, not for cell data.
+  CSV cell data is now also normalized to \r\n.
+
+  For multiline translation keys, need to normalize back to \n, as that's
+  what is used in source code, meta views, etc.
+  This fixes translations when keys contain end-of-lines.

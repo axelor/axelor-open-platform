@@ -136,6 +136,10 @@ public class I18nLoader extends AbstractParallelLoader {
           continue;
         }
 
+        // Convert CRLF from CSV back to LF
+        key = key.replace("\r\n", "\n");
+        message = message.replace("\r\n", "\n");
+
         MetaTranslation entity = translations.findByKey(key, language);
         if (entity == null) {
           entity = new MetaTranslation();
