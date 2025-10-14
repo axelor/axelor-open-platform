@@ -77,7 +77,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -475,11 +474,14 @@ public class MailServiceImpl implements MailService, MailConstants {
     }
 
     // send email using a separate process to void thread blocking
-    executor.submit(ContextAware.of().withTransaction(false).build(
-        () -> {
-          send(sender, email);
-          return true;
-        }));
+    executor.submit(
+        ContextAware.of()
+            .withTransaction(false)
+            .build(
+                () -> {
+                  send(sender, email);
+                  return true;
+                }));
   }
 
   @Transactional(rollbackOn = Exception.class)
