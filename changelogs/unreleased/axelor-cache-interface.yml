@@ -1,0 +1,21 @@
+---
+title: Add AxelorCache caching interface supporting distributed caching
+type: feature
+description: |
+  The `AxelorCache` interface wraps various cache implementations.
+
+  Supported implementations include:
+    - Caffeine (in-memory)
+    - Redisson (Redis/Valkey)
+
+  The underlying implementation that is used depends on application configuration.
+
+  Usage example:
+
+  ```java
+  private static final AxelorCache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
+  ```
+
+  Added `DistributedFactory`, which is a utility class that facilitates concurrency control in distributed cache environments.
+  It provides static methods to access distributed-aware synchronization primitives, such as locks and atomic longs.
