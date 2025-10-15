@@ -232,6 +232,10 @@ public class I18nExtractor {
             public void endElement(String uri, String localName, String qName) throws SAXException {
               if (TEXT_NODES.contains(qName)) {
                 String text = StringUtils.stripIndent(readTextLines.toString());
+                // Match unmarshalled text for static and help
+                if (List.of("static", "help").contains(qName)) {
+                  text = text.trim();
+                }
                 accept(new I18nItem(text, file, locator.getLineNumber()));
                 readText = false;
                 readTextLines.setLength(0);
