@@ -1,3 +1,70 @@
+## 7.4.5 (2025-10-15)
+
+#### Feature
+
+* Add LDAP support to subtree search for users
+
+  <details>
+  
+  By default, search scope to locate users is `onelevel`: search only only level immediately below the base DN. Use new 
+  property `auth.ldap.user.search.subtree = true | false`, to update the search scope to `subtree` if needed 
+  (search whole subtree of base DN).
+  
+  </details>
+
+* Add LDAP support to subtree search for groups
+
+  <details>
+  
+  By default, search scope to locate groups is `onlevel`: only the level immediately below the base DN. Use new 
+  property `auth.ldap.group.search.subtree = true | false`, to update the search scope to `subtree` if needed (search 
+  subtree below the base DN and includes the base DN level).
+  
+  </details>
+
+#### Fix
+
+* Fix StringTemplate not taking into account locale for LocalDate/LocalDateTome/LocalTime formatting
+* Render Label widget as static text instead of template
+* Fix audit tracking issue when L1 cache is cleared
+
+  <details>
+  
+  When a tracked value is lazy proxy and is not in L1 cache, it will
+  give lazy initialization error.
+  
+  </details>
+
+* Fix closing LDAP connection pool when shutting down Tomcat
+
+  <details>
+  
+  With Runtime.getRuntime().addShutdownHook(),
+  closing LDAP connection pool will attempt to log something
+  after the web application has already been stopped.
+  
+  Instead, now observing ShutdownEvent,
+  ensuring we close LDAP connection pool within application lifecycle.
+  
+  Fixes various NoClassDefFoundError, such as:
+  
+  java.lang.NoClassDefFoundError: ch/qos/logback/classic/spi/ThrowableProxy
+  Caused by: java.lang.ClassNotFoundException: Illegal access: this web application instance has been stopped already.
+  Caused by: java.lang.IllegalStateException: Illegal access: this web application instance has been stopped already.
+  
+  </details>
+
+#### Security
+
+* Fix arbitrary download from data-export endpoint
+
+  <details>
+  
+  Check relative filename parameter actually belongs to export path.
+  
+  </details>
+
+
 ## 7.4.4 (2025-08-08)
 
 #### Deprecate

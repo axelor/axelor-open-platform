@@ -1,5 +1,0 @@
----
-title: Fix arbitrary download from data-export endpoint
-type: security
-description: |
-  Check relative filename parameter actually belongs to export path.
