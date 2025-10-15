@@ -19,11 +19,13 @@
 package com.axelor.script;
 
 import com.axelor.JpaTest;
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
@@ -147,9 +149,20 @@ public abstract class ScriptTest extends JpaTest {
             }
           });
 
+      loadTranslation("Customer", "Client", "fr");
+      loadTranslation("Supplier", "Fournisseur", "fr");
+
       selects.save(colors);
       selects.save(types);
     }
+  }
+
+  private void loadTranslation(String key, String message, String language) {
+    MetaTranslation obj = new MetaTranslation();
+    obj.setKey(key);
+    obj.setMessage(message);
+    obj.setLanguage(language);
+    JPA.save(obj);
   }
 
   private void prepareCustomFields() {

@@ -1,0 +1,3 @@
+---
+title: Fix StringTemplate not taking into account locale for LocalDate/LocalDateTome/LocalTime formatting
+type: fix
