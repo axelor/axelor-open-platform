@@ -26,6 +26,8 @@ import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
+import { createEvalContext } from "@/hooks/use-parser/context";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import {
   FormAtom,
   Form as FormComponent,
@@ -34,6 +36,7 @@ import {
   FormWidget,
   WidgetErrors,
   WidgetProps,
+  WidgetState,
   useFormHandlers,
 } from "@/views/form/builder";
 import {
@@ -296,23 +299,76 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { newItem: newItemAtom } = useCollectionTree();
 
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
+    const columnNamesRef = useRef<string[]>([]);
+    const columnNames = useMemo(() => {
+      const list = (columns ?? []).map((c) => c.name).filter(Boolean);
+      if (isEqual(list, columnNamesRef.current)) {
+        return columnNamesRef.current;
+      }
+      return (columnNamesRef.current = list);
+    }, [columns]);
+
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find(isFocusableField)?.name;
-      const editColumn = view.items?.find((c) => c.name === editColumnName);
-      const name = editColumn?.readonly
-        ? defaultColumnName
-        : editColumnName || defaultColumnName;
-      const item = view.items?.find((item) => item.name === name);
-      if (item) {
+      const viewItems = (view.items ?? []).filter((item) =>
+        columnNames.includes(item.name!),
+      );
+      const defaultColumnName = viewItems?.find(isFocusableField)?.name;
+      const editColumn = viewItems?.find((c) => c.name === editColumnName);
+
+      const columnAttrs: Record<string, WidgetState> = {};
+
+      const context = createEvalContext(record, {
+        fields,
+      });
+
+      viewItems.forEach((viewItem) => {
+        const { name, showIf, hideIf, readonlyIf } = viewItem;
+
+        if (!name) return;
+
+        const readonly = readonlyIf
+          ? Boolean(parseExpression(readonlyIf)(context))
+          : undefined;
+        let hidden = hideIf
+          ? Boolean(parseExpression(hideIf)(context))
+          : undefined;
+
+        if (!hidden && showIf) {
+          hidden = !parseExpression(showIf)(context);
+        }
+
+        if (readonly !== undefined || hidden !== undefined) {
+          columnAttrs[name] = {
+            attrs: { hidden, readonly },
+          };
+        }
+      });
+
+      const focusItemName =
+        editColumn?.readonly &&
+        columnAttrs[editColumnName!]?.attrs?.readonly !== false
+          ? defaultColumnName
+          : editColumnName || defaultColumnName;
+      const focusItem =
+        focusItemName &&
+        view.items?.find((item) => item.name === focusItemName);
+
+      if (focusItem) {
         return {
-          [item.name as string]: {
+          ...columnAttrs,
+          [focusItemName]: {
             attrs: {
+              ...columnAttrs[focusItemName],
               focus: true,
             },
           },
         };
       }
-    }, [editColumnName, view.items]);
+
+      return columnAttrs;
+      // intentionally exclude `fields`, `record`, etc. to avoid unnecessary recomputation.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editColumnName, columnNames, view.items]);
 
     const expandState = useMemo(
       () =>
