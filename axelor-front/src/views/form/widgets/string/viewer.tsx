@@ -79,7 +79,6 @@ export function ViewerLink({
       alignSelf="start"
       textAlign="start"
       textDecoration="none"
-      overflow="hidden"
       onClick={onClick}
       tabIndex={-1}
       className={styles.viewer}
