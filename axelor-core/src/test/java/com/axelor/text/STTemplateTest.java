@@ -266,13 +266,19 @@ public class STTemplateTest extends TemplateScriptTest {
     vars.put("x", context());
 
     assertEquals("Customer", st.fromText("$x.contactType$").make(vars).render());
-    assertEquals("Friday, 22 May 2020", st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
-    assertEquals("1,000.200", st.fromText("$x.attrs.orderAmount; format=\"%,2.3f\"$").make(vars).render());
+    assertEquals(
+        "Friday, 22 May 2020",
+        st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
+    assertEquals(
+        "1,000.200", st.fromText("$x.attrs.orderAmount; format=\"%,2.3f\"$").make(vars).render());
 
     st.withLocale(Locale.FRENCH);
     assertEquals("Client", st.fromText("$x.contactType$").make(vars).render());
-    assertEquals("vendredi, 22 mai 2020", st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
+    assertEquals(
+        "vendredi, 22 mai 2020",
+        st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
     // French grouping separator is \u00A0 (NBSP)
-    assertEquals("1\u00A0000,200", st.fromText("$x.orderAmount; format=\"%,2.3f\"$").make(vars).render());
+    assertEquals(
+        "1\u00A0000,200", st.fromText("$x.orderAmount; format=\"%,2.3f\"$").make(vars).render());
   }
 }
