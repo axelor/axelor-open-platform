@@ -1,4 +1,3 @@
-import legacy from "@vitejs/plugin-legacy";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import fs from "fs";
@@ -16,7 +15,6 @@ const monacoHash = crypto
 const monacoPath = `assets/monaco-${monacoHash}`;
 const monacoNodePath = "node_modules/monaco-editor/min/vs";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   base: "./",
   plugins: [
@@ -25,10 +23,6 @@ export default defineConfig({
       svgrOptions: {
         icon: true,
       },
-    }),
-    legacy({
-      modernPolyfills: true,
-      renderLegacyChunks: false,
     }),
     {
       name: "monaco-hash",
@@ -60,6 +54,19 @@ export default defineConfig({
     ],
   },
   build: {
+    /**
+     * Browser Compatibility (ES2022):
+     * 
+     *  ┌──────────────┬──────────────────┬───────────────────┐
+     *  │ Browser      │ Minimum Version  │ Release Date      │
+     *  ├──────────────┼──────────────────┼───────────────────┤
+     *  │ Chrome       │ 105+             │ August 2022       │
+     *  │ Edge         │ 105+             │ September 2022    │
+     *  │ Firefox      │ 104+             │ August 2022       │
+     *  │ Safari       │ 16.4+            │ March 2023        │
+     *  │ Opera        │ 91+              │ September 2022    │
+     *  └──────────────┴──────────────────┴───────────────────┘
+     */
     target: ["es2022"],
   },
 });
