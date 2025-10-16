@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hibernate.jpa.AvailableHints;
+import org.hibernate.proxy.HibernateProxy;
 import org.junit.jupiter.api.Test;
 
 public class QueryTest extends ScriptTest {
@@ -272,6 +273,21 @@ public class QueryTest extends ScriptTest {
   }
 
   @Test
+  void testFilterProxy() {
+    var contact = all(Contact.class).filter("self.title.code = ?", "mr").fetchOne();
+    var title = contact.getTitle();
+    assertInstanceOf(HibernateProxy.class, title);
+
+    var resultsEquals =
+        all(Contact.class).filter("self.title = :title").bind("title", title).fetch();
+    assertEquals(2, resultsEquals.size());
+
+    var resultsIn =
+        all(Contact.class).filter("self.title IN :titles").bind("titles", List.of(title)).fetch();
+    assertEquals(2, resultsIn.size());
+  }
+
+  @Test
   void testQueryAdaptSingle() {
     var qlString = "SELECT self FROM Contact self WHERE self.credit = :credit";
     var credit = "2.5";
@@ -315,6 +331,27 @@ public class QueryTest extends ScriptTest {
     // Hibernate 5 doesn't fail because of null in collection.
     // Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
     assertThrows(AssertionError.class, query::getResultList);
+  }
+
+  @Test
+  void testQueryProxy() {
+    var contact = all(Contact.class).filter("self.title.code = ?", "mr").fetchOne();
+    var title = contact.getTitle();
+    assertInstanceOf(HibernateProxy.class, title);
+
+    var resultsEquals =
+        JPA.em()
+            .createQuery("SELECT self FROM Contact self WHERE self.title = :title", Contact.class)
+            .setParameter("title", title)
+            .getResultList();
+    assertEquals(2, resultsEquals.size());
+
+    var resultsIn =
+        JPA.em()
+            .createQuery("SELECT self FROM Contact self WHERE self.title IN :titles", Contact.class)
+            .setParameter("titles", List.of(title))
+            .getResultList();
+    assertEquals(2, resultsIn.size());
   }
 
   /** Hibernate 6's stricter parser assigns a single parameter type per parameter. */

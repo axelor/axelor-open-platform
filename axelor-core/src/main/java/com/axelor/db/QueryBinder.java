@@ -305,7 +305,8 @@ public class QueryBinder {
       value = JPA.em().find(type, number.longValue());
     } else if (value instanceof Model bean && type.isInstance(value)) {
       if (bean.getId() != null) {
-        value = JPA.find(bean.getClass(), bean.getId());
+        Class<Model> beanClass = EntityHelper.getEntityClass(bean);
+        value = JPA.find(beanClass, bean.getId());
       }
     }
 
