@@ -557,6 +557,7 @@
 "Unable to revoke API key",,,
 "Unable to rotate API key",,,
 "Unexpected database error occurred on the server.",,,
+"Unique ID",,,
 "Unique constraint violation",,,
 "Unique message identifier",,,
 "Unread",,,

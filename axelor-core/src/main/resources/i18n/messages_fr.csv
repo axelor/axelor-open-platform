@@ -557,6 +557,7 @@
 "Unable to revoke API key","Échec de la révocation de la clé API",,
 "Unable to rotate API key","Échec du renouvellement de la clé API",,
 "Unexpected database error occurred on the server.","Une erreur de base de données est survenue sur le serveur.",,
+"Unique ID","ID unique",,
 "Unique constraint violation","Violation de contrainte unique",,
 "Unique message identifier","Identifiant unique de message",,
 "Unread","Non lus",,

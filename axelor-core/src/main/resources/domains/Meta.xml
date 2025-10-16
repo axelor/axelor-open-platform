@@ -32,7 +32,7 @@
     <string name="module"/>
     <string name="xml" required="true" large="true"/>
     <boolean name="computed"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="helpLink" />
     <boolean name="extension" />
     <many-to-many name="groups" table="meta_view_groups" column="meta_view_id" column2="group_id" ref="com.axelor.auth.db.Group"/>
@@ -78,7 +78,7 @@
 
     <integer name="priority" />
     <integer name="order" column="order_seq" title="aop.meta.order"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="icon"/>
@@ -117,7 +117,7 @@
 
     <integer name="priority" />
     <integer name="order" column="order_seq" title="aop.meta.order"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
@@ -137,7 +137,7 @@
     ]]>
 
     <integer name="priority" />
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="type" required="true" selection="action.type.selection"/>
     <boolean name="home" title="Used as home action" help="Specify whether this action can be used as home action."/>
@@ -161,7 +161,7 @@
     <![CDATA[
     This object stores the selects.
     ]]>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <integer name="priority" required="true" default="20"/>
     <string name="module"/>
