@@ -98,7 +98,7 @@
 
   <action-condition name="action-condition-user-password">
     <check error="Password doesn't match configured pattern." field="newPassword"
-      if="!com.axelor.auth.AuthService.getInstance().passwordMatchesPattern(newPassword)" />
+      if="!__bean__(com.axelor.auth.UserService).passwordMatchesPattern(newPassword)" />
   </action-condition>
 
   <action-view name="action.view.show.active.tokens" title="API keys" model="com.axelor.auth.db.UserToken">
