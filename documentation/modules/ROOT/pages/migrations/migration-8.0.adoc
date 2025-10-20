@@ -637,7 +637,7 @@ ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).bu
 IMPORTANT: The `AuditableRunner` first tries to set current authenticated user as audit user but if not found it will
 set admin user as the audit user. Also, it doesn't run the task inside a new transaction. With the new implementation,
 it no more sets the admin user as the audit user by default. In a non-servlet environment, you may have to provide the
-user you want the process runs with. Also, it opens a new translation by default. This can be disabled with
+user you want the process to run with. Also, it opens a new transaction by default. This can be disabled with
 `.withTransaction(false)`.
 
 See more details xref:dev-guide:application/multi-tenancy.adoc[here]
