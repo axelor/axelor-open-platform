@@ -1,0 +1,6 @@
+---
+title: Fix test sources used as deployment assembly in eclipse
+type: fix
+description: |
+  Sometime when refreshing gradle projects, test sources appears as
+  deployment assembly causing unexpected behavior.

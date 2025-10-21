@@ -18,6 +18,8 @@ import org.gradle.plugins.ide.eclipse.model.EclipseClasspath;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
 import org.gradle.plugins.ide.eclipse.model.Library;
 import org.gradle.plugins.ide.eclipse.model.SourceFolder;
+import org.gradle.plugins.ide.eclipse.model.WbResource;
+import org.gradle.plugins.ide.eclipse.model.WtpComponent;
 
 public class EclipseSupport extends AbstractSupport {
 
@@ -91,6 +93,21 @@ public class EclipseSupport extends AbstractSupport {
                       it ->
                           it instanceof Library l
                               && l.getPath().contains(project.getName() + "/build"));
+            });
+
+    // exclude test sources from deployment assembly
+    eclipse
+        .getWtp()
+        .getComponent()
+        .getFile()
+        .whenMerged(
+            (WtpComponent wtp) -> {
+              wtp.getWbModuleEntries()
+                  .removeIf(
+                      it ->
+                          it instanceof WbResource wb
+                              && (wb.getSourcePath().startsWith("src/test/")
+                                  || wb.getSourcePath().startsWith("build/src-gen/test/")));
             });
 
     // finally configure wtp resources
