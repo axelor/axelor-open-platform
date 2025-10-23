@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { useEffect, useState } from "react";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
-import { PlusData, applyTitles } from "../../builder/utils";
+import { PlusData, applyTitles, useIsDiscrete } from "../../builder/utils";
 import { BarGroup } from "../bar/bar-group";
 
 const defaultOption = {
@@ -22,8 +22,9 @@ const defaultOption = {
 
 export function Hbar(props: ChartProps) {
   const { data } = props;
+  const isDiscrete = useIsDiscrete(data);
   const [type, setType] = useState<ChartGroupType>(
-    data.stacked ? "stack" : "group"
+    data.stacked ? "stack" : "group",
   );
   const [options, setOptions] = useState(defaultOption);
 
@@ -34,18 +35,31 @@ export function Hbar(props: ChartProps) {
         applyTitles(draft, data);
         draft.series = dimensions.map((key) => ({
           type: "bar",
-          stack: type === "stack" ? "all" : `${key}`,
+          stack: isDiscrete || type === "stack" ? "all" : `${key}`,
+          ...(isDiscrete && {
+            label: {
+              show: true,
+              position: "right",
+              formatter: (params: any) =>
+                formatter(
+                  params.value[params.dimensionNames[params.encode.x[0]]],
+                ),
+            },
+            labelLayout: {
+              hideOverlap: true,
+            },
+          }),
         }));
         draft.dataset.dimensions = ["x", ...dimensions];
         draft.dataset.source = source;
         draft.tooltip.valueFormatter = formatter;
-      })
+      }),
     );
-  }, [type, data]);
+  }, [type, data, isDiscrete]);
 
   return (
     <>
-      <BarGroup value={type} onChange={setType} />
+      {!isDiscrete && <BarGroup value={type} onChange={setType} />}
       <ECharts options={options} {...(props as any)} />
     </>
   );

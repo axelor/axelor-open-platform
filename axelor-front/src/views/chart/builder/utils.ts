@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import Color from "color";
 import difference from "lodash/difference";
 import filter from "lodash/filter";
@@ -681,5 +682,21 @@ export function prepareTheme(type: ChartType) {
         crossStyle: { color, width: "1" },
       },
     },
+    label: { color },
+    emphasis: {
+      label: { color }
+    }
   };
+}
+
+export function useIsDiscrete(chartView?: ChartView) {
+  return (
+    useMemo(
+      () =>
+        chartView?.series?.some(
+          (item) => !item.groupBy || item.groupBy === chartView.xAxis,
+        ),
+      [chartView],
+    ) ?? false
+  );
 }
