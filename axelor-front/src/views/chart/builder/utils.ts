@@ -533,18 +533,24 @@ export function PlusData(data: any) {
   const result = map(
     groupCollectionBy(dataset, xAxis),
     (group: any[], name: string) => {
-      let value = 0;
+      let value: number | string = 0;
       forEach(group, (item) => {
-        value += $conv(item[series.key]);
+        const val = $conv(item[series.key]);
+        if (Number.isNaN(Number(val))) {
+          value = val;
+        } else {
+          value += val;
+        }
       });
       if (!series.groupBy && xAxis) series.groupBy = xAxis;
       const groupBars = series.groupBy
         ? group.reduce(
             (attrs, rec) => ({
               ...attrs,
-              [rec[series.groupBy]]: isNaN(rec[series.key])
+              [rec[series.groupBy]]: Number.isNaN(Number(rec[series.key]))
                 ? rec[series.key]
-                : Number(rec[series.key]),
+                : Number(attrs[rec[series.groupBy]] ?? 0) +
+                  Number(rec[series.key]),
             }),
             {},
           )
