@@ -1,0 +1,6 @@
+---
+title: Fix missing series labels on bar chart
+type: fix
+description: |
+  Also don't show bar group for discrete bar,
+  i.e., when groupBy is not used.
