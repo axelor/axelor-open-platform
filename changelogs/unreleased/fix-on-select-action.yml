@@ -1,0 +1,13 @@
+---
+title: Make autocomplete search non-blocking to prevent keyboard input disruption
+type: fix
+description: |
+  On M2O input autocomplete, as soon as search was triggered, onSelect then search query was triggered. onSelect is a 
+  UI blocking action, so any subsequent keyboard input in that time is skipped causing a poor user experience on heavy 
+  application.
+  
+  Now onSelect is triggered if necessary, means only if the context doesn't change. This reduce the number of calls.
+  Moreover, keyboard input isn't blocking on input element anymore. This allow users to continue typing smoothly while 
+  the onSelect action processes in the background.
+  
+  An abortion technique is implemented to abort previous search request depending on keyboard input received.

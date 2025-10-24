@@ -58,6 +58,7 @@ export const Select = forwardRef(function Select<
     onShowCreateAndSelect,
     onInputChange,
     onOpen,
+    onClose,
     canSelect = true,
     openOnFocus = true,
     value = null,
@@ -94,25 +95,47 @@ export const Select = forwardRef(function Select<
     [fetchOptions],
   );
 
+  const refs = useRef({
+    fetchOptions,
+    loadOptions,
+    inputValue,
+  });
+
+  useEffect(() => {
+    refs.current = {
+      fetchOptions,
+      loadOptions,
+      inputValue,
+    };
+  }, [fetchOptions, loadOptions, inputValue]);
+
+  const isOpenRef = useRef(false);
+
   const handleOpen = useCallback(() => {
+    isOpenRef.current = true;
     if (onOpen) onOpen();
-    if (fetchOptions && !inputValue && !loadTimerRef.current) {
-      loadOptions("");
+    const {
+      fetchOptions: _fetchOptions,
+      loadOptions: _loadOptions,
+      inputValue: _inputValue,
+    } = refs.current;
+    if (_fetchOptions && !_inputValue && !loadTimerRef.current) {
+      _loadOptions("");
     }
-  }, [fetchOptions, inputValue, loadOptions, onOpen]);
+  }, [onOpen]);
 
   const handleClose = useCallback(() => {
+    isOpenRef.current = false;
+    onClose?.();
     setReady(false);
-  }, []);
+  }, [onClose]);
 
   const handleInputChange = useCallback(
     (text: string) => {
       setInputValue(text);
       if (onInputChange) onInputChange(text);
-      if (fetchOptions) {
-        if (text) {
-          loadOptions(text);
-        }
+      if (isOpenRef.current && fetchOptions) {
+        loadOptions(text);
       }
     },
     [fetchOptions, loadOptions, onInputChange],
