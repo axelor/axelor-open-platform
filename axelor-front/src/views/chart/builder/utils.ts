@@ -507,17 +507,23 @@ export function getScale(data: ChartView, dataset: ChartDataRecord[]) {
   return scale;
 }
 
-export function applyTitles(draft: any, data: any) {
+export function applyTitles(
+  draft: any,
+  data: any,
+  options: { xAxis?: any; yAxis?: any } = {},
+) {
   if (data.xTitle && draft.xAxis) {
     draft.xAxis.name = data.xTitle;
     draft.xAxis.nameLocation = "middle";
     draft.xAxis.nameGap = 25;
+    Object.assign(draft.xAxis, options.xAxis);
   }
   const [series] = data.series || [];
   if (series && series.title) {
     draft.yAxis.name = series.title;
     draft.yAxis.nameLocation = "middle";
-    draft.yAxis.nameGap = 50;
+    draft.yAxis.nameGap = 60;
+    Object.assign(draft.yAxis, options.yAxis);
   }
 }
 
