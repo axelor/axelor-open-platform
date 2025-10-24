@@ -1,0 +1,6 @@
+---
+title: Horizontal bar chart y-axis should be in descending order
+type: fix
+description: |
+  For example, if y-axis has years,
+  top should be earliest, bottom should be latest.

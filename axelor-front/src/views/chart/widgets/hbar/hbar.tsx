@@ -16,7 +16,7 @@ const defaultOption = {
     source: [],
   },
   xAxis: { axisLine: { show: true } },
-  yAxis: { type: "category" },
+  yAxis: { type: "category", inverse: true },
   series: [],
 };
 
