@@ -32,7 +32,10 @@ export function Bar(props: ChartProps) {
     const { types: dimensions, data: source, formatter } = PlusData(data);
     setOptions(
       produce((draft: any) => {
-        applyTitles(draft, data);
+        const rotateLabels = source.length > 6;
+        applyTitles(draft, data, {
+          xAxis: { nameGap: rotateLabels ? 75 : 25 },
+        });
         draft.series = dimensions.map((key) => ({
           type: "bar",
           stack: isDiscrete || type === "stack" ? "all" : `${key}`,
@@ -53,6 +56,25 @@ export function Bar(props: ChartProps) {
         draft.tooltip.valueFormatter = formatter;
         draft.dataset.dimensions = ["x", ...dimensions];
         draft.dataset.source = source;
+
+        if (rotateLabels) {
+          draft.xAxis.axisLabel = {
+            ...draft.xAxis.axisLabel,
+            rotate: 30,
+            interval: 0,
+            overflow: "truncate",
+            width: 110,
+          };
+          draft.grid = {
+            ...draft.grid,
+            bottom: 120,
+          };
+        } else {
+          draft.xAxis.axisLabel = {
+            interval: 0,
+          };
+          draft.grid = {};
+        }
       }),
     );
   }, [type, data, isDiscrete]);

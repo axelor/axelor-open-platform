@@ -32,7 +32,9 @@ export function Hbar(props: ChartProps) {
     const { types: dimensions, data: source, formatter } = PlusData(data);
     setOptions(
       produce((draft: any) => {
-        applyTitles(draft, data);
+        applyTitles(draft, data, {
+          yAxis: { nameGap: 85 },
+        });
         draft.series = dimensions.map((key) => ({
           type: "bar",
           stack: isDiscrete || type === "stack" ? "all" : `${key}`,
@@ -50,6 +52,11 @@ export function Hbar(props: ChartProps) {
             },
           }),
         }));
+        draft.yAxis.axisLabel = {
+          ...draft.yAxis.axisLabel,
+          overflow: "truncate",
+          width: 75,
+        };
         draft.dataset.dimensions = ["x", ...dimensions];
         draft.dataset.source = source;
         draft.tooltip.valueFormatter = formatter;
