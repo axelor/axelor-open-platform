@@ -19,4 +19,4 @@ From the eclipse, import the project using menu:File[Import... > Gradle > Existi
 ====
 
 The application project is configured to be {url-wtp}[eclipse webtool] compatible.
-{url-wtp-tomcat}[Create a tomcat 9.x server], add the `open-platform-demo` module and run the server.
+{url-wtp-tomcat}[Create a tomcat 10.1 server], add the `open-platform-demo` module and run the server.
