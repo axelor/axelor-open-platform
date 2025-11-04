@@ -84,7 +84,17 @@ function HttpBlock({ count, disabled }: { count: number, disabled?: boolean }) {
       const timer = setTimeout(() => setBlock(_block), 100);
 
       // Block keyboard events
-      const handler = (event: Event) => {
+      const handler = (event: KeyboardEvent) => {
+        const activeElement = document.activeElement;
+
+        if (
+          activeElement &&
+          ["INPUT", "TEXTAREA"].includes(activeElement.tagName) &&
+          !["Enter", "Tab"].includes(event.key)
+        ) {
+          return;
+        }
+
         event.stopPropagation();
         event.preventDefault();
       };
