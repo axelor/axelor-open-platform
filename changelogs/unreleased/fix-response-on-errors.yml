@@ -1,0 +1,8 @@
+---
+title: Fix response error handling
+type: fix
+description: |
+  On constraint violations, return the violations mentioning the fields and the associated explicit constraint message.
+  
+  Add the check, not null and too long violations to as explicit messages returned to users. Other cases are default messages.
+  

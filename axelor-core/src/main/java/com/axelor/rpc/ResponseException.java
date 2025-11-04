@@ -10,6 +10,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.google.common.base.Throwables;
 import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,10 +76,12 @@ public class ResponseException extends RuntimeException {
     }
 
     if (cause instanceof ConstraintViolationException ex) {
-      Map<String, Object> errors = new HashMap<>();
-      ex.getConstraintViolations()
-          .forEach(error -> errors.put(error.getPropertyPath().toString(), error.getMessage()));
-      report.put("constraints", errors);
+      final StringBuilder sb = new StringBuilder();
+      for (ConstraintViolation<?> cv : ex.getConstraintViolations()) {
+        sb.append("    &#8226; ").append(cv.getPropertyPath()).append(" - ");
+        sb.append(cv.getMessage()).append("\n");
+      }
+      report.put("message", sb.toString());
     }
 
     return report;

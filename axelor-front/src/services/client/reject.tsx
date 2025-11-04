@@ -14,7 +14,6 @@ export type ErrorReport = {
   causeStack?: string;
   entityId?: number;
   entityName?: string;
-  constraints?: Record<string, string>;
 };
 
 export type RejectType = number | string | ErrorReport | null;
