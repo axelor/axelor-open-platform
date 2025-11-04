@@ -1,0 +1,6 @@
+---
+title: Fix UI blocking after re-login popup
+type: fix
+description: |
+  Fix duplicate count decrement upon 401 (session expiration),
+  that caused non-blocking UI after re-login from popup.
