@@ -41,7 +41,6 @@ export function useHttpWatch() {
                 return;
               }
             }
-            setCount((count) => count - 1);
             return new Promise((resolve, reject) => {
               setPending((pending) => [
                 ...pending,
