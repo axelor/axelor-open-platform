@@ -26,7 +26,12 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@axelor/ui/*": ["./node_modules/@axelor/ui/*", "./node_modules/@axelor/ui/src/*"]
+      "@axelor/ui/*": [
+        "./node_modules/@axelor/ui/*",
+        "./node_modules/@axelor/ui/src/*"
+      ],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"]
     }
   },
   "include": ["src"],

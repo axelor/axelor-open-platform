@@ -72,8 +72,8 @@ function SelectInner<Type, Multiple extends boolean>(
   const [inputValue, setInputValue] = useState("");
 
   const [ready, setReady] = useState(!fetchOptions);
-  const selectRef = useRefs(ref);
-
+  const selectRef = useRef<HTMLDivElement>(null);
+  const combinedRef = useRefs(selectRef, ref);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const abortRef = useRef<AbortController>(undefined);
 
@@ -271,7 +271,7 @@ function SelectInner<Type, Multiple extends boolean>(
       clearOnBlur
       clearOnEscape
       {...selectProps}
-      ref={selectRef}
+      ref={combinedRef}
       value={value}
       autoFocus={autoFocus}
       readOnly={readOnly || !canSelect}
