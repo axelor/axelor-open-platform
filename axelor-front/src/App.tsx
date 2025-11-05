@@ -5,6 +5,7 @@ import { ThemeProvider } from "@axelor/ui";
 import { useAppLang } from "./hooks/use-app-lang";
 import { useAppThemeOption } from "./hooks/use-app-theme";
 import { Routes } from "./routes";
+import { axelor } from "./utils/globals";
 
 import "./styles/global.scss";
 
@@ -16,6 +17,10 @@ function App() {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [dir, lang]);
+
+  useEffect(() => {
+    axelor.notifyListeners();
+  }, [theme, options, dir, lang]);
 
   return (
     <ThemeProvider dir={dir} theme={theme} options={options}>

@@ -1,0 +1,6 @@
+---
+title: Improve React-based HTML applications embedded
+type: feature
+description: |
+  React-based HTML applications embedded can now retrieve some information (theme/language/...) and subscribe to 
+  changes via a listener pattern.
