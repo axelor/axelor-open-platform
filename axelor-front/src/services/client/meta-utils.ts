@@ -375,13 +375,11 @@ export function processView(
     view &&
     view.items
   ) {
-    const hasCustomAttrsItems =
-      view.items.some((item) => {
-        const [jsonField, name] = item.name?.split(".", 2) ?? [];
-        return jsonField === "attrs" && meta.jsonFields?.["attrs"][name];
-      }) || findViewItem(meta, "attrs") != null;
+    const hasCustomAttrsField =
+      Object.values(meta.fields ?? {}).some((f) => f.jsonField === "attrs") ||
+      findViewItem(meta, "attrs") != null;
 
-    if (view.type === "grid" && !hasCustomAttrsItems) {
+    if (view.type === "grid" && !hasCustomAttrsField) {
       const findLast = (
         array: any[],
         callback: (element: Schema, index?: number, array?: any[]) => boolean,
@@ -415,7 +413,7 @@ export function processView(
       })(view.items);
     }
 
-    if (view.type === "form" && !hasCustomAttrsItems) {
+    if (view.type === "form" && !hasCustomAttrsField) {
       view.items.push({
         type: "panel",
         title: i18n.get("Attributes"),
