@@ -213,7 +213,7 @@ export function ManyToOne(
   ]);
 
   const fetchOptions = useCallback(
-    async (text: string) => {
+    async (text: string, signal?: AbortSignal) => {
       const _domain = await beforeSelect(domain);
       const _domainContext = _domain ? getContext() : {};
       const options = {
@@ -224,7 +224,10 @@ export function ManyToOne(
         return [];
       }
 
-      const { records, page } = await search(text, options);
+      const { records, page } = await search(text, options, signal);
+      if (signal?.aborted) {
+        throw signal.reason;
+      }
       setSearchMore((page.totalCount ?? 0) > records.length);
       return records;
     },

@@ -20,6 +20,10 @@ export type SearchOptions = {
   };
 };
 
+export type SearchInit = {
+  signal?: AbortSignal;
+};
+
 export type SearchPage = {
   offset?: number;
   limit?: number;
@@ -40,7 +44,7 @@ export type ReadOptions = {
   related?: {
     [K: string]: string[];
   };
-  select?: SelectOptions
+  select?: SelectOptions;
 };
 
 export type SaveOptions<T extends DataRecord | DataRecord[]> = ReadOptions & {
@@ -73,10 +77,14 @@ export class DataSource {
     return this.#model;
   }
 
-  async search(options: SearchOptions): Promise<SearchResult> {
+  async search(
+    options: SearchOptions,
+    init?: SearchInit,
+  ): Promise<SearchResult> {
     const url = `ws/rest/${this.model}/search`;
     const { filter: data, limit, ...rest } = options ?? {};
     const resp = await request({
+      ...init,
       url,
       method: "POST",
       body: {

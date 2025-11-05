@@ -78,12 +78,13 @@ export function makeURL(path: string | string[]) {
 }
 
 export async function request(args: RequestArgs): Promise<Response> {
-  const { url, method, headers, body, options } = args;
+  const { url, method, headers, body, signal, options } = args;
   const input = makeURL(url);
   const init = {
     method,
     headers,
     body,
+    signal,
   };
   return $request(input, init, options);
 }

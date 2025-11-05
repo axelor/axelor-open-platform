@@ -33,7 +33,7 @@ export type {
 export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
   canSelect?: boolean;
-  fetchOptions?: (inputValue: string) => Promise<Type[]>;
+  fetchOptions?: (inputValue: string, signal: AbortSignal) => Promise<Type[]>;
   canCreateOnTheFly?: boolean;
   canShowNoResultOption?: boolean;
   onShowCreateAndSelect?: (inputValue: string) => void;
@@ -72,7 +72,9 @@ export const Select = forwardRef(function Select<
 
   const [ready, setReady] = useState(!fetchOptions);
   const selectRef = useRefs(ref);
+
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const abortRef = useRef<AbortController>();
 
   const loadOptions = useCallback(
     (inputValue: string) => {
@@ -80,13 +82,36 @@ export const Select = forwardRef(function Select<
         clearTimeout(loadTimerRef.current);
       }
 
+      const abortController = new AbortController();
+      if (abortRef.current) {
+        abortRef.current.abort(
+          new DOMException("Concurrent request", "AbortError"),
+        );
+      }
+      abortRef.current = abortController;
+
       loadTimerRef.current = setTimeout(
         async () => {
           if (fetchOptions) {
-            const items = await fetchOptions(inputValue);
-            loadTimerRef.current = undefined;
-            setItems(items || []);
-            setReady(true);
+            try {
+              const items = await fetchOptions(
+                inputValue,
+                abortController.signal,
+              );
+              loadTimerRef.current = undefined;
+              if (!abortController.signal.aborted) {
+                setItems(items || []);
+                setReady(true);
+              }
+            } catch (error) {
+              // Ignore AbortError
+              if (
+                !(error instanceof DOMException) ||
+                error.name !== "AbortError"
+              ) {
+                throw error;
+              }
+            }
           }
         },
         inputValue ? 300 : 0,
