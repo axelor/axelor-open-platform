@@ -25,7 +25,13 @@ import { i18n } from "@/services/client/i18n";
 import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { DEFAULT_COUNTRIES, FLAGS, getPhoneInfo, useDefaultCountry } from "./utils";
+import {
+  DEFAULT_COUNTRIES,
+  FLAGS,
+  getPhoneInfo,
+  useDefaultCountry,
+} from "./utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import "react-international-phone/style.css";
 
@@ -106,10 +112,11 @@ export function Phone({
   }, [_text, noPrefix]);
 
   const countries = useMemo(() => {
-
     // Filter out countries that are not in `onlyCountries`, if specified.
     let countries = onlyCountries.length
-      ? DEFAULT_COUNTRIES.filter((country) => onlyCountries.includes(country[1]))
+      ? DEFAULT_COUNTRIES.filter((country) =>
+          onlyCountries.includes(country[1]),
+        )
       : DEFAULT_COUNTRIES;
 
     // Translate country names
@@ -226,13 +233,13 @@ export function Phone({
   const hasValue = !!text && text === phone;
   const showButton = hasValue || !readonly;
 
-  const { isPossibleNumber, numberType } = useMemo(() => {
-    const phoneNumber = getPhoneInfo(phone);
+  const [isPossibleNumber, setIsPossibleNumber] = useState<boolean>(false);
+  const [numberType, setNumberType] = useState<string | undefined>(undefined);
 
-    return {
-      isPossibleNumber: phoneNumber.isPossible(),
-      numberType: phoneNumber.getDisplayType(),
-    };
+  useAsyncEffect(async () => {
+    const phoneNumber = await getPhoneInfo(phone);
+    setIsPossibleNumber(phoneNumber.isPossible());
+    setNumberType(phoneNumber.getDisplayType());
   }, [phone]);
 
   const handleOpenPhoneLink = useCallback(() => {
