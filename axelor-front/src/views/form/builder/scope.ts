@@ -487,18 +487,30 @@ function useActionAttrs({
 
             // collection field column ?
             if (targetFieldName.includes(".")) {
-              const fieldName = targetFieldName.split(".")[0];
-              const field = findViewItem(updateFormState.meta, fieldName);
+              const fieldName = targetFieldName
+                .split(".")
+                .slice(0, -1)
+                .join(".");
+
+              const refEditorName =
+                isRefScope && (formState.meta as any)?.schema?.name;
+              const fieldFromRef = refEditorName
+                ? findViewItem(formState.meta, fieldName)
+                : null;
+
+              const field =
+                fieldFromRef ?? findViewItem(updateFormState.meta, fieldName);
+
               const stateName =
                 target !== targetFieldName && jsonItem
                   ? `${jsonItem.modelField}.${fieldName}`
-                  : fieldName;
+                  : fieldFromRef
+                    ? `${refEditorName}.${fieldName}`
+                    : fieldName;
 
               if (field && isCollection(field) && !field.editor) {
                 const state = statesByName[stateName] ?? {};
-                const column = targetFieldName.substring(
-                  targetFieldName.indexOf(".") + 1,
-                );
+                const column = targetFieldName.substring(fieldName.length + 1);
                 const columns = state.columns ?? {};
                 const newState = {
                   ...state,
