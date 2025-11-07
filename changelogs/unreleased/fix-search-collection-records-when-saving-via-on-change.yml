@@ -1,0 +1,3 @@
+---
+title: Fix search collection records when saving via onChange
+type: fix
