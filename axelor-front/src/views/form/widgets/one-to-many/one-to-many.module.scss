@@ -7,6 +7,9 @@ $treeNodePadding: 1.175rem;
   &.hasActions {
     --ax-panel-header-title-padding: 0 0.5rem;
   }
+  > div:first-child > div > div:first-child {
+    min-width: 0;
+  }
 }
 
 .tree {
@@ -61,10 +64,12 @@ $treeNodePadding: 1.175rem;
 .header {
   display: flex;
   align-items: center;
+  min-width: 0;
 
   .title {
     display: flex;
     flex: 1;
+    min-width: 0;
 
     .button {
       --bs-border-radius: 1rem;
