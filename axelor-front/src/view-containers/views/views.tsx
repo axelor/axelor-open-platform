@@ -24,7 +24,10 @@ import {
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { toCamelCase, toKebabCase } from "@/utils/names";
-import { processContextValues } from "@/views/form/builder/utils";
+import {
+  getDashletContext,
+  processContextValues,
+} from "@/views/form/builder/utils";
 
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
@@ -68,7 +71,7 @@ function ViewContainer({
   const { state, data, error } = useAsync(
     async () =>
       loadView({
-        context,
+        context: { ...getDashletContext(tab.action), ...context },
         model,
         jsonModel: context?.jsonModel,
         ...view,

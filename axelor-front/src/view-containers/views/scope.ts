@@ -2,8 +2,6 @@ import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import omit from "lodash/omit";
-import pick from "lodash/pick";
 import {
   SetStateAction,
   useCallback,
@@ -33,7 +31,12 @@ import {
   useFormActiveHandler,
   useFormScope,
 } from "@/views/form/builder/scope";
-import { processContextValues } from "@/views/form/builder/utils";
+import {
+  createContextParams,
+  getDashletContext,
+  hasDashletContext,
+  processContextValues,
+} from "@/views/form/builder/utils";
 import { useDashboardContext } from "@/views/dashboard/scope";
 
 const fallbackAtom: TabAtom = atom(
@@ -92,20 +95,17 @@ export function useViewAction() {
   return tab.action;
 }
 
-const DEFAULT_CONTEXT = {};
-
 /**
  * This scoped hook can be used to access view context.
  *
  * @returns Context
  */
-export function useViewContext({
-  dashboard = true,
-}: { dashboard?: boolean } = {}) {
+export function useViewContext() {
   const { action, dashlet } = useViewTab();
   const { formAtom } = useFormScope();
   const _dashboardContext = useDashboardContext();
-  const dashboardContext = dashboard ? _dashboardContext : DEFAULT_CONTEXT;
+  const dashboard = Boolean(_dashboardContext);
+  const dashboardContext = dashboard ? _dashboardContext : undefined;
 
   const setState = useFormActiveHandler();
 
@@ -126,21 +126,17 @@ export function useViewContext({
 
   return useCallback(
     (actionContext?: boolean) => {
-      const formCtx = dashlet || recordId ? getFormContext() : undefined;
-      const _parent = (() => {
-        if (dashlet) {
-          return {
-            ...(actionContext ? omit(formCtx, ["_domainAction"]) : formCtx),
-            ...pick(action.context ?? {}, [
-              "_model",
-              "_viewName",
-              "_viewType",
-              "_views",
-            ]),
-          };
-        }
-        return formCtx;
-      })();
+      const getCtx = () =>
+        hasDashletContext(action)
+          ? {
+              ...getDashletContext(action),
+              // If the dashlet is rendered within a dashboard, add context parameters like _viewType, _views
+              // because unlike form view dashlet dashlet.getContext will not set these values.
+              ...(dashboard && createContextParams({}, action)),
+            }
+          : getFormContext();
+
+      const _parent = dashlet || recordId ? getCtx() : undefined;
 
       return processContextValues(
         actionContext
@@ -156,7 +152,7 @@ export function useViewContext({
             },
       );
     },
-    [dashlet, recordId, dashboardContext, action.context, getFormContext],
+    [dashlet, recordId, dashboard, dashboardContext, action, getFormContext],
   );
 }
 

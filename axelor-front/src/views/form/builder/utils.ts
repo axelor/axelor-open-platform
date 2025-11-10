@@ -373,6 +373,21 @@ export function compactJson(
   return JSON.stringify(rec);
 }
 
+const DASHLET_GET_CONTEXT = Symbol("dashlet.getContext");
+
+export function setDashletContext(getContext?: () => DataContext) {
+  return { [DASHLET_GET_CONTEXT]: getContext };
+}
+
+export function hasDashletContext(action?: ActionView) {
+  return Boolean(action?.params?.[DASHLET_GET_CONTEXT as any]);
+}
+
+export function getDashletContext(action?: ActionView) {
+  const getCtx = action?.params?.[DASHLET_GET_CONTEXT as any];
+  return typeof getCtx === "function" ? getCtx() : {};
+}
+
 const NUMBER_ATTRS = [
   "width",
   "height",

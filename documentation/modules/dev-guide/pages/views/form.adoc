@@ -238,9 +238,9 @@ A `panel-include` can have following attributes:
 
 === Panel Dashlet
 
-A `panel-dashlet` can be used to embed other views like chart, portlet, iframe…
+A `panel-dashlet` can be used to embed other views like chart, cards, iframe…
 
-A `panel-dashlet` can have following attributes:
+A `panel-dashlet` can have the following attributes:
 
 [cols="2,8"]
 |===
@@ -250,6 +250,9 @@ A `panel-dashlet` can have following attributes:
 | `name` | name of the panel
 | `title` | title of the panel
 | `canSearch` | enable search header (for grid views) or search box (for card views)
+| `canEdit` | whatever we can edit dashlet records even if the dashlet is in readonly
+| `canDelete` | whatever we can delete dashlet records
+| `canNew` | whatever we can create dashlet records
 | `height` | height taken by the widget
 | `colSpan` | number of columns taken by the widget
 | `hidden` | whether to hide the widget
@@ -259,12 +262,41 @@ A `panel-dashlet` can have following attributes:
 | `showIf` | boolean expression to show the panel
 | `showTitle` | whether to show the panel title
 | `if-module` | use the widget if the given module is installed
+| `x-show-bars` | whether to show the related grid toolbar and menubar in header
 |===
 
 [source,xml]
 -----
+<!-- Display a chart -->
 <panel-dashlet action="chart:chart.sales.per.month"/>
+<!-- Display a grid -->
+<panel-dashlet action="sale.category.link.products" />
 -----
+
+==== Search request
+
+The domain context of the search request is the main top record.
+
+[source,xml]
+-----
+<panel-dashlet action="sale.category.link.products" />
+
+<action-view name="sale.category.link.products" model="com.axelor.sale.db.Product" title="Related products">
+    <view type="grid"/>
+    <view type="form"/>
+    <domain>self.category.id = :_categoryId</domain>
+    <!-- id is the id of the main top record (ie, the category) -->
+    <context name="_categoryId" expr="eval: id"/>
+</action-view>
+-----
+
+==== Toolbar and menubar actions
+
+The grid toolbar and menubar actions context is the dashlet context containing :
+
+* the action view context
+* the main top record in `_parent`
+* if any records are selected, the selected line ids are available in `_ids`
 
 == Panel Widgets
 

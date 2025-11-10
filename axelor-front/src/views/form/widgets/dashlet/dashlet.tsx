@@ -38,7 +38,7 @@ import {
 } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 import { createWidgetAtom } from "../../builder/atoms";
-import { processContextValues } from "../../builder/utils";
+import { processContextValues, setDashletContext } from "../../builder/utils";
 import classes from "./dashlet.module.scss";
 
 interface DashletProps {
@@ -51,7 +51,6 @@ interface DashletProps {
   canDelete?: boolean;
   dashboard?: boolean;
   attrs?: Attrs;
-  viewContext?: DataContext;
   getContext?: () => DataContext;
   viewId?: number;
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
@@ -100,7 +99,6 @@ export function DashletComponent({
   canDelete,
   popup,
   viewId,
-  viewContext,
   dashboard,
   onViewLoad,
   getContext,
@@ -116,11 +114,6 @@ export function DashletComponent({
       const actionView = await findActionView(action, context, {
         silent: true,
       });
-      const ctx = {
-        ...actionView.context,
-        ...context,
-      };
-      const { _id, _showRecord } = actionView.context || {};
       return await initTab({
         ...actionView,
         name: uniqueId("$dashlet"),
@@ -130,25 +123,17 @@ export function DashletComponent({
           "show-toolbar": false,
           "dashlet.canSearch": canSearch,
           "dashlet.params": actionView.params,
+          ...setDashletContext(getContext),
           ...(popup && {
             "dashlet.in.popup": popup,
           }),
         },
         context: {
-          ...(dashboard
-            ? ctx
-            : {
-                ...processContextValues(viewContext ?? {}),
-                ...actionView.context,
-                _id: _id || viewContext?._id,
-                _showRecord,
-              }),
-          ...pick(ctx, ["_viewName", "_viewType", "_views"]),
-          _model: ctx.model ?? ctx._model,
+          ...actionView.context,
           _domainAction: action,
         },
       });
-    }, [dashboard, action, popup, canSearch, viewContext, getContext]),
+    }, [action, popup, canSearch, getContext]),
   );
 
   const { data: tab, state } = useAsync(load, [load]);
@@ -371,7 +356,6 @@ function DashletWrapper(props: WidgetProps) {
     useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom]),
   );
 
-  const viewContext = useViewAction()?.context;
   const getFormContext = usePrepareContext(formAtom);
 
   const getContext = useCallback(() => {
@@ -397,7 +381,6 @@ function DashletWrapper(props: WidgetProps) {
           schema,
           attrs,
           getContext,
-          viewContext,
           canNew,
           canEdit,
           canDelete,
