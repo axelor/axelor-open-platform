@@ -1,5 +1,0 @@
----
-title: Fix blinking grid header
-type: fix
-description: |
-  While switching from edit/view mode, grid header label was blinking due to style changes.

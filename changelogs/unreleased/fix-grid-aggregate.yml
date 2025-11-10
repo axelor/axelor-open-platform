@@ -1,6 +1,0 @@
----
-title: Don't render grid footer if no records
-type: fix
-description: |
-  In case of `all` grid aggregation type, don't render grid footer if there is no record. This also ensure 
-  the aggregate function doesn't not crash when no data are available.

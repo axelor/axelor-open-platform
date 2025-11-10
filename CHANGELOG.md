@@ -1,3 +1,169 @@
+## 8.0.1 (2025-11-10)
+
+#### Feature
+
+* Improve frontend loading performance with lazy loading
+
+  <details>
+  
+  Lazy load application routes, but also ReactDatePicker and libphonenumber-js libraries. This reduce main bundle size 
+  by 50% and loaded them on-demand.
+  
+  </details>
+
+#### Fix
+
+* Fix blinking grid header
+
+  <details>
+  
+  While switching from edit/view mode, grid header label was blinking due to style changes.
+  
+  </details>
+
+* Rotate x-axis labels to avoid hiding overlaps on bar chart
+* Don't render grid footer if no records
+
+  <details>
+  
+  In case of `all` grid aggregation type, don't render grid footer if there is no record. This also ensure 
+  the aggregate function doesn't not crash when no data are available.
+  
+  </details>
+
+* Fix time series with line chart
+
+  <details>
+  
+  Use xAxis type "time" for `<category type="date|time" />`
+  Line chart was always using "category" type (equal spacing),
+  which is incorrect when dealing with time.
+  
+  </details>
+
+* Fix search collection records when saving via onChange
+* Fix test sources used as deployment assembly in eclipse
+
+  <details>
+  
+  Sometime when refreshing gradle projects, test sources appears as
+  deployment assembly causing unexpected behavior.
+  
+  </details>
+
+* Fix forbidden action condition when changing user password
+
+  <details>
+  
+  Add script-allowed `com.axelor.auth.UserService` for `passwordMatchesPattern` method.
+  
+  </details>
+
+* Fix UI blocking after re-login popup
+
+  <details>
+  
+  Fix duplicate count decrement upon 401 (session expiration),
+  that caused non-blocking UI after re-login from popup.
+  
+  </details>
+
+* Fix response error handling
+
+  <details>
+  
+  On constraint violations, return the violations mentioning the fields and the associated explicit constraint message.
+  
+  Add the check, not null and too long violations to as explicit messages returned to users. Other cases are default messages.
+  
+  </details>
+
+* Fix handling of end-of-lines in i18n messages
+
+  <details>
+  
+  CSV normalized end-of-lines to \r\n, between CSV records only, not for cell data.
+  CSV cell data is now also normalized to \r\n.
+  
+  For multiline translation keys, need to normalize back to \n, as that's
+  what is used in source code, meta views, etc.
+  This fixes translations when keys contain end-of-lines.
+  
+  </details>
+
+* Fix set action attrs in collection field of m2o editor
+
+  <details>
+  
+  This fix enables setting action-attrs (e.g., show/hide columns) for collection fields in O2O/M2O editors.
+  Attributes can now be set both from the main form scope (customer.addresses.country: { hidden: true })
+  and within the editor scope (addresses.country: { hidden: true }).
+  
+  </details>
+
+* Fix close action behavior in custom model popup
+* Fix binding of collection of proxies
+
+  <details>
+  
+  Example:
+  
+  ```java
+  // titles contains HibernateProxy objects
+  List<Contact> results = contactRepo.all().filter("self.title IN :titles").bind("titles", titles).fetch();
+  ```
+  
+  Caused UnknownEntityTypeException
+  
+  </details>
+
+* Fix missing series labels on bar chart
+
+  <details>
+  
+  Also don't show bar group for discrete bar,
+  i.e., when groupBy is not used.
+  
+  </details>
+
+* Adjust compose message popup title and buttons
+* Horizontal bar chart y-axis should be in descending order
+
+  <details>
+  
+  For example, if y-axis has years,
+  top should be earliest, bottom should be latest.
+  
+  </details>
+
+* Add `title` attribute on `xmlId` fields in Meta entities
+* Fix pass action context in panel-dashlet edit form
+
+  <details>
+  
+  When a form view is opened through the `panel-dashlet` `edit icon` in a `tab view`,
+  the newly opened form view (in tab) record should be treated as the `_parent`,
+  and the original panel-dashlet record should be passed as a nested `_parent` within it.
+  
+  </details>
+
+* Make autocomplete search non-blocking to prevent keyboard input disruption
+
+  <details>
+  
+  On M2O input autocomplete, as soon as search was triggered, onSelect then search query was triggered. onSelect is a 
+  UI blocking action, so any subsequent keyboard input in that time is skipped causing a poor user experience on heavy 
+  application.
+  
+  Now onSelect is triggered if necessary, means only if the context doesn't change. This reduce the number of calls.
+  Moreover, keyboard input isn't blocking on input element anymore. This allow users to continue typing smoothly while 
+  the onSelect action processes in the background.
+  
+  An abortion technique is implemented to abort previous search request depending on keyboard input received.
+  
+  </details>
+
+
 ## 8.0.0 (2025-10-14)
 
 #### Feature
