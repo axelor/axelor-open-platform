@@ -1,0 +1,6 @@
+---
+title: Improve frontend loading performance with lazy loading
+type: feature
+description: |
+  Lazy load application routes, but also ReactDatePicker and libphonenumber-js libraries. This reduce main bundle size 
+  by 50% and loaded them on-demand.
