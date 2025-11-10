@@ -1,6 +1,0 @@
----
-title: Fix editable grid rendering
-type: fix
-description: |
-  In editable grid, edit record then switching from records perform multiple renders causing blinking issue. Now 
-  with batch state update, it will combine all renders into one.

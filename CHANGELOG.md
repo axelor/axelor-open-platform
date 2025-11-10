@@ -1,3 +1,101 @@
+## 7.4.6 (2025-11-10)
+
+#### Fix
+
+* Fix blinking grid header
+
+  <details>
+  
+  While switching from edit/view mode, grid header label was blinking due to style changes.
+  
+  </details>
+
+* Rotate x-axis labels to avoid hiding overlaps on bar chart
+* Fix time series with line chart
+
+  <details>
+  
+  Use xAxis type "time" for `<category type="date|time" />`
+  Line chart was always using "category" type (equal spacing),
+  which is incorrect when dealing with time.
+  
+  </details>
+
+* Fix search collection records when saving via onChange
+* Fix UI blocking after re-login popup
+
+  <details>
+  
+  Fix duplicate count decrement upon 401 (session expiration),
+  that caused non-blocking UI after re-login from popup.
+  
+  </details>
+
+* Fix editable grid rendering
+
+  <details>
+  
+  In editable grid, edit record then switching from records perform multiple renders causing blinking issue. Now 
+  with batch state update, it will combine all renders into one.
+  
+  </details>
+
+* Fix set action attrs in collection field of m2o editor
+
+  <details>
+  
+  This fix enables setting action-attrs (e.g., show/hide columns) for collection fields in O2O/M2O editors.
+  Attributes can now be set both from the main form scope (customer.addresses.country: { hidden: true })
+  and within the editor scope (addresses.country: { hidden: true }).
+  
+  </details>
+
+* Fix close action behavior in custom model popup
+* Fix missing series labels on bar chart
+
+  <details>
+  
+  Also don't show bar group for discrete bar,
+  i.e., when groupBy is not used.
+  
+  </details>
+
+* Horizontal bar chart y-axis should be in descending order
+
+  <details>
+  
+  For example, if y-axis has years,
+  top should be earliest, bottom should be latest.
+  
+  </details>
+
+* Fix pass action context in panel-dashlet edit form
+
+  <details>
+  
+  When a form view is opened through the `panel-dashlet` `edit icon` in a `tab view`,
+  the newly opened form view (in tab) record should be treated as the `_parent`,
+  and the original panel-dashlet record should be passed as a nested `_parent` within it.
+  
+  </details>
+
+* Make autocomplete search non-blocking to prevent keyboard input disruption
+
+  <details>
+  
+  On M2O input autocomplete, as soon as search was triggered, onSelect then search query was triggered. onSelect is a 
+  UI blocking action, so any subsequent keyboard input in that time is skipped causing a poor user experience on heavy 
+  application.
+  
+  Now onSelect is triggered if necessary, means only if the context doesn't change. This reduce the number of calls.
+  Moreover, keyboard input isn't blocking on input element anymore. This allow users to continue typing smoothly while 
+  the onSelect action processes in the background.
+  
+  An abortion technique is implemented to abort previous search request depending on keyboard input received.
+  
+  </details>
+
+
 ## 7.4.5 (2025-10-15)
 
 #### Feature

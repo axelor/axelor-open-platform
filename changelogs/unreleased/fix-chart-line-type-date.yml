@@ -1,7 +1,0 @@
----
-title: Fix time series with line chart
-type: fix
-description: |
-  Use xAxis type "time" for `<category type="date|time" />`
-  Line chart was always using "category" type (equal spacing),
-  which is incorrect when dealing with time.

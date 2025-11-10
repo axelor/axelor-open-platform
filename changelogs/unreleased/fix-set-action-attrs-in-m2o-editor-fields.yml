@@ -1,8 +1,0 @@
----
-title: Fix set action attrs in collection field of m2o editor
-type: fix
-description: |
-  This fix enables setting action-attrs (e.g., show/hide columns) for collection fields in O2O/M2O editors.
-  Attributes can now be set both from the main form scope (customer.addresses.country: { hidden: true })
-  and within the editor scope (addresses.country: { hidden: true }).
-
