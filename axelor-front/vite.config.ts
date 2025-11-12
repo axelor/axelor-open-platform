@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
 
@@ -34,7 +35,12 @@ export default defineConfig({
         fs.symlinkSync(sourceDir, targetDir, "dir");
       },
     },
-  ],
+    process.env.VITE_VISUALIZER === "true" && visualizer({
+      emitFile: true,
+      // to generate json output
+      //template: "raw-data"
+    }),
+  ].filter(Boolean),
   define: {
     "import.meta.env.MONACO_PATH": JSON.stringify(
       process.env.NODE_ENV === "production" ? monacoPath : monacoNodePath,
