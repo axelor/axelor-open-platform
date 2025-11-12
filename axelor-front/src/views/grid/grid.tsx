@@ -1107,7 +1107,7 @@ function GridInner(props: ViewProps<GridView>) {
           deleteEnabled && {
             onDelete: handleDelete,
           }),
-        onRefresh: () => doSearch({}),
+        onRefresh: doSearch,
       });
     }
   }, [

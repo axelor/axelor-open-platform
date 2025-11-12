@@ -229,7 +229,7 @@ export function DashletComponent({
               title={attrs?.title ?? (title || tab?.title)}
             />
             {hasSearch && <DashletSearch />}
-            {attrs?.refresh && <DashletRefresh count={attrs.refresh} />}
+            <DashletRefresh count={attrs?.refresh ?? 0} />
             <DashletActions
               dashboard={dashboard}
               viewType={viewType}
@@ -260,13 +260,22 @@ function DashletRefresh({ count }: { count: number }) {
   const doRefresh = useAfterActions(
     useCallback(async () => onRefresh?.(), [onRefresh]),
   );
+  const hasGridInitialized = Boolean(onRefresh);
+  const initDashlet = useRef(false);
 
   useAsyncEffect(async () => {
-    if (count) {
+    // Prevent unnecessary dashlet reload during initial grid setup.
+    // The grid initialization itself loads the dashlet data.
+    // Once the grid is fully initialized, mark it as ready (initDashlet = true)
+    // so that subsequent changes to `count` trigger a refresh.
+    if (initDashlet.current && count) {
       doRefresh();
     }
+    if (hasGridInitialized) {
+      initDashlet.current = true;
+    }
   }, [count, doRefresh]);
-
+  
   return null;
 }
 
