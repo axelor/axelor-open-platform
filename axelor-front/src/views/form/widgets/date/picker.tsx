@@ -88,7 +88,7 @@ export const Picker = forwardRef<
 
       setLoaded(true);
     },
-    [locale],
+    [loaded, locale],
   );
 
   if (loaded) {
