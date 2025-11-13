@@ -91,7 +91,7 @@ public class AuthPac4jUserService {
     }
 
     userRepo.persist(user);
-    logger.info("User(code={}) created from {}", user.getCode(), profile);
+    logger.info("User(code={}) created from {}", user.getCode(), profile.getClientName());
   }
 
   @Transactional
