@@ -20,9 +20,9 @@ import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
+import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
-import { DataStore } from "@/services/client/data-store";
 import { toTitleCase } from "@/utils/names";
 
 import {
@@ -288,7 +288,7 @@ export function ToolbarActions({
   );
 
   return (
-    <Box d="flex" textWrap={false} overflow="hidden">
+    <Box d="flex" textWrap={false} data-testid="view-actions">
       {responsive && (
         <CommandBar
           items={[
@@ -302,6 +302,8 @@ export function ToolbarActions({
               showDownArrow: true,
             } as CommandItemProps,
           ]}
+          data-testid="more"
+          aria-label={i18n.get("More actions")}
         />
       )}
       <Box
@@ -314,7 +316,7 @@ export function ToolbarActions({
           },
         })}
       >
-        <CommandBar items={items} />
+        <CommandBar items={items} data-testid="actions" />
       </Box>
     </Box>
   );
@@ -485,9 +487,19 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const { ref, width } = useResizeDetector();
 
   return (
-    <Box className={styles.toolbar}>
-      <CommandBar className={styles.actions} iconOnly items={actions} />
-      <Box ref={ref} d="flex" className={styles.extra}>
+    <Box
+      className={styles.toolbar}
+      data-testid="toolbar"
+      role="toolbar"
+      aria-label={i18n.get("View toolbar")}
+    >
+      <CommandBar
+        className={styles.actions}
+        iconOnly
+        items={actions}
+        data-testid="common-actions"
+      />
+      <Box ref={ref} d="flex" className={styles.extra} gap={2}>
         {(toolbar?.length > 0 || menubar?.length > 0) && (
           <ToolbarActions
             buttons={toolbar}
@@ -502,7 +514,11 @@ export function ViewToolBar(props: ViewToolBarProps) {
         )}
         {children}
       </Box>
-      {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
+      {pageText && (
+        <Box className={styles.pageInfo} data-testid="page-info">
+          {pageText}
+        </Box>
+      )}
       {PageComp && (
         <Box className={styles.pageInfo}>
           <PageComp />
@@ -511,6 +527,8 @@ export function ViewToolBar(props: ViewToolBarProps) {
       {pageActions && (
         <CommandBar
           className={styles.pageActions}
+          data-testid="page-actions"
+          aria-label={i18n.get("Page navigation")}
           items={[
             {
               key: "prev",
@@ -519,6 +537,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               },
               disabled: !canPrev,
               onClick: handlePrev,
+              description: i18n.get("Previous"),
             },
             {
               key: "next",
@@ -528,16 +547,26 @@ export function ViewToolBar(props: ViewToolBarProps) {
               },
               disabled: !canNext,
               onClick: handleNext,
+              description: i18n.get("Next"),
             },
             ...(paginationActions || []),
           ]}
         />
       )}
       {switchActions && (
-        <CommandBar items={switchActions} className={styles.viewSwitch} />
+        <CommandBar
+          items={switchActions}
+          className={styles.viewSwitch}
+          data-testid="view-switcher"
+          aria-label={i18n.get("Switch view")}
+        />
       )}
       {sessionInfo?.user?.technical && (
-        <CommandBar items={farItems} className={styles.farItems} />
+        <CommandBar
+          items={farItems}
+          className={styles.farItems}
+          data-testid="view-settings"
+        />
       )}
       {Boolean(helpLink) && (
         <CommandBar
@@ -553,6 +582,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             },
           ]}
           className={styles.helpLink}
+          data-testid="view-help"
         />
       )}
     </Box>
