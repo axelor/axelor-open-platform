@@ -3,9 +3,9 @@ import { useCallback, useMemo, useState } from "react";
 import { Badge, clsx, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { AccessibleButton } from "@/components/accessible-button";
 import { AppIcon, AppLogo } from "@/components/app-logo/app-logo";
 import { Icon } from "@/components/icon";
-import { useAppSettings } from "@/hooks/use-app-settings";
 import { useMenu } from "@/hooks/use-menu";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
@@ -159,6 +159,8 @@ export function NavDrawer() {
 
   return (
     <NavMenu
+      data-testid="nav-drawer"
+      aria-label={i18n.get("Main navigation")}
       mode={mode}
       show={show}
       items={items}
@@ -190,26 +192,40 @@ function Header() {
   }, [appHome, openTab]);
 
   return (
-    <div className={styles.header}>
-      <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
-        <MaterialIcon className={styles.toggleIcon} icon="menu" />
-      </div>
-      <div
+    <div className={styles.header} data-testid="nav-drawer-header">
+      <AccessibleButton
+        className={styles.toggle}
+        onClick={(e) => setSidebar(!sidebar)}
+        tabIndex={0}
+        aria-label={i18n.get("Toggle navigation")}
+        data-testid="btn-toggle-sidebar"
+      >
+        <MaterialIcon
+          className={styles.toggleIcon}
+          icon="menu"
+          aria-hidden="true"
+        />
+      </AccessibleButton>
+      <AccessibleButton
         className={clsx(styles.appLogo, {
           [styles.appLogoAction]: appHome,
         })}
         onClick={onLogoClick}
+        role={appHome ? "button" : undefined}
+        tabIndex={appHome ? 0 : undefined}
+        aria-label={appHome ? i18n.get("Go to home") : undefined}
+        data-testid="logo"
       >
         <AppLogo />
-      </div>
+      </AccessibleButton>
     </div>
   );
 }
 
 function HeaderSmall() {
   return (
-    <div className={styles.header}>
-      <div className={styles.appIcon}>
+    <div className={styles.header} data-testid="nav-drawer-header-small">
+      <div className={styles.appIcon} data-testid="app-icon">
         <AppIcon />
       </div>
     </div>
