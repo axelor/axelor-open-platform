@@ -2,6 +2,7 @@ import {
   FormEventHandler,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -182,6 +183,10 @@ export function ChangePassword({
   const newPasswordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
 
+  const errorId = useId();
+  const newPasswordHelpId = useId();
+  const confirmPasswordHelpId = useId();
+
   useEffect(() => {
     newPasswordInputRef.current?.setCustomValidity(newPasswordValidity);
   }, [newPasswordValidity]);
@@ -195,7 +200,14 @@ export function ChangePassword({
   }
 
   return (
-    <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>
+    <Box
+      as="main"
+      mt={5}
+      ms="auto"
+      me="auto"
+      className={styles.main}
+      data-testid="change-password-page"
+    >
       <Box className={styles.container}>
         <Box
           className={styles.paper}
@@ -205,8 +217,8 @@ export function ChangePassword({
           alignItems="center"
           p={3}
         >
-          <AppSignInLogo className={styles.logo} />
-          <Box as="legend" style={{ textWrap: "balance" }}>
+          <AppSignInLogo className={styles.logo} data-testid="logo" />
+          <Box as="legend" style={{ textWrap: "balance" }} data-testid="title">
             {i18n.get("Change your password")}
           </Box>
           <Box
@@ -214,10 +226,14 @@ export function ChangePassword({
             w={100}
             onSubmit={handleSubmit}
             onInput={() => setErrorMessage("")}
+            data-testid="form"
           >
             {requireCurrentPassword && (
-              <Box className={styles.inputContainer}>
-                <InputLabel htmlFor="password">
+              <Box
+                className={styles.inputContainer}
+                data-testid="field-current-password"
+              >
+                <InputLabel htmlFor="password" data-testid="label">
                   {i18n.get("Current password")}
                 </InputLabel>
                 <AdornedInput
@@ -230,26 +246,39 @@ export function ChangePassword({
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   spellCheck="false"
+                  aria-required="true"
+                  aria-describedby={errorMessage ? errorId : undefined}
+                  data-testid="input"
                   endAdornment={
                     <Button
                       as="span"
                       onClick={() => setShowCurrentPassword((value) => !value)}
                       title={
-                        showPassword
+                        showCurrentPassword
                           ? i18n.get("Hide password")
                           : i18n.get("Show password")
                       }
+                      aria-label={
+                        showCurrentPassword
+                          ? i18n.get("Hide password")
+                          : i18n.get("Show password")
+                      }
+                      data-testid="btn-toggle-current-password"
                     >
                       <BootstrapIcon
-                        icon={showPassword ? "eye-slash" : "eye"}
+                        icon={showCurrentPassword ? "eye-slash" : "eye"}
+                        aria-hidden="true"
                       />
                     </Button>
                   }
                 />
               </Box>
             )}
-            <Box className={styles.inputContainer}>
-              <InputLabel htmlFor="newPassword">
+            <Box
+              className={styles.inputContainer}
+              data-testid="field-new-password"
+            >
+              <InputLabel htmlFor="newPassword" data-testid="label">
                 {i18n.get("New password")}
               </InputLabel>
               <AdornedInput
@@ -262,6 +291,16 @@ export function ChangePassword({
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 spellCheck="false"
+                aria-required="true"
+                aria-invalid={!!newPasswordValidity}
+                aria-describedby={
+                  newPasswordValidity
+                    ? newPasswordHelpId
+                    : errorMessage
+                      ? errorId
+                      : undefined
+                }
+                data-testid="input"
                 endAdornment={
                   <Button
                     as="span"
@@ -271,18 +310,37 @@ export function ChangePassword({
                         ? i18n.get("Hide password")
                         : i18n.get("Show password")
                     }
+                    aria-label={
+                      showPassword
+                        ? i18n.get("Hide password")
+                        : i18n.get("Show password")
+                    }
+                    data-testid="btn-toggle-password"
                   >
-                    <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                    <BootstrapIcon
+                      icon={showPassword ? "eye-slash" : "eye"}
+                      aria-hidden="true"
+                    />
                   </Button>
                 }
               />
               {newPasswordValidity && (
-                <Box className={styles.validity}>{newPasswordValidity}</Box>
+                <Box
+                  className={styles.validity}
+                  id={newPasswordHelpId}
+                  role="alert"
+                  data-testid="help"
+                >
+                  {newPasswordValidity}
+                </Box>
               )}
             </Box>
 
-            <Box className={styles.inputContainer}>
-              <InputLabel htmlFor="confirmPassword">
+            <Box
+              className={styles.inputContainer}
+              data-testid="field-confirm-password"
+            >
+              <InputLabel htmlFor="confirmPassword" data-testid="label">
                 {i18n.get("Confirm new password")}
               </InputLabel>
               <AdornedInput
@@ -294,6 +352,16 @@ export function ChangePassword({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 spellCheck="false"
+                aria-required="true"
+                aria-invalid={!!confirmPasswordValidity}
+                aria-describedby={
+                  confirmPasswordValidity
+                    ? confirmPasswordHelpId
+                    : errorMessage
+                      ? errorId
+                      : undefined
+                }
+                data-testid="input"
                 endAdornment={
                   <Button
                     as="span"
@@ -303,21 +371,43 @@ export function ChangePassword({
                         ? i18n.get("Hide password")
                         : i18n.get("Show password")
                     }
+                    aria-label={
+                      showConfirmPassword
+                        ? i18n.get("Hide password")
+                        : i18n.get("Show password")
+                    }
+                    data-testid="btn-toggle-confirm-password"
                   >
                     <BootstrapIcon
                       icon={showConfirmPassword ? "eye-slash" : "eye"}
+                      aria-hidden="true"
                     />
                   </Button>
                 }
               />
 
               {confirmPasswordValidity && (
-                <Box className={styles.validity}>{confirmPasswordValidity}</Box>
+                <Box
+                  className={styles.validity}
+                  id={confirmPasswordHelpId}
+                  role="alert"
+                  data-testid="help"
+                >
+                  {confirmPasswordValidity}
+                </Box>
               )}
             </Box>
 
             {errorMessage && (
-              <Alert mb={1} p={2} variant="danger" className={styles.error}>
+              <Alert
+                mb={1}
+                p={2}
+                variant="danger"
+                className={styles.error}
+                id={errorId}
+                role="alert"
+                data-testid="error"
+              >
                 {errorMessage}
               </Alert>
             )}
@@ -336,6 +426,8 @@ export function ChangePassword({
                 !newPassword ||
                 !confirmPassword
               }
+              data-testid="btn-change-password"
+              aria-label={i18n.get("Change password")}
             >
               {i18n.get("Change password")}
             </LoadingButton>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 
 import {
@@ -11,7 +11,6 @@ import {
 } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
-import { LoadingButton } from "../loading-button";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -26,6 +25,7 @@ import { SessionInfo, SignInButtonType } from "@/services/client/session";
 import { sanitize } from "@/utils/sanitize";
 import { AppSignInLogo } from "../app-logo/app-logo";
 import { Icon } from "../icon";
+import { LoadingButton } from "../loading-button";
 import { TextLink as Link } from "../text-link";
 
 import styles from "./login-form.module.scss";
@@ -50,6 +50,7 @@ export function LoginForm({
   const [showError, setShowError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const errorId = useId();
 
   const isPage = !onSuccess;
   const location = useLocation();
@@ -243,7 +244,7 @@ export function LoginForm({
   }
 
   return (
-    <Box className={styles.container}>
+    <Box className={styles.container} data-testid="login-page">
       <Box
         className={styles.paper}
         shadow={shadow ? "2xl" : false}
@@ -253,7 +254,7 @@ export function LoginForm({
         p={3}
         mb={3}
       >
-        <AppSignInLogo className={styles.logo} />
+        <AppSignInLogo className={styles.logo} data-testid="logo" />
         {isPage && signInTitle && (
           <Box
             d="flex"
@@ -264,11 +265,17 @@ export function LoginForm({
             }}
           />
         )}
-        <Box as="form" w={100} onSubmit={handleSubmit} mt={3}>
+        <Box
+          as="form"
+          w={100}
+          onSubmit={handleSubmit}
+          mt={3}
+          data-testid="form"
+        >
           {isPage && hasTenantSelect && (
-            <Box mb={4}>
+            <Box mb={4} data-testid="field-tenant">
               {tenantField.showTitle !== false && (
-                <InputLabel htmlFor="tenant">
+                <InputLabel htmlFor="tenant" data-testid="label">
                   {tenantField.title ? tenantField.title : i18n.get("Tenant")}
                 </InputLabel>
               )}
@@ -281,12 +288,13 @@ export function LoginForm({
                 optionLabel={(x) => x.title}
                 onChange={handleTenantChange}
                 clearIcon={false}
+                data-testid="input"
               />
             </Box>
           )}
-          <Box>
+          <Box data-testid="field-username">
             {usernameField.showTitle !== false && (
-              <InputLabel htmlFor="username">
+              <InputLabel htmlFor="username" data-testid="label">
                 {usernameField.title
                   ? usernameField.title
                   : i18n.get("Username")}
@@ -304,16 +312,19 @@ export function LoginForm({
               autoCorrect="off"
               spellCheck="false"
               placeholder={usernameField.placeholder}
+              aria-required="true"
+              aria-describedby={errorText ? errorId : undefined}
+              data-testid="input"
               startAdornment={
                 usernameFieldIcon ? (
-                  <Icon icon={usernameFieldIcon} />
+                  <Icon icon={usernameFieldIcon} aria-hidden="true" />
                 ) : undefined
               }
             />
           </Box>
-          <Box mt={3}>
+          <Box mt={3} data-testid="field-password">
             {passwordField.showTitle !== false && (
-              <InputLabel htmlFor="password">
+              <InputLabel htmlFor="password" data-testid="label">
                 {passwordField.title
                   ? passwordField.title
                   : i18n.get("Password")}
@@ -328,9 +339,13 @@ export function LoginForm({
               onChange={(e) => setPassword(e.target.value)}
               spellCheck="false"
               placeholder={passwordField.placeholder}
+              aria-required="true"
+              aria-invalid={showError}
+              aria-describedby={errorText ? errorId : undefined}
+              data-testid="input"
               startAdornment={
                 passwordFieldIcon ? (
-                  <Icon icon={passwordFieldIcon} />
+                  <Icon icon={passwordFieldIcon} aria-hidden="true" />
                 ) : undefined
               }
               endAdornment={
@@ -341,21 +356,43 @@ export function LoginForm({
                       ? i18n.get("Hide password")
                       : i18n.get("Show password")
                   }
+                  aria-label={
+                    showPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                  data-testid="btn-toggle-password"
                 >
-                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                  <BootstrapIcon
+                    icon={showPassword ? "eye-slash" : "eye"}
+                    aria-hidden="true"
+                  />
                 </Button>
               }
             />
             {isPage && resetPasswordEnabled && (
               <Box d="flex" justifyContent="flex-end" mt={1} mb={1}>
-                <Link href="#" onClick={handleForgotPassword} underline={false}>
+                <Link
+                  href="#"
+                  onClick={handleForgotPassword}
+                  underline={false}
+                  data-testid="link-forgot-password"
+                >
                   {i18n.get("Forgot password?")}
                 </Link>
               </Box>
             )}
           </Box>
           {errorText && (
-            <Alert mt={3} mb={1} p={2} variant="danger">
+            <Alert
+              mt={3}
+              mb={1}
+              p={2}
+              variant="danger"
+              id={errorId}
+              role="alert"
+              data-testid="error"
+            >
               {errorText}
             </Alert>
           )}
@@ -443,8 +480,11 @@ function LoginFormButton({
           mt={2}
           w={100}
           gap={4}
+          data-testid="btn-signin-link"
         >
-          {icon && <Icon icon={icon} className={styles.icon} />}
+          {icon && (
+            <Icon icon={icon} className={styles.icon} aria-hidden="true" />
+          )}
           {title}
         </Link>
       </>
@@ -462,8 +502,10 @@ function LoginFormButton({
       mt={2}
       w={100}
       gap={4}
+      data-testid="btn-login"
+      aria-label={onSubmit ? i18n.get("Sign in") : title}
     >
-      {icon && <Icon icon={icon} className={styles.icon} />}
+      {icon && <Icon icon={icon} className={styles.icon} aria-hidden="true" />}
       {title}
     </LoadingButton>
   );

@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -10,20 +9,22 @@ import {
   type TForeground,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { LoadingButton } from "@/components/loading-button";
 import { AppSignInLogo } from "@/components/app-logo";
+import { LoadingButton } from "@/components/loading-button";
 import { useAppSettings } from "@/hooks/use-app-settings";
-import { i18n } from "@/services/client/i18n";
 import { useSession } from "@/hooks/use-session";
+import { CLIENT_NAME_PARAM } from "@/routes/login";
+import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
-import { SessionInfo } from "@/services/client/session";
 import {
   MFAMethod,
   mfaSession,
   sendEmailVerificationCode,
 } from "@/services/client/mfa";
-import { CLIENT_NAME_PARAM } from "@/routes/login";
+import { SessionInfo } from "@/services/client/session";
+
 import styles from "./mfa-form.module.scss";
 
 function getTimeoutOfEmailRetryByUser(usernameKey: string) {
@@ -69,7 +70,10 @@ export function MFAForm({
     variant: TVariant;
     message: string;
   } | null>(null);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const alertId = useId();
+  const codeId = useId();
 
   const showAlert = useCallback((variant: TVariant, message: string) => {
     setAlert({ variant, message });
@@ -257,7 +261,7 @@ export function MFAForm({
   }
 
   return (
-    <Box className={styles.container}>
+    <Box className={styles.container} data-testid="mfa-page">
       <Box
         className={styles.paper}
         shadow={shadow ? "2xl" : false}
@@ -267,24 +271,30 @@ export function MFAForm({
         p={3}
         mb={3}
       >
-        <AppSignInLogo className={styles.logo} />
-        <Box as="form" w={100} onSubmit={handleSubmit} mt={3}>
+        <AppSignInLogo className={styles.logo} data-testid="logo" />
+        <Box
+          as="form"
+          w={100}
+          onSubmit={handleSubmit}
+          mt={3}
+          data-testid="form"
+        >
           <Box>
-            <Box mt={2} mb={3} as="h3" textAlign={"center"}>
+            <Box mt={2} mb={3} as="h3" textAlign={"center"} data-testid="title">
               {getTitle()}
             </Box>
-            <Box as="p" textAlign={"center"}>
+            <Box as="p" textAlign={"center"} data-testid="description">
               {getDescription()}
             </Box>
           </Box>
 
-          <Box>
-            <InputLabel htmlFor="mfaCode">
+          <Box data-testid="field-code">
+            <InputLabel htmlFor="mfaCode" data-testid="label">
               {i18n.get("Verification code")}
             </InputLabel>
             <Input
               ref={inputRef}
-              id="mfaCode"
+              id={codeId}
               name="mfaCode"
               autoFocus
               value={mfaCode}
@@ -293,11 +303,22 @@ export function MFAForm({
               autoCorrect="off"
               spellCheck="false"
               placeholder={getPlaceholder()}
+              aria-required="true"
+              aria-describedby={alert ? alertId : undefined}
+              data-testid="input"
             />
           </Box>
 
           {alert && (
-            <Alert mt={3} mb={1} p={2} variant={alert.variant}>
+            <Alert
+              mt={3}
+              mb={1}
+              p={2}
+              variant={alert.variant}
+              id={alertId}
+              role="alert"
+              data-testid="error"
+            >
               {alert.message}
             </Alert>
           )}
@@ -312,6 +333,8 @@ export function MFAForm({
             mt={2}
             w={100}
             gap={4}
+            data-testid="btn-verify"
+            aria-label={i18n.get("Verify")}
           >
             {i18n.get("Verify")}
           </LoadingButton>
@@ -325,6 +348,12 @@ export function MFAForm({
                 disabled={!showResend || retryCount > 0}
                 justifyContent={"center"}
                 onClick={handleSendEmail}
+                data-testid="btn-resend-email"
+                aria-label={
+                  retryCount > 0
+                    ? i18n.get("Resend email in ({0})s", retryCount)
+                    : i18n.get("Resend email")
+                }
               >
                 {retryCount > 0
                   ? i18n.get("Resend email in ({0})s", retryCount)
@@ -341,10 +370,14 @@ export function MFAForm({
                 d="flex"
                 justifyContent={"center"}
                 onClick={() => setShowOptions(!showOptions)}
+                aria-expanded={showOptions}
+                data-testid="btn-other-options"
+                aria-label={i18n.get("Other options")}
               >
                 {i18n.get("Other options")}
                 <MaterialIcon
                   icon={showOptions ? "arrow_drop_up" : "arrow_drop_down"}
+                  aria-hidden="true"
                 />
               </Button>
             </Box>
@@ -362,6 +395,7 @@ export function MFAForm({
                     onClick={() =>
                       handleMFAMethodChange(option.key as MFAMethod)
                     }
+                    data-testid={`btn-method-${option.key.toLowerCase()}`}
                   >
                     {option.title}
                   </Button>
