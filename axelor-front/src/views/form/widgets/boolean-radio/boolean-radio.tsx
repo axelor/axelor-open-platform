@@ -5,6 +5,7 @@ import { Box, Input } from "@axelor/ui";
 import { i18n } from "@/services/client/i18n";
 
 import { FieldControl, FieldProps } from "../../builder";
+import { useId } from "react";
 
 export function BooleanRadio(props: FieldProps<boolean | null>) {
   const { schema, readonly, valueAtom } = props;
@@ -13,11 +14,14 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
     widgetAttrs || {};
   const [value = nullable ? null : undefined, setValue] = useAtom(valueAtom);
 
+  const id = useId();
+
   function renderRadio($value: boolean, label: string) {
     const checked = value === $value;
     return (
       <Box d="flex" alignItems="center">
         <Input
+          id={id}
           data-input
           m={0}
           name={name}
@@ -27,6 +31,7 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
           disabled={readonly}
           onChange={() => {}}
           onClick={() => setValue(nullable && checked ? null : $value, true)}
+          data-testid="radio"
         />
         <Box as="span" d="inline-block" ms={1} me={3}>
           {i18n.get(label)}
@@ -36,7 +41,7 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
   }
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box
         d="flex"
         flexDirection={direction === "vertical" ? "column" : "row"}
