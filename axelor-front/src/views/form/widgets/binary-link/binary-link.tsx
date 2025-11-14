@@ -1,12 +1,13 @@
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useMemo, useRef, useCallback } from "react";
+import { ChangeEvent, useId, useMemo, useRef, useCallback } from "react";
 
-import { clsx, Box, Button, ButtonGroup } from "@axelor/ui";
+import { Box, Button, ButtonGroup, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
+import { FileDroppable } from "@/components/file-droppable";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n.ts";
 import { download } from "@/utils/download";
 import { validateFileSize } from "@/utils/files";
 
@@ -14,8 +15,6 @@ import { FieldControl, FieldProps } from "../../builder";
 import { META_FILE_MODEL, makeImageURL } from "../image/utils";
 
 import styles from "./binary-link.module.scss";
-import { i18n } from "@/services/client/i18n.ts";
-import { FileDroppable } from "@/components/file-droppable";
 
 export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   const { schema, readonly, invalid, formAtom, widgetAtom, valueAtom } = props;
@@ -46,6 +45,8 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   const parentModel = useAtomValue(
     useMemo(() => selectAtom(formAtom, (x) => x.model), [formAtom]),
   );
+
+  const id = useId();
 
   const parent = {
     id: parentId,
@@ -103,18 +104,20 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   if (attrs.hidden) return null;
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box d="flex">
         {!readonly && (
           <>
             <form ref={formRef}>
               <Box
                 as={"input"}
+                id={id}
                 onChange={handleInputChange}
                 type="file"
                 ref={inputRef}
                 d="none"
                 accept={accept}
+                data-testid="input"
               />
             </form>
             <Box
@@ -136,8 +139,9 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
                     alignItems="center"
                     title={i18n.get("Upload")}
                     onClick={handleUpload}
+                    data-testid="btn-upload"
                   >
-                    <MaterialIcon icon="upload" />
+                    <MaterialIcon icon="upload" aria-hidden="true" />
                   </Button>
                   <Button
                     variant="light"
@@ -145,8 +149,9 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
                     alignItems="center"
                     title={i18n.get("Remove")}
                     onClick={handleRemove}
+                    data-testid="btn-remove"
                   >
-                    <MaterialIcon icon="close" />
+                    <MaterialIcon icon="close" aria-hidden="true" />
                   </Button>
                 </ButtonGroup>
               </FileDroppable>
@@ -159,6 +164,7 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
             variant="link"
             title={name}
             onClick={() => handleDownload()}
+            data-testid="btn-download"
           >
             {text}
           </Button>

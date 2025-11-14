@@ -1,20 +1,19 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { ChangeEvent, useCallback, useMemo, useRef } from "react";
+import { ChangeEvent, useCallback, useId, useMemo, useRef } from "react";
 
 import { Box, Button, ButtonGroup } from "@axelor/ui";
-
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { FileDroppable } from "@/components/file-droppable";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { download } from "@/utils/download";
 import { validateFileSize } from "@/utils/files";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
-import { i18n } from "@/services/client/i18n";
-import { FieldControl, FieldProps, FormAtom } from "../../builder";
-import { META_FILE_MODEL, makeImageURL } from "../image/utils";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
+
+import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import { formDirtyUpdater } from "../../builder/atoms";
-import { FileDroppable } from "@/components/file-droppable";
+import { META_FILE_MODEL, makeImageURL } from "../image/utils";
 
 function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   return useSetAtom(
@@ -38,6 +37,8 @@ export function Binary(
   const { name, accept } = schema;
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const id = useId();
 
   const setValue = useSetAtom(valueAtom);
   const dirtyAtom = useViewDirtyAtom();
@@ -133,16 +134,18 @@ export function Binary(
   }
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box d="flex">
         <form ref={formRef}>
           <Box
-            as={"input"}
+            as="input"
+            id={id}
             onChange={handleInputChange}
             type="file"
             ref={inputRef}
             d="none"
             accept={accept}
+            data-testid="input"
           />
         </form>
         <FileDroppable
@@ -158,8 +161,9 @@ export function Binary(
                 d="flex"
                 alignItems="center"
                 onClick={handleUpload}
+                data-testid="btn-upload"
               >
-                <MaterialIcon icon="upload" />
+                <MaterialIcon icon="upload" aria-hidden="true" />
               </Button>
             )}
             {canDownload() && (
@@ -169,8 +173,9 @@ export function Binary(
                 d="flex"
                 alignItems="center"
                 onClick={handleDownload}
+                data-testid="btn-download"
               >
-                <MaterialIcon icon="download" />
+                <MaterialIcon icon="download" aria-hidden="true" />
               </Button>
             )}
             {!readonly && (
@@ -180,8 +185,9 @@ export function Binary(
                 d="flex"
                 alignItems="center"
                 onClick={handleRemove}
+                data-testid="btn-remove"
               >
-                <MaterialIcon icon="close" />
+                <MaterialIcon icon="close" aria-hidden="true" />
               </Button>
             )}
           </ButtonGroup>
