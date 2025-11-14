@@ -1350,6 +1350,7 @@ function GridInner(props: ViewProps<GridView>) {
         <div className={styles["grid-view"]} style={gridViewStyles}>
           <GridWrapper state={state} isTreeGrid={Boolean(isTreeGrid)}>
             <GridComponent
+              data-testid="grid"
               className={styles.grid}
               ref={gridRef}
               records={records}

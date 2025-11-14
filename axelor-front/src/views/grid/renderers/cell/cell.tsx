@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from "react";
 
-import { Box } from "@axelor/ui";
+import { Box, findAriaProp, findDataProp } from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
 import { useHilites } from "@/hooks/use-parser";
@@ -18,8 +18,13 @@ const getWidget = (name?: string) =>
 export function Cell(props: GridCellProps) {
   const { view, viewContext, data, value, record } = props;
   const { type, tooltip, widget, serverType, hilites } = data as Field;
-  const { children, style, className, onClick } =
+  const { children, style, className, role, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
+
+  const testId = findDataProp(props, "data-testid");
+  const ariaColIndex = findAriaProp(props, "aria-colindex");
+  const ariaSort = findAriaProp(props, "aria-sort");
+  const ariaSelected = findAriaProp(props, "aria-selected");
 
   const getHilite = useHilites(hilites);
   const $className = useMemo(
@@ -61,6 +66,11 @@ export function Cell(props: GridCellProps) {
           className: legacyClassNames(className, $className),
           onClick,
         }}
+        role={role}
+        aria-colindex={ariaColIndex}
+        aria-selected={ariaSelected}
+        aria-sort={ariaSort}
+        data-testid={testId}
       >
         {renderContent()}
       </Box>

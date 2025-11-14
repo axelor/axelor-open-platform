@@ -37,6 +37,7 @@ import {
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData, ViewData } from "@/services/client/meta";
+import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
   Field,
@@ -51,7 +52,6 @@ import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
-import { findView } from "@/services/client/meta-cache";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
 import {
@@ -62,13 +62,13 @@ import {
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
+import { ExpandIcon, ExpandableFormView } from "./expandable";
 import {
   GridContext,
   GridHandler as GridContextType,
   useCollectionTreeEditable,
   useGridColumnNames,
 } from "./scope";
-import { ExpandIcon, ExpandableFormView } from "./expandable";
 
 import styles from "../grid.module.scss";
 
@@ -102,6 +102,13 @@ const getLabels: () => Record<GridLabel, string> = () =>
     "Sort Descending": i18n.get("Sort Descending"),
     "Group by": i18n.get("Group by"),
     "Customize...": i18n.get("Customize..."),
+    "Expand row": i18n.get("Expand row"),
+    "Collapse row": i18n.get("Collapse row"),
+    "Expand group": i18n.get("Expand group"),
+    "Collapse group": i18n.get("Collapse group"),
+    "Column options": i18n.get("Column options"),
+    "Select row": i18n.get("Select row"),
+    "Select all rows": i18n.get("Select all rows"),
   });
 
 export type GridHandler = {

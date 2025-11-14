@@ -15,19 +15,27 @@ import {
   useRef,
 } from "react";
 
-import { clsx, Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
+import {
+  Box,
+  ClickAwayListener,
+  FocusTrap,
+  clsx,
+  findAriaProp,
+  findDataProp,
+} from "@axelor/ui";
 import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { createEvalContext } from "@/hooks/use-parser/context";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
+import { executeWithoutQueue } from "@/view-containers/action";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
-import { createEvalContext } from "@/hooks/use-parser/context";
-import { parseExpression } from "@/hooks/use-parser/utils";
 import {
   FormAtom,
   Form as FormComponent,
@@ -39,19 +47,18 @@ import {
   WidgetState,
   useFormHandlers,
 } from "@/views/form/builder";
+import { fallbackFormAtom } from "@/views/form/builder/atoms";
 import {
   useFormEditableScope,
   useFormScope,
   useFormValidityScope,
 } from "@/views/form/builder/scope";
+import { ExpandIcon } from "../../builder/expandable";
 import {
   useCollectionTree,
   useCollectionTreeEditable,
 } from "../../builder/scope";
-import { ExpandIcon } from "../../builder/expandable";
 import { AUTO_ADD_ROW } from "../../builder/utils";
-import { fallbackFormAtom } from "@/views/form/builder/atoms";
-import { executeWithoutQueue } from "@/view-containers/action";
 
 import styles from "./form.module.scss";
 
@@ -174,6 +181,9 @@ export const FormLayoutComponent = ({
                 minWidth: column.width,
               },
             })}
+            role="gridcell"
+            aria-colindex={ind}
+            data-testid={`column-${column.name}`}
           >
             {!item && column === expandColumn && (
               <Box d="flex" onClick={() => onExpand?.()}>
@@ -700,6 +710,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onInit?.();
     }, [onInit]);
 
+    const { role } = props as React.HTMLAttributes<HTMLDivElement>;
+    const testId = findDataProp(props, "data-testid");
+    const ariaRowIndex = findAriaProp(props, "aria-rowindex");
+    const ariaSelected = findAriaProp(props, "aria-selected");
+
     return (
       <>
         {!(view as Schema).serverType && (
@@ -712,6 +727,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             className={clsx(className, styles.container)}
             d="flex"
             onKeyDown={handleKeyDown}
+            role={role}
+            aria-rowindex={ariaRowIndex}
+            aria-selected={ariaSelected}
+            data-testid={testId}
           >
             <ClickAwayListener onClickAway={handleClickOutside}>
               <Box d="flex">
