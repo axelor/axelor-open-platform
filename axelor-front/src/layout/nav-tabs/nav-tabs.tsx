@@ -10,11 +10,11 @@ import {
 } from "react";
 
 import {
-  clsx,
   Menu as AxMenu,
   MenuDivider as AxMenuDivider,
   MenuItem as AxMenuItem,
   Box,
+  clsx,
   NavTabItem,
   Portal,
   NavTabs as Tabs,
@@ -22,6 +22,7 @@ import {
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
+import { Icon } from "@/components/icon";
 import { Tooltip } from "@/components/tooltip";
 import { useMenu } from "@/hooks/use-menu";
 import { useResponsiveContainer } from "@/hooks/use-responsive";
@@ -31,13 +32,12 @@ import { Tab, useTabs } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
+import { isProduction } from "@/utils/app-settings.ts";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
-import { isProduction } from "@/utils/app-settings.ts";
 
-import { Icon } from "@/components/icon";
-import styles from "./nav-tabs.module.scss";
 import colors from "@/styles/legacy/_colors.module.scss";
+import styles from "./nav-tabs.module.scss";
 
 const tabContainerSizeAtom = atom<string | undefined>(undefined);
 
@@ -206,6 +206,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
             items={items}
             active={activeTabId}
             onItemClick={handleItemClick}
+            data-testid="nav-tabs"
           />
         </Portal>
       )}
@@ -213,11 +214,16 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
       {tabs.map((tab) => (
         <div
           key={tab.id}
+          id={`tab-panel-${tab.id}`}
           data-tab-content={tab.id}
           data-tab-active={tab.id === activeTabId}
           className={clsx(styles.tabContent, {
             [styles.active]: tab.id === activeTabId,
           })}
+          role="tabpanel"
+          aria-labelledby={`tab-${tab.id}-title`}
+          hidden={tab.id !== activeTabId}
+          data-testid={`tab-panel:${tab.id}`}
         >
           <Views tab={tab} />
         </div>
@@ -325,6 +331,11 @@ function useItems(
         iconColor,
         onAuxClick,
         onContextMenu,
+        htmlProps: {
+          id: `tab-${tab.id}`,
+          "aria-labelledby": `tab-${tab.id}-title`,
+          "aria-controls": `tab-panel-${tab.id}`,
+        },
       };
       return item;
     });
@@ -343,8 +354,7 @@ function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
         if (activeTabId && tab?.state) {
           const state = get(tab.state);
           const isEditable =
-            state.type === "form" &&
-            state.props?.form?.displayMode === "edit";
+            state.type === "form" && state.props?.form?.displayMode === "edit";
           const canAutoReload = !document.hidden && !isEditable;
           if (canAutoReload) {
             onRefresh(activeTabId);
@@ -392,7 +402,11 @@ function SingleTab({ items }: { items: NavTabItem[] }) {
   const [item] = items;
   if (item) {
     const { title } = item;
-    return <div className={styles.singleTab}>{title}</div>;
+    return (
+      <div className={styles.singleTab} data-testid="nav-tab">
+        {title}
+      </div>
+    );
   }
   return null;
 }
@@ -442,10 +456,21 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
           [styles.dirty]: dirty,
         })}
       >
-        <div className={styles.tabText}>{title}</div>
+        <div
+          className={styles.tabText}
+          id={`tab-${tab.id}-title`}
+          data-testid="title"
+        >
+          {title}
+        </div>
         {showClose && (
-          <div className={styles.tabClose} onClick={handleClose}>
-            <MaterialIcon icon="close" />
+          <div
+            className={styles.tabClose}
+            onClick={handleClose}
+            aria-label={i18n.get("Close {0}", title)}
+            data-testid="btn-close"
+          >
+            <MaterialIcon icon="close" aria-hidden="true" />
           </div>
         )}
       </div>
