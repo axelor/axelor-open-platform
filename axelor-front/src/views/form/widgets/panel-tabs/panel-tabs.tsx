@@ -1,13 +1,22 @@
+import { ScopeProvider } from "bunshi/react";
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
-import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Box, NavTabItem, NavTabs, clsx } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
+import { createSchemaTestId, useSchemaTestId } from "@/hooks/use-testid";
 import {
   FieldLabelTitle,
   FormAtom,
@@ -185,25 +194,38 @@ export function PanelTabs(props: WidgetProps) {
     handleOnSelect(visibleTabs, activeTab);
   }, [activeTab, handleOnSelect, visibleTabs]);
 
+  const prefixId = useId();
+  const testId = useSchemaTestId(schema, "panel-tabs");
+
   const navTabs = useMemo(
     () =>
-      visibleTabs.map((tab) => ({
-        ...tab,
-        ...(tab.title && {
-          title: (
-            <HelpPopover
-              schema={tab}
-              formAtom={formAtom}
-              widgetAtom={fallbackWidgetAtom}
-            >
-              <Box p={1}>
-                <FieldLabelTitle title={tab.title} />
-              </Box>
-            </HelpPopover>
-          ),
-        }),
-      })) as NavTabItem[],
-    [visibleTabs, formAtom],
+      visibleTabs.map((tab, index) => {
+        const id = `${prefixId}-${index}`;
+        const tabTestId = createSchemaTestId(tab, "tab") ?? `tab:${index}`;
+        return {
+          ...tab,
+          ...(tab.title && {
+            title: (
+              <HelpPopover
+                schema={tab}
+                formAtom={formAtom}
+                widgetAtom={fallbackWidgetAtom}
+              >
+                <Box p={1} id={`${id}-title`}>
+                  <FieldLabelTitle title={tab.title} />
+                </Box>
+              </HelpPopover>
+            ),
+          }),
+          htmlProps: {
+            id,
+            "aria-controls": `${id}-panel`,
+            "aria-labelledby": `${id}-title`,
+            "data-testid": tabTestId,
+          },
+        };
+      }) as NavTabItem[],
+    [visibleTabs, prefixId, formAtom],
   );
 
   if (hidden) return;
@@ -214,6 +236,7 @@ export function PanelTabs(props: WidgetProps) {
         items={navTabs}
         active={activeTab ?? undefined}
         onItemClick={handleChange}
+        data-testid={testId}
       />
       <DummyTabs
         tabs={tabs}
@@ -223,11 +246,13 @@ export function PanelTabs(props: WidgetProps) {
         setActive={setTabActive}
         setTitle={setTabTitle}
       />
-      {visibleTabs.map((item) => {
+      {visibleTabs.map((item, index) => {
         const active = activeTab === item.uid;
+        const tab = navTabs[index];
         return (
           <TabContent
             key={item.uid}
+            item={tab}
             schema={item}
             active={active}
             formAtom={formAtom}
@@ -241,12 +266,14 @@ export function PanelTabs(props: WidgetProps) {
 }
 
 function TabContent({
+  item,
   schema,
   active,
   formAtom,
   parentAtom,
   readonly,
 }: {
+  item: NavTabItem;
   schema: Schema;
   active: boolean;
   formAtom: WidgetProps["formAtom"];
@@ -254,12 +281,19 @@ function TabContent({
   readonly?: boolean;
 }) {
   const display = active ? "block" : "none";
+
+  const id = item.htmlProps?.["aria-controls"];
+  const labelledBy = item.htmlProps?.["aria-labelledby"];
+
   return (
     <div
       className={clsx(styles.tabContent, {
         [styles.noRadius]: schema.widgetAttrs?.displayMode === "tree",
       })}
       style={{ display }}
+      role="tabpanel"
+      id={id}
+      aria-labelledby={labelledBy}
     >
       <ScopeProvider scope={FormTabScope} value={{ active }}>
         <FormWidget
