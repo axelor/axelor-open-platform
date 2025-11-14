@@ -54,9 +54,9 @@ function BadgeIcon({
 }) {
   return (
     <Box as="span" d="flex" position="relative">
-      <MaterialIcon {...props} />
+      <MaterialIcon {...props} aria-hidden="true" />
       {count ? (
-        <Badge bg="danger" className={styles.badge}>
+        <Badge bg="danger" className={styles.badge} data-testid="badge">
           {count}
         </Badge>
       ) : null}
@@ -191,12 +191,14 @@ function FavoriteItem(props: RenderCommandItemProps) {
 }
 
 function QuickMenuItem({
+  index,
   menu,
   data,
   actionExecutor,
   onClick,
   onRefresh,
 }: CommandItemProps & {
+  index: number;
   menu: QuickMenu;
   data: TQuickMenuItem;
   actionExecutor: ActionExecutor;
@@ -217,7 +219,7 @@ function QuickMenuItem({
   }
 
   return (
-    <MenuItem onClick={handleClick}>
+    <MenuItem onClick={handleClick} data-testid={`item-${index}`}>
       {menu.showingSelected && (
         <Input
           me={2}
@@ -274,7 +276,7 @@ function QuickMenuBar() {
   const items = useMemo(
     () =>
       menus.map((menu, ind) => ({
-        key: `quick_menu_${ind}`,
+        key: `${ind}`,
         text: menu.title,
         showDownArrow: true,
         items: menu?.items?.map((item, index) => {
@@ -300,6 +302,7 @@ function QuickMenuBar() {
                   ) && (
                   <QuickMenuItem
                     key={key}
+                    index={index}
                     data={item}
                     menu={menu}
                     actionExecutor={actionExecutor}
@@ -324,6 +327,8 @@ function QuickMenuBar() {
 
   return (
     <CommandBar
+      data-testid="quick-menu"
+      aria-label={i18n.get("Quick Menus")}
       items={items}
       menuProps={{ contentClassName: styles.quickMenus }}
     />
@@ -355,6 +360,8 @@ function FarItems() {
 
   return (
     <CommandBar
+      data-testid="user-menu"
+      aria-label={i18n.get("User Menu")}
       items={[
         {
           key: "fav",
@@ -503,15 +510,15 @@ function openHomePage(homePage: string | undefined) {
 
 export function NavHeader() {
   return (
-    <div className={styles.header}>
+    <div className={styles.header} data-testid="app-header">
       <div className={styles.menus}>
         <div className={commonClassNames("hide-sm", styles.quickMenu)}>
           <QuickMenuBar />
         </div>
       </div>
-      <div className={styles.farItems}>
+      <Box className={styles.farItems} pe={2}>
         <FarItems />
-      </div>
+      </Box>
     </div>
   );
 }

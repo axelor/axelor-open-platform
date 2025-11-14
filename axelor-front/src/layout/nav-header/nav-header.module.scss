@@ -10,8 +10,7 @@
 }
 
 .farItems {
-  overflow-y: hidden;
-  overflow-x: auto;
+  display: flex;
 }
 
 .badge {
@@ -33,7 +32,6 @@
     height: 1.5rem;
     width: 1.5rem;
     padding: 0;
-    font-size: 0.75rem;
   }
 }
 
