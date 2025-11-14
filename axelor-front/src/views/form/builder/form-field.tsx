@@ -12,18 +12,19 @@ import {
 } from "react";
 
 import {
-  clsx,
   Box,
   ClickAwayListener,
+  clsx,
   InputFeedback,
   InputLabel,
 } from "@axelor/ui";
 
-import { Tooltip } from "@/components/tooltip";
 import { Icon } from "@/components/icon";
+import { Tooltip } from "@/components/tooltip";
 import { useAsync } from "@/hooks/use-async";
 import { TemplateRenderer, useHilites } from "@/hooks/use-parser";
 import { useSession } from "@/hooks/use-session";
+import { useSchemaTestId } from "@/hooks/use-testid";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -33,13 +34,13 @@ import {
   Tooltip as TooltipType,
 } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
-import format from "@/utils/format";
 import { legacyClassNames } from "@/styles/legacy";
+import format from "@/utils/format";
 import { sanitize } from "@/utils/sanitize";
 
+import { useWidgetAttrsAtomByName } from "./atoms";
 import { useFormScope } from "./scope";
 import { FieldProps, FormAtom, ValueAtom, WidgetProps } from "./types";
-import { useWidgetAttrsAtomByName } from "./atoms";
 
 import styles from "./form-field.module.css";
 
@@ -48,11 +49,20 @@ export type WidgetControlProps = WidgetProps & {
   children: React.ReactNode;
 };
 
-export function WidgetControl({ className, children }: WidgetControlProps) {
-  return <Box className={clsx(className, styles.container)}>{children}</Box>;
+export function WidgetControl({ schema, className, children }: WidgetControlProps) {
+  const testId = useSchemaTestId(schema, 'widget');
+  return (
+    <Box 
+      className={clsx(className, styles.container)}
+      data-testid={testId}
+    >
+      {children}
+    </Box>
+  );
 }
 
 export type FieldControlProps<T> = FieldProps<T> & {
+  inputId?: string;
   className?: string;
   showTitle?: boolean;
   titleActions?: React.ReactNode;
@@ -88,6 +98,7 @@ function useFieldClassNames(schema: Schema) {
 
 export function FieldControl({
   schema,
+  inputId,
   className,
   showTitle,
   formAtom,
@@ -143,12 +154,22 @@ export function FieldControl({
     );
   }
 
+  const testId = useSchemaTestId(schema, 'field');
+  const labelId = inputId ? `${inputId}-label` : undefined;
+  const errorId = inputId ? `${inputId}-error` : undefined;
+
   return (
-    <Box ref={containerRef} className={clsx(className, styles.container)}>
+    <Box
+      ref={containerRef}
+      className={clsx(className, styles.container)}
+      data-testid={testId}
+    >
       {(canShowTitle || titleActions) && (
         <Box className={styles.title}>
           {canShowTitle && (
             <FieldLabel
+              id={labelId}
+              htmlFor={inputId}
               schema={schema}
               className={labelClassName}
               formAtom={formAtom}
@@ -169,19 +190,28 @@ export function FieldControl({
       ) : (
         render()
       )}
-      <FieldError widgetAtom={widgetAtom} />
+      <FieldError id={errorId} widgetAtom={widgetAtom} />
     </Box>
   );
 }
 
-export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
+export function FieldError({
+  id,
+  widgetAtom,
+}: Pick<WidgetProps, "id" | "widgetAtom">) {
   const error = useAtomValue(
     useMemo(
       () => selectAtom(widgetAtom, (state) => state.errors?.error),
       [widgetAtom],
     ),
   );
-  return error && <InputFeedback invalid>{error}</InputFeedback>;
+  return (
+    error && (
+      <InputFeedback id={id} invalid data-testid="error">
+        {error}
+      </InputFeedback>
+    )
+  );
 }
 
 export const FieldLabelTitle = forwardRef<HTMLSpanElement, { title?: string }>(
@@ -192,14 +222,16 @@ export const FieldLabelTitle = forwardRef<HTMLSpanElement, { title?: string }>(
 );
 
 export function FieldLabel({
+  id,
   schema,
   icon,
   formAtom,
   widgetAtom,
   className,
-}: WidgetProps & { className?: string; icon?: string }) {
+  htmlFor,
+}: WidgetProps & { className?: string; icon?: string; htmlFor?: string }) {
   const { data: sessionInfo } = useSession();
-  const { uid, help } = schema;
+  const { help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
@@ -208,17 +240,19 @@ export function FieldLabel({
   return (
     <HelpPopover schema={schema} formAtom={formAtom} widgetAtom={widgetAtom}>
       <InputLabel
-        htmlFor={uid}
+        id={id}
+        htmlFor={htmlFor}
         className={clsx(className, styles.label, {
           [styles.help]: canShowHelp,
         })}
+        data-testid="label"
       >
         <span
           className={clsx(styles.labelText, {
             [styles.icon]: Boolean(icon),
           })}
         >
-          {icon && <Icon icon={icon} />}
+          {icon && <Icon icon={icon} aria-hidden="true" />}
           <FieldLabelTitle title={title} />
         </span>
       </InputLabel>

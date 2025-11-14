@@ -1,6 +1,7 @@
-import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { ScopeProvider } from "bunshi/react";
+import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import uniq from "lodash/uniq";
 import {
   MutableRefObject,
   RefObject,
@@ -12,15 +13,15 @@ import {
   useRef,
   useState,
 } from "react";
-import uniq from "lodash/uniq";
 
-import { clsx, Block, Box, CommandItemProps } from "@axelor/ui";
+import { Block, Box, CommandItemProps, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useSingleClickHandler } from "@/hooks/use-button";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
@@ -36,6 +37,7 @@ import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
+import { toCamelCase } from "@/utils/names";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
@@ -52,9 +54,8 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { useSingleClickHandler } from "@/hooks/use-button";
-import { toCamelCase } from "@/utils/names";
 
+import { isBoolean, isNil, isUndefined } from "@/utils/types";
 import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
 import {
@@ -70,11 +71,11 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { FormReadyScope, useAfterActions } from "./builder/scope";
 import {
   FormWidgetProviders,
   FormWidgetsHandler,
 } from "./builder/form-providers";
+import { FormReadyScope, useAfterActions } from "./builder/scope";
 import {
   getDefaultValues,
   processOriginal,
@@ -82,7 +83,6 @@ import {
   resetFormDummyFieldsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
-import { isUndefined, isBoolean, isNil } from "@/utils/types";
 
 import styles from "./form.module.scss";
 
@@ -254,7 +254,9 @@ export const restoreSelectedStateWithSavedRecord = (
   return formState;
 };
 
-export const useHandleFocus = (containerRef: RefObject<HTMLDivElement | null>) => {
+export const useHandleFocus = (
+  containerRef: RefObject<HTMLDivElement | null>,
+) => {
   const handleFocus = useCallback(() => {
     const elem = containerRef.current;
     if (elem) {
@@ -1479,10 +1481,15 @@ const FormContainer = memo(function FormContainer({
           </Block>
         </ViewToolBar>
       )}
-      <div className={styles.formViewScroller} ref={containerRef}>
+      <div
+        className={styles.formViewScroller}
+        ref={containerRef}
+        data-testid="form"
+      >
         <ScopeProvider scope={FormReadyScope} value={readyAtom}>
           <FormWidgetProviders ref={widgetHandler}>
             <FormComponent
+              data-testid="form"
               className={styles.formView}
               readonly={readonly}
               schema={meta.view}

@@ -183,7 +183,7 @@ export const FormLayoutComponent = ({
             })}
             role="gridcell"
             aria-colindex={ind}
-            data-testid={`column-${column.name}`}
+            data-testid={`column:${column.name}`}
           >
             {!item && column === expandColumn && (
               <Box d="flex" onClick={() => onExpand?.()}>
