@@ -23,11 +23,13 @@ function DottedViewerInput({ value: _value, ...inputProps }: any) {
 }
 
 export function ViewerInput({
+  id,
   name,
   value,
   type,
   endAdornment,
 }: {
+  id?: string;
   name?: string;
   type?: string;
   value: string | number;
@@ -38,6 +40,7 @@ export function ViewerInput({
     : AdornedInput;
   return (
     <InputComponent
+      id={id}
       px={0}
       type={type || "text"}
       value={value}
