@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useState } from "react";
 import { Box, SelectProps } from "@axelor/ui";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -72,6 +72,8 @@ export function ManyToOne(
   const { hasButton } = usePermission(schema, widgetAtom, perms);
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain, hidden } = attrs;
+
+  const id = useId();
 
   const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const showSelector = useSelector();
@@ -273,18 +275,22 @@ export function ManyToOne(
 
   const icons: SelectIcon[] = useMemo(() => {
     const edit: SelectIcon = {
+      key: "edit",
       icon: <MaterialIcon icon="edit" />,
       onClick: () => handleEdit(),
     };
     const view: SelectIcon = {
+      key: "view",
       icon: <MaterialIcon icon="description" />,
       onClick: () => handleEdit(true),
     };
     const add: SelectIcon = {
+      key: "add",
       icon: <MaterialIcon icon="add" />,
       onClick: () => handleEdit(false, { id: null }),
     };
     const find: SelectIcon = {
+      key: "find",
       icon: <MaterialIcon icon="search" />,
       onClick: showSelect,
     };
@@ -341,7 +347,7 @@ export function ManyToOne(
   }
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       {readonly &&
         (value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>
@@ -352,10 +358,12 @@ export function ManyToOne(
             )}
           </ViewerLink>
         ) : (
-          <ViewerInput name={schema.name} value={getOptionLabel(value)} />
+          <ViewerInput id={id} name={schema.name} value={getOptionLabel(value)} />
         ))}
       {readonly || (
         <Select
+          id={id}
+          data-testid="select"
           autoFocus={focus}
           required={required}
           invalid={invalid}
