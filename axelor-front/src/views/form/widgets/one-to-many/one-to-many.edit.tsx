@@ -8,7 +8,14 @@ import {
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
+import {
+  SetStateAction,
+  useCallback,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
@@ -39,6 +46,8 @@ export function OneToManyEdit({
   valueAtom,
   ...props
 }: FieldProps<DataRecord[] | undefined>) {
+  const id = useId();
+  const popupId = `${id}-popup`;
   const [popup, setPopup] = useState(false);
   const [state, setState] = useGridState();
   const [value, setValue] = useAtom(
@@ -333,6 +342,9 @@ export function OneToManyEdit({
         autoFocus={focus}
         value={`(${value?.length || 0})`}
         onChange={() => {}}
+        aria-controls={popupId}
+        aria-expanded={popup}
+        aria-haspopup="dialog"
         icons={[
           ...(!readonly && (isManyToMany ? canSelect : canNew)
             ? [
@@ -367,7 +379,15 @@ export function OneToManyEdit({
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box d="flex">
               <FocusTrap enabled={popup}>
-                <Box d="flex" flex={1} className={styles.grid}>
+                <Box
+                  id={popupId}
+                  role="dialog"
+                  aria-label={i18n.get("Select items")}
+                  d="flex"
+                  flex={1}
+                  className={styles.grid}
+                  data-testid="select-popup"
+                >
                   {popup && meta && (
                     <GridComponent
                       showEditIcon
@@ -379,6 +399,7 @@ export function OneToManyEdit({
                       setState={setState}
                       onView={onView}
                       onEdit={canEdit ? onEdit : onView}
+                      data-testid="grid"
                     />
                   )}
                 </Box>
