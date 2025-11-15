@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import padStart from "lodash/padStart";
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
@@ -60,11 +60,13 @@ const isValid = (value: string) => !value.includes("_");
 
 export function Duration(props: FieldProps<string | number>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, placeholder, widgetAttrs } = schema;
+  const { placeholder, widgetAttrs } = schema;
   const { big, seconds } = widgetAttrs;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
+
+  const id = useId();
 
   const format = useCallback(
     (value?: string | number | null) => toText(value, { big, seconds }),
@@ -84,14 +86,15 @@ export function Duration(props: FieldProps<string | number>) {
   );
 
   return (
-    <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={displayText} />}
+    <FieldControl {...props} inputId={id}>
+      {readonly && <ViewerInput id={id} name={schema.name} value={displayText} />}
       {readonly || (
         <MaskedInput
           key={focus ? "focused" : "normal"}
           data-input
+          data-testid="input"
           type="text"
-          id={uid}
+          id={id}
           autoFocus={focus}
           placeholder={placeholder}
           value={text}
