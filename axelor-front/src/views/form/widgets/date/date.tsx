@@ -5,6 +5,7 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -53,6 +54,7 @@ export function DateComponent({
   value,
   onChange,
   trapFocus,
+  inputId,
 }: {
   schema: Schema;
   value?: string | null;
@@ -61,9 +63,10 @@ export function DateComponent({
   readonly?: boolean;
   invalid?: boolean;
   trapFocus?: boolean;
+  inputId?: string;
 }) {
   const { focus } = attrs || {};
-  const { uid, placeholder } = schema;
+  const { placeholder } = schema;
   const pickerRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const valueRef = useRef<string | null>(undefined);
@@ -262,7 +265,7 @@ export function DateComponent({
     return (
       <Box ref={boxRef} d="flex">
         <Picker
-          id={uid}
+          id={inputId}
           showMonthDropdown
           showYearDropdown
           todayButton={
@@ -321,7 +324,7 @@ export function DateComponent({
   }
 
   return readonly ? (
-    <ViewerInput name={schema.name} value={textValue} />
+    <ViewerInput id={inputId} name={schema.name} value={textValue} />
   ) : trapFocus ? (
     <FocusTrap enabled={open}>{render()}</FocusTrap>
   ) : (
@@ -333,8 +336,9 @@ export function Date(props: FieldProps<string>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const [value, setValue] = useAtom(valueAtom);
   const { attrs } = useAtomValue(widgetAtom);
+  const id = useId();
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <DateComponent
         schema={schema}
         readonly={readonly}
@@ -342,6 +346,7 @@ export function Date(props: FieldProps<string>) {
         attrs={attrs}
         value={value}
         onChange={setValue}
+        inputId={id}
       />
     </FieldControl>
   );
