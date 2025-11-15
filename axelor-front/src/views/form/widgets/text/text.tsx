@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useId, useState } from "react";
 
 import { clsx, Input } from "@axelor/ui";
 
@@ -20,12 +20,14 @@ export function Text({
   >;
 }) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, height, placeholder, translatable } = schema;
+  const { height, placeholder, translatable } = schema;
   const { onBlur } = inputProps || {};
   const { themeMode } = useAppSettings();
 
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
+
+  const id = useId();
 
   const [_, setTranslateValue] = useTranslationValue(props);
 
@@ -62,6 +64,7 @@ export function Text({
   return (
     <FieldControl
       {...props}
+      inputId={id}
       className={clsx(styles.container, {
         [styles.translatable]: translatable && !readonly,
       })}
@@ -78,9 +81,10 @@ export function Text({
       ) : (
         <Input
           data-input
+          data-testid="input"
           as="textarea"
           rows={height || 5}
-          id={uid}
+          id={id}
           invalid={invalid}
           placeholder={placeholder}
           value={text}
