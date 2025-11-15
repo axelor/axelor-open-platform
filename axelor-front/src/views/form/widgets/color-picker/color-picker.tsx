@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -20,6 +20,7 @@ export function ColorPicker(props: FieldProps<string>) {
   const { lite, widgetAttrs } = schema;
   const { colorPickerShowAlpha = true } = widgetAttrs;
 
+  const id = useId();
   const [value, setValue] = useAtom(valueAtom);
   // Color selected in the color picker popover
   const [color, setColor] = useState<ColorResult | null>(null);
@@ -56,12 +57,14 @@ export function ColorPicker(props: FieldProps<string>) {
   }, [color, value]);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box
+        id={id}
         className={styles.colorContainer}
         d="flex"
         flexDirection="row"
         alignItems="center"
+        data-testid="input"
       >
         <Box
           rounded={1}
@@ -79,6 +82,7 @@ export function ColorPicker(props: FieldProps<string>) {
             role="button"
             tabIndex={-1}
             {...(!readonly && { onClick: handleShowColorPicker })}
+            data-testid="color-preview"
           />
         </Box>
         {!readonly && value && (
@@ -90,6 +94,7 @@ export function ColorPicker(props: FieldProps<string>) {
             onClick={handleResetColor}
             title={i18n.get("Remove color")}
             tabIndex={-1}
+            data-testid="clear-button"
           >
             <MaterialIcon icon="close" />
           </Button>
