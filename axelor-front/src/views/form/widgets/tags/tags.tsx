@@ -2,7 +2,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { SelectRefHandler } from "@axelor/ui";
 
 import { RelationalTag } from "@/components/tag";
@@ -62,6 +62,8 @@ export function Tags(props: FieldProps<any>) {
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
 
+  const id = useId();
+  
   const selectRef = useRef<SelectRefHandler>(null);
   const valueRef = useRef<DataRecord[]>([]);
   const { attrs } = useAtomValue(widgetAtom);
@@ -342,8 +344,10 @@ export function Tags(props: FieldProps<any>) {
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Select
+        id={id}
+        data-testid="input"
         autoFocus={focus}
         multiple={true}
         readOnly={readonly}
