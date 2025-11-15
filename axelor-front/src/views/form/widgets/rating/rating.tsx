@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { Rating as AxRating } from "@axelor/ui";
 
@@ -19,6 +19,7 @@ export function Rating(props: FieldProps<number>) {
     ratingHighlightSelected = false,
   } = widgetAttrs || {};
 
+  const id = useId();
   const ready = useFormReady();
   const [value, setValue] = useAtom(valueAtom);
 
@@ -41,9 +42,10 @@ export function Rating(props: FieldProps<number>) {
   );
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       {ready && (
         <AxRating
+          id={id}
           value={Number(value)}
           text={text}
           icon={ratingIcon}
