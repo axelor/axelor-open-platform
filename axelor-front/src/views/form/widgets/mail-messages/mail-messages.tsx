@@ -330,7 +330,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const { total } = pagination;
 
   return (
-    <>
+    <div data-testid="mail-messages">
       {isMessageBox && (
         <MessageBoxUpdates
           count={total}
@@ -353,7 +353,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           {...(pagination.hasNext ? { onLoad: loadMore } : {})}
         />
       )}
-    </>
+    </div>
   );
 }
 
