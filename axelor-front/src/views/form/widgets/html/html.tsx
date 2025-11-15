@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { clsx } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
@@ -12,6 +13,8 @@ import styles from "./html.module.scss";
 
 export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
+  
+  const id = useId();
   const { lite, translatable, placeholder } = schema;
   const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
     schema,
@@ -29,12 +32,14 @@ export function Html(props: FieldProps<string>) {
   return (
     <FieldControl
       {...props}
+      inputId={id}
       className={clsx(styles.container, {
         [styles.translatable]: translatable && !readonly,
       })}
     >
       {readonly ? (
         <ViewerComponent
+          id={id}
           className={clsx({
             [styles.viewer]: translatable,
           })}
@@ -42,6 +47,8 @@ export function Html(props: FieldProps<string>) {
         />
       ) : (
         <EditorComponent
+          id={id}
+          data-testid="input"
           translatable={translatable}
           lite={Boolean(lite)}
           height={height}
