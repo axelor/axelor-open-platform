@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -18,6 +18,7 @@ import styles from "./slider.module.scss";
 export function Slider(props: FieldProps<string | number>) {
   const { schema, readonly, valueAtom, formAtom, widgetAtom } = props;
 
+  const id = useId();
   const scale = useScale(widgetAtom, formAtom, schema);
 
   const getViewContext = useViewContext();
@@ -178,7 +179,7 @@ export function Slider(props: FieldProps<string | number>) {
   }, [min, value]);
 
   return (
-    <FieldControl {...props} titleActions={<>{displayedValue}</>}>
+    <FieldControl {...props} inputId={id} titleActions={<>{displayedValue}</>}>
       <Box
         className={styles.trackWrapper}
         opacity={readonly ? 50 : 100}
@@ -188,12 +189,19 @@ export function Slider(props: FieldProps<string | number>) {
         borderColor="primary"
       >
         <Box
+          id={id}
           className={clsx(styles.track, { [styles.readonly]: readonly })}
           ref={sliderRef}
           display="flex"
           flex={1}
           position="relative"
           onMouseDown={handleMouseDown}
+          role="slider"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={currentValue}
+          aria-valuetext={displayedValue}
+          data-testid="input"
         >
           <Box h={100} bgColor="primary" style={{ width: thumbPosition }} />
           <Box
@@ -209,6 +217,7 @@ export function Slider(props: FieldProps<string | number>) {
               updateTooltipPosition(currentValue);
             }}
             onMouseLeave={() => setShowTooltip(false)}
+            data-testid="thumb"
           />
 
           <SliderTooltip
