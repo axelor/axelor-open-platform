@@ -39,6 +39,7 @@ export type DialogButton = {
 export type DialogClose = (result: boolean) => void;
 
 export type DialogOptions = {
+  id?: string;
   title?: string;
   content: React.ReactNode;
   showHeader?: boolean;
@@ -273,6 +274,7 @@ export function useDialogContext() {
 
 export function ModalDialog(props: DialogOptions) {
   const {
+    id,
     open,
     setOpen,
     size,
@@ -330,6 +332,7 @@ export function ModalDialog(props: DialogOptions) {
       </Fade>
       <DialogContext.Provider value={{ close: onCloseDialog }}>
         <Dialog
+          id={id}
           open={canShow}
           onHide={onHide}
           onShow={initialFocus}

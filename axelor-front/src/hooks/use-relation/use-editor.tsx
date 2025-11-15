@@ -23,6 +23,7 @@ import { initTab } from "../use-tabs";
 import { useSingleClickHandler } from "../use-button";
 
 export type EditorOptions = {
+  id?: string;
   model: string;
   title: string;
   record?: DataRecord | null;
@@ -95,6 +96,7 @@ export function useEditorInTab(schema: Schema) {
 export function useEditor() {
   return useCallback(async (options: EditorOptions) => {
     const {
+      id,
       title,
       model,
       record,
@@ -136,6 +138,7 @@ export function useEditor() {
     if (!tab) return;
 
     await showPopup({
+      id,
       tab,
       open: true,
       maximize,

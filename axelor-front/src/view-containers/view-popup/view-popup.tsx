@@ -38,6 +38,12 @@ import styles from "./view-popup.module.scss";
 
 export type PopupProps = {
   /**
+   * Unique identifier of the popup
+   *
+   */
+  id?: string;
+
+  /**
    * View tab to show as popup
    *
    */
@@ -110,6 +116,7 @@ export const PopupDialog = memo(function PopupDialog(props: PopupProps) {
 });
 
 const PopupDialogInner = memo(function PopupDialog({
+  id,
   tab,
   open,
   maximize,
@@ -131,6 +138,7 @@ const PopupDialogInner = memo(function PopupDialog({
 
   return (
     <ModalDialog
+      id={id}
       open={open}
       title={title || tab.title}
       size="xl"

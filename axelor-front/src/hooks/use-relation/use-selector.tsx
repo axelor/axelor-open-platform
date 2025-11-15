@@ -20,6 +20,7 @@ import { ActionView, GridView } from "@/services/client/meta.types";
 import { useSingleClickHandler } from "../use-button";
 
 export type SelectorOptions = {
+  id?: string;
   model: string;
   title?: string;
   multiple?: boolean;
@@ -38,6 +39,7 @@ export type SelectorOptions = {
 export function useSelector() {
   return useCallback(async function showSelector(options: SelectorOptions) {
     const {
+      id,
       title,
       model,
       view: gridView,
@@ -87,6 +89,7 @@ export function useSelector() {
     if (!tab) return;
 
     await showPopup({
+      id,
       tab,
       open: true,
       onClose: () => {
