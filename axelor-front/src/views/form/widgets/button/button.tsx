@@ -9,6 +9,7 @@ import { dialogs } from "@/components/dialogs";
 import { Icon } from "@/components/icon";
 import { Tooltip } from "@/components/tooltip";
 import { useSession } from "@/hooks/use-session";
+import { useSchemaTestId } from "@/hooks/use-testid";
 import { Schema } from "@/services/client/meta.types";
 import { sanitize } from "@/utils/sanitize.ts";
 
@@ -69,6 +70,7 @@ export function Button(props: WidgetProps) {
   const { schema, widgetAtom, formAtom } = props;
   const { showTitle = true, icon, help, inGridEditor } = schema;
 
+  const testId = useSchemaTestId(schema);
   const [titleHelp, setTitleHelp] = useState("");
   const btnTextRef = useRef<HTMLSpanElement>(null);
   const { data: sessionInfo } = useSession();
@@ -161,6 +163,7 @@ export function Button(props: WidgetProps) {
         [styles.help]: hasHelp && !titleHelp,
         [styles[variant]]: variant && styles[variant],
       })}
+      data-testid={`btn-${testId}`}
     >
       <div className={styles.title}>
         <span ref={btnTextRef} className={styles.titleContent}>
