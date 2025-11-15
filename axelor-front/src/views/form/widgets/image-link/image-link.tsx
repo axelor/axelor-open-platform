@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useAtomValue } from "jotai";
 import { Box } from "@axelor/ui";
 
@@ -9,7 +9,11 @@ import { String } from "../string";
 import { makeImageURL } from "../image/utils";
 import styles from "./image-link.module.scss";
 
-function Image({ valueAtom, schema }: FieldProps<string>) {
+function Image({
+  valueAtom,
+  schema,
+  id,
+}: FieldProps<string> & { id?: string }) {
   const [src, setSrc] = useState("");
   const { recordHandler } = useFormScope();
   const value = useAtomValue(valueAtom);
@@ -31,6 +35,8 @@ function Image({ valueAtom, schema }: FieldProps<string>) {
     <Box className={styles.imageContainer} style={{ width }}>
       <Box
         as="img"
+        id={id}
+        data-testid="input"
         {...(!noframe && {
           p: 1,
           border: true,
@@ -45,11 +51,12 @@ function Image({ valueAtom, schema }: FieldProps<string>) {
 
 export function ImageLink(props: FieldProps<string>) {
   const { readonly } = props;
+  const id = useId();
 
   if (readonly) {
     return (
-      <FieldControl {...props}>
-        <Image {...props} />
+      <FieldControl {...props} inputId={id}>
+        <Image {...props} id={id} />
       </FieldControl>
     );
   }
