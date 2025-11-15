@@ -1,7 +1,7 @@
 import Editor, { loader } from "@monaco-editor/react";
 import { clsx } from "@axelor/ui";
 import { useAtom } from "jotai";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useAppSettings } from "@/hooks/use-app-settings";
@@ -56,9 +56,11 @@ export function CodeEditorComponent(props: FieldProps<string>) {
 }
 
 export function CodeEditor(props: FieldProps<string>) {
+  const id = useId();
+  
   return (
-    <FieldControl {...props}>
-      <CodeEditorComponent {...props} />
+    <FieldControl {...props} inputId={id}>
+      <CodeEditorComponent {...props} id={id} data-testid="input" />
     </FieldControl>
   );
 }
