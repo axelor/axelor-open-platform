@@ -1,6 +1,6 @@
 import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { Select, SelectProps, SelectValue } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
@@ -54,6 +54,8 @@ export function Selection<Multiple extends boolean>(
     attrs: { required, focus },
   } = useAtomValue(widgetAtom);
 
+  const id = useId();
+
   const selectionList = useSelectionList({ schema, widgetAtom });
   const { selectionDefault, selectionZero } = useSelectionDefault({
     schema,
@@ -93,8 +95,9 @@ export function Selection<Multiple extends boolean>(
   );
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Select
+        id={id}
         className={clsx({
           [styles.readonly]: readonly,
           [styles.inGridEditor]: schema.inGridEditor,
