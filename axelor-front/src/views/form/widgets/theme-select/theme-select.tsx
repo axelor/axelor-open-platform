@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { Select, SelectValue } from "@/components/select";
 import { useAsync } from "@/hooks/use-async";
@@ -27,6 +27,7 @@ export function ThemeSelect(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { placeholder } = schema;
 
+  const id = useId();
   const { value, setValue } = useInput(valueAtom, { defaultValue: "", schema });
 
   const text = useMemo(
@@ -46,10 +47,11 @@ export function ThemeSelect(props: FieldProps<string>) {
   );
 
   return (
-    <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={text} />}
+    <FieldControl {...props} inputId={id}>
+      {readonly && <ViewerInput id={id} name={schema.name} value={text} />}
       {readonly || (
         <Select
+          id={id}
           autoComplete={false}
           placeholder={placeholder}
           onChange={handleChange}
