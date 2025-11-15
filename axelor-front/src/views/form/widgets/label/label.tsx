@@ -5,7 +5,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { sanitize } from "@/utils/sanitize";
 import { WidgetProps } from "../../builder";
 
-export function Label({ widgetAtom }: WidgetProps) {
+export function Label({ schema, widgetAtom }: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
   const { title = "", css } = attrs;
 
@@ -15,6 +15,7 @@ export function Label({ widgetAtom }: WidgetProps) {
     <label
       className={legacyClassNames(css)}
       dangerouslySetInnerHTML={{ __html: text }}
+      data-testid="label"
     />
   );
 }
