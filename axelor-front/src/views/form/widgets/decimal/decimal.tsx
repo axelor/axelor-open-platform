@@ -1,10 +1,11 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field } from "@/services/client/meta.types";
+import { i18n } from "@/services/client/i18n";
 import convert from "@/utils/convert";
 import format from "@/utils/format";
 import { useDisableWheelScroll } from "@/hooks/use-disable-wheel-scroll";
@@ -23,10 +24,12 @@ const isNumberLike = (text: string) => NUM_PATTERN.test(text);
 
 export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
-  const { uid, minSize: min, maxSize: max, placeholder, widgetAttrs } = schema;
+  const { minSize: min, maxSize: max, placeholder, widgetAttrs } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
   const { step: stepAttrs } = widgetAttrs;
+
+  const id = useId();
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
@@ -206,20 +209,21 @@ export function Decimal(props: FieldProps<string | number>) {
   }, [clearTimer]);
 
   return (
-    <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={text} />}
+    <FieldControl {...props} inputId={id}>
+      {readonly && <ViewerInput id={id} name={schema.name} value={text} />}
       {readonly || (
         <div className={styles.container}>
           <Input
             key={focus ? "focused" : "normal"}
             data-input
+            data-testid="input"
             className={styles.numberInput}
             autoFocus={focus}
             type="number"
             min={min}
             max={max}
             step={"any"}
-            id={uid}
+            id={id}
             ref={setInputElement}
             placeholder={placeholder}
             value={textValue ?? ""}
@@ -236,6 +240,8 @@ export function Decimal(props: FieldProps<string | number>) {
               onMouseDown={handleUp}
               onMouseUp={clearTimer}
               onMouseLeave={clearTimer}
+              aria-label={i18n.get("Increment")}
+              data-testid="increment"
             >
               <MaterialIcon icon="arrow_drop_up" />
             </span>
@@ -245,6 +251,8 @@ export function Decimal(props: FieldProps<string | number>) {
               onMouseDown={handleDown}
               onMouseUp={clearTimer}
               onMouseLeave={clearTimer}
+              aria-label={i18n.get("Decrement")}
+              data-testid="decrement"
             >
               <MaterialIcon icon="arrow_drop_down" />
             </span>
