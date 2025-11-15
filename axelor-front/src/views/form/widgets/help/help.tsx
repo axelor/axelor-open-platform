@@ -37,9 +37,11 @@ export function Help(props: WidgetProps) {
   const { record } = useAtomValue(formAtom);
 
   return (
-    <HelpComponent
-      text={<TemplateRenderer context={record} template={text} />}
-      variant={variant as any}
-    />
+    <div data-testid="help">
+      <HelpComponent
+        text={<TemplateRenderer context={record} template={text} />}
+        variant={variant as any}
+      />
+    </div>
   );
 }
