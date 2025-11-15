@@ -1,10 +1,10 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef } from "react";
+import { ChangeEvent, useCallback, useEffect, useId, useMemo, useRef } from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
+import { FileDroppable } from "@/components/file-droppable";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { focusAtom } from "@/utils/atoms";
@@ -14,7 +14,6 @@ import { FieldControl, FieldProps } from "../../builder";
 import { META_FILE_MODEL, makeImageURL } from "./utils";
 
 import styles from "./image.module.scss";
-import { FileDroppable } from "@/components/file-droppable";
 
 export function Image(
   props: FieldProps<string | DataRecord | undefined | null>,
@@ -22,6 +21,7 @@ export function Image(
   const { schema, readonly, formAtom, widgetAtom, valueAtom, invalid } = props;
   const { type, serverType, accept = "image/*", $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
+  const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [value, setValue] = useAtom(valueAtom);
@@ -147,7 +147,7 @@ export function Image(
   }, [isBinaryImage, required, url, setValid]);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <FileDroppable
         bgColor="body"
         border
@@ -164,8 +164,8 @@ export function Image(
         disabled={readonly}
         onDropFile={handleFileUpload}
         renderDragOverlay={({ children }) => (
-          <Box className={styles.overlay}>
-            <MaterialIcon icon="upload" />
+          <Box className={styles.overlay} data-testid="input">
+            <MaterialIcon icon="upload" aria-hidden="true"/>
             <span>{children}</span>
           </Box>
         )}
@@ -177,14 +177,17 @@ export function Image(
           d="inline-block"
           src={url}
           alt={title}
+          data-testid="image"
         />
         <form>
           <Input
+            id={id}
             onChange={handleInputChange}
             type="file"
             accept={accept}
             ref={inputRef}
             d="none"
+            data-testid="input"
           />
         </form>
         <Box
@@ -193,8 +196,8 @@ export function Image(
           alignItems={"center"}
           justifyContent={"center"}
         >
-          <MaterialIcon icon="upload" onClick={handleUpload} />
-          <MaterialIcon icon="close" onClick={handleRemove} />
+          <MaterialIcon icon="upload" onClick={handleUpload} data-testid="upload-button" />
+          <MaterialIcon icon="close" onClick={handleRemove} data-testid="remove-button" />
         </Box>
       </FileDroppable>
     </FieldControl>
