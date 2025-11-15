@@ -5,6 +5,7 @@ import uniqueId from "lodash/uniqueId";
 import pick from "lodash/pick";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { produce } from "immer";
+import { useSchemaTestId } from "@/hooks/use-testid";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -103,6 +104,8 @@ export function DashletComponent({
 }: DashletProps): any {
   const { title, action, canSearch, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
+  
+  const testId = useSchemaTestId(schema, "dashlet");
 
   const load = useAfterActions(
     useCallback(async () => {
@@ -211,6 +214,7 @@ export function DashletComponent({
     tab && (
       <DashletView>
         <Box
+          data-testid={testId}
           d="flex"
           flexDirection="column"
           className={clsx(classes.container, className)}
