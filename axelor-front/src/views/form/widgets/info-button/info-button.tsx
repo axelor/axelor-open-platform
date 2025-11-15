@@ -8,6 +8,7 @@ import { clsx, Box, Button } from "@axelor/ui";
 import format from "@/utils/format";
 import { dialogs } from "@/components/dialogs";
 import { Icon } from "@/components/icon";
+import { useSchemaTestId } from "@/hooks/use-testid";
 import { Field } from "@/services/client/meta.types";
 
 import { WidgetControl, WidgetProps } from "../../builder";
@@ -64,6 +65,7 @@ export function InfoButton(props: WidgetProps) {
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
+  const testId = useSchemaTestId(schema);
 
   return (
     <WidgetControl {...props}>
@@ -73,6 +75,7 @@ export function InfoButton(props: WidgetProps) {
         className={clsx(styles.button)}
         disabled={disabled}
         onClick={handleClick}
+        data-testid={testId ? `btn-${testId}` : undefined}
       >
         {icon && (
           <Icon
