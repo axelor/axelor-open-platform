@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef } from "react";
 import SignaturePad from "signature_pad";
 
 import { Box, clsx } from "@axelor/ui";
@@ -26,6 +26,8 @@ export function Drawing(
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const signaturePadRef = useRef<SignaturePad>(null);
   const [value, setValue] = useAtom(valueAtom);
+  
+  const id = useId();
   const {
     attrs: { title, required },
   } = useAtomValue(widgetAtom);
@@ -206,8 +208,9 @@ export function Drawing(
   }, [isBinaryImage, required, url, setValid]);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box
+        data-testid="input"
         bgColor="body"
         border
         flexGrow={1}
@@ -221,6 +224,7 @@ export function Drawing(
       >
         <Box
           as="img"
+          id={id}
           p={schema.inGridEditor ? 0 : 1}
           d="inline-block"
           src={url}
