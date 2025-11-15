@@ -21,6 +21,7 @@ import {
   useReducer,
   useRef,
   useState,
+  useId,
 } from "react";
 
 import { Box, Button, CommandBarProps, Panel, clsx } from "@axelor/ui";
@@ -45,6 +46,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
+import { useSchemaTestId } from "@/hooks/use-testid";
 import {
   Field,
   FormView,
@@ -299,6 +301,8 @@ function OneToManyInner({
     height,
     perms,
   } = schema;
+
+  const testId = useSchemaTestId(schema, "field");
 
   const refs = useRef<{
     reorder: boolean;
@@ -2082,6 +2086,7 @@ function OneToManyInner({
       )}
       <Panel
         ref={panelRef}
+        data-testid={testId}
         className={clsx(styles.container, panelClass, {
           [styles.tree]: isTreeGrid,
           [styles.subTree]: isSubTreeGrid,
@@ -2098,6 +2103,7 @@ function OneToManyInner({
           <ScopeProvider scope={MetaScope} value={viewMeta}>
             <GridComponent
               style={gridStyle}
+              data-testid="grid"
               className={clsx(styles["grid"], {
                 [styles["basic"]]: !hasMasterDetails,
                 [styles["no-rows"]]: !hasRows,
