@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 
 import { Button, clsx } from "@axelor/ui";
 
@@ -10,8 +10,10 @@ import styles from "./toggle.module.scss";
 
 export function Toggle(props: FieldProps<boolean>) {
   const { schema, readonly, valueAtom } = props;
-  const { uid, icon, iconActive, iconHover } = schema;
+  const { icon, iconActive, iconHover } = schema;
   const [value = false, setValue] = useAtom(valueAtom);
+
+  const id = useId();
 
   const handleClick = useCallback(
     () => setValue(!value, true),
@@ -22,24 +24,27 @@ export function Toggle(props: FieldProps<boolean>) {
 
   if (readonly) {
     return (
-      <FieldControl {...props} className={styles.container}>
+      <FieldControl {...props} inputId={id} className={styles.container}>
         <Icon
           icon={ico}
           className={clsx(styles.readonlyIcon, {
             [styles.active]: !!value,
           })}
+          data-testid="input"
         />
       </FieldControl>
     );
   }
 
   return (
-    <FieldControl {...props} className={styles.container}>
+    <FieldControl {...props} inputId={id} className={styles.container}>
       <Button
-        id={uid}
+        id={id}
         variant="light"
         className={styles.toggle}
         onClick={handleClick}
+        data-testid="input"
+        aria-pressed={value}
       >
         <Icon
           icon={ico}
