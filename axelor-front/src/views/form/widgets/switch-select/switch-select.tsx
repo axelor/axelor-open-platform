@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -23,6 +23,7 @@ export function SwitchSelect(
   const { schema, readonly, widgetAtom } = props;
   const { labels = true, direction = "horizontal" } = schema;
 
+  const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const [highlightStyles, setHighlightStyles] =
     useState<HighlightStyle | null>();
@@ -76,12 +77,15 @@ export function SwitchSelect(
   const vertical = direction === "vertical";
 
   return (
-    <FieldControl {...props} className={vertical ? styles.inline : styles.flex}>
+    <FieldControl {...props} inputId={id} className={vertical ? styles.inline : styles.flex}>
       <Box
+        id={id}
         ref={containerRef}
         d={vertical ? "inline-block" : "flex"}
         overflow={vertical ? "visible" : "auto"}
         position="relative"
+        role="group"
+        data-testid="input"
       >
         {highlightStyles && (
           <Box className={styles.highlighter} style={highlightStyles} />
@@ -108,6 +112,9 @@ export function SwitchSelect(
                 [styles.first]: index === 0,
                 [styles.last]: index === items.length - 1,
               })}
+              role="radio"
+              aria-checked={item.selected}
+              data-testid={`option-${item.selection.value}`}
               {...(!readonly && { onClick: () => handleChange(item) })}
             >
               {icon && <Icon icon={icon} className={styles.icon} />}
