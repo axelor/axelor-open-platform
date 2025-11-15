@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 
 import { Field } from "@/services/client/meta.types";
 import format from "@/utils/format";
@@ -13,11 +13,13 @@ const isValid = (value: string) => !value.includes("_");
 
 export function Time(props: FieldProps<string | number>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, placeholder, widgetAttrs } = schema;
+  const { placeholder, widgetAttrs } = schema;
   const { seconds } = widgetAttrs;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
+
+  const id = useId();
 
   const formatValue = useCallback(
     (value?: string | number | null) =>
@@ -49,14 +51,15 @@ export function Time(props: FieldProps<string | number>) {
   );
 
   return (
-    <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={text} />}
+    <FieldControl {...props} inputId={id}>
+      {readonly && <ViewerInput id={id} name={schema.name} value={text} />}
       {readonly || (
         <MaskedInput
           key={focus ? "focused" : "normal"}
           data-input
+          data-testid="input"
           type="text"
-          id={uid}
+          id={id}
           autoFocus={focus}
           placeholder={placeholder}
           value={text}
