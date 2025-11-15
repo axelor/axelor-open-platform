@@ -1,6 +1,6 @@
+import { Box, SelectProps } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useId, useMemo, useState } from "react";
-import { Box, SelectProps } from "@axelor/ui";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -23,6 +23,7 @@ import {
   useSelector,
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareWidgetContext } from "../../builder/form";
@@ -30,10 +31,10 @@ import { FieldControl } from "../../builder/form-field";
 import { useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { removeVersion } from "../../builder/utils";
+import { makeImageURL } from "../image/utils";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
-import { Schema } from "@/services/client/meta.types";
-import { makeImageURL } from "../image/utils";
+
 import styles from "./many-to-one.module.css";
 
 export function ManyToOne(
@@ -74,6 +75,8 @@ export function ManyToOne(
   const { title, focus, required, domain, hidden } = attrs;
 
   const id = useId();
+  const editorId = useId();
+  const selectorId = useId();
 
   const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const showSelector = useSelector();
@@ -117,6 +120,9 @@ export function ManyToOne(
 
   const isPermitted = usePermitted(target, perms);
 
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
       const $record = record ?? value;
@@ -126,7 +132,9 @@ export function ManyToOne(
       if (showEditorInTab && ($record?.id ?? 0) > 0) {
         return showEditorInTab($record!, readonly);
       }
-      showEditor({
+      setIsEditorOpen(true);
+      await showEditor({
+        id: editorId,
         title: title ?? "",
         model: target,
         viewName: formView,
@@ -136,6 +144,9 @@ export function ManyToOne(
           _parent: getContext(),
         },
         onSelect: handleChange,
+        onClose: () => {
+          setIsEditorOpen(false);
+        },
       });
     },
     [
@@ -143,6 +154,7 @@ export function ManyToOne(
       isPermitted,
       showEditorInTab,
       showEditor,
+      editorId,
       title,
       target,
       formView,
@@ -194,7 +206,9 @@ export function ManyToOne(
   const showSelect = useCallback(async () => {
     const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
-    showSelector({
+    setIsSelectorOpen(true);
+    await showSelector({
+      id: selectorId,
       model: target,
       viewName: gridView,
       orderBy: sortBy,
@@ -209,18 +223,22 @@ export function ManyToOne(
         const value = await ensureRelated(records[0]);
         handleChange(value);
       },
+      onClose: () => {
+        setIsSelectorOpen(false);
+      },
     });
   }, [
-    canNew,
     beforeSelect,
     domain,
     getContext,
     showSelector,
-    showCreate,
+    selectorId,
     target,
     gridView,
     sortBy,
     searchLimit,
+    canNew,
+    showCreate,
     ensureRelated,
     handleChange,
   ]);
@@ -278,21 +296,37 @@ export function ManyToOne(
       key: "edit",
       icon: <MaterialIcon icon="edit" />,
       onClick: () => handleEdit(),
+      htmlProps: {
+        "aria-haspopup": "dialog",
+        "aria-controls": isEditorOpen ? editorId : undefined,
+      },
     };
     const view: SelectIcon = {
       key: "view",
       icon: <MaterialIcon icon="description" />,
       onClick: () => handleEdit(true),
+      htmlProps: {
+        "aria-haspopup": "dialog",
+        "aria-controls": isEditorOpen ? editorId : undefined,
+      },
     };
     const add: SelectIcon = {
       key: "add",
       icon: <MaterialIcon icon="add" />,
       onClick: () => handleEdit(false, { id: null }),
+      htmlProps: {
+        "aria-haspopup": "dialog",
+        "aria-controls": isEditorOpen ? editorId : undefined,
+      },
     };
     const find: SelectIcon = {
       key: "find",
       icon: <MaterialIcon icon="search" />,
       onClick: showSelect,
+      htmlProps: {
+        "aria-haspopup": "dialog",
+        "aria-controls": isSelectorOpen ? selectorId : undefined,
+      },
     };
 
     const result: SelectIcon[] = [];
@@ -307,14 +341,18 @@ export function ManyToOne(
 
     return result;
   }, [
+    isEditorOpen,
+    editorId,
+    showSelect,
+    isSelectorOpen,
+    selectorId,
+    target,
+    handleEdit,
     canEdit,
+    canView,
+    isSuggestBox,
     canNew,
     canSelect,
-    canView,
-    handleEdit,
-    showSelect,
-    isSuggestBox,
-    target,
   ]);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
@@ -358,7 +396,11 @@ export function ManyToOne(
             )}
           </ViewerLink>
         ) : (
-          <ViewerInput id={id} name={schema.name} value={getOptionLabel(value)} />
+          <ViewerInput
+            id={id}
+            name={schema.name}
+            value={getOptionLabel(value)}
+          />
         ))}
       {readonly || (
         <Select
