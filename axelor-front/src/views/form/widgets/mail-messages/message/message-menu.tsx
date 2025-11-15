@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useCallback, useState } from "react";
 
 import { clsx, Box, Menu, MenuItem } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -20,39 +20,40 @@ export function MessageMenu({
   onRemove?: (data: Message) => void;
 }) {
   const [target, setTarget] = useState<HTMLElement | null>(null);
+  const [show, setShow] = useState(false);
 
-  const open = Boolean(target);
+  const baseId = useId();
+  const menuId = `${baseId}-menu`;
   const _t = i18n.get;
-  const id = open ? `actions-popover-${data.id}` : undefined;
   const { $flags, $thread, $canDelete } = data;
   const { isRead, isStarred, isArchived } = ($flags || {}) as MessageFlag;
 
-  function onOpen({ target }: React.MouseEvent<HTMLSpanElement>) {
-    setTarget(target as HTMLElement);
-  }
+  const showMenu = useCallback(() => {
+    setShow(true);
+  }, []);
 
-  function onClose() {
-    setTarget(null);
-  }
+  const hideMenu = useCallback(() => {
+    setShow(false);
+  }, []);
 
   function onRead() {
     onAction({ isRead: !isRead });
-    onClose();
+    hideMenu();
   }
 
   function onStarred() {
     onAction({ isStarred: !isStarred });
-    onClose();
+    hideMenu();
   }
 
   function onArchived() {
     onAction({ isArchived: !isArchived }, true);
-    onClose();
+    hideMenu();
   }
 
   function onDelete() {
     onRemove && onRemove(data);
-    onClose();
+    hideMenu();
   }
 
   return (
@@ -62,6 +63,7 @@ export function MessageMenu({
         alignItems="center"
         position="absolute"
         className={styles.icons}
+        data-testid={"message-actions"}
       >
         {$thread && (
           <Box
@@ -70,34 +72,50 @@ export function MessageMenu({
             aria-label="reply"
             className={styles.icon}
             onClick={onReply}
+            data-testid={"btn-message-reply"}
           >
             <MaterialIcon icon="reply" />
           </Box>
         )}
         <Box
+          id={baseId}
+          ref={setTarget}
           px={1}
           as="span"
-          aria-describedby={id}
-          aria-label="open"
           className={clsx(styles.icon, styles["pull-right"])}
-          onClick={onOpen}
+          onClick={showMenu}
+          aria-label={_t("Message actions")}
+          aria-haspopup="menu"
+          aria-expanded={show}
+          aria-controls={menuId}
+          data-testid={"btn-message-actions"}
         >
           <MaterialIcon icon="arrow_drop_down" />
         </Box>
       </Box>
-      <Menu show={open} target={target} onHide={onClose} placement="bottom-end">
-        <MenuItem onClick={onRead}>
+      <Menu
+        show={show}
+        target={target}
+        onHide={hideMenu}
+        placement="bottom-end"
+        data-testid={"message-menu"}
+      >
+        <MenuItem onClick={onRead} data-testid={"btn-mark-as-read"}>
           {isRead ? _t("Mark as unread") : _t("Mark as read")}
         </MenuItem>
-        <MenuItem onClick={onStarred}>
+        <MenuItem onClick={onStarred} data-testid={"btn-mark-as-important"}>
           {isStarred ? _t("Mark as not important") : _t("Mark as important")}
         </MenuItem>
         {$thread && (
-          <MenuItem onClick={onArchived}>
+          <MenuItem onClick={onArchived} data-testid={"btn-archive"}>
             {isArchived ? _t("Move to inbox") : _t("Move to archive")}
           </MenuItem>
         )}
-        {$canDelete && <MenuItem onClick={onDelete}>{_t("Delete")}</MenuItem>}
+        {$canDelete && (
+          <MenuItem onClick={onDelete} data-testid={"btn-delete"}>
+            {_t("Delete")}
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

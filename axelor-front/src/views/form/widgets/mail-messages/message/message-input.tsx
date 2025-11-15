@@ -133,7 +133,7 @@ export function MessageInput({
   );
 
   return (
-    <Box>
+    <Box data-testid={"compose-message"}>
       <TextareaAutoSizeInput
         value={value}
         autoFocus={focus}
@@ -160,10 +160,9 @@ export function MessageInput({
           {...(!focus && {
             onMouseDown: (e) => e.preventDefault(),
           })}
+          data-testid={"btn-post-message"}
         >
-          <div className={styles.title}>
-            {i18n.get("Post")}
-          </div>
+          <div className={styles.title}>{i18n.get("Post")}</div>
         </Button>
         <Button
           size="sm"
@@ -171,9 +170,10 @@ export function MessageInput({
           variant="primary"
           outline
           onClick={handleAttachment}
+          data-testid={"btn-add-attachment"}
         >
           <div className={styles.title}>
-            <MaterialIcon icon="attach_file"/>
+            <MaterialIcon icon="attach_file" />
           </div>
         </Button>
         <Button
@@ -182,12 +182,13 @@ export function MessageInput({
           variant="primary"
           outline
           onClick={handleEdit}
+          data-testid={"btn-edit-message"}
         >
           <div className={styles.title}>
-            <MaterialIcon icon="edit"/>
+            <MaterialIcon icon="edit" />
           </div>
         </Button>
       </Box>
     </Box>
-);
+  );
 }
