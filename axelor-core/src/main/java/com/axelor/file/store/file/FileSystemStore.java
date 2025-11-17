@@ -86,6 +86,7 @@ public class FileSystemStore implements Store {
   public UploadedFile addFile(Path path, String fileName) {
     Path targetFile = resolveFilePath(fileName);
     try {
+      Files.createDirectories(targetFile.getParent());
       if (TempFiles.getTempPath().equals(path.getParent())) {
         Files.move(path, targetFile, MOVE_OPTIONS);
       } else {
