@@ -339,7 +339,7 @@
   `CliCommand` instances using service loader interface. A `database`
   command is added to perform various database related tasks.
   
-  The Gradle plugin adds a new task `buildApp` to build application
+  The Gradle plugin adds a new task `installDist` to build application
   distribution. The application bundle will be generated at
   `build/install/{project-name}` folder which includes extracted war
   application in the `app/` directory, launcher script dependencies in

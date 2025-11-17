@@ -10,28 +10,34 @@ CAUTION: CLI is in beta. Use it with caution till it is promoted GA.
 
 == Command line app
 
-The command line application can be built with the following gradle command:
+The command line application, ie distribution contents, can be built with the following Gradle command:
 
 [source,sh]
 ----
-  $ ./gradlew buildApp
+  $ ./gradlew installDist
 ----
 
-The application bundle will be generated at `build/install/+{project-name}+` folder which includes
-extracted war application in the `app/` directory, launcher script dependencies in the `lib/`
-directory and executable scripts in the `bin/` directory.
+The distribution contents will be generated at `build/install/+{project-name}+` folder which includes:
 
-The bundle also includes a `README.txt` file with usage instructions and a `LICENSE` file.
+* extracted war application in the `app/` directory
+* launcher script dependencies in the `lib/`
+* directory and executable scripts in the `bin/` directory.
+
+The bundle also includes a `README.txt` file with usage instructions and a `LICENSE` file by default. All the files
+in the `src/main/dist` directory will automatically be included in the distribution.
+
+To package the distribution contents into a ZIP or a TAR archive, run either `distZip` or `distTar` (or `assembleDist`
+for both). The files are created at `build/distributions/+{project-name}+-+{project.version}+.+{ext}+`.
 
 IMPORTANT: Java 21 or higher is required to run the command line application.
 
 == Command line tool
 
-The `axelor` script is an executable command line tool that can be used to execute various commands provided by the app:
+The `axelor` script, located in `bin/` directory, is an executable command line tool that can be used to execute various commands provided by the app:
 
 [source,sh]
 ----
-  $ ./bin/axelor --help
+  $ axelor --help
 ----
 
 You would see something like this:
@@ -50,15 +56,15 @@ To know how to use the supported commands, call the tool like this:
 
 [source,sh]
 ----
-  $ ./bin/axelor run --help
-  $ ./bin/axelor database --help
+  $ axelor run --help
+  $ axelor database --help
 ----
 
 The `-c` option can be used to provide axelor config file.
 
 [source,sh]
 ----
-  $ ./bin/axelor -c /path/to/axelor-config.properties run
+  $ axelor -c /path/to/axelor-config.properties run
 ----
 
 == Custom commands
@@ -104,7 +110,7 @@ The `hello` command will be available with the `axelor` tool:
 
 [source,sh]
 ----
-  $ ./bin/axelor hello --message "Awesome!"
+  $ axelor hello --message "Awesome!"
 ----
 
 The `AbstractCliCommand` class provide two helper methods:

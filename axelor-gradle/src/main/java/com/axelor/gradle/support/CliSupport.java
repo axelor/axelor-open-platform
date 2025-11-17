@@ -4,31 +4,25 @@
  */
 package com.axelor.gradle.support;
 
-import com.axelor.common.ResourceUtils;
-import com.axelor.common.StringUtils;
-import com.axelor.gradle.AxelorUtils;
-import com.google.common.io.CharStreams;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.axelor.gradle.tasks.PrepareDistFiles;
 import java.util.List;
-import org.gradle.api.GradleException;
+import java.util.stream.Stream;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.BasePlugin;
+import org.gradle.api.distribution.Distribution;
+import org.gradle.api.distribution.DistributionContainer;
+import org.gradle.api.distribution.plugins.DistributionPlugin;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.WarPlugin;
-import org.gradle.api.tasks.Sync;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.application.CreateStartScripts;
 import org.gradle.api.tasks.bundling.War;
 
 public class CliSupport extends AbstractSupport {
 
-  public static final String CLI_BUILD_TASK = "buildApp";
+  private static final String PREPARE_DIST_FILES_PATH = "generated/dist";
+  private static final String START_SCRIPTS_PATH = "scripts";
 
-  public static final String CLI_PREPARE_TASK = "prepareApp";
-
-  private static final String CLI_INSTALL_DIR = "install";
+  public static final String CLI_PREPARE_TASK = "prepareDistFiles";
 
   private static final String APP_DIR = "app";
   private static final String LIB_DIR = "lib";
@@ -36,98 +30,102 @@ public class CliSupport extends AbstractSupport {
 
   @Override
   public void apply(Project project) {
-    Path buildDir = project.getLayout().getBuildDirectory().get().getAsFile().toPath();
-    Path appDir = buildDir.resolve(CLI_INSTALL_DIR).resolve(project.getName());
-    Path libDir = appDir.resolve(LIB_DIR);
-    Path binDir = appDir.resolve(BIN_DIR);
 
-    project
-        .getTasks()
-        .register(
-            CLI_PREPARE_TASK,
-            Sync.class,
+    project.getPlugins().apply(DistributionPlugin.class);
+
+    War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
+
+    // prepare files for distribution
+    TaskProvider<PrepareDistFiles> prepareDistFiles =
+        project
+            .getTasks()
+            .register(
+                CLI_PREPARE_TASK,
+                PrepareDistFiles.class,
+                task -> {
+                  task.getOutputDir()
+                      .set(
+                          project
+                              .getLayout()
+                              .getBuildDirectory()
+                              .dir(PREPARE_DIST_FILES_PATH)
+                              .get());
+                });
+
+    // start script generation
+    TaskProvider<CreateStartScripts> startScripts =
+        project
+            .getTasks()
+            .register(
+                "startScripts",
+                CreateStartScripts.class,
+                task -> configureStartScripts(project, task));
+
+    // Distribution Plugin
+    DistributionContainer distributions =
+        project.getExtensions().getByType(DistributionContainer.class);
+    distributions
+        .named(DistributionPlugin.MAIN_DISTRIBUTION_NAME)
+        .configure(
+            distribution ->
+                configureDistribution(project, distribution, war, prepareDistFiles, startScripts));
+
+    // disable zip and tar dist archives till GA
+    configureDistTasks(project);
+  }
+
+  private void configureDistTasks(Project project) {
+    List<String> distTaskName = List.of("assembleDist", "distZip", "distTar");
+    List<String> taskNames = project.getGradle().getStartParameter().getTaskNames();
+
+    boolean distRequested = taskNames.stream().anyMatch(distTaskName::contains);
+
+    Stream.of(project.getTasks().named("distZip"), project.getTasks().named("distTar"))
+        .forEach(
             task -> {
-              task.dependsOn(WarPlugin.WAR_TASK_NAME);
-              task.setDestinationDir(appDir.toFile());
-
-              // extract war
-              War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
-              task.from(project.zipTree(war.getArchiveFile()), x -> x.into(APP_DIR));
-
-              // tomcat runner jars
-              task.from(
-                  project
-                      .getConfigurations()
-                      .getByName(TomcatSupport.TOMCAT_CONFIGURATION)
-                      .getIncoming()
-                      .artifactView(view -> view.componentFilter(x -> true))
-                      .getFiles(),
-                  x -> x.into(LIB_DIR));
-
-              // copy resources
-              task.doLast(
-                  x -> {
-                    try {
-                      createReadme(appDir, project);
-                      createLicense(appDir, project);
-                    } catch (IOException e) {
-                      throw new GradleException("Failed to generate application bundle", e);
-                    }
-                  });
-            });
-
-    project
-        .getTasks()
-        .register(
-            CLI_BUILD_TASK,
-            CreateStartScripts.class,
-            task -> {
-              task.dependsOn(CLI_PREPARE_TASK);
-              task.setGroup(BasePlugin.BUILD_GROUP);
-              task.setDescription("Build application package.");
-
-              task.setApplicationName("axelor");
-              task.setOutputDir(binDir.toFile());
-              task.getMainClass().set("com.axelor.app.Launcher");
-              task.setClasspath(project.files(project.fileTree(libDir, x -> x.include("*.jar"))));
+              task.configure(act -> act.onlyIf(spec -> distRequested));
             });
   }
 
-  private void createReadme(Path appDir, Project project) throws IOException {
-    try (var stream = ResourceUtils.getResourceStream("com/axelor/app/README.txt");
-        var reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-      var text = CharStreams.toString(reader);
-      var path = appDir.resolve("README.txt");
-      var name = project.getName();
-
-      var configPath = AxelorUtils.findAxelorConfig(project);
-      if (configPath != null) {
-        var config = AxelorUtils.parseAxelorConfig(project, configPath);
-        var appName = (String) config.get("application.name");
-        if (StringUtils.notBlank(appName)) {
-          name = appName;
-        }
-      }
-
-      text = text.replace("{{app-name}}", name);
-      text = text.replace("{{app-header}}", "=".repeat(name.length()));
-
-      Files.writeString(path, text, StandardCharsets.UTF_8);
-    }
+  private FileCollection getTomcatRunnerLibs(Project project) {
+    return project
+        .getConfigurations()
+        .getByName(TomcatSupport.TOMCAT_CONFIGURATION)
+        .getIncoming()
+        .artifactView(view -> view.componentFilter(x -> true))
+        .getFiles();
   }
 
-  private void createLicense(Path appDir, Project project) throws IOException {
-    var from = project.getProjectDir().toPath();
-    var file =
-        List.of("LICENSE", "LICENSE.txt", "LICENSE.md").stream()
-            .map(x -> from.resolve(x))
-            .filter(x -> Files.exists(x))
-            .findFirst()
-            .orElse(null);
-    if (file != null) {
-      var name = file.getFileName();
-      var target = appDir.resolve(name);
-      Files.copy(file, target);
-    }
+  private void configureStartScripts(Project project, CreateStartScripts task) {
+    task.setGroup("distribution");
+    task.setDescription("Creates OS specific scripts to run the project as a JVM application.");
+    task.setApplicationName("axelor");
+    task.setOutputDir(
+        project.getLayout().getBuildDirectory().dir(START_SCRIPTS_PATH).get().getAsFile());
+    task.getMainClass().set("com.axelor.app.Launcher");
+    task.setClasspath(getTomcatRunnerLibs(project).filter(file -> file.getName().endsWith(".jar")));
+  }
+
+  private void configureDistribution(
+      Project project,
+      Distribution task,
+      War war,
+      TaskProvider<PrepareDistFiles> prepareDistFiles,
+      TaskProvider<CreateStartScripts> startScripts) {
+    task.getDistributionBaseName().set(project.getName());
+    task.contents(
+        copySpec -> {
+          // war files → APP_DIR
+          copySpec.into(APP_DIR, spec -> spec.from(project.zipTree(war.getArchiveFile())));
+
+          // tomcat runner jars → LIB_DIR
+          copySpec.into(LIB_DIR, spec -> spec.from(getTomcatRunnerLibs(project)));
+
+          // start scripts → BIN_DIR
+          copySpec.into(BIN_DIR, spec -> spec.from(startScripts));
+
+          // prepareDistFiles → root of distribution
+          copySpec.from(prepareDistFiles);
+        });
   }
 }
