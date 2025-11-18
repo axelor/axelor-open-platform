@@ -1007,7 +1007,7 @@ image::widgets/suggest-box.png[]
 
 == Tag
 
-The `Tags` widget can be used with `many-to-one`/`one-to-one` fields to select a single record displayed as a tag
+The `Tag` widget can be used with `many-to-one`/`one-to-one` fields to select a single record displayed as a tag.
 
 [source,xml]
 ----
@@ -1022,7 +1022,7 @@ The following attributes are supported:
 value.
 * `x-image-field`: specify the image field to use.
 
-The widget is also supported in grids views.
+The widget is also supported in grid views.
 
 == Tags
 
