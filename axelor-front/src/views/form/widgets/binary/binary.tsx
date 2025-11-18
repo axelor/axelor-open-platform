@@ -14,6 +14,7 @@ import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import { META_FILE_MODEL, makeImageURL } from "../image/utils";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { formDirtyUpdater } from "../../builder/atoms";
+import { FileDroppable } from "@/components/file-droppable";
 
 function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   return useSetAtom(
@@ -99,21 +100,36 @@ export function Binary(
     ),
   );
 
-  async function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+  const handleFileUpload = useCallback(
+    (file?: File) => {
+      if (file && validateFileSize(file)) {
+        setUpload({
+          field: name,
+          file,
+        });
+        setFileSize(file.size);
+        setFileType(file.type);
+        isMetaModel && setFileName(file.name);
+        setDirty();
+      }
+    },
+    [
+      isMetaModel,
+      name,
+      setDirty,
+      setFileName,
+      setFileSize,
+      setFileType,
+      setUpload,
+    ],
+  );
+
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e?.target?.files?.[0];
 
     inputRef.current && (inputRef.current.value = "");
 
-    if (file && validateFileSize(file)) {
-      setUpload({
-        field: name,
-        file,
-      });
-      setFileSize(file.size);
-      setFileType(file.type);
-      isMetaModel && setFileName(file.name);
-      setDirty();
-    }
+    handleFileUpload(file);
   }
 
   return (
@@ -129,41 +145,47 @@ export function Binary(
             accept={accept}
           />
         </form>
-        <ButtonGroup border>
-          {!readonly && (
-            <Button
-              title={i18n.get("Upload")}
-              variant="light"
-              d="flex"
-              alignItems="center"
-              onClick={handleUpload}
-            >
-              <MaterialIcon icon="upload" />
-            </Button>
-          )}
-          {canDownload() && (
-            <Button
-              title={i18n.get("Download")}
-              variant="light"
-              d="flex"
-              alignItems="center"
-              onClick={handleDownload}
-            >
-              <MaterialIcon icon="download" />
-            </Button>
-          )}
-          {!readonly && (
-            <Button
-              title={i18n.get("Remove")}
-              variant="light"
-              d="flex"
-              alignItems="center"
-              onClick={handleRemove}
-            >
-              <MaterialIcon icon="close" />
-            </Button>
-          )}
-        </ButtonGroup>
+        <FileDroppable
+          accept={accept}
+          disabled={readonly}
+          onDropFile={handleFileUpload}
+        >
+          <ButtonGroup border>
+            {!readonly && (
+              <Button
+                title={i18n.get("Upload")}
+                variant="light"
+                d="flex"
+                alignItems="center"
+                onClick={handleUpload}
+              >
+                <MaterialIcon icon="upload" />
+              </Button>
+            )}
+            {canDownload() && (
+              <Button
+                title={i18n.get("Download")}
+                variant="light"
+                d="flex"
+                alignItems="center"
+                onClick={handleDownload}
+              >
+                <MaterialIcon icon="download" />
+              </Button>
+            )}
+            {!readonly && (
+              <Button
+                title={i18n.get("Remove")}
+                variant="light"
+                d="flex"
+                alignItems="center"
+                onClick={handleRemove}
+              >
+                <MaterialIcon icon="close" />
+              </Button>
+            )}
+          </ButtonGroup>
+        </FileDroppable>
       </Box>
     </FieldControl>
   );

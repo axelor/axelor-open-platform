@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useEffect, useMemo, useRef } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -14,6 +14,7 @@ import { FieldControl, FieldProps } from "../../builder";
 import { META_FILE_MODEL, makeImageURL } from "./utils";
 
 import styles from "./image.module.scss";
+import { FileDroppable } from "@/components/file-droppable";
 
 export function Image(
   props: FieldProps<string | DataRecord | undefined | null>,
@@ -80,35 +81,42 @@ export function Image(
     isBinary && required && setValid(false);
   }
 
+  const handleFileUpload = useCallback(
+    async (file?: File) => {
+      if (file && validateFileSize(file)) {
+        if (isBinary) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const value = e.target?.result ?? null;
+            setValue(value, true);
+            required && setValid(true);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const dataStore = new DataStore(META_FILE_MODEL);
+          const metaFile = await dataStore.save({
+            id: record?.id,
+            version: record?.version ?? record?.$version,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            $upload: { file },
+          });
+          if (metaFile.id) {
+            setValue(metaFile, true, record?.id == null);
+          }
+        }
+      }
+    },
+    [isBinary, record, required, setValid, setValue],
+  );
+
   async function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e?.target?.files?.[0];
 
     inputRef.current && (inputRef.current.value = "");
 
-    if (file && validateFileSize(file)) {
-      if (isBinary) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const value = e.target?.result ?? null;
-          setValue(value, true);
-          required && setValid(true);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const dataStore = new DataStore(META_FILE_MODEL);
-        const metaFile = await dataStore.save({
-          id: record?.id,
-          version: record?.version ?? record?.$version,
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          $upload: { file },
-        });
-        if (metaFile.id) {
-          setValue(metaFile, true, record?.id == null);
-        }
-      }
-    }
+    await handleFileUpload(file);
   }
 
   const { target, name } = isBinary
@@ -140,17 +148,27 @@ export function Image(
 
   return (
     <FieldControl {...props}>
-      <Box
+      <FileDroppable
         bgColor="body"
         border
         flexGrow={1}
         position="relative"
         maxW={100}
         maxH={100}
+        d="block"
         className={clsx(styles.image, {
           [styles.inGridEditor]: schema.inGridEditor,
           [styles.invalid]: !isBinary && !readonly && invalid,
         })}
+        accept={accept}
+        disabled={readonly}
+        onDropFile={handleFileUpload}
+        renderDragOverlay={({ children }) => (
+          <Box className={styles.overlay}>
+            <MaterialIcon icon="upload" />
+            <span>{children}</span>
+          </Box>
+        )}
       >
         <Box
           ref={imageRef}
@@ -178,7 +196,7 @@ export function Image(
           <MaterialIcon icon="upload" onClick={handleUpload} />
           <MaterialIcon icon="close" onClick={handleRemove} />
         </Box>
-      </Box>
+      </FileDroppable>
     </FieldControl>
   );
 }
