@@ -10,7 +10,6 @@ import {
 } from "react";
 
 import {
-  clsx,
   Box,
   Button,
   Dialog,
@@ -20,6 +19,7 @@ import {
   DialogTitle,
   Fade,
   Portal,
+  clsx,
 } from "@axelor/ui";
 
 import { DataRecord } from "@/services/client/data.types";
@@ -49,6 +49,7 @@ export type DialogOptions = {
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
   padding?: string;
+  testId?: string;
   classes?: {
     root?: string;
     content?: string;
@@ -110,6 +111,7 @@ export namespace dialogs {
     yesTitle,
     noTitle,
     padding,
+    testId,
     footer,
   }: {
     title?: string;
@@ -117,6 +119,7 @@ export namespace dialogs {
     yesNo?: boolean;
     yesTitle?: string;
     noTitle?: string;
+    testId?: string;
   } & Pick<DialogOptions, "size" | "padding" | "footer">) {
     const [cancelButton, confirmButton] = getDefaultButtons();
     const buttons = yesNo
@@ -139,6 +142,7 @@ export namespace dialogs {
           content,
           buttons,
           padding,
+          testId,
           classes: { content: styles.box },
           onClose: (result) => resolve(result),
           footer,
@@ -234,8 +238,12 @@ function Dialogs() {
   const dialogs = useAtomValue(dialogsAtom);
   return (
     <Portal>
-      {dialogs.map(({ id, options }) => (
-        <ModalDialog key={id} {...options} />
+      {dialogs.map(({ id, options }, index) => (
+        <ModalDialog
+          key={id}
+          {...options}
+          testId={options?.testId ?? `dialog:${index}`}
+        />
       ))}
     </Portal>
   );
@@ -287,6 +295,7 @@ export function ModalDialog(props: DialogOptions) {
     padding,
     buttons = getDefaultButtons(),
     classes = {},
+    testId,
     closeable = true,
     onClose,
     maximize,
@@ -342,6 +351,7 @@ export function ModalDialog(props: DialogOptions) {
           className={clsx(classes.root, styles.root)}
           initialFocus={initialFocus}
           data-dialog="true"
+          data-testid={testId}
         >
           {showHeader && (
             <DialogHeader
@@ -349,6 +359,7 @@ export function ModalDialog(props: DialogOptions) {
                 onCloseClick: () => onCloseDialog(false),
               })}
               className={classes.header}
+              data-testid="header"
             >
               <DialogTitle className={styles.title}>{title}</DialogTitle>
               {Header && <Header close={onCloseDialog} />}
@@ -359,11 +370,12 @@ export function ModalDialog(props: DialogOptions) {
             style={{ padding }}
             tabIndex={-1}
             ref={contentRef}
+            data-testid="body"
           >
             {content}
           </DialogContent>
           {showFooter && (
-            <DialogFooter className={classes.footer}>
+            <DialogFooter className={classes.footer} data-testid="footer">
               {Footer && <Footer close={onCloseDialog} />}
               {buttons.map((button) => (
                 <Button
@@ -372,6 +384,7 @@ export function ModalDialog(props: DialogOptions) {
                   type="button"
                   variant={button.variant}
                   onClick={() => button.onClick(onCloseDialog)}
+                  data-testid={`btn:${button.name}`}
                 >
                   {button.title}
                 </Button>
