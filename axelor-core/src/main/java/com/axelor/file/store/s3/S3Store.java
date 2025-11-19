@@ -18,20 +18,21 @@ import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.ServerSideEncryption;
 import io.minio.ServerSideEncryptionKms;
 import io.minio.ServerSideEncryptionS3;
 import io.minio.StatObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
 import io.minio.errors.InvalidResponseException;
 import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -46,6 +47,9 @@ public class S3Store implements Store {
 
   private final S3ClientManager _s3ClientManager;
   private final S3Cache _s3Cache;
+
+  // Define Part Size: 30 MB
+  private static final long PART_SIZE = 30L * 1024 * 1024;
 
   public S3Store(S3ClientManager s3ClientManager) {
     this._s3ClientManager = s3ClientManager;
@@ -132,45 +136,25 @@ public class S3Store implements Store {
 
   @Override
   public UploadedFile addFile(InputStream inputStream, String fileName) {
-    Path tempFile = null;
-    try {
-      tempFile = TempFiles.createTempFile();
-      FileUtils.write(tempFile, inputStream);
-      return addFile(tempFile, fileName);
+    // We wrap the stream here to allow MimeTypesUtils to inspect bytes safely
+    inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
+
+    try (InputStream safeStream = inputStream) {
+      return uploadData(
+          safeStream, fileName, -1, MimeTypesUtils.getContentType(safeStream, fileName));
     } catch (Exception e) {
       throw new RuntimeException(e);
-    } finally {
-      try {
-        Files.deleteIfExists(tempFile);
-      } catch (IOException e) {
-        // ignore
-      }
     }
   }
 
   @Override
   public UploadedFile addFile(Path path, String fileName) {
-    if (hasFile(fileName)) {
-      deleteFile(fileName);
-    }
-    try {
-      String contentType = MimeTypesUtils.getContentType(path);
-      Map<String, String> headers = new HashMap<>();
-      if (StringUtils.notBlank(_s3ClientManager.getStorageClass())) {
-        headers.put("X-Amz-Storage-Class", _s3ClientManager.getStorageClass());
-      }
-      final String objectName = getObjectName(fileName);
-      UploadObjectArgs.Builder builder =
-          UploadObjectArgs.builder()
-              .bucket(getBucketName())
-              .object(objectName)
-              .contentType(contentType)
-              .filename(path.toString())
-              .headers(headers)
-              .sse(getEncryption());
-      getClient().uploadObject(builder.build());
-      return new UploadedFile(
-          FileUtils.getFileName(fileName), fileName, Files.size(path), contentType, getStoreType());
+    try (InputStream inputStream = Files.newInputStream(path)) {
+      return uploadData(
+          inputStream,
+          fileName,
+          Files.size(path),
+          MimeTypesUtils.getContentType(path.toFile(), fileName));
     } catch (IOException
         | ErrorResponseException
         | InsufficientDataException
@@ -182,6 +166,46 @@ public class S3Store implements Store {
         | XmlParserException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private UploadedFile uploadData(
+      InputStream inputStream, String fileName, long fileSize, String contentType)
+      throws NoSuchAlgorithmException,
+          IOException,
+          ServerException,
+          InsufficientDataException,
+          ErrorResponseException,
+          InvalidKeyException,
+          InvalidResponseException,
+          XmlParserException,
+          InternalException {
+    Map<String, String> headers = new HashMap<>();
+    if (StringUtils.notBlank(_s3ClientManager.getStorageClass())) {
+      headers.put("X-Amz-Storage-Class", _s3ClientManager.getStorageClass());
+    }
+
+    final String objectName = getObjectName(fileName);
+    PutObjectArgs.Builder builder =
+        PutObjectArgs.builder()
+            .bucket(getBucketName())
+            .object(objectName)
+            .contentType(contentType)
+            .stream(inputStream, fileSize > 0 ? fileSize : -1, PART_SIZE)
+            .headers(headers)
+            .sse(getEncryption());
+    getClient().putObject(builder.build());
+
+    // Get actual size from S3 if it was unknown
+    if (fileSize < 0) {
+      StatObjectResponse stat =
+          getClient()
+              .statObject(
+                  StatObjectArgs.builder().bucket(getBucketName()).object(objectName).build());
+      fileSize = stat.size();
+    }
+
+    return new UploadedFile(
+        FileUtils.getFileName(fileName), fileName, fileSize, contentType, getStoreType());
   }
 
   @Override
@@ -209,9 +233,9 @@ public class S3Store implements Store {
 
   @Override
   public Path getPath(String fileName, boolean cache) {
-    Path cachePath = S3Cache.CACHE_ENABLED ? _s3Cache.get(fileName) : null;
+    Path cachePath = S3Cache.CACHE_ENABLED && cache ? _s3Cache.get(fileName) : null;
     if (cachePath != null) {
-      // if in cache, return it
+      // if in cache, return it as a new temp file
       try {
         Path tempFile = TempFiles.createTempFile();
         FileUtils.copyPath(cachePath, tempFile);
@@ -238,7 +262,7 @@ public class S3Store implements Store {
 
   @Override
   public InputStream getStream(String fileName, boolean cache) {
-    if (S3Cache.CACHE_ENABLED) {
+    if (S3Cache.CACHE_ENABLED && cache) {
       try {
         // if in cache, return it
         Path cachePath = _s3Cache.get(fileName);
@@ -254,15 +278,12 @@ public class S3Store implements Store {
     InputStream inputStream = _fetchStream(fileName);
 
     if (S3Cache.CACHE_ENABLED && cache) {
-      // put in the cache
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      try {
-        inputStream.transferTo(baos);
+      try (inputStream) {
+        File cachedFile = _s3Cache.put(inputStream, fileName);
+        return Files.newInputStream(cachedFile.toPath());
       } catch (IOException e) {
-        throw new UncheckedIOException(e);
+        throw new RuntimeException(e);
       }
-      _s3Cache.put(new ByteArrayInputStream(baos.toByteArray()), fileName);
-      return new ByteArrayInputStream(baos.toByteArray());
     }
 
     return inputStream;
