@@ -62,15 +62,11 @@ public class FileSystemStore implements Store {
 
   @Override
   public UploadedFile addFile(InputStream inputStream, String fileName) {
-    try {
-      Path targetFile = resolveFilePath(fileName);
-      FileUtils.write(targetFile, inputStream);
-      return new UploadedFile(
-          FileUtils.getFileName(targetFile),
-          getRootPath().relativize(targetFile).toString(),
-          Files.size(targetFile),
-          MimeTypesUtils.getContentType(targetFile),
-          getStoreType());
+    Path targetFile = resolveFilePath(fileName);
+    try (inputStream) {
+      Files.createDirectories(targetFile.getParent());
+      Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+      return createUploadedFile(targetFile);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -86,15 +82,19 @@ public class FileSystemStore implements Store {
       } else {
         Files.copy(path, targetFile, COPY_OPTIONS);
       }
-      return new UploadedFile(
-          FileUtils.getFileName(targetFile),
-          getRootPath().relativize(targetFile).toString(),
-          Files.size(targetFile),
-          MimeTypesUtils.getContentType(targetFile),
-          getStoreType());
+      return createUploadedFile(targetFile);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  private UploadedFile createUploadedFile(Path file) throws IOException {
+    return new UploadedFile(
+        FileUtils.getFileName(file),
+        getRootPath().relativize(file).toString(),
+        Files.size(file),
+        MimeTypesUtils.getContentType(file),
+        getStoreType());
   }
 
   @Override
