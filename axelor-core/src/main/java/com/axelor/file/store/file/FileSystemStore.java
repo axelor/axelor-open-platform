@@ -36,13 +36,7 @@ public class FileSystemStore implements Store {
 
   private static final CopyOption[] MOVE_OPTIONS = {StandardCopyOption.REPLACE_EXISTING};
 
-  public FileSystemStore() {
-    try {
-      Files.createDirectories(getRootPath());
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
+  public FileSystemStore() {}
 
   @Override
   public boolean hasFile(String fileName) {
