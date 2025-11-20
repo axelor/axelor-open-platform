@@ -23,7 +23,7 @@ versions.junit5 = "5.13.4"
 
 versions.slf4j = "2.0.17"
 
-versions.tomcat = "10.1.47"
+versions.tomcat = "10.1.49"
 
 versions.asm = "9.8"
 
