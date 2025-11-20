@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Upgrade Quartz from 2.5.0 to 2.5.1
+  - Upgrade Hibernate from 6.6.31 to 6.6.36
