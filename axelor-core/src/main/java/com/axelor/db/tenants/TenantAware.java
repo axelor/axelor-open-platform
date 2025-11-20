@@ -18,7 +18,9 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.auth.AuditableRunner;
 import com.axelor.db.JPA;
+import com.axelor.inject.Beans;
 
 /**
  * A Thread implementation that makes a thread tenant-aware by setting the tenant configuration
@@ -41,6 +43,9 @@ public class TenantAware extends Thread {
   /** Whatever to start a new transaction */
   private boolean withTransaction;
 
+  /** Whatever to track changes */
+  private boolean withTracking;
+
   /**
    * Constructs a TenantAware using the current tenant.
    *
@@ -51,6 +56,7 @@ public class TenantAware extends Thread {
     this.tenantId = TenantResolver.currentTenantIdentifier();
     this.tenantHost = TenantResolver.currentTenantHost();
     this.withTransaction = true;
+    this.withTracking = true;
   }
 
   /**
@@ -86,14 +92,29 @@ public class TenantAware extends Thread {
     return this;
   }
 
+  /**
+   * Whatever the task should track changes
+   *
+   * @param withTracking false to not track changes, else true
+   * @return this
+   */
+  public TenantAware withTracking(boolean withTracking) {
+    this.withTracking = withTracking;
+    return this;
+  }
+
   @Override
   public void run() {
     String currentId = TenantResolver.CURRENT_TENANT.get();
     String currentHost = TenantResolver.CURRENT_HOST.get();
     TenantResolver.setCurrentTenant(tenantId, tenantHost);
     try {
+      Runnable wrapped =
+          withTracking
+              ? super::run
+              : () -> Beans.get(AuditableRunner.class).runWithoutTracking(super::run);
       if (withTransaction) {
-        JPA.runInTransaction(super::run);
+        JPA.runInTransaction(wrapped);
       } else {
         super.run();
       }

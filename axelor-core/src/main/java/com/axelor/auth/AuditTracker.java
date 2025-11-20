@@ -214,6 +214,11 @@ final class AuditTracker {
    */
   public void track(Model entity, String[] names, Object[] state, Object[] previousState) {
 
+    // tracking disabled
+    if (isTrackingDisabled()) {
+      return;
+    }
+
     final ModelTracking track = getTrack(entity);
     if (track == null) {
       return;
@@ -571,9 +576,14 @@ final class AuditTracker {
    * @param user the session user
    */
   public void onComplete(Transaction tx, User user) {
+
     try {
       this.fireBeforeCompleteEvent();
+    } catch (Exception e) {
+      log.error("Error during before transaction complete event", e);
+    }
 
+    try {
       CURRENT_USER.set(user);
       this.processTracks(tx);
       this.processDelete(tx);
@@ -581,6 +591,10 @@ final class AuditTracker {
       clear();
       JPA.em().flush();
     }
+  }
+
+  private boolean isTrackingDisabled() {
+    return AuditableRunner.DISABLE_TRACKING.get();
   }
 
   @Singleton

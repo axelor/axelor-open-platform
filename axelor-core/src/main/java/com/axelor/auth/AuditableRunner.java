@@ -28,6 +28,7 @@ import javax.inject.Inject;
 public class AuditableRunner {
 
   static ThreadLocal<User> batchUser = new ThreadLocal<>();
+  static final ThreadLocal<Boolean> DISABLE_TRACKING = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
   private static final String DEFAULT_BATCH_USER = "admin";
 
@@ -81,6 +82,39 @@ public class AuditableRunner {
       return job.call();
     } finally {
       batchUser.remove();
+    }
+  }
+
+  /**
+   * Run a batch job without audit tracking.
+   *
+   * @param job the job to run
+   */
+  public void runWithoutTracking(Runnable job) {
+    Boolean previous = DISABLE_TRACKING.get();
+    DISABLE_TRACKING.set(Boolean.TRUE);
+    try {
+      run(job);
+    } finally {
+      DISABLE_TRACKING.set(previous);
+    }
+  }
+
+  /**
+   * Run a batch job without audit tracking.
+   *
+   * @param <T> type of the result
+   * @param job the job to run
+   * @return job result
+   * @throws Exception if unable to compute a result
+   */
+  public <T> T runWithoutTracking(Callable<T> job) throws Exception {
+    Boolean previous = DISABLE_TRACKING.get();
+    DISABLE_TRACKING.set(Boolean.TRUE);
+    try {
+      return run(job);
+    } finally {
+      DISABLE_TRACKING.set(previous);
     }
   }
 }
