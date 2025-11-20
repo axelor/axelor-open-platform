@@ -1,0 +1,6 @@
+---
+title: Fix monaco editor worker loading for non-basic languages
+type: fix
+description: |
+  Web workers is required for rich language features (validation, formatting, completion). This ensure these 
+  resources are fetched correctly using explicit paths containing `/vs`.

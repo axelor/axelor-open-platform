@@ -1,9 +1,10 @@
 import react from "@vitejs/plugin-react";
-import path from "path";
-import fs from "fs";
-import crypto from "crypto";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
+
 import monacoPkg from "monaco-editor/package.json" with { type: "json" };
 
 const monacoHash = crypto
@@ -12,7 +13,7 @@ const monacoHash = crypto
   .digest()
   .toString("base64url")
   .slice(0, 8);
-const monacoPath = `assets/monaco-${monacoHash}`;
+const monacoPath = `assets/monaco-${monacoHash}/vs`;
 const monacoNodePath = "node_modules/monaco-editor/min/vs";
 
 export default defineConfig({
@@ -29,6 +30,7 @@ export default defineConfig({
       writeBundle() {
         const sourceDir = path.resolve(__dirname, monacoNodePath);
         const targetDir = `dist/${monacoPath}`;
+        fs.mkdirSync(path.dirname(targetDir));
         fs.symlinkSync(sourceDir, targetDir, "dir");
       },
     },
@@ -56,7 +58,7 @@ export default defineConfig({
   build: {
     /**
      * Browser Compatibility (ES2022):
-     * 
+     *
      *  ┌──────────────┬──────────────────┬───────────────────┐
      *  │ Browser      │ Minimum Version  │ Release Date      │
      *  ├──────────────┼──────────────────┼───────────────────┤
