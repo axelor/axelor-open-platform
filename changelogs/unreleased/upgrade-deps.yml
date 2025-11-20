@@ -15,3 +15,4 @@ description: |
   - Upgrade Swagger from 2.2.38 to 2.2.40
   - Upgrade Greenmail from 2.1.6 to 2.1.7
   - Upgrade Shiro from 2.0.5 to 2.0.6
+  - Upgrade Jackson from 2.19.2 to 2.19.4
