@@ -8,6 +8,7 @@ import { dialogs } from "@/components/dialogs";
 import {
   Scheduler,
   SchedulerEvent,
+  SchedulerRef,
   SchedulerView,
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -37,7 +38,6 @@ import { ViewProps } from "../types";
 import { getColor } from "./colors";
 import { Filter, Filters } from "./filters";
 import { Popover } from "./popover";
-import { getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
 import eventStyles from "./event.module.scss";
@@ -56,6 +56,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     hilites,
     template = "",
   } = meta.view;
+
+  const [scheduler, setScheduler] = useState<SchedulerRef | null>(null);
 
   // create clone of data store
   const dataStore = useMemo(
@@ -113,7 +115,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             },
             {
               fieldName: eventStart,
-              operator: "<=",
+              operator: "<",
               value: end,
             },
           ],
@@ -134,7 +136,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
                   },
                   {
                     fieldName: eventStart,
-                    operator: "<=",
+                    operator: "<",
                     value: end,
                   },
                 ],
@@ -294,7 +296,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
   });
 
   useEffect(() => {
-    const { start, end } = getTimes(date, "month");
+    if (!scheduler) return;
+
+    const { activeStart: start, activeEnd: end } = scheduler.getApi().view;
+
     if (
       moment(start).isSameOrAfter(searchStart) &&
       moment(start).isSameOrBefore(searchEnd) &&
@@ -305,7 +310,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }
     setSearchStart(start);
     setSearchEnd(end);
-  }, [date, searchEnd, searchStart]);
+  }, [date, scheduler, mode, searchEnd, searchStart]);
 
   useAsyncEffect(async () => {
     onRefresh();
@@ -607,6 +612,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       />
       <div className={styles.wrapper}>
         <Scheduler
+          ref={setScheduler}
           className={styles.calendar}
           view={mode}
           date={date}

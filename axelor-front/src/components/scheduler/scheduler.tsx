@@ -1,3 +1,4 @@
+import { Ref, useCallback, useEffect, useRef } from "react";
 import {
   DateSelectArg,
   EventApi,
@@ -9,8 +10,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { clsx } from "@axelor/ui";
-import { useCallback, useEffect, useRef } from "react";
+
+import { clsx, useRefs } from "@axelor/ui";
 
 import styles from "./scheduler.module.scss";
 
@@ -41,7 +42,10 @@ function toSchedulerEvent<T>(event: EventApi) {
   } as SchedulerEvent<T>;
 }
 
+export type SchedulerRef = FullCalendar;
+
 export interface SchedulerProps<T> {
+  ref?: Ref<FullCalendar | null>;
   className?: string;
   date?: Date;
   view?: SchedulerView;
@@ -74,6 +78,7 @@ const dayViewMap = {
 export function Scheduler<T>(props: SchedulerProps<T>) {
   const {
     className,
+    ref,
     editable = true,
     editableDuration,
     locale,
@@ -90,6 +95,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
   } = props;
   const calendarRef = useRef<FullCalendar>(null);
 
+  const refs = useRefs(calendarRef, ref);
   const view = allDayOnly ? dayViewMap[mode] : timeViewMap[mode];
   const date = props.date;
 
@@ -132,7 +138,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
   return (
     <div className={clsx(styles.scheduler, className)}>
       <FullCalendar
-        ref={calendarRef}
+        ref={refs}
         selectable={true}
         selectMirror={true}
         dayMaxEvents={maxEvents}
