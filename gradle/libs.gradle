@@ -9,7 +9,7 @@ versions.hibernate_validator = "8.0.3.Final"
 versions.caffeine = "3.2.2"
 versions.redisson = "3.51.0"
 
-versions.groovy = "4.0.28"
+versions.groovy = "4.0.29"
 versions.graal_js = "24.2.2"
 versions.resteasy = "6.2.14.Final"
 versions.jackson = "2.19.2"
