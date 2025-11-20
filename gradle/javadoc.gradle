@@ -43,7 +43,7 @@ tasks.register("generateDocs", Javadoc) {
       'https://google.github.io/guice/api-docs/7.0.0/javadoc/',
       'https://guava.dev/releases/33.4.8-jre/api/docs/',
       'https://docs.hibernate.org/orm/6.6/javadocs/',
-      'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.5.0'
+      'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.5.1'
     ]
   }
 
