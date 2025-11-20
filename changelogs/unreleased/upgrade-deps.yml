@@ -11,3 +11,4 @@ description: |
   - Upgrade Caffeine from 3.2.2 to 3.2.3
   - Upgrade Undertow from 2.3.19 to 2.3.20
   - Upgrade Tomcat from 10.1.47 to 10.1.49
+  - Upgrade Bytebuddy from 1.17.7 to 1.17.8
