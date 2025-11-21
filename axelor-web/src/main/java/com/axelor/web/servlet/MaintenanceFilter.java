@@ -41,6 +41,7 @@ public class MaintenanceFilter implements Filter {
         && maintenanceService.isMaintenanceMode(AuthUtils.getUser(), httpRequest)) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
       httpResponse.setHeader(HttpHeaders.RETRY_AFTER, "30");
+      httpResponse.setHeader("X-Show-Error-Page", "true");
       httpResponse.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
       return;
     }
