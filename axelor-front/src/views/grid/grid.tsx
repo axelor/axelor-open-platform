@@ -83,7 +83,7 @@ import {
   GridExpandableContext,
   useSetRootCollectionTreeColumnAttrs,
 } from "./builder/scope";
-import { AUTO_ADD_ROW, getSortBy, useGridState } from "./builder/utils";
+import { AUTO_ADD_ROW, useGridSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 
@@ -243,12 +243,13 @@ function GridInner(props: ViewProps<GridView>) {
 
   const getSearchTranslate = useSearchTranslate(orderBy, fields);
 
+  const sortBy = useGridSortBy(state);
+
   const getSearchOptions = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
         const { query = {}, search } = get(searchAtom!);
 
-        const sortBy = getSortBy(orderBy);
         const searchQuery = getSearchFilter(fields as any, view.items, search);
 
         const filter: SearchOptions["filter"] = {
@@ -289,7 +290,7 @@ function GridInner(props: ViewProps<GridView>) {
         };
       },
       [
-        orderBy,
+        sortBy,
         searchAtom,
         fields,
         view,
@@ -891,13 +892,13 @@ function GridInner(props: ViewProps<GridView>) {
 
   const searchOptions = useMemo(() => {
     const options: Partial<SearchOptions> = {
-      sortBy: getSortBy(orderBy),
+      sortBy,
     };
     if (currentPage) {
       return { ...options, offset: (currentPage - 1) * limit };
     }
     return options;
-  }, [orderBy, currentPage, limit]);
+  }, [sortBy, currentPage, limit]);
 
   const onGridSearch = useCallback(
     (options?: SearchOptions) => {

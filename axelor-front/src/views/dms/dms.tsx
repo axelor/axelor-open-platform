@@ -48,7 +48,7 @@ import {
 
 import { legacyClassNames } from "@/styles/legacy";
 import { Grid as GridComponent } from "../grid/builder";
-import { useGridState } from "../grid/builder/utils";
+import { useGridSortBy, useGridState } from "../grid/builder/utils";
 import gridRowStyles from "../grid/renderers/row/row.module.css";
 import { ViewProps } from "../types";
 import {
@@ -143,7 +143,7 @@ export function Dms(props: ViewProps<GridView>) {
   const [showTree, setShowTree] = useState<boolean | undefined>(undefined);
   const advancedSearchHandler = useRef<AdvanceSearchHandler | null>(null);
 
-  const { orderBy, rows, selectedRows } = state;
+  const { rows, selectedRows } = state;
   const uploadSize = session?.data?.upload?.maxSize ?? 0;
   const uploader = useMemo(() => new Uploader(), []);
   const { relatedId, relatedModel } = popupRecord || {};
@@ -289,6 +289,8 @@ export function Dms(props: ViewProps<GridView>) {
       });
   }, [ROOT, action.domain, dataStore, popupRecord]);
 
+  const sortBy = useGridSortBy(state);
+
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
@@ -315,10 +317,6 @@ export function Dms(props: ViewProps<GridView>) {
             selected ? `self.parent.id = ${selected}` : "self.parent IS NULL",
           );
         }
-
-        const sortBy = orderBy?.map(
-          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
-        );
 
         const filterDomains = domains.filter((s) => (s ?? "").trim());
 
@@ -369,7 +367,7 @@ export function Dms(props: ViewProps<GridView>) {
       [
         isDMSFromPopup,
         searchAtom,
-        orderBy,
+        sortBy,
         dataStore,
         action.domain,
         root,
