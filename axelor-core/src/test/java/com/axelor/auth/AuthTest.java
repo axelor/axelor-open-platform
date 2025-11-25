@@ -238,6 +238,7 @@ public class AuthTest extends JpaTest {
     authService.encrypt(user2);
 
     users.save(user2);
+    users.flush();
 
     assertNotNull(user2.getCreatedBy());
 

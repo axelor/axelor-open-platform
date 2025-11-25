@@ -117,11 +117,6 @@ public final class JPA {
         .multiLoad(ids);
   }
 
-  private static boolean isAutoFlushEnabled() {
-    return !Objects.equals(
-        "false", em().getEntityManagerFactory().getProperties().get("JPA.auto_flush"));
-  }
-
   /**
    * Make an entity managed and persistent.
    *
@@ -131,9 +126,6 @@ public final class JPA {
     // optimistic concurrency check
     checkVersion(entity, entity.getVersion());
     em().persist(entity);
-    if (isAutoFlushEnabled()) {
-      em().flush();
-    }
     return entity;
   }
 
@@ -145,11 +137,7 @@ public final class JPA {
   public static <T extends Model> T merge(T entity) {
     // optimistic concurrency check
     checkVersion(entity, entity.getVersion());
-    T result = em().merge(entity);
-    if (isAutoFlushEnabled()) {
-      em().flush();
-    }
-    return result;
+    return em().merge(entity);
   }
 
   /**

@@ -327,6 +327,36 @@ Additionally, a new feature has been introduced that allows developers to regist
 If you were using a custom Hibernate interceptor, we encourage you to migrate to event listeners as well, in order to address these issues.
 For details, refer to xref:dev-guide:modules/hibernate-listeners.adoc[Hibernate Event Listeners Documentation].
 
+== Removal of explicit EntityManager.flush()
+
+> 🏷️ This change was introduced in version 8.0.2
+
+The goal of this change is to significantly improve performance by enabling JDBC batching and reducing unnecessary
+database round trips. We have removed the practice of explicitly calling `entityManager.flush()` after every
+`persist()`, `save()` and `merge()` operation.
+
+The explicit `flush()` call forced Hibernate to execute the pending SQL INSERT/UPDATE statement immediately. The new
+policy relies on the standard: changes are accumulated in the Hibernate Session (the Persistence Context) and only
+executed against the database when the transaction is automatically/manually flushed (e.g., before a query) or, most
+commonly, when the transaction is committed.
+
+For most code, no changes are required. However, developers must be aware of the following scenarios where code
+might have relied on the immediate flush behavior.
+
+- Constraint violations detected at next flush or transaction commit instead of during `save()`
+- JPA lifecycle callbacks (`@PrePersist`, `@PostPersist`, `@PreUpdate`, `@PostUpdate`, etc.) execute at flush time
+rather than immediately after `save()`
+- JPA event listeners and entity interceptors (e.g., setting `createdBy`/`updatedBy`) trigger at flush
+time, not during `save()`
+- SQL execution order may shift slightly due to batching (no functional impact)
+- The changes are now not visible to native SQL or other connections/sessions until the transaction successfully commits
+
+Code that expects entity state to be populated by listeners/interceptors immediately after `save()` must call `flush()`
+explicitly. For example, asserting createdBy field after `save()` now requires `flush()` to trigger the audit
+listener. Similarly, execute a native SQL query that depends on data you have recently modified (via
+`persist()`/`save()`/`merge()`) within the same transaction, you must manually call `flush()` just before the native
+query execution to avoid reading stale data.
+
 == Guice 5.1 to Guice 7.0
 
 Guice 7.0 supports the Jakarta EE namespace and is part of the Jakarta EE migration. Compared to previous versions, it has completely dropped support for the `javax.*` namespace.

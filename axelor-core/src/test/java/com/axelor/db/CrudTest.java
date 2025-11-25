@@ -127,6 +127,7 @@ public class CrudTest extends JpaTest {
 
     contact.setPhone("9876543210");
     contacts.save(contact);
+    contacts.flush();
 
     Integer versionNext = contact.getVersion();
 
