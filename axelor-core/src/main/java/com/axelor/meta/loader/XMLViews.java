@@ -225,7 +225,7 @@ public class XMLViews {
     try {
       marshal(views, writer);
     } catch (JAXBException e) {
-      log.error(e.getMessage(), e);
+      throw new RuntimeException(e);
     }
     String text = writer.toString();
     if (strip) {
