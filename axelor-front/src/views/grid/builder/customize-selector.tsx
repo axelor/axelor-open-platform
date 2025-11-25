@@ -90,7 +90,7 @@ export function CustomizeSelectorDialog({
         .map((item) => ({
           id: nextId(),
           name: `${item.jsonField}.${item.name}`,
-          type: item.type === "button" ? "button" : "field",
+          type: "field",
           label: item.title || item.autoTitle,
         })),
     ) as DataRecord[];

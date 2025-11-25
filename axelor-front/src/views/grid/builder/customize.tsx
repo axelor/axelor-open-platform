@@ -6,7 +6,7 @@ import { useAtomCallback } from "jotai/utils";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
-import { Field, GridView } from "@/services/client/meta.types";
+import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
@@ -91,6 +91,12 @@ function CustomizeDialog({
                 String(mainGridItem.width)!,
               )}`;
             }
+          }
+          if ((schemaItem as JsonField).jsonField) {
+            return {
+              name: schemaItem.name,
+              type: "field",
+            };
           }
           return schemaItem;
         });
