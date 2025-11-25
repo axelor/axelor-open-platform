@@ -1149,7 +1149,7 @@ function GridInner(props: ViewProps<GridView>) {
   useViewTabRefresh("grid", onSearch);
 
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
-  const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
+  const canMassUpdate = perms?.massUpdate != false && hasButton("edit") && massUpdateFields.length > 0;
 
   const { treeLimit, treeField, treeFieldTitle } = view;
   const widget = toKebabCase(view.widget ?? "");

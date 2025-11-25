@@ -25,6 +25,7 @@ import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
@@ -202,11 +203,12 @@ public final class MetaStore {
     }
 
     Map<String, Object> perms = getPermissions(modelClass);
-    if (massUpdate) {
+    boolean isSafeForBulkUpdate = EntityHelper.isSafeForBulkUpdate(modelClass);
+    if (!isSafeForBulkUpdate) {
       if (perms == null) {
         perms = new HashMap<>();
       }
-      perms.put("massUpdate", massUpdate);
+      perms.put("massUpdate", false);
     }
 
     // find dotted json fields

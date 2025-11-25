@@ -29,6 +29,10 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.persister.entity.JoinedSubclassEntityPersister;
+import org.hibernate.persister.entity.UnionSubclassEntityPersister;
 import org.hibernate.proxy.HibernateProxy;
 
 /** This class provides helper methods for model objects. */
@@ -173,5 +177,45 @@ public final class EntityHelper {
   public static <T> boolean isUninitialized(T entity) {
     return entity instanceof HibernateProxy
         && ((HibernateProxy) entity).getHibernateLazyInitializer().isUninitialized();
+  }
+
+  /**
+   * Retrieves the {@link EntityPersister} for the given entity class model.
+   *
+   * @param model the entity class for which the EntityPersister is to be fetched
+   * @return the EntityPersister associated with the given entity class
+   */
+  public static EntityPersister getEntityPersister(Class<?> model) {
+    SessionFactoryImplementor sessionFactory =
+        JPA.em().getEntityManagerFactory().unwrap(SessionFactoryImplementor.class);
+    return sessionFactory.getMetamodel().entityPersister(model);
+  }
+
+  /**
+   * Determines whether the specified model class is safe for bulk update operations.
+   *
+   * <p>As soon as the model involves multi tables to update, it shouldn't be safe for bulk update.
+   *
+   * @param model the entity class to check for bulk update safety
+   * @return true if the model is safe for bulk update; false otherwise
+   */
+  public static boolean isSafeForBulkUpdate(Class<?> model) {
+    EntityPersister entityPersister = getEntityPersister(model);
+
+    // Case TABLE_PER_CLASS
+    // isMultiTable() -> isAbstract() || hasSubclasses() -> implies UNION query -> Unsafe
+    if (entityPersister instanceof UnionSubclassEntityPersister) {
+      return !((UnionSubclassEntityPersister) entityPersister).isMultiTable();
+    }
+
+    // Case JOINED
+    // getTableSpan() < 2 -> implies Root Entity (1 table) -> Safe
+    // If getTableSpan() >= 2 -> implies Child Entity (joined tables) -> Unsafe
+    if (entityPersister instanceof JoinedSubclassEntityPersister) {
+      return ((JoinedSubclassEntityPersister) entityPersister).getTableSpan() < 2;
+    }
+
+    // Case SINGLE_TABLE (Default) -> Always Safe
+    return true;
   }
 }

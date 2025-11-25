@@ -1386,6 +1386,11 @@ public class Resource<T extends Model> {
   @SuppressWarnings("unchecked")
   public Response updateMass(Request request) {
 
+    if (!EntityHelper.isSafeForBulkUpdate(model)) {
+      throw new UnsupportedOperationException(
+          "Mass update not supported on " + model.getName() + " due to inheritance strategy");
+    }
+
     security.get().check(JpaSecurity.CAN_WRITE, model);
 
     if (LOG.isTraceEnabled()) {
