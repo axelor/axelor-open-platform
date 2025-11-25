@@ -76,13 +76,33 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 * `equalsIncludeAll` - whether to include all the simple non-function fields in equality test (default is false)
 * `jsonAttrs` - whether to enable/disable generating "attrs" json field
 
-The `strategy` attribute can be used on base entity only.
+The `strategy` attribute can be used on base entity only. Each strategy results in a different database structure with
+specific trade-offs regarding performance and data integrity.
+
+* `SINGLE`: The Single table strategy creates one table for the entire class hierarchy. This is the default if it is
+not explicitly specified.
+* `JOINED`: The Joined strategy creates a separate table for each class, containing only its specific fields. The child
+table links to the parent table via a Foreign Key. This is the most normalized approach.
+* `CLASS`: The Class strategy (referring `InheritanceType.TABLE_PER_CLASS`) creates separate and independent table for
+every concrete class. Each table contains all columns (inherited and specific).
+
+[WARNING]
+====
+**Choose your strategy carefully.**
+
+Changing the inheritance strategy after going to production requires a complex data migration.
+
+* **Recommended:** Use `SINGLE` for simple hierarchies or `JOINED` for complex data models requiring strict data
+integrity.
+* **Caution with `CLASS`:** While the `CLASS` strategy may seem convenient, it has significant drawbacks related to
+performance: queries targeting the parent entity can become extremely slow as data grows (due to `UNION ALL`
+operations).
+====
 
 The `persistable` attribute can be used to define a non-persistable entity class
 annotated with `@MappedSuperclass` that can be used as base class of other entities.
 
-The `<module>` tag can be used to define package names of the generated entities
-& repositories:
+The `<module>` tag can be used to define package names of the generated entities and repositories:
 
 [source,xml]
 ----
