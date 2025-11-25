@@ -243,7 +243,7 @@ export const Grid = forwardRef<
       .map((item) => {
         const field = fields?.[item.name!];
         const title = item.title ?? item.autoTitle;
-        const attrs = item.widgetAttrs;
+        const attrs = { ...field?.widgetAttrs, ...item.widgetAttrs };
         const serverType = (item as Field).serverType || field?.type;
         const columnProps: Partial<GridColumn> = {};
         const extraAttrs = columnAttrs?.[item.name!];
@@ -263,7 +263,11 @@ export const Grid = forwardRef<
           columnProps.computed = true;
         }
 
-        if (item.type === "button" || item.widget === "icon") {
+        if (
+          widget === "button" ||
+          item.type === "button" ||
+          item.widget === "icon"
+        ) {
           columnProps.sortable = false;
           columnProps.searchable = false;
           columnProps.editable = false;
