@@ -5,7 +5,7 @@ import { FocusEventHandler, useCallback, useId, useMemo } from "react";
 import { moment } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { MaskedInput } from "../date/mask-input";
+import { MaskedInput } from "@/components/masked-input";
 import { ViewerInput } from "../string/viewer";
 
 function toText(
@@ -96,6 +96,19 @@ export function Duration(props: FieldProps<string | number>) {
     [big, seconds, value],
   );
 
+  const mask = useMemo(
+    () => [
+      ...(big ? [/\d/] : []),
+      /\d/,
+      /\d/,
+      ":",
+      /[0-5]/,
+      /\d/,
+      ...(seconds ? [":", /[0-5]/, /\d/] : []),
+    ],
+    [big, seconds],
+  );
+
   return (
     <FieldControl {...props} inputId={id}>
       {readonly && <ViewerInput id={id} name={schema.name} value={displayText} />}
@@ -114,15 +127,7 @@ export function Duration(props: FieldProps<string | number>) {
           onChange={onChange}
           onBlur={handleBlur}
           onKeyDown={onKeyDown}
-          mask={[
-            ...(big ? [/\d/] : []),
-            /\d/,
-            /\d/,
-            ":",
-            /[0-5]/,
-            /\d/,
-            ...(seconds ? [":", /[0-5]/, /\d/] : []),
-          ]}
+          mask={mask}
         />
       )}
     </FieldControl>

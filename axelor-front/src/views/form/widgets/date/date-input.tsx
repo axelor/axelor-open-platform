@@ -1,7 +1,7 @@
 import { AdornedInput, Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { forwardRef, useCallback, useRef } from "react";
-import { MaskedInput } from "./mask-input";
+import { MaskedInput } from "@/components/masked-input";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 const CHAR_MASK: Record<string, (RegExp | ((ch: string) => RegExp))[]> = {

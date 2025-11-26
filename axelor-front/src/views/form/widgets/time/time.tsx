@@ -6,7 +6,7 @@ import format from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { MaskedInput } from "../date/mask-input";
+import { MaskedInput } from "@/components/masked-input";
 import { ViewerInput } from "../string/viewer";
 
 const isValid = (value: string) => !value.includes("_");

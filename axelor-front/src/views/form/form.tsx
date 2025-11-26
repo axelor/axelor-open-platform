@@ -3,7 +3,6 @@ import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniq from "lodash/uniq";
 import {
-  MutableRefObject,
   RefObject,
   SyntheticEvent,
   memo,
@@ -432,7 +431,7 @@ const FormContainer = memo(function FormContainer({
   perms,
 }: ViewProps<FormView> & {
   record: DataRecord;
-  recordRef: MutableRefObject<DataRecord | null>;
+  recordRef: RefObject<DataRecord | null>;
   isLoading?: boolean;
   perms?: Perms;
 }) {
