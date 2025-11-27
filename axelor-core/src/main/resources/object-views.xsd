@@ -5,7 +5,7 @@
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="8.0">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="8.1">
 
   <xsd:annotation>
     <xsd:documentation>
