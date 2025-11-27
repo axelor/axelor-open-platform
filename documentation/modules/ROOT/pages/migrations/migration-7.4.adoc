@@ -24,9 +24,10 @@ It also brings new features such as studio and advance import/export.
 
 Run following SQL script to adjust `auth_permission` and `meta_permission_rule` tables changes :
 
-```sql
+[source,sql]
+----
 ALTER TABLE auth_permission ADD COLUMN can_import boolean;
 ALTER TABLE meta_permission_rule ADD COLUMN can_import boolean;
-```
+----
 
 This is used only by enterprise edition for the moment to fine-grained data import permissions support.

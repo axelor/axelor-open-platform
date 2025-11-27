@@ -231,9 +231,10 @@ changelog {
 
 To generate the `CHANGELOG.md` with unreleased entries, run the following Gradle task:
 
-```
+[source,shell]
+----
 ./gradlew generateChangelog
-```
+----
 
 NOTE: `--preview` argument can also be used to preview the generated changelog without deleting/updating files.
 
