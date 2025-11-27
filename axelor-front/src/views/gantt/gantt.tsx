@@ -25,7 +25,11 @@ import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import format from "@/utils/format";
 import { compare } from "@/utils/sort";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+import {
+  useViewContext,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import { formatRecord, getFieldNames, transformRecord } from "./utils";
@@ -182,16 +186,19 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       const set = connectSetTypes[`${source}_${target}`];
       const record = records.find((r) => r.id === finishId);
       if (record) {
-        const $set: DataRecord[] = record[set] || [];
+        const $set: DataRecord[] = formatter(record)?.[set] || [];
         if (!$set?.find((obj) => String(obj.id) === String(startId))) {
           return updateRecord({
-            ...record,
-            [set]: [...$set, { id: startId }],
+            id: record.id,
+            version: record.version,
+            ...transformer({
+              [set]: [...$set, { id: startId }],
+            } as unknown as GanttRecord),
           });
         }
       }
     },
-    [records, updateRecord],
+    [records, formatter, transformer, updateRecord],
   );
 
   const handleRecordDisconnect = useCallback(
@@ -199,14 +206,17 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       const set = connectSetTypes[`${source}_${target}`];
       const record = records.find((r) => r.id === finishId);
       if (record) {
-        const $set: DataRecord[] = record[set] || [];
+        const $set: DataRecord[] = formatter(record)?.[set] || [];
         return updateRecord({
-          ...record,
-          [set]: $set?.filter((obj) => String(obj.id) !== String(startId)),
+          id: record.id,
+          version: record.version,
+          ...transformer({
+            [set]: $set?.filter((obj) => String(obj.id) !== String(startId)),
+          } as unknown as GanttRecord),
         });
       }
     },
-    [records, updateRecord],
+    [records, transformer, formatter, updateRecord],
   );
 
   const handleRecordUpdate = useCallback(
