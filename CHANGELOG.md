@@ -4852,12 +4852,12 @@
   <field name="myTextField" widget="markdown"/>
   ```
   
-  | Attribute           | Description                                                    |
-  | ------------------- | -------------------------------------------------------------- |
-  |`x-lite`             | Enable lite toolbar (defaults to `false`)                      |
-  |`x-preview-style`    | Markdown editor's preview style: `tab` (default), `vertical`   |
-  |`x-initial-edit-type`| Initial editor type: `markdown` (default), `wysiwyg`           |
-  |`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`) |
+  | Attribute             | Description                                                    |
+  |-----------------------|----------------------------------------------------------------|
+  | `x-lite`              | Enable lite toolbar (defaults to `false`)                      |
+  | `x-preview-style`     | Markdown editor's preview style: `tab` (default), `vertical`   |
+  | `x-initial-edit-type` | Initial editor type: `markdown` (default), `wysiwyg`           |
+  | `x-hide-mode-switch`  | Whether to hide edit typo switch tab bar (defaults to `false`) |
   
   </details>
 
