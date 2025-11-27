@@ -45,6 +45,9 @@
 
     <one-to-many name="flags" ref="MailFlags" mappedBy="message" />
 
+    <boolean name="emailSent" index="true" />
+    <datetime name="emailSentOn" />
+
     <index columns="relatedModel,relatedId" />
   </entity>
 

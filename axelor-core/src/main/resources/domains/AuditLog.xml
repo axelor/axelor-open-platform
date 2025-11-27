@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.1.xsd">
+
+  <module name="audit" package="com.axelor.audit.db" />
+
+  <entity name="AuditLog" table="AUDIT_LOG">
+    <![CDATA[
+    Stores raw audit data for asynchronous processing.
+    Decouples entity changes from audit message generation.
+
+    Multiple AuditLog records may exist for same entity within same transaction.
+    AuditLogProcessor consolidates these during background processing.
+    ]]>
+
+    <string name="relatedModel" required="true" index="true" />
+    <long name="relatedId" required="true" index="true" />
+    <string name="txId" required="true" index="true" />
+    <enum name="eventType" required="true" ref="AuditEventType" />
+    <string name="currentState" large="true" />
+    <string name="previousState" large="true" />
+    <boolean name="processed" default="false" index="true" />
+    <datetime name="processedOn" />
+    <string name="errorMessage" large="true" />
+    <integer name="retryCount" default="0" index="true" />
+    <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" />
+
+    <!-- Optimized index for findPending() query - covers filter + supports ordering -->
+    <index columns="processed,retryCount,txId,relatedModel,relatedId" />
+
+    <!-- Optimized index for findRelated() query - covers all filters + ordering -->
+    <index columns="txId,eventType,relatedModel,relatedId,processed,createdOn" />
+  </entity>
+
+  <enum name="AuditEventType">
+    <item name="CREATE" title="Create" />
+    <item name="UPDATE" title="Update" />
+    <item name="DELETE" title="Delete" />
+  </enum>
+
+</domain-models>
