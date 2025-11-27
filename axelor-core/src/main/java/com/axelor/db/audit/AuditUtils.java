@@ -17,8 +17,10 @@ final class AuditUtils {
     return session
         .createQuery("SELECT self FROM User self WHERE self.code = :code", User.class)
         .setParameter("code", code)
-        .setHibernateFlushMode(FlushMode.MANUAL)
+        .setCacheable(true)
+        .setCacheRegion("audit.user.byCode")
         .setCacheMode(CacheMode.NORMAL)
+        .setHibernateFlushMode(FlushMode.MANUAL)
         .uniqueResult();
   }
 
