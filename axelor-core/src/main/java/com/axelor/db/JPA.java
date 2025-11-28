@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -89,12 +90,29 @@ public final class JPA {
   }
 
   /**
-   * Find by primary key.
+   * Finds an entity by its primary key.
    *
+   * @param <T> the type of the model class
+   * @param klass the class of the entity to find
+   * @param id the primary key of the entity to find
+   * @return entity found by the given id, null otherwise
    * @see EntityManager#find(Class, Object)
    */
   public static <T extends Model> T find(Class<T> klass, Long id) {
     return em().find(klass, id);
+  }
+
+  /**
+   * Finds an entity by its primary key.
+   *
+   * @param <T> the type of the model class
+   * @param klass the class of the entity to find
+   * @param id the primary key of the entity to find
+   * @return an {@code Optional} containing the found entity, or {@code Optional#empty()} if not
+   *     found
+   */
+  public static <T extends Model> Optional<T> findById(Class<T> klass, Long id) {
+    return Optional.ofNullable(find(klass, id));
   }
 
   /**
@@ -120,6 +138,31 @@ public final class JPA {
   private static boolean isAutoFlushEnabled() {
     return !Objects.equals(
         "false", em().getEntityManagerFactory().getProperties().get("JPA.auto_flush"));
+  }
+
+  /**
+   * Retrieves a reference (proxy) to an entity instance with the specified ID without immediately
+   * loading its state from the database.
+   *
+   * <p>This method delegates to {@link jakarta.persistence.EntityManager#getReference(Class,
+   * Object)}. It is designed for performance optimization, particularly when you need to associate
+   * an entity (set a foreign key) without the overhead of a database SELECT query.
+   *
+   * <p><strong>Note:</strong> The returned object is likely a dynamic proxy. The database will only
+   * be accessed when you invoke a method on the proxy (other than getting the ID). If the entity
+   * does not exist in the database, an {@link jakarta.persistence.EntityNotFoundException} will be
+   * thrown at the time of that access, not at the time of calling this method.
+   *
+   * @param <T> the type of the model class
+   * @param modelClass the class of the entity to retrieve
+   * @param id the primary key of the entity
+   * @return a managed entity proxy instance with the state lazily fetched
+   * @throws jakarta.persistence.EntityNotFoundException if the entity state is accessed, and the
+   *     entity does not exist in the database
+   * @see jakarta.persistence.EntityManager#getReference(Class, Object)
+   */
+  public static <T extends Model> T getReferenceById(Class<T> modelClass, Long id) {
+    return JPA.em().getReference(modelClass, id);
   }
 
   /**

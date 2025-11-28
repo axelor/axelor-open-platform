@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The JPA implementation of the {@link Repository}.
@@ -66,6 +67,16 @@ public class JpaRepository<T extends Model> implements Repository<T> {
   @Override
   public T find(Long id) {
     return JPA.find(modelClass, id);
+  }
+
+  @Override
+  public Optional<T> findById(Long id) {
+    return JPA.findById(modelClass, id);
+  }
+
+  @Override
+  public T getReferenceById(Long id) {
+    return JPA.getReferenceById(modelClass, id);
   }
 
   @Override

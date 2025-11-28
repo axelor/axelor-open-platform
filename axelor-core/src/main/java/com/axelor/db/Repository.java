@@ -7,6 +7,7 @@ package com.axelor.db;
 import com.axelor.db.mapper.Property;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The repository interface defines common data access methods.
@@ -50,20 +51,51 @@ public interface Repository<T extends Model> {
   T copy(T entity, boolean deep);
 
   /**
-   * Find by primary key.
+   * Finds an entity by its primary key.
    *
-   * @param id the record id
-   * @return a domain object found by the given id, null otherwise
+   * @param id the entity id to load
+   * @return entity found by the given id, null otherwise
    */
   T find(Long id);
+
+  /**
+   * Finds an entity by its primary key.
+   *
+   * @param id the entity id to load
+   * @return an {@code Optional} containing the found entity, or {@code Optional#empty()} if not
+   *     found
+   */
+  Optional<T> findById(Long id);
 
   /**
    * Find multiple entities by their primary key.
    *
    * @param ids The ids to load
    * @return list of all the matched records
+   * @see com.axelor.db.JPA#findByIds(Class, List)
    */
   List<T> findByIds(List<Long> ids);
+
+  /**
+   * Retrieves a reference (proxy) to an entity instance with the specified ID without immediately
+   * loading its state from the database.
+   *
+   * <p>This method delegates to {@link jakarta.persistence.EntityManager#getReference(Class,
+   * Object)}. It is designed for performance optimization, particularly when you need to associate
+   * an entity (set a foreign key) without the overhead of a database SELECT query.
+   *
+   * <p><strong>Note:</strong> The returned object is likely a dynamic proxy. The database will only
+   * be accessed when you invoke a method on the proxy (other than getting the ID). If the entity
+   * does not exist in the database, an {@link jakarta.persistence.EntityNotFoundException} will be
+   * thrown at the time of that access, not at the time of calling this method.
+   *
+   * @param id the primary key of the entity
+   * @return a managed entity proxy instance with the state lazily fetched
+   * @throws jakarta.persistence.EntityNotFoundException if the entity state is accessed, and the
+   *     entity does not exist in the database
+   * @see jakarta.persistence.EntityManager#getReference(Class, Object)
+   */
+  T getReferenceById(Long id);
 
   /**
    * Save the given entity.
