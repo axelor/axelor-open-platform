@@ -643,7 +643,6 @@ public class Entity implements BaseType<Entity> {
     }
 
     if (notTrue(mappedSuperClass) && isTrue(dynamicUpdate)) {
-      all.add(new JavaAnnotation("org.hibernate.annotations.DynamicInsert"));
       all.add(new JavaAnnotation("org.hibernate.annotations.DynamicUpdate"));
     }
 

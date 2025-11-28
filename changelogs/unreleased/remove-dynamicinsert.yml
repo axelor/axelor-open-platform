@@ -1,0 +1,6 @@
+---
+title: Remove `@DynamicInsert` support
+type: remove
+description: |
+  `@DynamicInsert` on entities provides almost zero benefit. In fact, it often decreases performance because it 
+  prevents `PreparedStatement` caching. The support is removed. No changes are expected.
