@@ -4,6 +4,8 @@
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.common.StringUtils;
+import com.axelor.gradle.AxelorExtension;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
-import com.axelor.common.StringUtils;
-import com.axelor.gradle.AxelorExtension;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
