@@ -1,0 +1,13 @@
+---
+title: Improve `@DynamicUpdate` support
+type: change
+description: |
+  Currently, `@DynamicUpdate` is added on entity having a computed persisted field.
+  The annotation prevents using cached `PreparedStatement` but it generates a new SQL string specifically for that 
+  transaction, compiles it, and executes it. 
+  
+  We now apply this annotation only when the cost of generating the SQL is outweighed by the savings in database I/O.
+  Cases are : 
+  - large tables (+30 fields): prevent massive, unnecessary data payloads
+  - tables with large objects (binary/large fields): ensure heavy binary/large data is not re-transmitted unless it is 
+  actually changed

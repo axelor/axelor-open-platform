@@ -201,7 +201,11 @@ public class Entity implements BaseType<Entity> {
       attrsField.setJson(true);
     }
 
-    dynamicUpdate = getFields().stream().anyMatch(p -> p.isVirtual() && notTrue(p.getTransient()));
+    // Enable `@DynamicUpdate` on large tables or if it has a binary or a large field
+    dynamicUpdate =
+        getFields().size() > 30
+            || getFields().stream().anyMatch(p -> p.isBinary() || isTrue(p.getLarge()));
+
     nameField = getFields().stream().filter(p -> isTrue(p.getNameField())).findFirst().orElse(null);
 
     equalsAll = isTrue(equalsAll);
