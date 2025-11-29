@@ -467,6 +467,7 @@ export interface View {
   title?: string;
   css?: string;
   model?: string;
+  jsonModel?: string;
   editable?: boolean;
   groups?: string;
   helpLink?: string;

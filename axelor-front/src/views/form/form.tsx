@@ -97,7 +97,15 @@ export const fetchRecord = async (
     const related = meta.related;
     return dataStore.read(+id, { fields, related, select });
   }
-  return getDefaultValues(meta.fields, meta.view.items);
+  const defaults = getDefaultValues(meta.fields, meta.view.items);
+
+  // Set jsonModel default value for custom models
+  const { model, jsonModel } = meta.view;
+  if (model === "com.axelor.meta.db.MetaJsonRecord" && jsonModel) {
+    defaults.jsonModel = jsonModel;
+  }
+
+  return defaults;
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {

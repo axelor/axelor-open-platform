@@ -196,8 +196,7 @@
     <field name="attrs" />
   </grid>
 
-  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord"
-    onNew="action-json-record-defaults">
+  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord">
     <panel title="Overview">
       <field name="attrs" colSpan="12" />
     </panel>
@@ -215,6 +214,7 @@
     <field name="modelField" expr="attrs" />
   </action-record>
 
+  <!-- TODO: kept in case old views use it, but needs to be removed eventually -->
   <action-record name="action-json-record-defaults" model="com.axelor.meta.db.MetaJsonRecord">
     <field name="jsonModel" expr="#{jsonModel}" />
   </action-record>

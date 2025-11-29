@@ -122,11 +122,6 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     String onSave = jsonModel.getOnSave();
     String width = jsonModel.getFormWidth();
 
-    onNew =
-        StringUtils.isBlank(onNew)
-            ? "action-json-record-defaults"
-            : "action-json-record-defaults," + onNew;
-
     MetaView formView = jsonModel.getFormView();
     if (formView == null) {
       formView = new MetaView();
@@ -149,11 +144,11 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(" model=")
             .append('"')
             .append(formView.getModel())
-            .append('"')
-            .append(" onNew=")
-            .append('"')
-            .append(onNew)
             .append('"');
+
+    if (!StringUtils.isBlank(onNew)) {
+      xml.append(" onNew=").append('"').append(onNew).append('"');
+    }
 
     if (!StringUtils.isBlank(onSave)) {
       xml.append(" onSave=").append('"').append(onSave).append('"');
