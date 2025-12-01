@@ -42,7 +42,11 @@ public class AuditTrail
               .getActionQueue()
               .registerProcess(
                   (AfterTransactionCompletionProcess)
-                      (success, session) -> trackers.remove(transaction));
+                      (success, session) -> {
+                        trackers
+                            .remove(transaction)
+                            .doAfterTransactionCompletion(success, sourceSession);
+                      });
           return tracker;
         });
   }

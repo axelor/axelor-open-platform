@@ -37,11 +37,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.hibernate.FlushMode;
+import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /** This class provides change tracking for auditing and notifications. */
-public class AuditTracker implements BeforeTransactionCompletionProcess {
+public class AuditTracker
+    implements BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
 
   private final String txId;
 
@@ -52,6 +55,7 @@ public class AuditTracker implements BeforeTransactionCompletionProcess {
   private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
 
   private final Queue<AuditLog> queue = new ConcurrentLinkedQueue<>();
+  private boolean logCreated = false;
 
   public AuditTracker() {
     this.txId = generateTxId();
@@ -225,6 +229,7 @@ public class AuditTracker implements BeforeTransactionCompletionProcess {
 
   private void enqueueAuditLog(SessionImplementor session, AuditLog auditLog) {
     queue.add(auditLog);
+    logCreated = true;
     if (queue.size() >= BATCH_SIZE) {
       flushQueue(session, false);
     }
@@ -335,6 +340,14 @@ public class AuditTracker implements BeforeTransactionCompletionProcess {
     }
 
     session.flush();
+  }
+
+  @Override
+  public void doAfterTransactionCompletion(
+      boolean success, SharedSessionContractImplementor session) {
+    if (logCreated) {
+      Beans.get(AuditQueue.class).process(txId);
+    }
   }
 
   @Singleton

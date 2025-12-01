@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,26 +69,34 @@ public class AuditProcessor {
   @Inject private MailFollowerRepository mailFollowerRepository;
   @Inject private ObjectMapper objectMapper;
 
-  /**
-   * Process all pending audit logs in batches. Handles consolidation automatically via unique
-   * constraint.
-   */
+  /** Process all pending audit logs. */
   @Transactional
-  public void processAll() {
+  public void process() {
     log.info("Starting audit log processing...");
+    process(this::findPending);
+  }
 
-    int totalProcessed = 0;
-    int totalFailed = 0;
+  /** Process audit logs for a specific transaction ID. */
+  @Transactional
+  public void process(String txId) {
+    log.info("Starting audit log processing for transaction ID: {}", txId);
+    process(() -> findPending(txId));
+  }
+
+  /** Core processing loop that fetches and processes audit logs in batches. */
+  private void process(Supplier<List<AuditLog>> fetcher) {
+    var totalProcessed = 0;
+    var totalFailed = 0;
 
     while (true) {
-      var batch = findPending();
+      var batch = fetcher.get();
       if (batch.isEmpty()) {
         break;
       }
 
       for (var auditLog : batch) {
         try {
-          processSingle(auditLog);
+          process(auditLog);
           totalProcessed++;
         } catch (Exception e) {
           totalFailed++;
@@ -104,7 +113,7 @@ public class AuditProcessor {
         "Audit log processing complete. Processed: {}, Failed: {}", totalProcessed, totalFailed);
   }
 
-  private void processSingle(AuditLog auditLog) throws Exception {
+  private void process(AuditLog auditLog) throws Exception {
     // Check if already processed (might be consolidated with previous)
     if (Boolean.TRUE.equals(auditLog.getProcessed())) {
       return;
@@ -158,16 +167,160 @@ public class AuditProcessor {
     var entityClass = Class.forName(relatedModel).asSubclass(Model.class);
     var entity = JPA.em().find(entityClass, relatedId);
 
-    entityState.entity = entity;
-    entityState.values = consolidatedNew;
-    entityState.oldValues = consolidatedOld;
+    // If entity is deleted, skip processing
+    if (entity != null) {
+      entityState.entity = entity;
+      entityState.values = consolidatedNew;
+      entityState.oldValues = consolidatedOld;
 
-    // Process the audit log
-    process(entityState, auditLog.getUser());
+      // Process the audit log
+      process(entityState, auditLog.getUser());
+    }
 
     for (var log : group) {
       log.setProcessed(true);
       log.setProcessedOn(LocalDateTime.now());
+    }
+  }
+
+  private void process(EntityState state, User user) {
+
+    final Model entity = state.entity;
+    final Mapper mapper = Mapper.of(entity.getClass());
+    final MailMessage message = new MailMessage();
+
+    final ModelTracking track = AuditTracker.getTrack(entity);
+
+    final Map<String, Object> values = state.values;
+    final Map<String, Object> oldValues = state.oldValues;
+    final Map<String, Object> previousState = oldValues.isEmpty() ? null : oldValues;
+
+    final ScriptBindings bindings = new ScriptBindings(state.values);
+    final ScriptHelper scriptHelper = new CompositeScriptHelper(bindings);
+
+    final List<Map<String, String>> tags = new ArrayList<>();
+    final List<Map<String, String>> tracks = new ArrayList<>();
+    final Set<String> tagFields = new HashSet<>();
+
+    final Function<String, Map<String, Object>> jsonValues = new JsonValues(values);
+    final Function<String, Map<String, Object>> oldJsonValues = new JsonValues(oldValues);
+
+    // find matched message
+    String msg = findMessage(track, track.getMessages(), values, oldValues, scriptHelper);
+
+    // find matched content message
+    String content = findMessage(track, track.getContents(), values, oldValues, scriptHelper);
+
+    for (FieldTracking field : track.getFields()) {
+
+      if (!hasEvent(track, field, TrackEvent.ALWAYS)
+          && !hasEvent(
+              track, field, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
+        continue;
+      }
+
+      if (!isBlank(field.getCondition()) && !scriptHelper.test(field.getCondition())) {
+        continue;
+      }
+
+      final String name = field.getFieldName();
+      final Property property = mapper.getProperty(entity, field.getName());
+      if (property == null) {
+        log.debug("{} field not found", field.getName());
+        continue;
+      }
+
+      String title = property.getTitle();
+      if (isBlank(title)) {
+        title = Inflector.getInstance().humanize(name);
+      }
+
+      final Object value = getValue(values, jsonValues, field, property);
+      final Object oldValue = getValue(oldValues, oldJsonValues, field, property);
+
+      if (Objects.equals(value, oldValue)) {
+        continue;
+      }
+
+      tagFields.add(name);
+
+      final Map<String, String> item = new HashMap<>();
+      item.put("name", property.getName());
+      item.put("title", title);
+      item.put("value", format(property, value));
+
+      if (oldValue != null) {
+        item.put("oldValue", format(property, oldValue));
+      }
+
+      tracks.add(item);
+    }
+
+    // find matched tags
+    for (TrackMessage tm : track.getMessages()) {
+      boolean canTag =
+          tm.fields().length == 0 || (tm.fields().length == 1 && isBlank(tm.fields()[0]));
+      for (String name : tm.fields()) {
+        if (isBlank(name)) {
+          continue;
+        }
+        canTag = tagFields.contains(name);
+        if (canTag) {
+          break;
+        }
+      }
+      if (!canTag) {
+        continue;
+      }
+      if (hasEvent(track, tm, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
+        if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
+          final Map<String, String> item = new HashMap<>();
+          item.put("title", tm.message());
+          item.put("style", tm.tag());
+          tags.add(item);
+        }
+      }
+    }
+
+    // don't generate empty tracking info
+    if (msg == null && content == null && tracks.isEmpty()) {
+      return;
+    }
+
+    if (msg == null) {
+      msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
+    }
+
+    final Map<String, Object> json = new HashMap<>();
+    json.put("title", msg);
+    json.put("tags", tags);
+    json.put("tracks", tracks);
+
+    if (!StringUtils.isBlank(content)) {
+      json.put("content", content);
+    }
+
+    message.setSubject(msg);
+    message.setBody(toJSON(json));
+    message.setAuthor(user);
+    message.setRelatedId(entity.getId());
+    message.setRelatedModel(entity.getClass().getName());
+    message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
+
+    mailMessageRepository.save(message);
+
+    try {
+      message.setRelatedName(mapper.getNameField().get(entity).toString());
+    } catch (Exception e) {
+    }
+
+    if (previousState == null && track.isSubscribe()) {
+      final MailFollower follower = new MailFollower();
+      follower.setRelatedId(entity.getId());
+      follower.setRelatedModel(entity.getClass().getName());
+      follower.setUser(user);
+      follower.setArchived(false);
+      mailFollowerRepository.save(follower);
     }
   }
 
@@ -194,6 +347,19 @@ public class AuditProcessor {
         .filter("self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry")
         .bind("maxRetry", MAX_RETRY)
         .order("txId")
+        .order("relatedModel")
+        .order("relatedId")
+        .order("eventType")
+        .order("createdOn")
+        .fetch(BATCH_SIZE);
+  }
+
+  private List<AuditLog> findPending(String txId) {
+    return Query.of(AuditLog.class)
+        .filter(
+            "self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry AND self.txId = :txId")
+        .bind("maxRetry", MAX_RETRY)
+        .bind("txId", txId)
         .order("relatedModel")
         .order("relatedId")
         .order("eventType")
@@ -384,147 +550,6 @@ public class AuditProcessor {
     } catch (Exception e) {
     }
     return null;
-  }
-
-  private void process(EntityState state, User user) {
-
-    final Model entity = state.entity;
-    final Mapper mapper = Mapper.of(entity.getClass());
-    final MailMessage message = new MailMessage();
-
-    final ModelTracking track = AuditTracker.getTrack(entity);
-
-    final Map<String, Object> values = state.values;
-    final Map<String, Object> oldValues = state.oldValues;
-    final Map<String, Object> previousState = oldValues.isEmpty() ? null : oldValues;
-
-    final ScriptBindings bindings = new ScriptBindings(state.values);
-    final ScriptHelper scriptHelper = new CompositeScriptHelper(bindings);
-
-    final List<Map<String, String>> tags = new ArrayList<>();
-    final List<Map<String, String>> tracks = new ArrayList<>();
-    final Set<String> tagFields = new HashSet<>();
-
-    final Function<String, Map<String, Object>> jsonValues = new JsonValues(values);
-    final Function<String, Map<String, Object>> oldJsonValues = new JsonValues(oldValues);
-
-    // find matched message
-    String msg = findMessage(track, track.getMessages(), values, oldValues, scriptHelper);
-
-    // find matched content message
-    String content = findMessage(track, track.getContents(), values, oldValues, scriptHelper);
-
-    for (FieldTracking field : track.getFields()) {
-
-      if (!hasEvent(track, field, TrackEvent.ALWAYS)
-          && !hasEvent(
-              track, field, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
-        continue;
-      }
-
-      if (!isBlank(field.getCondition()) && !scriptHelper.test(field.getCondition())) {
-        continue;
-      }
-
-      final String name = field.getFieldName();
-      final Property property = mapper.getProperty(entity, field.getName());
-      if (property == null) {
-        log.debug("{} field not found", field.getName());
-        continue;
-      }
-
-      String title = property.getTitle();
-      if (isBlank(title)) {
-        title = Inflector.getInstance().humanize(name);
-      }
-
-      final Object value = getValue(values, jsonValues, field, property);
-      final Object oldValue = getValue(oldValues, oldJsonValues, field, property);
-
-      if (Objects.equals(value, oldValue)) {
-        continue;
-      }
-
-      tagFields.add(name);
-
-      final Map<String, String> item = new HashMap<>();
-      item.put("name", property.getName());
-      item.put("title", title);
-      item.put("value", format(property, value));
-
-      if (oldValue != null) {
-        item.put("oldValue", format(property, oldValue));
-      }
-
-      tracks.add(item);
-    }
-
-    // find matched tags
-    for (TrackMessage tm : track.getMessages()) {
-      boolean canTag =
-          tm.fields().length == 0 || (tm.fields().length == 1 && isBlank(tm.fields()[0]));
-      for (String name : tm.fields()) {
-        if (isBlank(name)) {
-          continue;
-        }
-        canTag = tagFields.contains(name);
-        if (canTag) {
-          break;
-        }
-      }
-      if (!canTag) {
-        continue;
-      }
-      if (hasEvent(track, tm, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
-        if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
-          final Map<String, String> item = new HashMap<>();
-          item.put("title", tm.message());
-          item.put("style", tm.tag());
-          tags.add(item);
-        }
-      }
-    }
-
-    // don't generate empty tracking info
-    if (msg == null && content == null && tracks.isEmpty()) {
-      return;
-    }
-
-    if (msg == null) {
-      msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
-    }
-
-    final Map<String, Object> json = new HashMap<>();
-    json.put("title", msg);
-    json.put("tags", tags);
-    json.put("tracks", tracks);
-
-    if (!StringUtils.isBlank(content)) {
-      json.put("content", content);
-    }
-
-    message.setSubject(msg);
-    message.setBody(toJSON(json));
-    message.setAuthor(user);
-    message.setRelatedId(entity.getId());
-    message.setRelatedModel(entity.getClass().getName());
-    message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
-
-    mailMessageRepository.save(message);
-
-    try {
-      message.setRelatedName(mapper.getNameField().get(entity).toString());
-    } catch (Exception e) {
-    }
-
-    if (previousState == null && track.isSubscribe()) {
-      final MailFollower follower = new MailFollower();
-      follower.setRelatedId(entity.getId());
-      follower.setRelatedModel(entity.getClass().getName());
-      follower.setUser(user);
-      follower.setArchived(false);
-      mailFollowerRepository.save(follower);
-    }
   }
 
   private static class EntityState {

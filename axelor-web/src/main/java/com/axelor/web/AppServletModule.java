@@ -10,6 +10,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.audit.AuditModule;
 import com.axelor.db.tenants.TenantFilter;
 import com.axelor.meta.MetaScanner;
 import com.axelor.quartz.SchedulerModule;
@@ -57,9 +58,10 @@ public class AppServletModule extends ServletModule {
   protected List<? extends Module> getModules() {
     final AuthModule authModule = new AuthModule(getServletContext());
     final AppModule appModule = new AppModule();
+    final AuditModule auditModule = new AuditModule();
     final SchedulerModule schedulerModule = new SchedulerModule();
     final WebSocketModule webSocketModule = new WebSocketModule();
-    return Arrays.asList(authModule, appModule, schedulerModule, webSocketModule);
+    return Arrays.asList(authModule, appModule, auditModule, schedulerModule, webSocketModule);
   }
 
   protected void afterConfigureServlets() {
