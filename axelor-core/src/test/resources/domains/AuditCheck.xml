@@ -3,22 +3,29 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.1.xsd">
 
-  <module name="test" package="com.axelor.test.db"/>
+  <module name="test" package="com.axelor.test.db" />
 
   <entity name="AuditCheck" table="AUDIT_CHECK" sequential="true">
-    <string name="name"/>
-    <string name="email"/>
-    <string name="empSeq" sequence="seq.emp.id"/>
-    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User"/>
+    <string name="name" />
+    <string name="email" />
+    <string name="empSeq" sequence="seq.emp.id" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
 
-    <track>
-      <field name="name"/>
-      <field name="email" on="ALWAYS"/>
-      <field name="empSeq" on="CREATE"/>
-      <field name="user"/>
+    <track subscribe="true">
+      <field name="name" />
+      <field name="email" on="ALWAYS" />
+      <field name="empSeq" on="CREATE" />
+      <field name="user" />
       <message if="email?.contains('example.com')" on="ALWAYS">Invalid email?</message>
     </track>
 
+  </entity>
+
+  <entity name="AuditCheckNoTracking" table="AUDIT_CHECK_NO_TRACKING" sequential="true">
+    <string name="name" />
+    <string name="email" />
+    <string name="empSeq" sequence="seq.emp.id" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
   </entity>
 
 </domain-models>
