@@ -56,7 +56,7 @@ public class AuditTrail
       final Model entity = (Model) event.getEntity();
       final String[] names = event.getPersister().getPropertyNames();
       final Object[] state = event.getState();
-      tracker.track(entity, names, state, null);
+      tracker.track(session, entity, names, state, null);
       tracker.updated(entity);
     }
 
@@ -73,7 +73,7 @@ public class AuditTrail
       final String[] names = event.getPersister().getPropertyNames();
       final Object[] state = event.getState();
       final Object[] oldState = event.getOldState();
-      tracker.track(entity, names, state, oldState);
+      tracker.track(session, entity, names, state, oldState);
       tracker.updated(entity);
     }
 

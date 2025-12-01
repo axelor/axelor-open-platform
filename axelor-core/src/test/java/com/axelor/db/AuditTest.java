@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
+import com.axelor.audit.db.AuditLog;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.cache.CaffeineTest;
 import com.axelor.concurrent.ContextAware;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
@@ -152,11 +152,11 @@ public class AuditTest extends JpaTest {
   @Test
   @Order(5)
   public void testTrack() {
-    List<MailMessage> messages = Query.of(MailMessage.class).fetch();
-    assertNotNull(messages);
-    assertNotEquals(0, messages.size());
+    List<AuditLog> auditLogs = Query.of(AuditLog.class).fetch();
+    assertNotNull(auditLogs);
+    assertNotEquals(0, auditLogs.size());
     assertTrue(
-        messages.stream().anyMatch(x -> AuditCheck.class.getName().equals(x.getRelatedModel())));
+        auditLogs.stream().anyMatch(x -> AuditCheck.class.getName().equals(x.getRelatedModel())));
   }
 
   @Test
@@ -304,10 +304,10 @@ public class AuditTest extends JpaTest {
     Statistics stats = calculateStatistics(durations, MAX_SIZE);
     stats.memoryDelta = memoryAfter - memoryBefore;
 
-    // Check if entity has audit tracking (check for MailMessage records)
+    // Check if entity has audit tracking (check for AuditLog records)
     try {
       long auditCount =
-          Query.of(MailMessage.class).filter("self.relatedModel = ?", entityType.getName()).count();
+          Query.of(AuditLog.class).filter("self.relatedModel = ?", entityType.getName()).count();
       stats.auditRecordCount = auditCount;
       stats.auditRecordsPerEntity = auditCount / (double) (MAX_SIZE * measurementRuns);
     } catch (Exception e) {
