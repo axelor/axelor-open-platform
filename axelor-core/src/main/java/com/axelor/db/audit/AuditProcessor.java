@@ -172,6 +172,7 @@ public class AuditProcessor {
       entityState.entity = entity;
       entityState.values = consolidatedNew;
       entityState.oldValues = consolidatedOld;
+      entityState.received = auditLog.getCreatedOn();
 
       // Process the audit log
       process(entityState, auditLog.getUser());
@@ -306,6 +307,7 @@ public class AuditProcessor {
     message.setRelatedId(entity.getId());
     message.setRelatedModel(entity.getClass().getName());
     message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
+    message.setReceivedOn(state.received);
 
     mailMessageRepository.save(message);
 
@@ -556,6 +558,7 @@ public class AuditProcessor {
     private Model entity;
     private Map<String, Object> values;
     private Map<String, Object> oldValues;
+    private LocalDateTime received;
   }
 
   private class JsonValues implements Function<String, Map<String, Object>> {

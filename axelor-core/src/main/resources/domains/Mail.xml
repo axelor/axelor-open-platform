@@ -45,6 +45,8 @@
 
     <one-to-many name="flags" ref="MailFlags" mappedBy="message" />
 
+    <datetime name="receivedOn" index="true" />
+
     <boolean name="emailSent" index="true" />
     <datetime name="emailSentOn" />
 

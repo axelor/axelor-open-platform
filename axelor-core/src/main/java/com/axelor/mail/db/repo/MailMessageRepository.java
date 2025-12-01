@@ -32,6 +32,7 @@ import jakarta.inject.Inject;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.persistence.PersistenceException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -329,12 +330,15 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
               + user.getVersion());
     }
 
+    LocalDateTime eventTime =
+        message.getReceivedOn() != null ? message.getReceivedOn() : message.getCreatedOn();
+
     details.put("$from", Resource.toMap(email, "address", "personal"));
     details.put("$author", Resource.toMapCompact(author));
     details.put("$files", files);
     details.put("$eventType", eventType);
     details.put("$eventText", eventText);
-    details.put("$eventTime", message.getCreatedOn());
+    details.put("$eventTime", eventTime);
 
     return details;
   }

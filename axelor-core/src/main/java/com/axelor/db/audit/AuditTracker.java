@@ -26,11 +26,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -241,7 +241,7 @@ public class AuditTracker
     }
 
     var builder = new StringBuilder();
-    var params = new ArrayList<Map<String, Object>>();
+    var params = new ArrayList<AuditLog>();
 
     var n = full ? queue.size() : BATCH_SIZE;
     while (n-- > 0) {
@@ -249,21 +249,12 @@ public class AuditTracker
       if (auditLog == null) {
         break;
       }
-      var values = new HashMap<String, Object>();
-      values.put("txId", auditLog.getTxId());
-      values.put("eventType", auditLog.getEventType());
-      values.put("relatedModel", auditLog.getRelatedModel());
-      values.put("relatedId", auditLog.getRelatedId());
-      values.put("currentState", auditLog.getCurrentState());
-      values.put("previousState", auditLog.getPreviousState());
-      values.put("user", auditLog.getUser());
-      values.put("processed", auditLog.getProcessed());
-      params.add(values);
+      params.add(auditLog);
     }
 
     builder.append("INSERT INTO AuditLog (");
     builder.append(
-        "txId, eventType, relatedModel, relatedId, currentState, previousState, user, processed");
+        "txId, eventType, relatedModel, relatedId, currentState, previousState, user, processed, createdBy, createdOn");
     builder.append(") VALUES ");
 
     for (int i = 0; i < params.size(); i++) {
@@ -287,21 +278,27 @@ public class AuditTracker
           .append(i)
           .append(", :processed")
           .append(i)
+          .append(", :createdBy")
+          .append(i)
+          .append(", :createdOn")
+          .append(i)
           .append(")");
     }
 
     var query = session.createMutationQuery(builder.toString());
 
     for (int i = 0; i < params.size(); i++) {
-      var values = params.get(i);
-      query.setParameter("txId" + i, values.get("txId"));
-      query.setParameter("eventType" + i, values.get("eventType"));
-      query.setParameter("relatedModel" + i, values.get("relatedModel"));
-      query.setParameter("relatedId" + i, values.get("relatedId"));
-      query.setParameter("currentState" + i, values.get("currentState"));
-      query.setParameter("previousState" + i, values.get("previousState"));
-      query.setParameter("user" + i, values.get("user"));
-      query.setParameter("processed" + i, values.get("processed"));
+      var log = params.get(i);
+      query.setParameter("txId" + i, log.getTxId());
+      query.setParameter("eventType" + i, log.getEventType());
+      query.setParameter("relatedModel" + i, log.getRelatedModel());
+      query.setParameter("relatedId" + i, log.getRelatedId());
+      query.setParameter("currentState" + i, log.getCurrentState());
+      query.setParameter("previousState" + i, log.getPreviousState());
+      query.setParameter("user" + i, log.getUser());
+      query.setParameter("processed" + i, log.getProcessed());
+      query.setParameter("createdBy" + i, log.getUser());
+      query.setParameter("createdOn" + i, LocalDateTime.now());
     }
 
     query.setHibernateFlushMode(FlushMode.MANUAL); // Prevent flush during audit log insertion
