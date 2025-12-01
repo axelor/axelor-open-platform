@@ -1,8 +1,0 @@
----
-title: Use Gradle distribution plugin
-type: change
-description: |
-  In recent 8.0, we introduced a new task `buildApp` to build application distribution. Now we rely on built-in Gradle 
-  distribution plugin. It provides `installDist` (replace `buildApp`) but also adds support to package content into ZIP 
-  and TAR archives (ie `distZip` and `distTar`). CLI is still in BETA, so both tasks have been disabled by default. 
-  Request the tasks explicitly to generate the archives.

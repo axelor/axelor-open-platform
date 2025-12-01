@@ -1,7 +1,0 @@
----
-title: Prevent long panel titles from overflowing
-type: fix
-description: |
-  Form panel headers now force their title container to shrink so overly long
-  titles are truncated (ellipsis) instead of spilling outside of the panel
-  frame. Applies to standard panels, o2m/m2m grids, and dashlets.

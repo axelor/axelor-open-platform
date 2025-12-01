@@ -1,7 +1,0 @@
----
-title: Fetch calendar records based on visible range instead of current month
-type: fix
-description: |
-  Previously, records were fetched based on the strict start and end of the current month. This caused missing data for 
-  the trailing days of the previous month and leading days of the next month that were still visible. The fetch logic 
-  now calculates the actual start and end dates of the visible viewport.

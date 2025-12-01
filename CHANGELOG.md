@@ -1,3 +1,119 @@
+## 8.0.2 (2025-12-01)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Quartz from 2.5.0 to 2.5.1
+  - Upgrade Hibernate from 6.6.31 to 6.6.36
+  - Upgrade Groovy from 4.0.28 to 4.0.29
+  - Upgrade Logback from 1.5.19 to 1.5.21
+  - Upgrade Caffeine from 3.2.2 to 3.2.3
+  - Upgrade Undertow from 2.3.19 to 2.3.20
+  - Upgrade Tomcat from 10.1.47 to 10.1.49
+  - Upgrade Bytebuddy from 1.17.7 to 1.17.8
+  - Upgrade Swagger from 2.2.38 to 2.2.40
+  - Upgrade Greenmail from 2.1.6 to 2.1.7
+  - Upgrade Shiro from 2.0.5 to 2.0.6
+  - Upgrade Jackson from 2.19.2 to 2.19.4
+  
+  </details>
+
+* Remove flush from JPA.persist and and JPA.merge
+
+  <details>
+  
+  Removed automatic flush calls from JPA.persist() and JPA.merge() methods to restore JDBC batching for bulk operations.
+  Previously, calling flush inside these methods forced Hibernate to execute SQL immediately, disabling JDBC batching
+  and causing significant performance degradation. Since entities use SEQUENCE-based ID generation,
+  Hibernate does not require an immediate flush to obtain IDs.
+  
+  Behavior changes:
+  - Constraint violations detected at next flush or transaction commit instead of during .save()
+  - JPA lifecycle callbacks (@PrePersist, @PostPersist, @PreUpdate, @PostUpdate, etc.) execute at flush time rather than immediately after save()
+  - JPA event listeners and entity interceptors (e.g., AuditInterceptor setting createdBy/updatedBy) trigger at flush time, not during save()
+  - SQL execution order may shift slightly due to batching (no functional impact)
+  - The changes are now not visible to native SQL or other connections/sessions until the transaction successfully commits
+  
+  Code that expects entity state to be populated by listeners/interceptors immediately after save() must call flush()
+  explicitly. For example, asserting createdBy field after save() now requires flush() to trigger the audit interceptor.
+  
+  </details>
+
+* Use Gradle distribution plugin
+
+  <details>
+  
+  In recent 8.0, we introduced a new task `buildApp` to build application distribution. Now we rely on built-in Gradle 
+  distribution plugin. It provides `installDist` (replace `buildApp`) but also adds support to package content into ZIP 
+  and TAR archives (ie `distZip` and `distTar`). CLI is still in BETA, so both tasks have been disabled by default. 
+  Request the tasks explicitly to generate the archives.
+  
+  </details>
+
+#### Fix
+
+* Prevent long panel titles from overflowing
+
+  <details>
+  
+  Form panel headers now force their title container to shrink so overly long
+  titles are truncated (ellipsis) instead of spilling outside of the panel
+  frame. Applies to standard panels, o2m/m2m grids, and dashlets.
+  
+  </details>
+
+* Fetch calendar records based on visible range instead of current month
+
+  <details>
+  
+  Previously, records were fetched based on the strict start and end of the current month. This caused missing data for 
+  the trailing days of the previous month and leading days of the next month that were still visible. The fetch logic 
+  now calculates the actual start and end dates of the visible viewport.
+  
+  </details>
+
+* Fix files upload store
+
+  <details>
+  
+  Ensures all stream are closed in order to avoid memory leak.
+  S3 now upload files using stream-based uploads instead of file based upload as it costs a bit of extra I/O.
+  S3 caching mechanism stores the entire file content in the Java Heap memory : this cause high memory consumption.
+  
+  </details>
+
+* Fix monaco editor worker loading for non-basic languages
+
+  <details>
+  
+  Web workers is required for rich language features (validation, formatting, completion). This ensure these 
+  resources are fetched correctly using explicit paths containing `/vs`.
+  
+  </details>
+
+* Fix how to handle 50x response errors
+
+  <details>
+  
+  Display 50x error response in alter, except for the special maintenance mode.
+  
+  </details>
+
+* Fix redundant dashlet refresh after grid initialization
+
+  <details>
+  
+  Previously, when a dashlet was not yet rendered (e.g., in an inactive panel tab or hidden state) and refresh: true was set through action-attrs, it would trigger an unnecessary refresh once it became visible.
+  This fix ensures that if the dashlet has already been refreshed during grid initialization, the extra refresh triggered by the earlier refresh: true flag is skipped.
+  
+  </details>
+
+
 ## 8.0.1 (2025-11-10)
 
 #### Feature

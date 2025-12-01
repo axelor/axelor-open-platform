@@ -1,7 +1,0 @@
----
-title: Fix files upload store
-type: fix
-description: |
-  Ensures all stream are closed in order to avoid memory leak.
-  S3 now upload files using stream-based uploads instead of file based upload as it costs a bit of extra I/O.
-  S3 caching mechanism stores the entire file content in the Java Heap memory : this cause high memory consumption.
