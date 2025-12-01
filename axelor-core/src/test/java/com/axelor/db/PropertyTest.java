@@ -61,5 +61,11 @@ public class PropertyTest extends AbstractTest {
     assertEquals(Contact.class, p.getEntity());
     assertEquals("notes", p.getName());
     assertEquals(PropertyType.TEXT, p.getType());
+
+    // uuid column
+    p = mapper.getProperty("UUID");
+    assertEquals(Contact.class, p.getEntity());
+    assertEquals("UUID", p.getName());
+    assertEquals(PropertyType.UUID, p.getType());
   }
 }

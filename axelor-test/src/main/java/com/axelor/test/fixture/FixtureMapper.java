@@ -4,6 +4,7 @@
  */
 package com.axelor.test.fixture;
 
+import com.axelor.common.UuidUtils;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 class FixtureMapper {
@@ -90,6 +92,7 @@ class FixtureMapper {
 
     // Handle simple type
     if (type == String.class) return value.toString();
+    if (type == UUID.class) return UuidUtils.parse(value.toString());
     if (type == Character.TYPE || type == Character.class) return value.toString().charAt(0);
     if (type == byte[].class && value instanceof String string) return string.getBytes();
     if (type == Byte.TYPE || type == Byte.class) return Byte.valueOf(value.toString());

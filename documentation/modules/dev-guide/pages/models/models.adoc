@@ -373,6 +373,17 @@ example:
 <decimal name="price" precision="8" scale="2" />
 ----
 
+==== UUID
+
+The `<uuid>` field is used to define fields to store universally unique identifiers using `java.util.UUID` java type.
+
+example:
+
+[source,xml]
+----
+<uuid name="productUid" />
+----
+
 ==== Date
 
 The `<date>` field is used to define fields to store date using `java.time.LocalDate` java type.

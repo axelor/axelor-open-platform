@@ -337,6 +337,7 @@ public abstract class Property {
     if (type == PropertyType.DATETIME && isTrue(tz)) return "java.time.ZonedDateTime";
     if (type == PropertyType.DATETIME) return "java.time.LocalDateTime";
     if (type == PropertyType.BINARY) return "byte[]";
+    if (type == PropertyType.UUID) return "java.util.UUID";
     if (type == PropertyType.ENUM) return target;
     if (type == PropertyType.ONE_TO_ONE) return target;
     if (type == PropertyType.MANY_TO_ONE) return target;
@@ -1493,6 +1494,9 @@ public abstract class Property {
 
   @XmlType(name = "enum")
   static class EnumProperty extends Property {}
+
+  @XmlType(name = "uuid")
+  static class UUIDProperty extends Property {}
 
   @XmlType(name = "one-to-one")
   static class OneToOneProperty extends Property {}

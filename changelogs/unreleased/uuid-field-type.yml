@@ -1,0 +1,6 @@
+---
+title: Add UUID field type support for domain entities
+type: feature
+description: |
+  Added support for UUID field type in domain entities to store uuid values more efficiently.
+  Also added a common UuidUtils to generate UUID v4 and v7.

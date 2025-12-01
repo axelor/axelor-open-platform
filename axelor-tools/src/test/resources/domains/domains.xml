@@ -99,6 +99,7 @@
     <string name="notes" multiline="true" title="About Me" />
     <string name="resume" large="true" encrypted="true" />
     <date name="dateOfBirth" default="now" />
+    <uuid name="uniqueId" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts" table="contact_groups" column="contact_id" column2="group_id" />
 
     <!-- test o2m fields with mappedBy & orphanRemoval -->

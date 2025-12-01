@@ -198,8 +198,8 @@ public class EqualityTest extends JpaTest {
     Contact contact2 = new Contact();
     contact1.setUniqueName("John");
     contact2.setUniqueName("Jane");
-    contact1.setUUID(UUID.randomUUID().toString());
-    contact2.setUUID(UUID.randomUUID().toString());
+    contact1.setUUID(UUID.randomUUID());
+    contact2.setUUID(UUID.randomUUID());
 
     Set<Contact> contacts = new HashSet<>();
     contacts.add(contact1);

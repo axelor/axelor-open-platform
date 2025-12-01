@@ -116,6 +116,7 @@ public class Entity implements BaseType<Entity> {
     @XmlElement(name = "datetime", type = Property.DateTimeProperty.class),
     @XmlElement(name = "binary", type = Property.BinaryProperty.class),
     @XmlElement(name = "enum", type = Property.EnumProperty.class),
+    @XmlElement(name = "uuid", type = Property.UUIDProperty.class),
     @XmlElement(name = "one-to-one", type = Property.OneToOneProperty.class),
     @XmlElement(name = "many-to-one", type = Property.ManyToOneProperty.class),
     @XmlElement(name = "one-to-many", type = Property.OneToManyProperty.class),

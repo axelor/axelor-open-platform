@@ -11,6 +11,7 @@ import com.axelor.db.mapper.types.ListAdapter;
 import com.axelor.db.mapper.types.MapAdapter;
 import com.axelor.db.mapper.types.SetAdapter;
 import com.axelor.db.mapper.types.SimpleAdapter;
+import com.axelor.db.mapper.types.UUIDAdapter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class Adapter {
 
@@ -29,8 +31,8 @@ public class Adapter {
   private static MapAdapter mapAdapter = new MapAdapter();
   private static JavaTimeAdapter javaTimeAdapter = new JavaTimeAdapter();
   private static EnumAdapter enumAdapter = new EnumAdapter();
-
   private static DecimalAdapter decimalAdapter = new DecimalAdapter();
+  private static UUIDAdapter uuidAdapter = new UUIDAdapter();
 
   public static Object adapt(
       Object value, Class<?> type, Type genericType, Annotation[] annotations) {
@@ -81,6 +83,10 @@ public class Adapter {
 
     if (BigDecimal.class.isAssignableFrom(type)) {
       return decimalAdapter.adapt(value, type, genericType, annotations);
+    }
+
+    if (UUID.class.isAssignableFrom(type)) {
+      return uuidAdapter.adapt(value, type, genericType, annotations);
     }
 
     return simpleAdapter.adapt(value, type, genericType, annotations);

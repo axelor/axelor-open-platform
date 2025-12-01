@@ -570,6 +570,17 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="Uuid">
+    <xsd:annotation>
+      <xsd:documentation>UUID Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="dm:SimpleColumn">
+        <xsd:attribute name="selection" use="prohibited"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:complexType name="Enum">
     <xsd:annotation>
       <xsd:documentation>Enum field.</xsd:documentation>
@@ -930,6 +941,13 @@
           <xsd:annotation>
             <xsd:documentation>
               Enum field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="uuid" type="dm:Uuid">
+          <xsd:annotation>
+            <xsd:documentation>
+              UUID field.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>

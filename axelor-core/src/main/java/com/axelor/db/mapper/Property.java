@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.hibernate.Length;
 import org.hibernate.usertype.UserType;
@@ -155,6 +156,9 @@ public class Property {
 
       if (javaType == BigDecimal.class) {
         type = PropertyType.DECIMAL;
+      }
+      if (javaType == UUID.class) {
+        type = PropertyType.UUID;
       }
 
       if (annotation instanceof OneToOne oneToOne) {

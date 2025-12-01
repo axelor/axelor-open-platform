@@ -131,6 +131,7 @@
       - business
     addresses:
       - john_addr_home
+    UUID: 550e8400-e29b-41d4-a716-446655440000
 
 - type: Contact
   key: mark_ram
@@ -142,3 +143,4 @@
     dateOfBirth: 1975-03-23
     circles:
       - business
+    UUID: 019c0514-9f12-724b-961d-123456789012

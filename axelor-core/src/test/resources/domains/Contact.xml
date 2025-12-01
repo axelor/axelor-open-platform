@@ -46,7 +46,7 @@
     <string name="notes" multiline="true" transient="true"/>
 
     <string name="uniqueName" unique="true" equalsInclude="true"/>
-    <string name="UUID" unique="true" equalsInclude="true"/>
+    <uuid name="UUID" unique="true" equalsInclude="true"/>
 
     <many-to-many name="relatedContacts" ref="Contact"/>
 

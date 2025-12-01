@@ -23,6 +23,8 @@ public enum PropertyType {
 
   BINARY,
 
+  UUID,
+
   ENUM,
 
   ONE_TO_ONE,
