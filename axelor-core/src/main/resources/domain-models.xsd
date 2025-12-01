@@ -1096,6 +1096,15 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="dynamicUpdate" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specifies that SQL update statements for the entity are generated dynamically, and only include columns which
+          are actually being updated. This might result in improved performance if it is common to change only a few
+          attributes of the entity. However, there is a cost associated with generating the SQL at runtime.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="persistable" type="xsd:boolean" default="true">
       <xsd:annotation>
         <xsd:documentation>

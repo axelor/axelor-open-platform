@@ -11,3 +11,6 @@ description: |
   - large tables (+30 fields): prevent massive, unnecessary data payloads
   - tables with large objects (binary/large fields): ensure heavy binary/large data is not re-transmitted unless it is 
   actually changed
+  
+  Also, allow enabling/disabling the `@DynamicUpdate` support on demand per entity through the `dynamicUpdate` 
+  attribute for more control.

@@ -66,7 +66,8 @@ public class Entity implements BaseType<Entity> {
 
   @XmlTransient boolean isModelClass;
 
-  @XmlTransient boolean dynamicUpdate;
+  @XmlAttribute(name = "dynamicUpdate")
+  private Boolean dynamicUpdate;
 
   @XmlTransient Property idField;
 
@@ -200,11 +201,6 @@ public class Entity implements BaseType<Entity> {
       attrsField.setTitle("Attributes");
       attrsField.setJson(true);
     }
-
-    // Enable `@DynamicUpdate` on large tables or if it has a binary or a large field
-    dynamicUpdate =
-        getFields().size() > 30
-            || getFields().stream().anyMatch(p -> p.isBinary() || isTrue(p.getLarge()));
 
     nameField = getFields().stream().filter(p -> isTrue(p.getNameField())).findFirst().orElse(null);
 
@@ -638,6 +634,36 @@ public class Entity implements BaseType<Entity> {
     return track == null ? null : track.toJavaAnnotation();
   }
 
+  /**
+   * Generates the `@DynamicUpdate` annotation if either:
+   *
+   * <ul>
+   *   <li>The entity explicitly requests dynamic updates through its `dynamicUpdate` property.
+   *   <li>The entity contains more than 30 fields.
+   *   <li>The entity contains at least one field that is either binary or marked as large.
+   * </ul>
+   *
+   * If none of these conditions are met or the entity is a mapped super class, the method returns
+   * null.
+   *
+   * @return a {@link JavaAnnotation} representing the `@DynamicUpdate` annotation if applicable;
+   *     otherwise, null
+   */
+  private JavaAnnotation $dynamicUpdate() {
+
+    if (isTrue(mappedSuperClass) || isFalse(dynamicUpdate)) {
+      return null;
+    }
+
+    if (isTrue(dynamicUpdate)
+        || getFields().size() > 30
+        || getFields().stream().anyMatch(p -> p.isBinary() || isTrue(p.getLarge()))) {
+      return new JavaAnnotation("org.hibernate.annotations.DynamicUpdate");
+    }
+
+    return null;
+  }
+
   public List<JavaAnnotation> getAnnotations() {
     List<JavaAnnotation> all = new ArrayList<>();
 
@@ -646,10 +672,7 @@ public class Entity implements BaseType<Entity> {
       all.add($cacheable());
     }
 
-    if (notTrue(mappedSuperClass) && isTrue(dynamicUpdate)) {
-      all.add(new JavaAnnotation("org.hibernate.annotations.DynamicUpdate"));
-    }
-
+    all.add($dynamicUpdate());
     all.add($table());
     all.add($strategy());
     all.add($track());
