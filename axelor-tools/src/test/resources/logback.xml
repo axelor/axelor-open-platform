@@ -16,23 +16,18 @@
 
   <!-- Log all SQL DML statements as they are executed -->
   <!-- <logger name="org.hibernate.SQL" level="debug" /> -->
-  <!-- <logger name="org.hibernate.engine.jdbc" level="debug" /> -->
 
   <!-- Log all SQL DDL statements as they are executed -->
-  <!-- <logger name="org.hibernate.tool.hbm2ddl" level="info" /> -->
+  <!-- <logger name="org.hibernate.tool.schema" level="info" /> -->
 
   <!-- Log all JDBC parameters -->
-  <!-- <logger name="org.hibernate.type" level="all" /> -->
+  <!-- <logger name="org.hibernate.orm.jdbc.bind" level="all" /> -->
 
   <!-- Log transactions -->
-  <!-- <logger name="org.hibernate.transaction" level="debug" /> -->
+  <!-- <logger name="org.hibernate.resource.transaction" level="trace" /> -->
 
   <!-- Log L2-Cache -->
-  <!-- <logger name="org.hibernate.cache" level="debug" /> -->
-
-  <!-- Log JDBC resource acquisition -->
-  <!-- <logger name="org.hibernate.jdbc" level="trace" /> -->
-  <!-- <logger name="org.hibernate.service.jdbc" level="trace" /> -->
+  <!-- <logger name="org.hibernate.orm.cache" level="debug" /> -->
 
   <!-- Log connection pooling -->
   <!-- <logger name="com.zaxxer.hikari" level="info" /> -->
