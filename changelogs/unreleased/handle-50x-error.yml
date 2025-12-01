@@ -1,5 +1,0 @@
----
-title: Fix how to handle 50x response errors
-type: fix
-description: |
-  Display 50x error response in alter, except for the special maintenance mode.

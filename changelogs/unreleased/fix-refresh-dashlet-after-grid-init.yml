@@ -1,6 +1,0 @@
----
-title: Fix redundant dashlet refresh after grid initialization
-type: fix
-description: |
-  Previously, when a dashlet was not yet rendered (e.g., in an inactive panel tab or hidden state) and refresh: true was set through action-attrs, it would trigger an unnecessary refresh once it became visible.
-  This fix ensures that if the dashlet has already been refreshed during grid initialization, the extra refresh triggered by the earlier refresh: true flag is skipped.
