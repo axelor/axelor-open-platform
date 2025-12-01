@@ -116,11 +116,14 @@ public final class JPA {
   }
 
   /**
-   * Find multiple entities by their primary key.<br>
-   * <br>
-   * Ensure to check the first-level cache first then the second-level cache and, if the entity is
+   * Find multiple entities by their primary key.
+   *
+   * <p>Ensure to check the first-level cache first, then the second-level cache. If the entity is
    * found and already managed by the Hibernate Session, the cached entity will be added to the
-   * returned List, therefore skipping it from being fetched via the multi-load query.
+   * returned List. Therefore, skipping it from being fetched via the multi-load query.
+   *
+   * <p>WARNING: The list may contain NULL elements if an id was not found. The list size and order
+   * will match the input ids.
    *
    * @param klass The model class
    * @param ids The ids to load

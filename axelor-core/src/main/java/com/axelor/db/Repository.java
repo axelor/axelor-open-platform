@@ -70,9 +70,11 @@ public interface Repository<T extends Model> {
   /**
    * Find multiple entities by their primary key.
    *
+   * <p>WARNING: The list may contain NULL elements if an id was not found. The list size and order
+   * will match the input ids.
+   *
    * @param ids The ids to load
    * @return list of all the matched records
-   * @see com.axelor.db.JPA#findByIds(Class, List)
    */
   List<T> findByIds(List<Long> ids);
 

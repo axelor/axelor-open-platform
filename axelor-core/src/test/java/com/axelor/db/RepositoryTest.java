@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +22,6 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.Person;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.ContactRepositoryEx;
-import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Arrays;
@@ -77,11 +77,20 @@ public class RepositoryTest extends JpaTest {
   }
 
   @Test
-  @Transactional
-  public void testFindByIds() {
+  public void findByIds_returnPartialListOfEntities() {
+    List<Contact> contacts =
+        Beans.get(ContactRepository.class).findByIds(Arrays.asList(2L, 999L, 1L));
+    assertNotNull(contacts);
+    assertEquals(3, contacts.size());
+    assertNull(contacts.get(1));
+  }
+
+  @Test
+  public void findByIds_returnListOfEntities() {
     List<Contact> contacts = Beans.get(ContactRepository.class).findByIds(Arrays.asList(1L, 2L));
     assertNotNull(contacts);
     assertEquals(2, contacts.size());
+    assertTrue(contacts.stream().allMatch(c -> c instanceof Contact));
   }
 
   @Test
