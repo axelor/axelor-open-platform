@@ -141,6 +141,9 @@ public class AuditTracker
       Object[] state,
       Object[] previousState) {
 
+    // Signal activity to audit processor (skip audit's own entities)
+    AuditProcessor.signalActivity(entity);
+
     var track = getTrack(entity);
     if (track == null) {
       return;

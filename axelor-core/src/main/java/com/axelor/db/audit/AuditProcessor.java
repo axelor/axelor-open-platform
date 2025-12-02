@@ -65,9 +65,30 @@ public class AuditProcessor {
   private static final int BATCH_SIZE = 100;
   private static final int MAX_RETRY = 3;
 
+  // Throttling constants
+  private static final long MIN_PAUSE_MS = 5;
+  private static final long ACTIVITY_PAUSE_MS = 200;
+  private static final long ACTIVITY_TIMEOUT_MS = 200; // Consider idle after 200ms of no activity
+
+  // The last time activity was signaled
+  private static volatile long lastActivityTime = 0;
+
   @Inject private MailMessageRepository mailMessageRepository;
   @Inject private MailFollowerRepository mailFollowerRepository;
   @Inject private ObjectMapper objectMapper;
+
+  /**
+   * Signal that entity tracking is happening (called from AuditTracker). This tells the processor
+   * to back off as real work is in progress.
+   */
+  public static void signalActivity(Object value) {
+    if (value instanceof MailMessage
+        || value instanceof MailFollower
+        || value instanceof AuditLog) {
+      return; // Ignore audit & mail entities
+    }
+    lastActivityTime = System.currentTimeMillis();
+  }
 
   /** Process all pending audit logs. */
   @Transactional
@@ -85,10 +106,23 @@ public class AuditProcessor {
 
   /** Core processing loop that fetches and processes audit logs in batches. */
   private void process(Supplier<List<AuditLog>> fetcher) {
+    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
     var totalProcessed = 0;
     var totalFailed = 0;
 
     while (true) {
+      // Check if main work is active - back off immediately
+      if (isSystemBusy()) {
+        try {
+          Thread.sleep(ACTIVITY_PAUSE_MS);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+        continue; // Re-check before processing
+      }
+
       var batch = fetcher.get();
       if (batch.isEmpty()) {
         break;
@@ -107,10 +141,23 @@ public class AuditProcessor {
       // Flush and clear to avoid memory issues
       JPA.flush();
       JPA.clear();
+
+      // Wait a bit before next batch to reduce DB load
+      try {
+        Thread.sleep(MIN_PAUSE_MS);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        break;
+      }
     }
 
     log.info(
         "Audit log processing complete. Processed: {}, Failed: {}", totalProcessed, totalFailed);
+  }
+
+  /** Check if system is busy with main work. Returns true if entity tracking happened recently. */
+  private boolean isSystemBusy() {
+    return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_TIMEOUT_MS;
   }
 
   private void process(AuditLog auditLog) throws Exception {
