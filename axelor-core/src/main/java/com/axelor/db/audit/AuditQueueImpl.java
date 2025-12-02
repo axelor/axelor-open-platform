@@ -29,6 +29,7 @@ class AuditQueueImpl implements AuditQueue {
           (task) -> {
             var thread = new Thread(task);
             thread.setDaemon(true);
+            thread.setPriority(Thread.MIN_PRIORITY);
             thread.setName("Audit-Worker");
             return thread;
           });
@@ -60,14 +61,9 @@ class AuditQueueImpl implements AuditQueue {
         });
   }
 
-  public void onAppShutdown(@Observes ShutdownEvent event) {
-    log.info("Shutting down AuditQueue...");
-
-    // Clear queued items first
-    QUEUE.clear();
-
+  @Override
+  public void await(long timeout) {
     // Wait for currently running task to finish (if any)
-    final long timeout = 30_000; // 30 seconds
     final long startTime = System.currentTimeMillis();
     while (RUNNING.get()) {
       if (System.currentTimeMillis() - startTime > timeout) {
@@ -83,10 +79,26 @@ class AuditQueueImpl implements AuditQueue {
     }
   }
 
+  public void onAppShutdown(@Observes ShutdownEvent event) {
+    log.info("Shutting down AuditQueue...");
+
+    // Clear queued items first
+    QUEUE.clear();
+
+    // Wait for currently running task to finish (if any)
+    final long timeout = 30_000; // 30 seconds
+    this.await(timeout);
+  }
+
   public static class Noop implements AuditQueue {
 
     @Override
     public void process(String txId) {
+      // No operation
+    }
+
+    @Override
+    public void await(long timeout) {
       // No operation
     }
   }
