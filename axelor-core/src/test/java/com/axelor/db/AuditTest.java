@@ -18,7 +18,10 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.cache.CaffeineTest;
 import com.axelor.concurrent.ContextAware;
+import com.axelor.db.audit.AuditModule;
+import com.axelor.db.audit.AuditQueue;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
@@ -28,15 +31,35 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-@GuiceModules(CaffeineTest.CaffeineTestModule.class)
+@GuiceModules(AuditTest.AuditTestModule.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuditTest extends JpaTest {
+
+  private static final int MAX_SIZE = 5000;
+  private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
+  private static final int TOTAL_WARMUPS = 2;
+  private static final int TOTAL_RUNS = 5;
+
+  public static class AuditTestModule extends CaffeineTest.CaffeineTestModule {
+    @Override
+    protected void configure() {
+      super.configure();
+      install(new AuditModule());
+    }
+  }
+
+  @AfterAll
+  public static void afterAll() {
+    // Wait for audit queue to be processed (5 minutes max)
+    Beans.get(AuditQueue.class).await(5 * 60 * 1000);
+  }
 
   @BeforeEach
   public void beforeAll() {
@@ -185,11 +208,6 @@ public class AuditTest extends JpaTest {
               });
         });
   }
-
-  private static final int MAX_SIZE = 5000;
-  private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
-  private static final int TOTAL_WARMUPS = 2;
-  private static final int TOTAL_RUNS = 5;
 
   @Test
   @Order(7)
