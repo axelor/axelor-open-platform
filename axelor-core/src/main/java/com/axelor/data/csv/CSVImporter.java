@@ -394,6 +394,7 @@ public class CSVImporter implements Importer {
 
     if (bean != null) {
       JPA.manage((Model) bean);
+      JPA.flush();
 
       LOG.trace("bean saved: {}", bean);
     }

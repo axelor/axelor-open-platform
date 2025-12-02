@@ -242,6 +242,7 @@ public class XMLImporter implements Importer {
               bean = binding.call(bean, ctx);
               if (bean != null) {
                 bean = JPA.manage((Model) bean);
+                JPA.flush();
                 count++;
                 for (Listener listener : listeners) {
                   listener.imported((Model) bean);

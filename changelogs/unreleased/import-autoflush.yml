@@ -1,0 +1,8 @@
+---
+title: Re-enable csv/xml imports auto flush after the record is managed
+type: fix
+description: |
+  The import feature is used out of the box, so we re-introduce the explicit `flush()` call within the CSV/XML 
+  processing loop immediately after the record is managed. This ensures that when the next record in the batch tries 
+  to search for the previous one, the required data is present in the database. This accepts the reduced performance 
+  (loss of JDBC batching) for the sake of functional correctness, which is the necessary default for an import utility.
