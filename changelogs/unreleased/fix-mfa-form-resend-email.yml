@@ -1,0 +1,6 @@
+---
+title: Fix MFA form email resend timer
+type: fix
+description: |
+  Fix initial email resend timer when email method is default.
+  Fix email resend timer on browser refresh.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -97,7 +97,13 @@ export function MFAForm({
       }
       if (typeof err?.message === "string") {
         showAlert("danger", err.message);
-        setRetryCount(0);
+        if (err?.emailRetryAfter) {
+          mfaSession.EmailRetryAfter.set(usernameKey, err?.emailRetryAfter);
+          const diff = getTimeoutOfEmailRetryByUser(usernameKey);
+          setRetryCount(diff);
+        } else {
+          setRetryCount(0);
+        }
       }
     }
   }, [username, onBackToLogin, showAlert]);
@@ -195,7 +201,15 @@ export function MFAForm({
     // if default method is email then
     // no need to execute initial email attempt
     if (username && emailRetryAfter) {
-      mfaSession.EmailRetryAfter.set(username, emailRetryAfter as string);
+      const current = mfaSession.EmailRetryAfter.get(username);
+
+      // Only set if storage is empty or the route value is newer than stored value
+      // This prevents stale route state (on F5 refresh) from overwriting new resend timers
+      if (!current || moment(emailRetryAfter).isAfter(moment(current))) {
+        mfaSession.EmailRetryAfter.set(username, emailRetryAfter);
+        const diff = getTimeoutOfEmailRetryByUser(username);
+        setRetryCount(diff);
+      }
     }
   }, [username, emailRetryAfter]);
 
