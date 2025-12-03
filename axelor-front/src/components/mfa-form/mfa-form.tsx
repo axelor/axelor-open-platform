@@ -26,8 +26,8 @@ import {
 import { CLIENT_NAME_PARAM } from "@/routes/login";
 import styles from "./mfa-form.module.scss";
 
-function getTimeoutOfEmailRetryByUser(username: string) {
-  const retryAfter = mfaSession.EmailRetryAfter.get(username);
+function getTimeoutOfEmailRetryByUser(usernameKey: string) {
+  const retryAfter = mfaSession.EmailRetryAfter.get(usernameKey);
   if (retryAfter) {
     return Math.max(0, moment(retryAfter).diff(moment(), "second"));
   }
@@ -53,12 +53,13 @@ export function MFAForm({
   const session = useSession();
   const { copyright } = useAppSettings();
   const { methods = [], username = "", emailRetryAfter, tenant } = state ?? {};
+  const usernameKey = tenant ? `${tenant}:${username}` : username;
 
   const availableMethods: MFAMethod[] = [...methods, "RECOVERY"];
 
   const [mfaCode, setMFACode] = useState("");
   const [mfaMethod, setMFAMethod] = useState<MFAMethod>(
-    mfaSession.MFAMethod.get(username) ?? availableMethods?.[0],
+    mfaSession.MFAMethod.get(usernameKey) ?? availableMethods?.[0],
   );
   const [showOptions, setShowOptions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,7 +76,7 @@ export function MFAForm({
   }, []);
 
   const handleSendEmail = useCallback(async () => {
-    if (getTimeoutOfEmailRetryByUser(username) > 0) {
+    if (getTimeoutOfEmailRetryByUser(usernameKey) > 0) {
       return;
     }
 
@@ -83,9 +84,9 @@ export function MFAForm({
       const { message, emailRetryAfter } =
         await sendEmailVerificationCode(username);
 
-      mfaSession.EmailRetryAfter.set(username, emailRetryAfter);
+      mfaSession.EmailRetryAfter.set(usernameKey, emailRetryAfter);
 
-      const diff = getTimeoutOfEmailRetryByUser(username);
+      const diff = getTimeoutOfEmailRetryByUser(usernameKey);
       setRetryCount(diff);
 
       showAlert("success", message);
@@ -106,12 +107,12 @@ export function MFAForm({
         }
       }
     }
-  }, [username, onBackToLogin, showAlert]);
+  }, [username, usernameKey, onBackToLogin, showAlert]);
 
   const handleMFAMethodChange = useCallback(
     (method: MFAMethod) => {
       setMFAMethod(method);
-      mfaSession.MFAMethod.set(username, method);
+      mfaSession.MFAMethod.set(usernameKey, method);
 
       // reset states
       setShowOptions(false);
@@ -120,11 +121,11 @@ export function MFAForm({
 
       // auto send email for first time only
       // skip for subsequent attempts
-      if (method === "EMAIL" && !mfaSession.EmailRetryAfter.get(username)) {
+      if (method === "EMAIL" && !mfaSession.EmailRetryAfter.get(usernameKey)) {
         handleSendEmail();
       }
     },
-    [username, handleSendEmail],
+    [usernameKey, handleSendEmail],
   );
 
   const handleSubmit: (event: React.SyntheticEvent) => Promise<void> =
@@ -180,11 +181,11 @@ export function MFAForm({
     inputRef?.current?.focus();
 
     if (mfaMethod === "EMAIL") {
-      const count = getTimeoutOfEmailRetryByUser(username);
+      const count = getTimeoutOfEmailRetryByUser(usernameKey);
       setRetryCount(count);
     }
     setShowResend(true);
-  }, [mfaMethod, username]);
+  }, [mfaMethod, usernameKey]);
 
   useEffect(() => {
     if (mfaMethod === "EMAIL" && retryCount > 0) {
@@ -200,18 +201,18 @@ export function MFAForm({
   useEffect(() => {
     // if default method is email then
     // no need to execute initial email attempt
-    if (username && emailRetryAfter) {
-      const current = mfaSession.EmailRetryAfter.get(username);
+    if (usernameKey && emailRetryAfter) {
+      const current = mfaSession.EmailRetryAfter.get(usernameKey);
 
       // Only set if storage is empty or the route value is newer than stored value
       // This prevents stale route state (on F5 refresh) from overwriting new resend timers
       if (!current || moment(emailRetryAfter).isAfter(moment(current))) {
-        mfaSession.EmailRetryAfter.set(username, emailRetryAfter);
-        const diff = getTimeoutOfEmailRetryByUser(username);
+        mfaSession.EmailRetryAfter.set(usernameKey, emailRetryAfter);
+        const diff = getTimeoutOfEmailRetryByUser(usernameKey);
         setRetryCount(diff);
       }
     }
-  }, [username, emailRetryAfter]);
+  }, [usernameKey, emailRetryAfter]);
 
   const authOptions = (
     [

@@ -106,7 +106,8 @@ export function LoginForm({
 
         try {
           // reset mfa session before login
-          mfaSession.reset(username);
+          const usernameKey = tenantId ? `${tenantId}:${username}` : username;
+          mfaSession.reset(usernameKey);
 
           const info = await session.login(
             { username, password },
