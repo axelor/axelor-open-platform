@@ -1,0 +1,6 @@
+---
+title: Apply tenant-aware for database-dependent caches
+type: fix
+description: |
+  Use tenant-aware caches for MFAService, I18nBundle, and MetaStore.
+  Any cache that contains database-dependent data should be tenant-aware.
