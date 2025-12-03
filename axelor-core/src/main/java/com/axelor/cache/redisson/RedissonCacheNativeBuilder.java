@@ -29,8 +29,8 @@ public class RedissonCacheNativeBuilder<K, V>
   }
 
   @Override
-  protected MapOptions<K, V> newOptions() {
-    return MapOptions.<K, V>name(getCacheName());
+  protected MapOptions<K, V> newOptions(String name) {
+    return MapOptions.<K, V>name(name);
   }
 
   @Override

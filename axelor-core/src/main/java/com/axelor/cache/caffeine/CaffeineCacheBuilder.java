@@ -34,7 +34,7 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(String name) {
     var caffeine = newCaffeine();
 
     @SuppressWarnings("unchecked")
@@ -44,8 +44,8 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
-      CacheLoader<? super K1, V1> loader) {
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(
+      String name, CacheLoader<? super K1, V1> loader) {
     var caffeine = newCaffeine();
 
     @SuppressWarnings("unchecked")

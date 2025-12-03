@@ -34,8 +34,8 @@ public class RedissonCacheBuilder<K, V>
   }
 
   @Override
-  protected MapCacheOptions<K, V> newOptions() {
-    return MapCacheOptions.<K, V>name(getCacheName());
+  protected MapCacheOptions<K, V> newOptions(String name) {
+    return MapCacheOptions.<K, V>name(name);
   }
 
   @Override

@@ -6,6 +6,7 @@ package com.axelor.cache;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.event.RemovalListener;
+import com.axelor.db.tenants.TenantModule;
 import java.time.Duration;
 
 /**
@@ -27,6 +28,8 @@ public abstract class CacheBuilder<K, V> {
   private boolean weakKeys;
 
   private boolean weakValues;
+
+  private boolean tenantAware;
 
   private RemovalListener<? super K, ? super V> removalListener;
 
@@ -203,6 +206,24 @@ public abstract class CacheBuilder<K, V> {
     return this;
   }
 
+  protected boolean isTenantAware() {
+    return tenantAware;
+  }
+
+  /**
+   * Enables data isolation per tenant. When multi-tenancy is active, the cache automatically
+   * segregates entries based on the current tenant context.
+   *
+   * <p>It is critical that you enable this option if your cached data is database-related in any
+   * way.
+   *
+   * @return this {@code CacheBuilder} instance (for chaining)
+   */
+  public CacheBuilder<K, V> tenantAware() {
+    this.tenantAware = true;
+    return this;
+  }
+
   @SuppressWarnings("unchecked")
   protected <K1 extends K, V1 extends V> RemovalListener<K1, V1> getRemovalListener() {
     return (RemovalListener<K1, V1>) removalListener;
@@ -232,7 +253,16 @@ public abstract class CacheBuilder<K, V> {
    * @param <V1> the value type of the cache
    * @return a new {@code AxelorCache} instance having the specified configuration
    */
-  public abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> build();
+  public final <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
+    if (isTenantAware() && TenantModule.isEnabled()) {
+      return new TenantAwareCache<>(
+          tenant -> buildCache("%s:%s".formatted(tenant, getCacheName())));
+    } else {
+      return buildCache(getCacheName());
+    }
+  }
+
+  protected abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(String name);
 
   /**
    * Builds an {@code AxelorCache} which either returns an already-loaded value for a given key or
@@ -244,6 +274,16 @@ public abstract class CacheBuilder<K, V> {
    * @return a new {@code AxelorCache} instance having the specified configuration and using the
    *     specified loader
    */
-  public abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
-      CacheLoader<? super K1, V1> loader);
+  public final <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
+      CacheLoader<? super K1, V1> loader) {
+    if (isTenantAware() && TenantModule.isEnabled()) {
+      return new TenantAwareCache<>(
+          tenant -> buildCache("%s:%s".formatted(tenant, getCacheName()), loader));
+    } else {
+      return buildCache(getCacheName(), loader);
+    }
+  }
+
+  protected abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(
+      String name, CacheLoader<? super K1, V1> loader);
 }

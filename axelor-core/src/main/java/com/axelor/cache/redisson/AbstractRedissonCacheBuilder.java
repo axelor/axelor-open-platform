@@ -30,7 +30,7 @@ public abstract class AbstractRedissonCacheBuilder<
   protected static final String PREFIX = "axelor-cache:";
 
   protected AbstractRedissonCacheBuilder(String cacheName) {
-    super(PREFIX + cacheName);
+    super(cacheName);
   }
 
   protected AbstractRedissonCacheBuilder(CacheBuilder<K, V> builder) {
@@ -38,8 +38,8 @@ public abstract class AbstractRedissonCacheBuilder<
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
-    var cache = newMapCache();
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(String name) {
+    var cache = newMapCache(name);
 
     @SuppressWarnings("unchecked")
     var redissonCache = (AxelorCache<K1, V1>) newConfiguredCache(cache);
@@ -48,9 +48,9 @@ public abstract class AbstractRedissonCacheBuilder<
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
-      CacheLoader<? super K1, V1> loader) {
-    var cache = newMapCache(loader);
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(
+      String name, CacheLoader<? super K1, V1> loader) {
+    var cache = newMapCache(name, loader);
 
     @SuppressWarnings("unchecked")
     var redissonCache = (AxelorCache<K1, V1>) newConfiguredCache(cache);
@@ -58,14 +58,18 @@ public abstract class AbstractRedissonCacheBuilder<
     return redissonCache;
   }
 
-  protected abstract O newOptions();
+  private O newPrefixedOptions(String name) {
+    return newOptions(PREFIX + name);
+  }
+
+  protected abstract O newOptions(String name);
 
   protected abstract M newMapCache(O options);
 
   protected abstract AbstractRedissonCache<K, V, M> newRedissonCache(M cache);
 
-  private M newMapCache() {
-    return newMapCache(newOptions());
+  private M newMapCache(String name) {
+    return newMapCache(newPrefixedOptions(name));
   }
 
   private <K1 extends K, V1 extends V> MapLoader<K, V> newMapLoader(
@@ -84,8 +88,9 @@ public abstract class AbstractRedissonCacheBuilder<
     };
   }
 
-  private <K1 extends K, V1 extends V> M newMapCache(CacheLoader<? super K1, V1> loader) {
-    var options = newOptions();
+  private <K1 extends K, V1 extends V> M newMapCache(
+      String name, CacheLoader<? super K1, V1> loader) {
+    var options = newPrefixedOptions(name);
     options.loader(newMapLoader(loader));
     return newMapCache(options);
   }

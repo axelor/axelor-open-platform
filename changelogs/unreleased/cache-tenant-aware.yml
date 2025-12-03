@@ -1,0 +1,6 @@
+---
+title: Implement tenant-aware caching option
+type: feature
+description: |
+  Add support for tenant-aware caches by introducing
+  a `tenantAware()` configuration option to `CacheBuilder`.
