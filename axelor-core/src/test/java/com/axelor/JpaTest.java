@@ -66,7 +66,6 @@ public abstract class JpaTest extends JpaSupport {
       user.setPassword(password);
       authService.encrypt(user);
       users.save(user);
-      users.flush();
     }
     login(username, password);
   }
