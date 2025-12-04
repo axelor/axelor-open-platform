@@ -1,3 +1,22 @@
+## 8.0.3 (2025-12-04)
+
+#### Fix
+
+* Restore flush on JPA.persist and JPA.merge
+
+  <details>
+  
+  In previous version, we removed automatic flush calls from JPA.persist() and JPA.merge() methods to restore JDBC 
+  batching for bulk operations.
+  We restored this behavior to ensure backward compatibilities. It was initially added for an eager synchronization model 
+  (assume read-your-own-writes consistency immediately after any `persist` or `merge`) but also to reduced cognitive 
+  load (doesn't have to wired about potential synchronization issues). We thought the impact will be restricted, but 
+  the fact is that lot of process depending the behavior. This requires more preparation and details before we can get 
+  ride of this anti-pattern strategy and fit on standard.
+  
+  </details>
+
+
 ## 8.0.2 (2025-12-01)
 
 #### Change
