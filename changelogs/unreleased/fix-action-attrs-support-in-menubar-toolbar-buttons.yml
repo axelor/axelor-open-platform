@@ -1,0 +1,6 @@
+---
+title: Fix action-attrs support on tooolbar/menubar
+type: fix
+description: |
+  Fix changing title of toolbar buttons and menubar items in form view.
+  Also add support for title/hidden/readonly attributes for cards/kanban/dms/grid views.

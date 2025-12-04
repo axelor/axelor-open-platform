@@ -1,6 +1,13 @@
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 
 import {
   Box,
@@ -91,9 +98,16 @@ function ActionCommandItem({
     schema: Schema;
     context?: DataContext;
   }) {
-  const { name, showIf, hideIf, readonlyIf } = schema;
-  const [hidden, setHidden] = useState<boolean | undefined>(schema.hidden);
-  const [readonly, setReadonly] = useState<boolean>(schema.readonly);
+  const {
+    name,
+    hidden: hiddenBySchema,
+    readonly: readonlyBySchema,
+    showIf,
+    hideIf,
+    readonlyIf,
+  } = schema;
+  const [hidden, setHidden] = useState<boolean | undefined>();
+  const [readonly, setReadonly] = useState<boolean>();
 
   const attrs = useAtomValue(
     useMemo(
@@ -106,17 +120,20 @@ function ActionCommandItem({
     const hasExpr = showIf || hideIf || readonlyIf;
     if (!hasExpr) return;
     const updateAttrs = (record: DataRecord) => {
-      (showIf || hideIf) &&
-        setHidden((hidden) => {
+      if (showIf || hideIf) {
+        setHidden((_hidden) => {
           if (hideIf) {
-            hidden = !!parseExpression(hideIf)(record);
+            _hidden = !!parseExpression(hideIf)(record);
           }
-          if ((!hidden || !hideIf) && showIf) {
-            hidden = !parseExpression(showIf)(record);
+          if ((!_hidden || !hideIf) && showIf) {
+            _hidden = !parseExpression(showIf)(record);
           }
-          return hidden;
+          return _hidden;
         });
-      readonlyIf && setReadonly(parseExpression(readonlyIf)(record));
+      }
+      if (readonlyIf) {
+        setReadonly(parseExpression(readonlyIf)(record));
+      }
     };
 
     if (recordHandler) {
@@ -129,11 +146,12 @@ function ActionCommandItem({
   return (
     <CommandItem
       {...props}
+      text={attrs?.title || props.text}
       {...(schema.css && {
         variant: findButtonVariant(schema),
       })}
-      hidden={attrs?.hidden ?? hidden}
-      {...((readonly || attrs?.readonly) && {
+      hidden={hidden ?? attrs?.hidden ?? hiddenBySchema}
+      {...((readonly ?? attrs?.readonly ?? readonlyBySchema) && {
         onClick: undefined,
         disabled: true,
       })}

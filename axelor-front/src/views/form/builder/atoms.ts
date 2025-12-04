@@ -231,6 +231,17 @@ export const fallbackWidgetAtom = createWidgetAtom({
   schema: {},
 });
 
+export function useCreateFormAtomByMeta(meta: ViewData<any>) {
+  return useMemo(
+    () =>
+      createFormAtom({
+        meta: meta as any,
+        record: {},
+      }),
+    [meta],
+  );
+}
+
 /**
  * This atom can be used to prepare context for the given formAtom.
  *
@@ -253,7 +264,14 @@ export const contextAtom = atom(
     actionView?: ActionView,
   ): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
-      const { meta, model, record, context: _context, statesByName, parent } = get(formAtom);
+      const {
+        meta,
+        model,
+        record,
+        context: _context,
+        statesByName,
+        parent,
+      } = get(formAtom);
 
       let context: DataContext = {
         ..._context,
