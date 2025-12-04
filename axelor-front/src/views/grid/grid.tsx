@@ -65,7 +65,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { createFormAtom } from "../form/builder/atoms";
+import { useCreateFormAtomByMeta } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import {
   createContextParams,
@@ -751,14 +751,7 @@ function GridInner(props: ViewProps<GridView>) {
     [action, view, getViewContext],
   );
 
-  const formAtom = useMemo(
-    () =>
-      createFormAtom({
-        meta: meta as any,
-        record: {},
-      }),
-    [meta],
-  );
+  const formAtom = useCreateFormAtomByMeta(meta);
 
   const handleRowSave = useAtomCallback(
     useCallback(
@@ -1275,6 +1268,7 @@ function GridInner(props: ViewProps<GridView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          formAtom={formAtom}
           actions={[
             {
               key: "new",

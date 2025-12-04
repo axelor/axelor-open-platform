@@ -42,6 +42,7 @@ import { useCardClassName } from "../cards/use-card-classname";
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
 import { createContextParams } from "../form/builder/utils";
+import { useCreateFormAtomByMeta } from "../form/builder/atoms";
 import {
   getColumnIndex,
   getColumnRecords,
@@ -258,7 +259,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return onSearch({ offset: 0 });
   }, [onSearch]);
 
+  const formAtom = useCreateFormAtomByMeta(meta);
   const actionExecutor = useActionExecutor(view, {
+    formAtom,
     getContext: getActionContext,
     onRefresh,
   });
@@ -650,6 +653,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          formAtom={formAtom}
           actionExecutor={actionExecutor}
           actions={[
             {
