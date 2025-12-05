@@ -66,6 +66,9 @@ import {
   toStrongText,
 } from "./builder/utils";
 import { DataStore } from "@/services/client/data-store";
+import { createContextParams } from "../form/builder/utils";
+import { useCreateFormAtomByMeta } from "../form/builder/atoms";
+import { useActionExecutor } from "../form/builder/scope";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import styles from "./dms.module.scss";
@@ -741,8 +744,23 @@ export function Dms(props: ViewProps<GridView>) {
 
   const onTabRefresh = useCallback(() => {
     onTreeSearch();
-    onSearch();
+    return onSearch();
   }, [onSearch, onTreeSearch]);
+
+  const getActionContext = useCallback(
+    () => ({
+      ...createContextParams(view, action),
+      ...getViewContext(true),
+    }),
+    [getViewContext, view, action],
+  );
+
+  const formAtom = useCreateFormAtomByMeta(meta);
+  const actionExecutor = useActionExecutor(view, {
+    formAtom,
+    getContext: getActionContext,
+    onRefresh: onTabRefresh,
+  });
 
   useEffect(() => {
     const parent = getSelectedNode();
@@ -891,6 +909,8 @@ export function Dms(props: ViewProps<GridView>) {
                 ],
               },
             ]}
+            formAtom={formAtom}
+            actionExecutor={actionExecutor}
             pagination={{
               canPrev,
               canNext,
