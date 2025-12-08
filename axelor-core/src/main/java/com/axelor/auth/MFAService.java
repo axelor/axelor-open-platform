@@ -84,10 +84,7 @@ public class MFAService {
   private static final Logger log = LoggerFactory.getLogger(MFAService.class);
 
   private static final AxelorCache<String, LocalDateTime> emailRetryAfters =
-      CacheBuilder.newBuilder("emailRetryAfters")
-          .expireAfterWrite(EMAIL_SEND_COOL_DOWN)
-          .tenantAware()
-          .build();
+      CacheBuilder.newBuilder("emailRetryAfters").expireAfterWrite(EMAIL_SEND_COOL_DOWN).build();
 
   @Inject
   public MFAService(MailService mailService, MFARepository mfaRepository) {

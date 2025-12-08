@@ -32,9 +32,9 @@ public class I18nBundle extends ResourceBundle {
   private final String languageTag;
 
   private static final AxelorCache<String, Map<String, String>> messages =
-      CacheBuilder.newBuilder("messages").tenantAware().build(I18nBundle::loadMessages);
+      CacheBuilder.newBuilder("messages").build(I18nBundle::loadMessages);
   private static final AxelorCache<String, String> hashes =
-      CacheBuilder.newBuilder("hashes").tenantAware().build(I18nBundle::computeHash);
+      CacheBuilder.newBuilder("hashes").build(I18nBundle::computeHash);
 
   private static final Logger log = LoggerFactory.getLogger(I18nBundle.class);
 

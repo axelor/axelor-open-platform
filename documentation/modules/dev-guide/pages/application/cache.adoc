@@ -53,7 +53,7 @@ The `CacheBuilder` class is used to configure and construct `AxelorCache` instan
 - `expireAfterAccess(duration)`: Configures entries to expire after a specified duration following their last access.
 - `weakKeys()` and `weakValues()`: Specifies the use of weak references for keys or values, allowing garbage collection if no strong references exist.
 - `removalListener(listener)`: Attaches a listener to be notified when entries are removed from the cache.
-- `tenantAware()`: Enables data isolation per tenant. When multi-tenancy is active, the cache automatically segregates entries based on the current tenant context. It is critical that you enable this option if your cached data is database-related in any way.
+- `nonTenantAware()`: By default, when multi-tenancy is active, the cache automatically segregates entries based on the current tenant context. This option disables this behavior and allows the cache to be shared globally across all tenants.
 
 NOTE: Support of these various options depends on the underlying cache implementation and may be approximated or ignored if not supported at all.
 
@@ -67,12 +67,10 @@ NOTE: Support of these various options depends on the underlying cache implement
 [source,java]
 ----
 private static final AxelorCache<String, Action> ACTIONS =
-    CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().tenantAware().build(XMLViews::findAction);
+    CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
 ----
 
-Here, the cache is configured with a maximum size of 1000 entries and uses weak references for values.
-Also, the `tenantAware()` option is enabled to ensure data isolation per tenant.
-The `XMLViews::findAction` loader dynamically loads actions not present in the cache.
+Here, the cache is configured with a maximum size of 1000 entries and uses weak references for values. The `XMLViews::findAction` loader dynamically loads actions not present in the cache.
 
 NOTE: In case of distributed caching, you need to make sure cache keys/values are serializable by the underlying cache implementation.
 For example, when using Redisson, keys/values should be serializable by its codec, the default codec being `org.redisson.codec.Kryo5Codec`.

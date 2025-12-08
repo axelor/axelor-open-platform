@@ -29,7 +29,7 @@ public abstract class CacheBuilder<K, V> {
 
   private boolean weakValues;
 
-  private boolean tenantAware;
+  private boolean tenantAware = true;
 
   private RemovalListener<? super K, ? super V> removalListener;
 
@@ -211,16 +211,16 @@ public abstract class CacheBuilder<K, V> {
   }
 
   /**
-   * Enables data isolation per tenant. When multi-tenancy is active, the cache automatically
-   * segregates entries based on the current tenant context.
+   * Disables data isolation per tenant. The cache will be shared globally across all tenants when
+   * multi-tenancy is active.
    *
-   * <p>It is critical that you enable this option if your cached data is database-related in any
-   * way.
+   * <p>By default, when multi-tenancy is active, the cache automatically segregates entries based
+   * on the current tenant context.
    *
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> tenantAware() {
-    this.tenantAware = true;
+  public CacheBuilder<K, V> nonTenantAware() {
+    this.tenantAware = false;
     return this;
   }
 

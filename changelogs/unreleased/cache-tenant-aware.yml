@@ -1,6 +1,8 @@
 ---
-title: Implement tenant-aware caching option
+title: Implement tenant-aware AxelorCache
 type: feature
 description: |
-  Add support for tenant-aware caches by introducing
-  a `tenantAware()` configuration option to `CacheBuilder`.
+  By default, when multi-tenancy is active, the cache automatically segregates entries based
+  on the current tenant context.
+  Use `CacheBuilder#nonTenantAware()` to disable this behavior and allow the cache
+  to be shared globally across all tenants.
