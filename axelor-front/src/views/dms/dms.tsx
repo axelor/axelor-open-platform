@@ -596,9 +596,7 @@ export function Dms(props: ViewProps<GridView>) {
       }
 
       for (let i = 0; i < files.length; i++) {
-        uploader.queue({
-          file: files[i],
-        });
+        uploader.queue(files[i]);
       }
 
       await uploader.process();

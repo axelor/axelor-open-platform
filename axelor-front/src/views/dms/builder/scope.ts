@@ -4,20 +4,17 @@ import { readCookie, request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { TreeRecord } from "./types";
 import { DataRecord } from "@/services/client/data.types";
+import { DEFAULT_UPLOAD_CLEANUP_DELAY } from "@/utils/app-settings";
 
 export type UploaderListener = () => void;
 
 export type UploadFile = {
   file: File;
-  uuid?: null | string;
+  uuid: string;
   _start?: number;
   _end?: number;
   _size?: number;
-  loaded?: boolean;
-  pending?: boolean;
-  active?: boolean;
-  failed?: boolean;
-  complete?: boolean;
+  status: UploadStatus;
   progress?: number;
   transfer?: string;
   abort?: () => void;
@@ -44,11 +41,30 @@ function formatSize(done: number, total: number) {
   return format(done || 0) + "/" + format(total);
 }
 
+export enum UploadStatus {
+  Pending = "pending",
+  Uploading = "uploading",
+  Uploaded = "uploaded",
+  Failed = "failed",
+  Cancelled = "cancelled",
+  Completed = "completed",
+}
+
+function createUuid() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `u_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(
+    36,
+  )}`;
+}
+
 export class Uploader {
   #items: UploadFile[] = [];
   #pending: UploadFile[] = [];
   #running = false;
   #saveHandler: ((data: DataRecord) => Promise<DataRecord>) | null = null;
+  #cleanupTimer: ReturnType<typeof setTimeout> | null = null;
   #listeners = new Set<UploaderListener>();
 
   get running() {
@@ -74,17 +90,26 @@ export class Uploader {
     this.#listeners.forEach((fn) => fn());
   }
 
-  queue(info: UploadFile) {
-    info.pending = true;
+  queue(file: File) {
+    this.#queue({
+      file,
+      uuid: createUuid(),
+      status: UploadStatus.Pending,
+    });
+  }
+
+  #queue(info: UploadFile) {
+    this.#clearCleanupTimer();
+    info.status = UploadStatus.Pending;
     info.progress = 0;
     info.transfer = i18n.get("Pending");
     info.abort = () => {
       info.transfer = i18n.get("Cancelled");
-      info.pending = false;
+      info.status = UploadStatus.Cancelled;
       this.notify();
     };
     info.retry = () => {
-      this.queue(info);
+      this.#queue(info);
       this.process();
       this.notify();
     };
@@ -100,18 +125,17 @@ export class Uploader {
 
   process() {
     if (this.#running || this.#pending.length === 0) {
-      if (this.#items.every((item) => item.complete)) {
-        this.#items.length = 0;
-      }
+      this.#scheduleCleanup();
       return this.notify();
     }
 
+    this.#clearCleanupTimer();
     this.#running = true;
     this.notify();
 
     let info = this.#pending.shift();
 
-    while (info && !info.pending) {
+    while (info && info.status !== UploadStatus.Pending) {
       info = this.#pending.shift();
     }
 
@@ -126,11 +150,9 @@ export class Uploader {
     const error = (reason: any): any => {
       this.#running = false;
       if (info) {
-        info.active = false;
-        info.pending = false;
         info.progress = 0;
         info.transfer = reason.message;
-        info.failed = true;
+        info.status = UploadStatus.Failed;
         this.notify();
       }
       return this.process();
@@ -139,9 +161,7 @@ export class Uploader {
     const success = (): any => {
       this.#running = false;
       if (info) {
-        info.active = false;
-        info.pending = false;
-        info.complete = true;
+        info.status = UploadStatus.Completed;
         info.progress = 100;
         this.notify();
       }
@@ -152,10 +172,64 @@ export class Uploader {
   }
 
   finish() {
+    this.#clearCleanupTimer();
     this.#running = false;
     this.#items.length = 0;
     this.#pending.length = 0;
     this.notify();
+  }
+
+  #scheduleCleanup(delay = DEFAULT_UPLOAD_CLEANUP_DELAY) {
+    if (
+      this.#cleanupTimer ||
+      this.#running ||
+      this.#pending.length > 0 ||
+      this.#items.length === 0
+    ) {
+      return;
+    }
+    const hasInProgress = this.#items.some(
+      (item) =>
+        item.status === UploadStatus.Pending ||
+        item.status === UploadStatus.Uploading ||
+        item.status === UploadStatus.Uploaded,
+    );
+    const hasCompleted = this.#items.some(
+      (item) => item.status === UploadStatus.Completed,
+    );
+    if (hasInProgress || !hasCompleted) {
+      return;
+    }
+    this.#cleanupTimer = setTimeout(() => {
+      this.#cleanupTimer = null;
+      this.#cleanupCompletedItems();
+    }, delay);
+  }
+
+  #clearCleanupTimer() {
+    if (this.#cleanupTimer) {
+      clearTimeout(this.#cleanupTimer);
+      this.#cleanupTimer = null;
+    }
+  }
+
+  #cleanupCompletedItems() {
+    if (this.#running || this.#pending.length > 0) {
+      return;
+    }
+    const incompleteItems = this.#items.filter(
+      (item) => item.status !== UploadStatus.Completed,
+    );
+    if (incompleteItems.length === 0) {
+      return this.finish();
+    }
+
+    const removed = this.#items.length !== incompleteItems.length;
+    this.#items = incompleteItems;
+
+    if (removed) {
+      this.notify();
+    }
   }
 
   async upload(info: UploadFile) {
@@ -203,17 +277,13 @@ export class Uploader {
         info._start = info._end;
         info._end = Math.min((info._end ?? 0) + (info._size ?? 0), file.size);
 
-        if (response && response.fileId) {
-          info.uuid = response.fileId;
-        }
-
         notify();
 
         if (response && response.id) {
           return onSuccess(response);
         }
 
-        if (info.loaded) {
+        if (info.status === UploadStatus.Uploaded) {
           return onError();
         }
 
@@ -247,22 +317,22 @@ export class Uploader {
         xhr.send(chunk);
       }
 
-      info.uuid = null;
       info._start = 0;
       info._size = 1000 * 1000; // 1MB
       info._end = info._size;
 
-      info.active = true;
+      info.status = UploadStatus.Uploading;
       info.transfer = formatSize(0, file.size);
       info.abort = function () {
         xhr.abort();
+        info.status = UploadStatus.Cancelled;
         onCancel();
         notify();
       };
 
       info.retry = () => {
         // put back on queue
-        this.queue(info);
+        this.#queue(info);
         this.process();
       };
 
@@ -272,7 +342,8 @@ export class Uploader {
         const done = Math.round((total / file.size) * 100);
         info.progress = done > 95 ? 95 : done;
         info.transfer = formatSize(total, file.size);
-        info.loaded = total === file.size;
+        info.status =
+          total === file.size ? UploadStatus.Uploaded : UploadStatus.Uploading;
         notify();
       });
 
