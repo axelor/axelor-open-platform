@@ -29,19 +29,21 @@ class TenantAwareCache<K, V> implements AxelorCache<K, V> {
 
   private final LoadingCache<String, AxelorCache<K, V>> caches;
 
+  private static final long MIN_EVICTION_MINUTES = 24 * 60L; // 1 day
+
   private static final Logger log = LoggerFactory.getLogger(TenantAwareCache.class);
 
   public TenantAwareCache(Function<String, AxelorCache<K, V>> cacheFactory) {
     this.caches =
         Caffeine.newBuilder()
-            .expireAfterAccess(Duration.ofDays(1))
-            .removalListener(
-                (String tenant, AxelorCache<K, V> cache, RemovalCause cause) -> {
-                  if (cache != null) {
+            .expireAfterAccess(Duration.ofMinutes(MIN_EVICTION_MINUTES))
+            .evictionListener(
+                (String tenantId, AxelorCache<K, V> innerCache, RemovalCause cause) -> {
+                  if (innerCache != null) {
                     try {
-                      cache.close();
+                      innerCache.close();
                     } catch (Exception e) {
-                      log.error("Failed to close cache for tenant %s".formatted(tenant), e);
+                      log.error("Failed to close cache for tenant %s".formatted(innerCache), e);
                     }
                   }
                 })

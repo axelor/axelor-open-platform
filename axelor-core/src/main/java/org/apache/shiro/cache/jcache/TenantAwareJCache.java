@@ -43,13 +43,14 @@ class TenantAwareJCache<K, V> implements Cache<K, V> {
     this.caches =
         Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(evictionMinutes))
-            .removalListener(
-                (String tenant, Cache<K, V> cache, RemovalCause cause) -> {
-                  if (cache != null && !cache.isClosed() && !cache.getCacheManager().isClosed()) {
+            .evictionListener(
+                (String tenantId, Cache<K, V> innerCache, RemovalCause cause) -> {
+                  if (innerCache != null && !innerCache.isClosed()) {
                     try {
-                      cache.close();
+                      innerCache.clear();
+                      innerCache.close();
                     } catch (Exception e) {
-                      log.error("Failed to close Shiro cache for tenant %s".formatted(tenant), e);
+                      log.error("Failed to close Shiro cache for tenant %s".formatted(tenantId), e);
                     }
                   }
                 })
