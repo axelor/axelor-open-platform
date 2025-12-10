@@ -200,7 +200,17 @@ public final class EntityHelper {
    * @return true if the model is safe for bulk update; false otherwise
    */
   public static boolean isSafeForBulkUpdate(Class<?> model) {
-    EntityPersister entityPersister = getEntityPersister(model);
+    EntityPersister entityPersister = null;
+
+    try {
+      entityPersister = getEntityPersister(model);
+    } catch (Exception e) {
+      // Not an entity (likely MappedSuperclass or POJO)
+    }
+
+    if (entityPersister == null) {
+      return false;
+    }
 
     // Case TABLE_PER_CLASS
     // isMultiTable() -> isAbstract() || hasSubclasses() -> implies UNION query -> Unsafe

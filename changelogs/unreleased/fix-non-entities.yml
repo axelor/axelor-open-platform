@@ -1,0 +1,3 @@
+---
+title: Handle non-entities gracefully in bulk update safety check
+type: feature
