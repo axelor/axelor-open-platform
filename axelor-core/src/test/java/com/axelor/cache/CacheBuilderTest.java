@@ -349,6 +349,9 @@ class CacheBuilderTest {
   @ParameterizedTest(name = "{0} - PutAll Operations")
   @EnumSource(CacheType.class)
   void testPutAllOperations(CacheType cacheType) {
+    assumeTrue(
+        hasHPExpire || cacheType != CacheType.REDISSON_NATIVE,
+        "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
     doPutAllOperations(cacheType::getCacheBuilder);
   }
 
@@ -391,7 +394,7 @@ class CacheBuilderTest {
   private void doPutAllOperations(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
     useCache(
-        cacheBuilderFactory.apply("test-put-all").build(),
+        cacheBuilderFactory.apply("test-put-all").expireAfterWrite(TTL).build(),
         cache -> {
           // Initial putAll
           Map<String, Object> batch1 =
@@ -420,6 +423,15 @@ class CacheBuilderTest {
           assertEquals("value1", cache.get("key1"), "Original entry should remain");
           assertEquals("value2-updated", cache.get("key2"), "Updated entry should persist");
           assertEquals("value99", cache.get("batch-key99"), "Last batch entry should exist");
+
+          // putAll should expire
+          await()
+              .atMost(Duration.ofSeconds(2))
+              .pollInterval(TTL.dividedBy(2))
+              .untilAsserted(
+                  () ->
+                      assertFalse(
+                          cache.asMap().containsKey("key1"), "putAll should expire entries"));
         });
   }
 
