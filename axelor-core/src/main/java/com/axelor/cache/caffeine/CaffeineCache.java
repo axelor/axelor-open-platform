@@ -81,7 +81,7 @@ public class CaffeineCache<K, V> implements AxelorCache<K, V> {
 
   @Override
   public void close() {
-    cache.cleanUp();
+    cache.invalidateAll();
   }
 
   @Override
