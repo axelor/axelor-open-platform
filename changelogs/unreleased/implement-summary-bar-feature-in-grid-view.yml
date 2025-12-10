@@ -1,0 +1,5 @@
+---
+title: Add summary bar feature in grid view
+type: feature
+description: |
+  The summary bar can be used to show summary by the selected rows, page and action in a grid view.

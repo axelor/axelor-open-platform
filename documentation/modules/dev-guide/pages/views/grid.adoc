@@ -146,7 +146,6 @@ shown in the top toolbar.
 
 In the case of grid view displayed as child of a form view or as a dashlet, first menu will be displayed.
 
-
 == Hilite
 
 The `<hilite>` item should be applied on the grid view to highlight whole rows
@@ -214,6 +213,97 @@ Besides those styles, these colors are also available:
 
 The `<hilite>` item if applied on grid view it highlights the rows.
 The `<hilite>` item if applied on fields it highlights the cells.
+
+== Summary bar
+
+The `<summary-bar>` item can be used to show a summary row at the bottom of the grid view
+and should be specified after all grid `<field>` and `<button>` items.
+
+Example:
+
+[source,xml]
+-----
+<summary-bar>
+  <field name="totalAmount" aggregate="sum" title="All sum" on="page" />
+  <field name="totalAmount" aggregate="sum" title="Selected sum" on="selection" align="end" />
+
+  <field name="totalAmount" aggregate="avg" title="All avg" on="page" />
+  <field name="totalAmount" aggregate="avg" title="Selected avg" on="selection" align="end" />
+
+  <call action="com.axelor.sale.web.SaleOrderController:fetchSummary">
+    <field name="allTotal" type="decimal" title="All total" align="end" />
+  </call>
+</summary-bar>
+-----
+
+The attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `hint` | Optional placeholder text displayed when no summary values are available
+(for example, when no rows are selected)
+|===
+
+=== Field
+
+The `<field>` item on which to perform an aggregation in the summary bar.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | Name of the field to aggregate. Used for value formatting based on grid field metadata
+| *`aggregate`* | Aggregation function to apply: sum \| min \| max \| avg \| count \| median
+| *`on`* | Defines the aggregation scope: selection \| page (selection – summary based on selected records, page - summary of currently displayed records)
+| *`title`* | Label shown in the summary bar
+| `align` | Horizontal alignment of the summary block: start \| end. (Default: start)
+
+|===
+
+=== Call
+
+The `<call>` item can be used to specify a summary block whose values are computed on the server.
+This can be typically used for computation based on the entire dataset.
+It is only supported with main grid view, so when a grid view configured with summary-bar
+is used for a collection field, it will skip action call.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`action`* | Action method used to retrieve summary values
+
+|===
+
+Example action method:
+
+[source,java]
+-----
+public void fetchSummary(ActionRequest request, ActionResponse response) {
+    var allTotal =
+        JPA.em()
+            .createQuery("SELECT SUM(self.totalAmount) FROM Order AS self", BigDecimal.class)
+            .getSingleResult();
+    response.setValue("allTotal", allTotal); // Response can set several values
+}
+-----
+
+==== Field
+
+The `<field>` defines a summary value returned by a <call> action.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | key used to retrieve the value from the action result
+| *`title`* | label shown in the summary bar
+| `type` | type hint for formatting when the field does not exist in the grid. (Default: string)
+| `align` | Horizontal alignment of the summary block: start \| end. (Default: start)
+
+|===
 
 == Advanced search
 

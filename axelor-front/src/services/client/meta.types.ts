@@ -153,6 +153,32 @@ export interface Hilite extends BaseHilite {
   css?: string;
 }
 
+export interface SummaryItem {
+  name: string;
+  title: string;
+  align?: "start" | "end";
+}
+
+export interface SummaryBarItem extends SummaryItem {
+  aggregate: "sum" | "count" | "avg" | "min" | "max" | "median";
+  on: "selection" | "page";
+}
+
+export interface SummaryCallItem extends SummaryItem {
+  serverType?: string;
+}
+
+export interface SummaryCall {
+  action: string;
+  items: SummaryCallItem[];
+}
+
+export interface SummaryBar {
+  hint?: string;
+  call?: SummaryCall;
+  items?: SummaryBarItem[];
+}
+
 export interface CalendarEventHilite extends BaseHilite {
   styles?: string;
 }
@@ -542,6 +568,7 @@ export interface GridView extends View {
   treeLimit?: number;
   treeField?: string;
   treeFieldTitle?: string;
+  summaryBar?: SummaryBar;
 }
 
 export interface CardsView extends View {

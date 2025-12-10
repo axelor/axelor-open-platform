@@ -108,6 +108,9 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
   })
   private List<AbstractWidget> items;
 
+  @XmlElement(name = "summary-bar")
+  private SummaryBar summaryBar;
+
   @XmlElement(name = "extend")
   private List<Extend> extendItems;
 
@@ -350,6 +353,14 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   public void setHilites(List<Hilite> hilites) {
     this.hilites = hilites;
+  }
+
+  public SummaryBar getSummaryBar() {
+    return summaryBar;
+  }
+
+  public void setSummaryBar(SummaryBar summaryBar) {
+    this.summaryBar = summaryBar;
   }
 
   public List<Button> getToolbar() {

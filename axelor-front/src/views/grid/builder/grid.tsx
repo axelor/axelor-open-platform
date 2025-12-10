@@ -3,6 +3,7 @@ import { atom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import {
+  Ref,
   RefObject,
   forwardRef,
   useCallback,
@@ -46,6 +47,7 @@ import {
   JsonField,
   Perms,
   Property,
+  Schema,
 } from "@/services/client/meta.types";
 import { getFieldValue } from "@/utils/data-record";
 import format from "@/utils/format";
@@ -69,6 +71,7 @@ import {
   useCollectionTreeEditable,
   useGridColumnNames,
 } from "./scope";
+import { SummaryBarHandler, SummaryBar } from "./summary-bar";
 
 import styles from "../grid.module.scss";
 
@@ -138,6 +141,7 @@ export const Grid = forwardRef<
     columnAttrs?: Record<string, Partial<Attrs>>;
     columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
+    summaryBarHandler?: Ref<SummaryBarHandler>;
     gridContext?: GridContextType;
     onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
@@ -173,6 +177,7 @@ export const Grid = forwardRef<
     readonly,
     columnAttrs,
     columnFormatter,
+    summaryBarHandler,
     records,
     state,
     setState,
@@ -664,53 +669,66 @@ export const Grid = forwardRef<
     [editable, readonly, _gridContext],
   );
 
+  const isCollectionGrid = (view as Schema).serverType?.endsWith("TO_MANY");
+
   return (
-    <AxGridProvider>
-      <GridContext.Provider value={gridContext}>
-        <AxGrid
-          ref={gridRef}
-          labels={getLabels()}
-          cellRenderer={CustomCellRenderer}
-          rowRenderer={CustomRowRenderer}
-          allowColumnResize
-          allowGrouping={!canMove}
-          allowSorting={!canMove}
-          allowSelection
-          allowCellSelection
-          allowColumnHide
-          allowColumnOptions
-          allowColumnCustomize
-          allowCheckboxSelection={allowCheckboxSelection}
-          allowRowReorder={canMove}
-          allowRowExpand={expandable}
-          sortType="state"
-          selectionType="multiple"
-          {...(editable &&
-            !isMobile && {
-              editable,
-              editRowRenderer: CustomFormRenderer,
-              onRecordSave: handleRecordSave,
-              onRecordAdd: handleRecordAdd,
-              onRecordEdit: handleRecordEdit,
-              onRecordDiscard: handleRecordDiscard,
+    <>
+      <AxGridProvider>
+        <GridContext.Provider value={gridContext}>
+          <AxGrid
+            ref={gridRef}
+            labels={getLabels()}
+            cellRenderer={CustomCellRenderer}
+            rowRenderer={CustomRowRenderer}
+            allowColumnResize
+            allowGrouping={!canMove}
+            allowSorting={!canMove}
+            allowSelection
+            allowCellSelection
+            allowColumnHide
+            allowColumnOptions
+            allowColumnCustomize
+            allowCheckboxSelection={allowCheckboxSelection}
+            allowRowReorder={canMove}
+            allowRowExpand={expandable}
+            sortType="state"
+            selectionType="multiple"
+            {...(editable &&
+              !isMobile && {
+                editable,
+                editRowRenderer: CustomFormRenderer,
+                onRecordSave: handleRecordSave,
+                onRecordAdd: handleRecordAdd,
+                onRecordEdit: handleRecordEdit,
+                onRecordDiscard: handleRecordDiscard,
+              })}
+            {...(expandable && {
+              rowDetailsRenderer: RowDetailsRenderer,
+              ...detailsProps,
             })}
-          {...(expandable && {
-            rowDetailsRenderer: RowDetailsRenderer,
-            ...detailsProps,
-          })}
-          onCellClick={handleCellClick}
-          onRowDoubleClick={handleRowDoubleClick}
-          sortHandler={sortHandler}
-          state={state!}
-          setState={setState!}
-          records={records!}
-          rowHeight={Math.max(view.rowHeight ?? 35, 35)}
-          {...gridProps}
-          {...(initData && { noRecordsText })}
-          columns={columns}
-          className={clsx(className, styles.grid)}
+            onCellClick={handleCellClick}
+            onRowDoubleClick={handleRowDoubleClick}
+            sortHandler={sortHandler}
+            state={state!}
+            setState={setState!}
+            records={records!}
+            rowHeight={Math.max(view.rowHeight ?? 35, 35)}
+            {...gridProps}
+            {...(initData && { noRecordsText })}
+            columns={columns}
+            className={clsx(className, styles.grid)}
+          />
+        </GridContext.Provider>
+      </AxGridProvider>
+      {state && view.summaryBar && (
+        <SummaryBar
+          state={state}
+          data={view.summaryBar}
+          handler={summaryBarHandler}
+          actionExecutor={actionExecutor}
+          callAction={!isCollectionGrid}
         />
-      </GridContext.Provider>
-    </AxGridProvider>
+      )}
+    </>
   );
 });

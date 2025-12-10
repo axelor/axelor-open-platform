@@ -86,6 +86,7 @@ import {
 import { AUTO_ADD_ROW, useGridSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
+import { SummaryBarHandler } from "./builder/summary-bar";
 
 import styles from "./grid.module.scss";
 
@@ -145,6 +146,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
+  const searchResultRef = useRef<SearchResult | null>(null);
   const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
   const saveIdRef = useRef<number>(null);
@@ -154,6 +156,7 @@ function GridInner(props: ViewProps<GridView>) {
   const [massUpdatePopperEl, setMassUpdatePopperEl] =
     useState<HTMLElement | null>();
   const [viewProps, setViewProps] = useViewProps();
+  const summaryBarHandlerRef = useRef<SummaryBarHandler | null>(null);
 
   const {
     action,
@@ -309,10 +312,25 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, getSearchOptions],
   );
 
+  const refreshSummaryBar = useCallback(
+    (result: SearchResult | null = searchResultRef.current) => {
+      // refresh summary bar if any
+      if (summaryBarHandlerRef?.current && result) {
+        const recordIds = result.records.map((r) => r.id!);
+        summaryBarHandlerRef?.current?.refresh?.(recordIds, getActionData());
+      }
+    },
+    [getActionData],
+  );
+
   const doSearch = useCallback(
-    (options: SearchOptions = {}) =>
-      dataStore.search(getSearchOptions(options)),
-    [dataStore, getSearchOptions],
+    async (options: SearchOptions = {}) => {
+      const result = await dataStore.search(getSearchOptions(options));
+      searchResultRef.current = result;
+      refreshSummaryBar(result);
+      return result;
+    },
+    [dataStore, refreshSummaryBar, getSearchOptions],
   );
 
   const onSearch = useAfterActions(doSearch);
@@ -519,10 +537,13 @@ function GridInner(props: ViewProps<GridView>) {
         },
         { ...options, ...(fields.length ? { fields } : {}) },
       );
-      saved && setDirty(false);
+      if (saved) {
+        setDirty(false);
+        refreshSummaryBar();
+      }
       return saved;
     },
-    [dataStore, meta, setDirty],
+    [dataStore, meta, setDirty, refreshSummaryBar],
   );
 
   const onDiscard = useCallback(() => {
@@ -905,10 +926,12 @@ function GridInner(props: ViewProps<GridView>) {
       if (cacheDataRef.current) {
         cacheDataRef.current = false;
         if (isEqual(dataStore.options?.fields, options?.fields)) {
-          return Promise.resolve({
+          const result = {
             records: dataStore.records,
             page: dataStore.page,
-          } as SearchResult);
+          } as SearchResult;
+          refreshSummaryBar(result);
+          return Promise.resolve(result);
         }
       }
 
@@ -927,7 +950,7 @@ function GridInner(props: ViewProps<GridView>) {
       }
       return (onSearchRef.current = onSearch)(options);
     },
-    [onSearch, dataStore],
+    [onSearch, refreshSummaryBar, dataStore],
   );
 
   const onGridColumnSearch = useCallback(
@@ -1326,7 +1349,9 @@ function GridInner(props: ViewProps<GridView>) {
             canNext,
             onPrev: handlePrev,
             onNext: handleNext,
-            text: () => <PageText dataStore={dataStore} />,
+            text: () => (
+              <PageText onResult={refreshSummaryBar} dataStore={dataStore} />
+            ),
           }}
         >
           {searchAtom && (
@@ -1384,6 +1409,7 @@ function GridInner(props: ViewProps<GridView>) {
               onRowReorder={onRowReorder}
               noRecordsText={i18n.get("No records found.")}
               onColumnCustomize={onColumnCustomize}
+              summaryBarHandler={summaryBarHandlerRef}
               {...(dashlet ? {} : searchProps)}
               {...dashletProps}
               {...popupProps}

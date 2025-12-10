@@ -750,6 +750,127 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:complexType name="SummaryBar">
+    <xsd:sequence>
+      <xsd:element name="field" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Specify a field on which to perform an aggregation.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:SummaryBaseField">
+          <xsd:attribute name="aggregate" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Aggregation type.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="sum" />
+                <xsd:enumeration value="count" />
+                <xsd:enumeration value="avg" />
+                <xsd:enumeration value="max" />
+                <xsd:enumeration value="min" />
+                <xsd:enumeration value="median" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="on" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Summary on page/select.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="selection" />
+                <xsd:enumeration value="page" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="call" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+            Specify a server side summary through action call.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="field" minOccurs="1" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Specify a data value received by the action to display.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:complexContent>
+                  <xsd:extension base="tns:SummaryBaseField">
+                    <xsd:attribute name="type" type="xsd:string">
+                      <xsd:annotation>
+                        <xsd:documentation>Specify the type for the data to display.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                  </xsd:extension>
+                </xsd:complexContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="action" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Action to fetch summary values
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="hint" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Placeholder text displayed when no summary values are available (for example, when no rows are selected).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="SummaryBaseField">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Field name to summarize.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Title to show for the summary item.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+        <xsd:attribute name="align">
+          <xsd:annotation>
+            <xsd:documentation>
+              Horizontal alignment of the summary block start | end
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="start" />
+              <xsd:enumeration value="end" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+  </xsd:complexType>
+
   <xsd:complexType name="Selection">
     <xsd:sequence maxOccurs="unbounded">
       <xsd:element name="option">
@@ -1437,6 +1558,7 @@
             <xsd:choice maxOccurs="unbounded">
               <xsd:group ref="tns:GridWidgets" />
             </xsd:choice>
+            <xsd:element name="summary-bar" type="tns:SummaryBar" minOccurs="0" />
           </xsd:sequence>
         </xsd:choice>
         <xsd:attribute name="widget" use="optional">

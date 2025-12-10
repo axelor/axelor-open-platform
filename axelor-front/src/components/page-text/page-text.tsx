@@ -11,12 +11,19 @@ import { Button, Input } from "@axelor/ui";
 import { alerts } from "@/components/alerts";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
+import { SearchResult } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
 import { getDefaultMaxPerPage } from "@/utils/app-settings.ts";
 
 import styles from "./page-text.module.scss";
 
-export function PageText({ dataStore }: { dataStore: DataStore }) {
+export function PageText({
+  dataStore,
+  onResult,
+}: {
+  dataStore: DataStore;
+  onResult?: (result: SearchResult) => void;
+}) {
   const page = useDataStore(dataStore, (state) => state.page);
   const maxLimit = getDefaultMaxPerPage();
   const { offset = 0, totalCount = 0 } = page;
@@ -47,15 +54,17 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
           message: i18n.get("Page size limited to {0} records", size),
         });
       }
-      dataStore.search({
-        limit: size,
-        ...(currentPage && {
-          offset: (currentPage - 1) * size,
-        }),
-      });
+      dataStore
+        .search({
+          limit: size,
+          ...(currentPage && {
+            offset: (currentPage - 1) * size,
+          }),
+        })
+        .then(onResult);
       setShowEditor(false);
     },
-    [dataStore, currentPage, userPageSize],
+    [dataStore, currentPage, onResult, userPageSize],
   );
 
   const handleKeyDown = useCallback(
