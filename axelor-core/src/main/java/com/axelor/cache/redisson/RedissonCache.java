@@ -5,6 +5,7 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -21,40 +22,26 @@ import org.redisson.api.map.event.MapEntryListener;
  */
 public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K, V>> {
 
-  private long ttl;
-  private TimeUnit ttlUnit;
+  private volatile long ttl;
+  private static final TimeUnit TTL_UNIT = TimeUnit.MILLISECONDS;
 
-  private long maxIdleTime;
-  private TimeUnit maxIdleTimeUnit;
-
-  private CachePutter<K, V> putter;
+  private volatile long maxIdleTime;
+  private static final TimeUnit MAX_IDLE_TIME_UNIT = TimeUnit.MILLISECONDS;
 
   private final Set<Integer> listenerIds = ConcurrentHashMap.newKeySet();
 
   public RedissonCache(RMapCache<K, V> cache) {
     super(cache);
-    updatePutter();
-  }
-
-  protected void updatePutter() {
-    putter =
-        ttl != 0 || maxIdleTime != 0
-            ? cache::fastPut
-            : (key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit) -> cache.fastPut(key, value);
   }
 
   @Override
   public void setExpireAfterWrite(Duration expireAfterWrite) {
     ttl = expireAfterWrite.toMillis();
-    ttlUnit = TimeUnit.MILLISECONDS;
-    updatePutter();
   }
 
   @Override
   public void setExpireAfterAccess(Duration expireAfterAccess) {
     maxIdleTime = expireAfterAccess.toMillis();
-    maxIdleTimeUnit = TimeUnit.MILLISECONDS;
-    updatePutter();
   }
 
   @Override
@@ -64,7 +51,21 @@ public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K
 
   @Override
   public void put(K key, V value) {
-    putter.accept(key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit);
+    cache.fastPut(key, value, ttl, TTL_UNIT, maxIdleTime, MAX_IDLE_TIME_UNIT);
+  }
+
+  @Override
+  public void putAll(Map<? extends K, ? extends V> map) {
+    if (maxIdleTime != 0) {
+      // Iteration to ensure maxIdle and TTL are applied on each entry
+      map.forEach(this::put);
+    } else if (ttl != 0) {
+      // Scripted Bulk to ensure TTL is applied on each entry
+      cache.putAll(map, ttl, TTL_UNIT);
+    } else {
+      // Native Bulk (No expiration)
+      cache.putAll(map);
+    }
   }
 
   @Override
@@ -87,12 +88,5 @@ public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K
   public void removeListener(int listenerId) {
     cache.removeListener(listenerId);
     listenerIds.remove(listenerId);
-  }
-
-  @FunctionalInterface
-  static interface CachePutter<K, V> {
-
-    public void accept(
-        K key, V value, long ttl, TimeUnit ttlUnit, long maxIdleTime, TimeUnit maxIdleTimeUnit);
   }
 }
