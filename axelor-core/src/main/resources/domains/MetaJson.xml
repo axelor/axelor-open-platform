@@ -80,6 +80,7 @@
     <string name="menuBackground" />
     <integer name="menuOrder" />
     <string name="menuTitle" />
+    <boolean name="isDelegated" />
     <enum name="panelMailDisplay" ref="PanelMailDisplay" title="Messaging panel" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />

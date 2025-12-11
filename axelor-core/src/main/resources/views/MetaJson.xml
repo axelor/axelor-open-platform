@@ -224,6 +224,7 @@
     model="com.axelor.meta.db.MetaJsonModel">
     <view type="grid" name="json-model-grid" />
     <view type="form" name="json-model-form" />
+    <domain>COALESCE(self.isDelegated, FALSE) = FALSE</domain>
   </action-view>
 
   <action-view name="custom.fields.all"

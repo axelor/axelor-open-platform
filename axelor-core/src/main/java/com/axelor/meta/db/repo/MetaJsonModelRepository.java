@@ -62,6 +62,11 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       }
     }
 
+    // Don't generate views
+    if (Boolean.TRUE.equals(jsonModel.getIsDelegated())) {
+      return;
+    }
+
     MetaView gridView = jsonModel.getGridView();
     String orderBy = jsonModel.getOrderBy();
     String groupBy = jsonModel.getGroupBy();
