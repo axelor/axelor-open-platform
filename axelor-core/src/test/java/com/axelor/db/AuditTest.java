@@ -280,6 +280,8 @@ public class AuditTest extends JpaTest {
     Runtime runtime = Runtime.getRuntime();
     runtime.gc();
     long memoryBefore = runtime.totalMemory() - runtime.freeMemory();
+    long auditCountBefore =
+        Query.of(AuditLog.class).filter("self.relatedModel = ?", entityType.getName()).count();
 
     long[] durations = new long[measurementRuns];
     for (int run = 0; run < measurementRuns; run++) {
@@ -306,13 +308,6 @@ public class AuditTest extends JpaTest {
       durations[run] = (endTime - startTime) / 1_000_000;
       System.out.println("  Run " + (run + 1) + ": " + durations[run] + " ms");
 
-      // Cleanup after each run
-      JPA.runInTransaction(
-          () -> {
-            getEntityManager()
-                .createQuery("DELETE FROM " + entityType.getSimpleName())
-                .executeUpdate();
-          });
       runtime.gc();
     }
 
@@ -324,8 +319,9 @@ public class AuditTest extends JpaTest {
 
     // Check if entity has audit tracking (check for AuditLog records)
     try {
-      long auditCount =
+      long auditCountAfter =
           Query.of(AuditLog.class).filter("self.relatedModel = ?", entityType.getName()).count();
+      long auditCount = auditCountAfter - auditCountBefore;
       stats.auditRecordCount = auditCount;
       stats.auditRecordsPerEntity = auditCount / (double) (MAX_SIZE * measurementRuns);
     } catch (Exception e) {
