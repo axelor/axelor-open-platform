@@ -8,12 +8,12 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.audit.db.AuditEventType;
 import com.axelor.audit.db.AuditLog;
+import com.axelor.audit.db.repo.AuditLogRepository;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.Query;
 import com.axelor.db.annotations.TrackEvent;
 import com.axelor.db.annotations.TrackMessage;
 import com.axelor.db.mapper.Adapter;
@@ -72,6 +72,7 @@ public class AuditProcessor {
 
   @Inject private MailMessageRepository mailMessageRepository;
   @Inject private MailFollowerRepository mailFollowerRepository;
+  @Inject private AuditLogRepository auditLogRepository;
   @Inject private ObjectMapper objectMapper;
 
   /**
@@ -103,8 +104,6 @@ public class AuditProcessor {
 
   /** Core processing loop that fetches and processes audit logs in batches. */
   private void process(Supplier<List<AuditLog>> fetcher) {
-    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
     var totalProcessed = 0;
     var totalFailed = 0;
 
@@ -125,9 +124,12 @@ public class AuditProcessor {
         break;
       }
 
+      var processedIds = new ArrayList<Long>();
+
       for (var auditLog : batch) {
         try {
-          process(auditLog);
+          var ids = process(auditLog);
+          processedIds.addAll(ids);
           totalProcessed++;
         } catch (Exception e) {
           totalFailed++;
@@ -135,8 +137,15 @@ public class AuditProcessor {
         }
       }
 
-      // Flush and clear to avoid memory issues
+      // Flush pending changes (e.g., MailMessage inserts, error updates)
       JPA.flush();
+
+      // Bulk delete successfully processed AuditLogs
+      if (!processedIds.isEmpty()) {
+        auditLogRepository.all().filter("self.id IN :ids").bind("ids", processedIds).delete();
+      }
+
+      // Clear to avoid memory issues
       JPA.clear();
 
       // Wait a bit before next batch to reduce DB load
@@ -157,10 +166,10 @@ public class AuditProcessor {
     return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_TIMEOUT_MS;
   }
 
-  private void process(AuditLog auditLog) throws Exception {
+  private List<Long> process(AuditLog auditLog) throws Exception {
     // Check if already processed (might be consolidated with previous)
     if (Boolean.TRUE.equals(auditLog.getProcessed())) {
-      return;
+      return Collections.emptyList();
     }
 
     var txId = auditLog.getTxId();
@@ -171,7 +180,7 @@ public class AuditProcessor {
     // Find all audit logs for same entity in same transaction
     var group = findRelated(txId, eventType, relatedId, relatedModel);
     if (group.isEmpty()) {
-      return;
+      return Collections.emptyList();
     }
 
     if (group.size() > 1) {
@@ -204,18 +213,15 @@ public class AuditProcessor {
       // Process the audit log
       process(entityState, lastLog.getUser());
     }
-    
+
     // Mark them processed
     for (var logEntry : group) {
       logEntry.setProcessed(true);
       logEntry.setProcessedOn(LocalDateTime.now());
     }
 
-    // Mark ALL audit logs as processed
-    for (var item : group) {
-      item.setProcessed(true);
-      item.setProcessedOn(LocalDateTime.now());
-    }
+    // Return IDs of all audit logs in this group for deletion
+    return group.stream().map(AuditLog::getId).toList();
   }
 
   private void process(EntityState state, User user) {
@@ -379,7 +385,8 @@ public class AuditProcessor {
   }
 
   private List<AuditLog> findPending() {
-    return Query.of(AuditLog.class)
+    return auditLogRepository
+        .all()
         .filter("self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry")
         .bind("maxRetry", MAX_RETRY)
         .order("txId")
@@ -391,7 +398,8 @@ public class AuditProcessor {
   }
 
   private List<AuditLog> findPending(String txId) {
-    return Query.of(AuditLog.class)
+    return auditLogRepository
+        .all()
         .filter(
             "self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry AND self.txId = :txId")
         .bind("maxRetry", MAX_RETRY)
@@ -405,7 +413,8 @@ public class AuditProcessor {
 
   private List<AuditLog> findRelated(
       String txId, AuditEventType eventType, Long relatedId, String relatedModel) {
-    return Query.of(AuditLog.class)
+    return auditLogRepository
+        .all()
         .filter(
             """
             self.txId = :txId
