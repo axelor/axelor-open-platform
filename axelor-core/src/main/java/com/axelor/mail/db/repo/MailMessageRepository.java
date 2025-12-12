@@ -64,6 +64,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
             "self.relatedModel = ? AND self.relatedId = ?",
             EntityHelper.getEntityClass(related).getName(),
             related.getId())
+        .order("-receivedOn")
         .order("-createdOn")
         .fetch(limit, offset);
   }
@@ -76,6 +77,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
             EntityHelper.getEntityClass(related).getName(),
             related.getId(),
             type)
+        .order("-receivedOn")
         .order("-createdOn")
         .fetch(limit, offset);
   }
@@ -191,6 +193,11 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     // make sure to set unique message-id
     if (entity.getMessageId() == null) {
       entity.setMessageId(generateMessageId(entity));
+    }
+
+    // set received on date
+    if (entity.getReceivedOn() == null) {
+      entity.setReceivedOn(LocalDateTime.now());
     }
 
     final MailMessage saved = super.save(entity);
