@@ -21,6 +21,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -149,34 +149,16 @@ public class AuditTracker
       return;
     }
 
-    var values = new HashMap<String, Object>();
-    var oldValues = new HashMap<String, Object>();
+    // Store FULL entity state (required for condition evaluation in tracking messages)
+    var currentValues = new HashMap<String, Object>();
+    var previousValues = new HashMap<String, Object>();
+    var mapper = Mapper.of(entity.getClass());
+    var isCreate = previousState == null;
 
     for (int i = 0; i < names.length; i++) {
-      values.put(names[i], state[i]);
-    }
-
-    if (previousState != null) {
-      for (int i = 0; i < names.length; i++) {
-        oldValues.put(names[i], previousState[i]);
-      }
-    }
-
-    // OPTIMIZATION: Extract only changed fields
-    var changedCurrent = new HashMap<String, Object>();
-    var changedOld = new HashMap<String, Object>();
-
-    var mapper = Mapper.of(entity.getClass());
-
-    for (var entry : values.entrySet()) {
-      var fieldName = entry.getKey();
-      var newValue = entry.getValue();
-      var oldValue = oldValues.get(fieldName);
-
-      // Skip audit fields
-      if (mapper.getSetter(fieldName) == null) {
-        continue;
-      }
+      var fieldName = names[i];
+      var newValue = state[i];
+      var oldValue = previousState != null ? previousState[i] : null;
 
       // Skip non-trackable fields
       var property = mapper.getProperty(fieldName);
@@ -189,23 +171,17 @@ public class AuditTracker
         continue;
       }
 
-      // Skip unchanged fields
-      if (Objects.equals(newValue, oldValue)) {
-        continue;
-      }
-
+      // For reference fields, store both id and name field value
       if (newValue instanceof Model newModel) {
-        newValue = newModel.getId();
+        newValue = Resource.toMapCompact(newModel);
       }
-
       if (oldValue instanceof Model oldModel) {
-        oldValue = oldModel.getId();
+        oldValue = Resource.toMapCompact(oldModel);
       }
 
-      changedCurrent.put(fieldName, newValue);
-
-      if (!oldValues.isEmpty()) {
-        changedOld.put(fieldName, oldValue);
+      currentValues.put(fieldName, newValue);
+      if (!isCreate) {
+        previousValues.put(fieldName, oldValue);
       }
     }
 
@@ -217,9 +193,9 @@ public class AuditTracker
     auditLog.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
     auditLog.setRelatedId(entity.getId());
     auditLog.setTxId(txId);
-    auditLog.setEventType(oldValues.isEmpty() ? AuditEventType.CREATE : AuditEventType.UPDATE);
-    auditLog.setCurrentState(toJSON(changedCurrent));
-    auditLog.setPreviousState(oldValues.isEmpty() ? null : toJSON(changedOld));
+    auditLog.setEventType(isCreate ? AuditEventType.CREATE : AuditEventType.UPDATE);
+    auditLog.setCurrentState(toJSON(currentValues));
+    auditLog.setPreviousState(isCreate ? null : toJSON(previousValues));
     auditLog.setUser(user);
     auditLog.setProcessed(false);
 

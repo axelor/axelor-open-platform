@@ -11,7 +11,6 @@ import com.axelor.audit.db.AuditLog;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
-import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -28,7 +27,6 @@ import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
-import com.axelor.rpc.ContextHandler;
 import com.axelor.rpc.ContextHandlerFactory;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -54,7 +52,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,28 +183,11 @@ public class AuditProcessor {
           txId);
     }
 
-    // Consolidate ALL changes from all audit logs
-    // IMPORTANT: Each AuditLog contains ONLY changed fields (storage optimization)
-    // Must merge all changes to get complete before/after state
-    var consolidatedOld = new HashMap<String, Object>();
-    var consolidatedNew = new HashMap<String, Object>();
-
-    for (var log : group) {
-      var oldState = fromJSON(log.getPreviousState());
-      var newState = fromJSON(log.getCurrentState());
-
-      // Merge changes: first occurrence of field = original old value
-      if (eventType != AuditEventType.CREATE) {
-        for (var field : oldState.keySet()) {
-          if (!consolidatedOld.containsKey(field)) {
-            consolidatedOld.put(field, oldState.get(field));
-          }
-        }
-      }
-
-      // Always update to latest new value
-      consolidatedNew.putAll(newState);
-    }
+    // Consolidate ALL changes from all audit logs in this transaction
+    var firstLog = group.get(0);
+    var lastLog = group.get(group.size() - 1);
+    var oldValues = fromJSON(firstLog.getPreviousState());
+    var values = fromJSON(lastLog.getCurrentState());
 
     // Process with consolidated state
     var entityState = new EntityState();
@@ -217,17 +197,24 @@ public class AuditProcessor {
     // If entity is deleted, skip processing
     if (entity != null) {
       entityState.entity = entity;
-      entityState.values = consolidatedNew;
-      entityState.oldValues = consolidatedOld;
-      entityState.received = auditLog.getCreatedOn();
-
+      entityState.received = lastLog.getCreatedOn();
+      entityState.values = parseValues(entityClass, values);
+      entityState.oldValues = parseValues(entityClass, oldValues);
+      entityState.eventType = eventType;
       // Process the audit log
-      process(entityState, auditLog.getUser());
+      process(entityState, lastLog.getUser());
+    }
+    
+    // Mark them processed
+    for (var logEntry : group) {
+      logEntry.setProcessed(true);
+      logEntry.setProcessedOn(LocalDateTime.now());
     }
 
-    for (var log : group) {
-      log.setProcessed(true);
-      log.setProcessedOn(LocalDateTime.now());
+    // Mark ALL audit logs as processed
+    for (var item : group) {
+      item.setProcessed(true);
+      item.setProcessedOn(LocalDateTime.now());
     }
   }
 
@@ -297,7 +284,7 @@ public class AuditProcessor {
       item.put("title", title);
       item.put("value", format(property, value));
 
-      if (oldValue != null) {
+      if (oldValue != null && state.eventType != AuditEventType.CREATE) {
         item.put("oldValue", format(property, oldValue));
       }
 
@@ -456,10 +443,13 @@ public class AuditProcessor {
     switch (property.getType()) {
       case MANY_TO_ONE:
       case ONE_TO_ONE:
-        try {
-          return Mapper.of(property.getTarget()).get(value, property.getTargetName()).toString();
-        } catch (Exception e) {
-        }
+        var mapper = Mapper.of(property.getTarget());
+        var nameField = mapper.getNameField();
+        var nameKey = nameField == null ? "id" : nameField.getName();
+        var nameValue = (Object) "N/A";
+        if (value instanceof Model model) nameValue = mapper.get(model, nameKey);
+        if (value instanceof Map map) nameValue = map.get(nameKey);
+        if (nameValue != null) return nameValue.toString();
         break;
       case ONE_TO_MANY:
       case MANY_TO_MANY:
@@ -520,41 +510,34 @@ public class AuditProcessor {
     return null;
   }
 
+  private Map<String, Object> parseValues(Class<?> entityClass, Map<String, Object> values) {
+    var mapper = Mapper.of(entityClass);
+    var entity = Mapper.toBean(entityClass, null);
+    var parsedValues = new HashMap<String, Object>();
+    for (var entry : values.entrySet()) {
+      var name = entry.getKey();
+      var value = entry.getValue();
+      var prop = mapper.getProperty(name);
+      if (prop == null || prop.isReference()) {
+        parsedValues.put(name, value);
+        continue;
+      }
+      prop.set(entity, value);
+      parsedValues.put(name, prop.get(entity));
+    }
+    return parsedValues;
+  }
+
   private Object getValue(
       Map<String, Object> values,
       Function<String, Map<String, Object>> jsonValues,
       FieldTracking field,
       Property property) {
 
-    var em = JPA.em();
-    var value = getValueInternal(values, jsonValues, field, property);
-
-    if (property.isReference() && value instanceof Number) {
-      value = em.getReference(property.getTarget(), value);
-    }
-
-    // If value is not in the L1 cache (may be it's cleared), it may cause lazy initialization error
-    if (value instanceof Model model && value instanceof HibernateProxy && !em.contains(value)) {
-      Long id = model.getId();
-      if (id != null) {
-        return em.getReference(EntityHelper.getEntityClass(value), id);
-      }
-    }
-
-    return value;
-  }
-
-  private Object getValueInternal(
-      Map<String, Object> values,
-      Function<String, Map<String, Object>> jsonValues,
-      FieldTracking field,
-      Property property) {
-
-    if (!field.isCustomField()) {
-      return values.get(field.getFieldName());
-    }
-
-    Object value = jsonValues.apply(field.getJsonFieldName()).get(field.getFieldName());
+    var value =
+        field.isCustomField()
+            ? jsonValues.apply(field.getJsonFieldName()).get(field.getFieldName())
+            : values.get(field.getFieldName());
 
     switch (property.getType()) {
       case BOOLEAN:
@@ -569,10 +552,9 @@ public class AuditProcessor {
         return Adapter.adapt(value, LocalDateTime.class, null, null);
       case MANY_TO_ONE:
       case ONE_TO_ONE:
-        if (value instanceof Map) {
+        if (value instanceof Map map) {
           @SuppressWarnings("unchecked")
-          Map<String, Object> map = (Map<String, Object>) value;
-          ContextHandler<?> handler = ContextHandlerFactory.newHandler(property.getTarget(), map);
+          var handler = ContextHandlerFactory.newHandler(property.getTarget(), map);
           return handler.getProxy();
         }
         return value;
@@ -606,6 +588,7 @@ public class AuditProcessor {
     private Map<String, Object> values;
     private Map<String, Object> oldValues;
     private LocalDateTime received;
+    private AuditEventType eventType;
   }
 
   private class JsonValues implements Function<String, Map<String, Object>> {
