@@ -1,0 +1,12 @@
+---
+title: Asynchronous Queue-Based Audit Tracking
+type: enhancement
+description: |
+  Improved audit tracking with asynchronous queue-based processing to address performance issues:
+
+  - Async audit queue to reduce blocking operations during entity changes
+  - AuditLog model for persistent audit event storage with full state capture
+  - Audit CLI command for managing and processing audit logs
+  - Adaptive throttling in AuditProcessor for better resource management
+  - Support to wait for audit queue to finish processing
+  - Automatic cleanup of processed AuditLogs to reduce storage
