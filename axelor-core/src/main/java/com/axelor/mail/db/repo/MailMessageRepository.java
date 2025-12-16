@@ -34,6 +34,7 @@ import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,28 +59,59 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     super(MailMessage.class);
   }
 
+  private List<MailMessage> findAll(
+      String type, String relatedModel, Long relatedId, int limit, int offset) {
+    var where = new ArrayList<String>();
+    var params = new HashMap<String, Object>();
+
+    if (StringUtils.notBlank(type)) {
+      where.add("self.type = :type");
+      params.put("type", type);
+    }
+
+    if (StringUtils.notBlank(relatedModel)) {
+      where.add("self.relatedModel = :relatedModel");
+      params.put("relatedModel", relatedModel);
+    }
+
+    if (relatedId != null) {
+      where.add("self.relatedId = :relatedId");
+      params.put("relatedId", relatedId);
+    }
+
+    var builder = new StringBuilder();
+
+    builder.append("SELECT self FROM MailMessage self");
+
+    if (!where.isEmpty()) {
+      builder.append(" WHERE ").append(String.join(" AND ", where));
+    }
+
+    builder.append(" ORDER BY COALESCE(self.receivedOn, self.createdOn) DESC");
+
+    var queryString = builder.toString();
+    var query = JPA.em().createQuery(queryString, MailMessage.class);
+
+    for (var entry : params.entrySet()) {
+      query.setParameter(entry.getKey(), entry.getValue());
+    }
+
+    query.setFirstResult(offset);
+    query.setMaxResults(limit);
+
+    return query.getResultList();
+  }
+
   public List<MailMessage> findAll(Model related, int limit, int offset) {
-    return all()
-        .filter(
-            "self.relatedModel = ? AND self.relatedId = ?",
-            EntityHelper.getEntityClass(related).getName(),
-            related.getId())
-        .order("-receivedOn")
-        .order("-createdOn")
-        .fetch(limit, offset);
+    var relatedModel = EntityHelper.getEntityClass(related).getName();
+    var relatedId = related.getId();
+    return findAll(null, relatedModel, relatedId, limit, offset);
   }
 
   public List<MailMessage> findBy(String type, Model related, int limit, int offset) {
-    if (StringUtils.isBlank(type)) return findAll(related, limit, offset);
-    return all()
-        .filter(
-            "self.relatedModel = ? AND self.relatedId = ? AND self.type = ?",
-            EntityHelper.getEntityClass(related).getName(),
-            related.getId(),
-            type)
-        .order("-receivedOn")
-        .order("-createdOn")
-        .fetch(limit, offset);
+    var relatedModel = EntityHelper.getEntityClass(related).getName();
+    var relatedId = related.getId();
+    return findAll(type, relatedModel, relatedId, limit, offset);
   }
 
   public long count(Model related) {
