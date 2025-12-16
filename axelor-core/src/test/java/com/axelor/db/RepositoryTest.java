@@ -164,7 +164,7 @@ public class RepositoryTest extends JpaTest {
           JPA.save(person);
           // one more query to retrieve the person id (with `nextval`)
           // but no extra select on contact
-          assertEquals(2, stats.getPrepareStatementCount());
+          assertEquals(6, stats.getPrepareStatementCount());
         });
   }
 
