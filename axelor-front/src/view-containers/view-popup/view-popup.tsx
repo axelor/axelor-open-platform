@@ -19,11 +19,13 @@ import {
   DialogOptions,
   ModalDialog,
   dialogs,
+  useDialogContext,
 } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { useSingleClickHandler } from "@/hooks/use-button";
 import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { DataRecord } from "@/services/client/data.types";
+import { ActionView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
@@ -143,6 +145,7 @@ const PopupDialogInner = memo(function PopupDialog({
       content={
         <>
           <Views tab={tab} />
+          <ViewClosure params={tab?.action?.params} />
           {handler?.()}
         </>
       }
@@ -256,19 +259,10 @@ function Footer({
   params?: DataRecord;
 }) {
   const handlerAtom = usePopupHandlerAtom();
-  const [handler, setHandler] = useAtom(handlerAtom);
+  const handler = useAtomValue(handlerAtom);
   const handleClose = useClose(handler, close, params);
 
-  const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
-
-  const getHandlerState = handler.getState;
-  const handleCancel = useCallback(() => {
-    dialogs.confirmDirty(
-      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
-      async () => handleClose(),
-    );
-  }, [handleClose, getHandlerState, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
     const { getState, getErrors, commitForm, onSave } = handler;
@@ -306,21 +300,9 @@ function Footer({
 
   const handleOk = useSingleClickHandler(handleConfirm);
 
-  useEffect(() => {
-    setHandler((popup) => ({ ...popup, close: handleCancel }));
-  }, [handleCancel, setHandler]);
-
-  useEffect(() => {
-    return handler.actionHandler?.setCloseHandler(async () => {
-      const { actionExecutor, getState } = handler;
-      await actionExecutor?.wait();
-      handleClose(getState?.()?.record);
-    });
-  }, [handleClose, handler]);
-
   return (
     <Box d="flex" g={2}>
-      <Button variant="secondary" onClick={handleCancel}>
+      <Button variant="secondary" onClick={() => handler?.close?.()}>
         {i18n.get("Close")}
       </Button>
       {popupCanSave && (
@@ -330,6 +312,38 @@ function Footer({
       )}
     </Box>
   );
+}
+
+function ViewClosure({ params }: { params?: ActionView["params"] }) {
+  const handlerAtom = usePopupHandlerAtom();
+  const [handler, setHandler] = useAtom(handlerAtom);
+
+  const { close } = useDialogContext();
+  const doClose = useClose(handler, close, params);
+
+  const popupCanConfirm = params?.["show-confirm"] !== false;
+
+  const getHandlerState = handler.getState;
+  const handleClose = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
+      async () => doClose(),
+    );
+  }, [doClose, getHandlerState, popupCanConfirm]);
+
+  useEffect(() => {
+    setHandler((popup) => ({ ...popup, close: handleClose }));
+  }, [handleClose, setHandler]);
+
+  useEffect(() => {
+    return handler.actionHandler?.setCloseHandler(async () => {
+      const { actionExecutor, getState } = handler;
+      await actionExecutor?.wait();
+      doClose(getState?.()?.record);
+    });
+  }, [doClose, handler]);
+
+  return null;
 }
 
 function useClose(

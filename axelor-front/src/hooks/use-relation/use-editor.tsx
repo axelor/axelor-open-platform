@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
@@ -174,21 +174,12 @@ function Footer({
   onSelect?: EditorOptions["onSelect"];
   params?: ActionView["params"];
 }) {
-  const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
   const popupRecord = params?.["_popup-record"];
 
   const hasToMany = Boolean(onSave); // o2m, m2m grid
   const handlerAtom = usePopupHandlerAtom();
-  const [handler, setHandler] = useAtom(handlerAtom);
-
-  const getHandlerState = handler.getState;
-  const handleClose = useCallback(() => {
-    dialogs.confirmDirty(
-      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
-      async () => onClose(false),
-    );
-  }, [getHandlerState, popupCanConfirm, onClose]);
+  const handler = useAtomValue(handlerAtom);
 
   const handleConfirm = useAfterActions(
     useAtomCallback(
@@ -244,17 +235,6 @@ function Footer({
 
   const handleOk = useSingleClickHandler(handleConfirm);
 
-  useEffect(() => {
-    setHandler((popup) => ({ ...popup, close: handleClose }));
-  }, [setHandler, handleClose]);
-
-  useEffect(() => {
-    return handler.actionHandler?.setCloseHandler(async () => {
-      const { actionExecutor } = handler;
-      await actionExecutor?.wait();
-      onClose(true);
-    });
-  }, [handler, onClose]);
 
   const { attachmentItem } = handler;
 
@@ -266,7 +246,7 @@ function Footer({
       <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
         {FooterComp && <FooterComp close={onClose} />}
         <Box d="flex" g={2}>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={() => handler.close?.()}>
             {i18n.get("Close")}
           </Button>
           {hasOk && popupCanSave && (

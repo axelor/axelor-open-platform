@@ -1,6 +1,7 @@
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect } from "react";
 import { Button } from "@axelor/ui";
+import { useAtomValue } from "jotai";
 
 import { showPopup } from "@/view-containers/view-popup";
 import { i18n } from "@/services/client/i18n";
@@ -10,7 +11,6 @@ import { Property } from "@/services/client/meta.types";
 import { TreeRecord } from "./types";
 import { DataRecord } from "@/services/client/data.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-import { useAtomValue, useSetAtom } from "jotai";
 
 export type DMSPopupOptions = {
   model?: string;
@@ -118,15 +118,6 @@ function Footer({
   onSelect,
   onClose,
 }: Pick<DMSPopupOptions, "onSelect"> & { onClose: (result: boolean) => void }) {
-  const setHandler = useSetAtom(usePopupHandlerAtom());
-  const handleClose = useCallback(() => {
-    onClose(false);
-  }, [onClose]);
-
-  useEffect(() => {
-    setHandler((popup) => ({ ...popup, close: handleClose }));
-  }, [setHandler, handleClose]);
-
   return (
     <>
       {onSelect && (
@@ -137,7 +128,7 @@ function Footer({
           }}
         />
       )}
-      <Button variant="secondary" onClick={handleClose}>
+      <Button variant="secondary" onClick={() => onClose(false)}>
         {i18n.get("Close")}
       </Button>
     </>
