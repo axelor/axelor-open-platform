@@ -174,7 +174,9 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
     <PopupDialog
       tab={tab}
       open={true}
-      footer={({ close }) => <Footer close={close} params={action.params} />}
+      footer={({ close, show }) => (
+        <Footer show={show} close={close} params={action.params} />
+      )}
       buttons={[]}
       onClose={handleClose}
       maximize={maximize}
@@ -241,9 +243,11 @@ function Header({
 }
 
 function Footer({
+  show = true,
   close,
   params,
 }: {
+  show?: boolean;
   close: (result: boolean) => void;
   params?: DataRecord;
 }) {
@@ -311,16 +315,18 @@ function Footer({
   }, [handleClose, handler]);
 
   return (
-    <Box d="flex" g={2}>
-      <Button variant="secondary" onClick={handleCancel}>
-        {i18n.get("Close")}
-      </Button>
-      {popupCanSave && (
-        <Button variant="primary" onClick={handleOk}>
-          {i18n.get("OK")}
+    show && (
+      <Box d="flex" g={2}>
+        <Button variant="secondary" onClick={handleCancel}>
+          {i18n.get("Close")}
         </Button>
-      )}
-    </Box>
+        {popupCanSave && (
+          <Button variant="primary" onClick={handleOk}>
+            {i18n.get("OK")}
+          </Button>
+        )}
+      </Box>
+    )
   );
 }
 

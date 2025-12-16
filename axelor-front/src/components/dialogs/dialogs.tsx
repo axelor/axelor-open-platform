@@ -44,7 +44,7 @@ export type DialogOptions = {
   showHeader?: boolean;
   showFooter?: boolean;
   header?: (props: { close: DialogClose }) => React.ReactNode;
-  footer?: (props: { close: DialogClose }) => React.ReactNode;
+  footer?: (props: { close: DialogClose; show?: boolean }) => React.ReactNode;
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
   padding?: string;
@@ -359,7 +359,7 @@ export function ModalDialog(props: DialogOptions) {
           >
             {content}
           </DialogContent>
-          {showFooter && (
+          {showFooter ? (
             <DialogFooter className={classes.footer}>
               {Footer && <Footer close={close} />}
               {buttons.map((button) => (
@@ -374,6 +374,8 @@ export function ModalDialog(props: DialogOptions) {
                 </Button>
               ))}
             </DialogFooter>
+          ) : (
+            Footer && <Footer close={close} show={showFooter} />
           )}
         </Dialog>
       </DialogContext.Provider>
