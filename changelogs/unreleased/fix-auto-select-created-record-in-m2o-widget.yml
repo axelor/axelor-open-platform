@@ -1,0 +1,7 @@
+---
+title: Fix auto-selection of created record in M2O widget
+type: fix
+description: |
+  When a record is created through the many-to-one widget using the popup form,
+  the record is persisted via an action. After clicking **OK**, the newly created
+  record should be automatically selected in the M2O widget.
