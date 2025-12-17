@@ -87,6 +87,13 @@ export class DataStore extends DataSource {
     return this.#records;
   }
 
+  clone(options?: SearchOptions) {
+    return new DataStore(this.model, {
+      ...this.#options,
+      ...options,
+    });
+  }
+
   subscribe(listener: DataStoreListener) {
     const listeners = this.#listeners;
     listeners.push(listener);

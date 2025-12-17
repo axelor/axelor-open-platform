@@ -119,7 +119,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           id: name!,
           title: title!,
           name: name!,
-          dataStore: new DataStore(dataStore.model, dataStore.options),
+          dataStore: dataStore.clone(),
         };
 
         if (view.onNew && ind === 0) {

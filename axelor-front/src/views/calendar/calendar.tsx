@@ -60,10 +60,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const [scheduler, setScheduler] = useState<SchedulerRef | null>(null);
 
   // create clone of data store
-  const dataStore = useMemo(
-    () => new DataStore(_dataStore.model, _dataStore.options),
-    [_dataStore],
-  );
+  const dataStore = useMemo(() => _dataStore.clone(), [_dataStore]);
   const colorField = meta.fields?.[colorBy!];
   const allDayOnly = meta.fields?.[eventStart]?.type === "DATE";
 
