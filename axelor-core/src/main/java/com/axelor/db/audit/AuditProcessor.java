@@ -12,6 +12,7 @@ import com.axelor.audit.db.repo.AuditLogRepository;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.annotations.TrackEvent;
@@ -228,7 +229,8 @@ public class AuditProcessor {
   private void process(EntityState state, User user) {
 
     final Model entity = state.entity;
-    final Mapper mapper = Mapper.of(entity.getClass());
+    final Class<? extends Model> entityClass = EntityHelper.getEntityClass(entity);
+    final Mapper mapper = Mapper.of(entityClass);
     final MailMessage message = new MailMessage();
 
     final ModelTracking track = AuditTracker.getTrack(entity);
@@ -346,7 +348,7 @@ public class AuditProcessor {
     message.setBody(toJSON(json));
     message.setAuthor(user);
     message.setRelatedId(entity.getId());
-    message.setRelatedModel(entity.getClass().getName());
+    message.setRelatedModel(entityClass.getName());
     message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
     message.setReceivedOn(state.received);
 
@@ -360,7 +362,7 @@ public class AuditProcessor {
     if (previousState == null && track.isSubscribe()) {
       final MailFollower follower = new MailFollower();
       follower.setRelatedId(entity.getId());
-      follower.setRelatedModel(entity.getClass().getName());
+      follower.setRelatedModel(entityClass.getName());
       follower.setUser(user);
       follower.setArchived(false);
       mailFollowerRepository.save(follower);
@@ -402,7 +404,8 @@ public class AuditProcessor {
     return auditLogRepository
         .all()
         .filter(
-            "self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry AND self.txId = :txId")
+            "self.processed = false AND COALESCE(self.retryCount, 0) < :maxRetry "
+                + "AND self.txId = :txId")
         .bind("maxRetry", MAX_RETRY)
         .bind("txId", txId)
         .order("relatedModel")
