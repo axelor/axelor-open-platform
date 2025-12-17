@@ -162,9 +162,13 @@ public class RepositoryTest extends JpaTest {
           person.setCode(String.valueOf(ThreadLocalRandom.current().nextInt()));
           person.setContact(proxy);
           JPA.save(person);
-          // one more query to retrieve the person id (with `nextval`)
-          // but no extra select on contact
-          assertEquals(6, stats.getPrepareStatementCount());
+          // 4 more queries:
+          // - nextval for person id
+          // - select contact_title (tracked relation on Contact)
+          // - select auth_user (for audit createdBy)
+          // - select meta_json_field (audit tracking check)
+          // but no extra select on contact itself
+          assertEquals(5, stats.getPrepareStatementCount());
         });
   }
 

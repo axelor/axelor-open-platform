@@ -17,9 +17,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.Query;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Person;
 import com.axelor.test.db.Product;
@@ -141,23 +139,6 @@ public abstract class AbstractBaseCache extends JpaTest {
 
     doInSession(this::clearStats);
 
-    // Initial query cache hit count because of audit tracker performing the query below
-    doInSession(
-        () -> {
-          Query.of(MetaJsonField.class)
-              .filter("self.model = :model AND self.tracked IS TRUE")
-              .bind("model", Person.class.getName())
-              .cacheable()
-              .autoFlush(false)
-              .fetch();
-
-          Statistics statistics =
-              JPA.em().unwrap(Session.class).getSessionFactory().getStatistics();
-          initialHitCount.set(statistics.getQueryCacheHitCount());
-        });
-
-    doInSession(this::clearStats);
-
     final AtomicLong aPersonId = new AtomicLong();
 
     doInSession(
@@ -169,6 +150,11 @@ public abstract class AbstractBaseCache extends JpaTest {
                   aPerson.setCode("unique-code");
                   JPA.save(aPerson);
                   aPersonId.set(aPerson.getId());
+
+                  // Set initial hit count
+                  Statistics statistics =
+                      JPA.em().unwrap(Session.class).getSessionFactory().getStatistics();
+                  initialHitCount.set(statistics.getQueryCacheHitCount());
                 }));
 
     // Should NOT hit query cache because this is first run
