@@ -176,6 +176,7 @@ function Footer({
 }) {
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
+  const popupRecord = params?.["_popup-record"];
 
   const hasToMany = Boolean(onSave); // o2m, m2m grid
   const handlerAtom = usePopupHandlerAtom();
@@ -205,10 +206,10 @@ function Footer({
 
           const hasRecordChanged = () => !isEqual(original, record);
 
+          const isNew = popupRecord && !popupRecord?.id;
           const dirtyAtom = handler.dirtyAtom;
           const dirty = (dirtyAtom && get(dirtyAtom)) || state.dirty;
-          const canSave =
-            dirty || !record.id || (hasToMany && hasRecordChanged());
+          const canSave = dirty || isNew || (hasToMany && hasRecordChanged());
 
           try {
             const errors = handler.getErrors?.();
@@ -236,7 +237,7 @@ function Footer({
             console.error(e);
           }
         },
-        [handler, hasToMany, onClose, onSave, onSelect],
+        [handler, hasToMany, popupRecord, onClose, onSave, onSelect],
       ),
     ),
   );
