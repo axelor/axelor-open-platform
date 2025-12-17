@@ -16,6 +16,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.annotations.TrackEvent;
 import com.axelor.db.annotations.TrackMessage;
+import com.axelor.db.audit.AuditTracker.BaseEntityState;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -592,10 +593,7 @@ public class AuditProcessor {
     return null;
   }
 
-  private static class EntityState {
-    private Model entity;
-    private Map<String, Object> values;
-    private Map<String, Object> oldValues;
+  private static class EntityState extends BaseEntityState {
     private LocalDateTime received;
     private AuditEventType eventType;
   }

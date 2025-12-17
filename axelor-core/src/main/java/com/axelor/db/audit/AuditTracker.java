@@ -5,7 +5,6 @@
 package com.axelor.db.audit;
 
 import com.axelor.audit.db.AuditEventType;
-import com.axelor.audit.db.AuditLog;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -28,14 +27,12 @@ import jakarta.inject.Singleton;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.hibernate.FlushMode;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
@@ -54,7 +51,7 @@ public class AuditTracker
   private static final SecureRandom random = new SecureRandom();
   private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
 
-  private final Queue<AuditLog> queue = new ConcurrentLinkedQueue<>();
+  private final Map<StoreKey, BaseEntityState> store = new HashMap<>();
   private boolean logCreated = false;
 
   public AuditTracker() {
@@ -151,9 +148,9 @@ public class AuditTracker
 
     // Store FULL entity state (required for condition evaluation in tracking messages)
     var currentValues = new HashMap<String, Object>();
-    var previousValues = new HashMap<String, Object>();
-    var mapper = Mapper.of(entity.getClass());
-    var isCreate = previousState == null;
+    var previousValues = previousState != null ? new HashMap<String, Object>() : null;
+    var entityClass = EntityHelper.getEntityClass(entity);
+    var mapper = Mapper.of(entityClass);
 
     for (int i = 0; i < names.length; i++) {
       var fieldName = names[i];
@@ -180,108 +177,99 @@ public class AuditTracker
       }
 
       currentValues.put(fieldName, newValue);
-      if (!isCreate) {
+      if (previousValues != null) {
         previousValues.put(fieldName, oldValue);
       }
     }
 
-    // Get current user
-    var user = AuditUtils.currentUser(session);
+    var entityState =
+        store.computeIfAbsent(
+            new StoreKey(entityClass, entity.getId()),
+            key -> new BaseEntityState(entity, currentValues, previousValues));
 
-    // Create new AuditLog - always INSERT
-    var auditLog = new AuditLog();
-    auditLog.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
-    auditLog.setRelatedId(entity.getId());
-    auditLog.setTxId(txId);
-    auditLog.setEventType(isCreate ? AuditEventType.CREATE : AuditEventType.UPDATE);
-    auditLog.setCurrentState(toJSON(currentValues));
-    auditLog.setPreviousState(isCreate ? null : toJSON(previousValues));
-    auditLog.setUser(user);
-    auditLog.setProcessed(false);
+    if (entityState.values != currentValues) {
+      entityState.values.putAll(currentValues);
+    }
 
-    // We can't use entity manager here because we are in the middle of flush
-    // and Hibernate doesn't allow new entity inserts at this point.
-
-    // Directly create mutation query to insert AuditLog, bypassing normal entity manager flow.
-    enqueueAuditLog(session, auditLog);
-  }
-
-  private void enqueueAuditLog(SessionImplementor session, AuditLog auditLog) {
-    queue.add(auditLog);
-    logCreated = true;
-    if (queue.size() >= BATCH_SIZE) {
-      flushQueue(session, false);
+    if (store.size() >= BATCH_SIZE) {
+      processStore(session);
     }
   }
 
-  private void flushQueue(SessionImplementor session, boolean full) {
-    if (queue.isEmpty()) {
+  private void processStore(SessionImplementor session) {
+    if (store.isEmpty()) {
       return;
     }
 
-    var builder = new StringBuilder();
-    var params = new ArrayList<AuditLog>();
+    try {
+      // We can't use entity manager here because we are in the middle of flush
+      // and Hibernate doesn't allow new entity inserts at this point.
+      // Directly create mutation query to insert AuditLogs, bypassing normal entity manager flow.
 
-    var n = full ? queue.size() : BATCH_SIZE;
-    while (n-- > 0) {
-      var auditLog = queue.poll();
-      if (auditLog == null) {
-        break;
+      var builder = new StringBuilder();
+      builder.append("INSERT INTO AuditLog (");
+      builder.append(
+          "txId, eventType, relatedModel, relatedId, currentState, previousState, user, processed,"
+              + " createdBy, createdOn");
+      builder.append(") VALUES ");
+
+      for (int i = 0; i < store.size(); ++i) {
+        if (i > 0) {
+          builder.append(", ");
+        }
+        builder
+            .append("(:txId")
+            .append(i)
+            .append(", :eventType")
+            .append(i)
+            .append(", :relatedModel")
+            .append(i)
+            .append(", :relatedId")
+            .append(i)
+            .append(", :currentState")
+            .append(i)
+            .append(", :previousState")
+            .append(i)
+            .append(", :user")
+            .append(i)
+            .append(", :processed")
+            .append(i)
+            .append(", :createdBy")
+            .append(i)
+            .append(", :createdOn")
+            .append(i)
+            .append(")");
       }
-      params.add(auditLog);
-    }
 
-    builder.append("INSERT INTO AuditLog (");
-    builder.append(
-        "txId, eventType, relatedModel, relatedId, currentState, previousState, user, processed, createdBy, createdOn");
-    builder.append(") VALUES ");
+      var query = session.createMutationQuery(builder.toString());
+      var user = AuditUtils.currentUser(session);
+      var now = LocalDateTime.now();
 
-    for (int i = 0; i < params.size(); i++) {
-      if (i > 0) {
-        builder.append(", ");
+      int i = 0;
+      for (var state : store.values()) {
+        var entity = state.entity;
+        var isCreate = state.oldValues == null;
+
+        query.setParameter("txId" + i, txId);
+        query.setParameter(
+            "eventType" + i, isCreate ? AuditEventType.CREATE : AuditEventType.UPDATE);
+        query.setParameter("relatedModel" + i, EntityHelper.getEntityClass(entity).getName());
+        query.setParameter("relatedId" + i, entity.getId());
+        query.setParameter("currentState" + i, toJSON(state.values));
+        query.setParameter("previousState" + i, isCreate ? null : toJSON(state.oldValues));
+        query.setParameter("user" + i, user);
+        query.setParameter("processed" + i, false);
+        query.setParameter("createdBy" + i, user);
+        query.setParameter("createdOn" + i, now);
+        ++i;
       }
-      builder
-          .append("(:txId")
-          .append(i)
-          .append(", :eventType")
-          .append(i)
-          .append(", :relatedModel")
-          .append(i)
-          .append(", :relatedId")
-          .append(i)
-          .append(", :currentState")
-          .append(i)
-          .append(", :previousState")
-          .append(i)
-          .append(", :user")
-          .append(i)
-          .append(", :processed")
-          .append(i)
-          .append(", :createdBy")
-          .append(i)
-          .append(", :createdOn")
-          .append(i)
-          .append(")");
+
+      query.setHibernateFlushMode(FlushMode.MANUAL); // Prevent flush during audit log insertion
+      query.executeUpdate();
+      logCreated = true;
+    } finally {
+      store.clear();
     }
-
-    var query = session.createMutationQuery(builder.toString());
-
-    for (int i = 0; i < params.size(); i++) {
-      var log = params.get(i);
-      query.setParameter("txId" + i, log.getTxId());
-      query.setParameter("eventType" + i, log.getEventType());
-      query.setParameter("relatedModel" + i, log.getRelatedModel());
-      query.setParameter("relatedId" + i, log.getRelatedId());
-      query.setParameter("currentState" + i, log.getCurrentState());
-      query.setParameter("previousState" + i, log.getPreviousState());
-      query.setParameter("user" + i, log.getUser());
-      query.setParameter("processed" + i, log.getProcessed());
-      query.setParameter("createdBy" + i, log.getUser());
-      query.setParameter("createdOn" + i, LocalDateTime.now());
-    }
-
-    query.setHibernateFlushMode(FlushMode.MANUAL); // Prevent flush during audit log insertion
-    query.executeUpdate();
   }
 
   public void deleted(Model entity) {
@@ -309,7 +297,7 @@ public class AuditTracker
   public void doBeforeTransactionCompletion(SessionImplementor session) {
     fireBeforeCompleteEvent();
     processDelete();
-    flushQueue(session, true);
+    processStore(session);
 
     if (session.getHibernateFlushMode() == FlushMode.MANUAL || session.isClosed()) {
       return;
@@ -323,6 +311,23 @@ public class AuditTracker
       boolean success, SharedSessionContractImplementor session) {
     if (logCreated) {
       Beans.get(AuditQueue.class).process(txId);
+    }
+  }
+
+  private static record StoreKey(Class<? extends Model> entityClass, Long id) {}
+
+  static class BaseEntityState {
+    Model entity;
+    Map<String, Object> values;
+    Map<String, Object> oldValues;
+
+    public BaseEntityState() {}
+
+    public BaseEntityState(
+        Model entity, Map<String, Object> values, Map<String, Object> oldValues) {
+      this.entity = entity;
+      this.values = values;
+      this.oldValues = oldValues;
     }
   }
 
