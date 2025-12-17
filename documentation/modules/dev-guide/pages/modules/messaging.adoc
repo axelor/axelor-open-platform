@@ -77,11 +77,30 @@ The `if` expressions are simple JEL boolean expressions evaluated against curren
 values of the record.
 
 By default, `<field>` are tracked only if it's value is changed and given `if`
-expression evaluates to `true`. O2M/M2M/binary type fields aren't supported.
+expression evaluates to `true`.
 
 A root message is created when record is created. All the followup messages are
 considered as replies to this root message. This done to keep change tracking
 messages in threaded format.
+
+**Excluded Fields**
+
+For security and performance reasons, certain field types are automatically excluded from audit tracking:
+
+* **Security Sensitive**: Passwords and encrypted fields are never tracked.
+* **Large Data**: Binary fields (files, images) are excluded.
+* **Collections**: One-to-Many and Many-to-Many relationships are not supported.
+* **Transient**: Fields that are not persisted to the database.
+
+=== Asynchronous Processing
+
+The audit tracking system processes tracking messages asynchronously after the user transaction.
+This allows to improve application responsiveness when creating many tracking messages.
+
+**Delayed Feedback**
+
+Tracking messages are not created immediately when a record is modified.
+Instead, they appear in the stream after a brief delay.
 
 == Streams & Discussions
 
