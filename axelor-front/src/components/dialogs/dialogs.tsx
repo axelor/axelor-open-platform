@@ -293,7 +293,7 @@ export function ModalDialog(props: DialogOptions) {
   const [show, setShow] = useState(open);
   const [result, setResult] = useState(false);
 
-  const close = useCallback(
+  const onCloseDialog = useCallback(
     (result: boolean = false) => {
       setOpen?.(false);
       setShow(false);
@@ -308,9 +308,9 @@ export function ModalDialog(props: DialogOptions) {
   useEffect(() => {
     setHandler((handler) => ({
       ...handler,
-      close,
+      close: onCloseDialog,
     }));
-  }, [close, setHandler]);
+  }, [onCloseDialog, setHandler]);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -328,7 +328,7 @@ export function ModalDialog(props: DialogOptions) {
       <Fade in={canShow} unmountOnExit mountOnEnter>
         <Box className={styles.backdrop}></Box>
       </Fade>
-      <DialogContext.Provider value={{ close }}>
+      <DialogContext.Provider value={{ close: onCloseDialog }}>
         <Dialog
           open={canShow}
           onHide={onHide}
@@ -343,12 +343,12 @@ export function ModalDialog(props: DialogOptions) {
           {showHeader && (
             <DialogHeader
               {...(closeable && {
-                onCloseClick: () => close(false),
+                onCloseClick: () => onCloseDialog(false),
               })}
               className={classes.header}
             >
               <DialogTitle className={styles.title}>{title}</DialogTitle>
-              {Header && <Header close={close} />}
+              {Header && <Header close={onCloseDialog} />}
             </DialogHeader>
           )}
           <DialogContent
@@ -361,14 +361,14 @@ export function ModalDialog(props: DialogOptions) {
           </DialogContent>
           {showFooter && (
             <DialogFooter className={classes.footer}>
-              {Footer && <Footer close={close} />}
+              {Footer && <Footer close={onCloseDialog} />}
               {buttons.map((button) => (
                 <Button
                   autoFocus={button.variant === "primary"}
                   key={button.name}
                   type="button"
                   variant={button.variant}
-                  onClick={() => button.onClick(close)}
+                  onClick={() => button.onClick(onCloseDialog)}
                 >
                   {button.title}
                 </Button>

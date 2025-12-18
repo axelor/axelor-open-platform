@@ -178,8 +178,10 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   const showFooter = params["popup.show-footer"] !== false;
   const maximize = params["popup.maximized"];
 
-  const { close } = useTabs();
-  const handleClose = useCallback(() => close(id), [close, id]);
+  const { close: closeTab } = useTabs();
+  const handleClosePopupView = useCallback(() => {
+    closeTab(id);
+  }, [closeTab, id]);
 
   return (
     <PopupDialog
@@ -187,7 +189,7 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
       open={true}
       footer={({ close }) => <Footer close={close} params={action.params} />}
       buttons={[]}
-      onClose={handleClose}
+      onClose={handleClosePopupView}
       maximize={maximize}
       showHeader={showHeader}
       showFooter={showFooter}
@@ -318,8 +320,8 @@ function ViewClosure({ params }: { params?: ActionView["params"] }) {
   const handlerAtom = usePopupHandlerAtom();
   const [handler, setHandler] = useAtom(handlerAtom);
 
-  const { close } = useDialogContext();
-  const doClose = useClose(handler, close, params);
+  const { close: onCloseDialog } = useDialogContext();
+  const doClose = useClose(handler, onCloseDialog, params);
 
   const popupCanConfirm = params?.["show-confirm"] !== false;
 

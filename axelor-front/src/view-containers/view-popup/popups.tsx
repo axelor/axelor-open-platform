@@ -19,23 +19,23 @@ const popupAtom = atom<PopupsState[]>([]);
 export async function showPopup(props: PopupProps) {
   const { tab, open = true, onClose, ...rest } = props;
 
-  const handleClose = (result: boolean, record?: DataRecord) => {
+  const handleClosePopup = (result: boolean, record?: DataRecord) => {
     onClose?.(result, record);
-    close();
+    removePopup();
   };
 
   const id = uniqueId("$p");
   const popup = tab && (
-    <PopupDialog tab={tab} open={open} onClose={handleClose} {...rest} />
+    <PopupDialog tab={tab} open={open} onClose={handleClosePopup} {...rest} />
   );
 
   popupStore.set(popupAtom, (prev) => [...prev, { id, popup, tabId: tab.id }]);
 
-  const close = () => {
+  const removePopup = () => {
     popupStore.set(popupAtom, (prev) => prev.filter((x) => x.id !== id));
   };
 
-  return close;
+  return removePopup;
 }
 
 export function PopupsProvider() {
