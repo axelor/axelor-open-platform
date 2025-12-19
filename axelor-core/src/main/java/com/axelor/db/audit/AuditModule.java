@@ -10,6 +10,6 @@ public class AuditModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(AuditQueue.class).to(AuditQueueImpl.class);
+    bind(AuditQueue.class).to(AsyncAuditQueue.class);
   }
 }

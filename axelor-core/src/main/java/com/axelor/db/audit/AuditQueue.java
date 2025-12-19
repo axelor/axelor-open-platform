@@ -6,7 +6,13 @@ package com.axelor.db.audit;
 
 import com.google.inject.ImplementedBy;
 
-@ImplementedBy(AuditQueueImpl.Noop.class)
+/**
+ * Represents an interface for queuing and triggering the processing of audit logs.
+ *
+ * <p>This abstraction allows audit log processing to be decoupled from the main transaction flow,
+ * enabling different implementation strategies
+ */
+@ImplementedBy(NoopAuditQueue.class)
 public interface AuditQueue {
 
   /**

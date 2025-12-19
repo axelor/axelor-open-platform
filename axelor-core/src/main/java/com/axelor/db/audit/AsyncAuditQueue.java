@@ -14,10 +14,17 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Asynchronous implementation of {@link AuditQueue} that offloads processing to a background
+ * thread.
+ *
+ * <p>This class uses a single-threaded {@link ExecutorService} to process audit logs sequentially
+ * (FIFO) without blocking the main application thread.
+ */
 @Singleton
-class AuditQueueImpl implements AuditQueue {
+class AsyncAuditQueue implements AuditQueue {
 
-  private static final Logger log = LoggerFactory.getLogger(AuditQueueImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncAuditQueue.class);
 
   private static final ExecutorService POOL =
       Executors.newSingleThreadExecutor(
@@ -60,14 +67,6 @@ class AuditQueueImpl implements AuditQueue {
       }
     } catch (InterruptedException e) {
       POOL.shutdownNow();
-    }
-  }
-
-  public static class Noop implements AuditQueue {
-
-    @Override
-    public void process(String txId) {
-      // No operation
     }
   }
 }
