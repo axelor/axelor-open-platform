@@ -41,6 +41,7 @@ class AsyncAuditQueue implements AuditQueue {
 
   @Override
   public void process(String txId) {
+    log.trace("Enqueue audit log processing for transaction ID: {}", txId);
     Runnable task =
         ContextAware.of()
             .withTransaction(false)

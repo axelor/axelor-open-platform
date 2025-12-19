@@ -11,6 +11,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.annotations.Track;
+import com.axelor.db.audit.state.EntityState;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.PropertyType;
@@ -58,9 +59,8 @@ public class AuditTracker
   private static final int FLUSH_THRESHOLD =
       AppSettings.get()
           .getInt(AvailableAppSettings.AUDIT_LOGS_FLUSH_THRESHOLD, DBHelper.getJdbcBatchSize());
-  ;
 
-  private final Map<StoreKey, BaseEntityState> store = new HashMap<>();
+  private final Map<StoreKey, EntityState> store = new HashMap<>();
   private ObjectMapper mapper;
   private boolean logCreated = false;
 
@@ -197,10 +197,10 @@ public class AuditTracker
     var entityState =
         store.computeIfAbsent(
             new StoreKey(entityClass, entity.getId()),
-            key -> new BaseEntityState(entity, currentValues, previousValues));
+            key -> new EntityState(entity, currentValues, previousValues));
 
-    if (entityState.values != currentValues) {
-      entityState.values.putAll(currentValues);
+    if (entityState.getValues() != currentValues) {
+      entityState.getValues().putAll(currentValues);
     }
 
     if (store.size() >= FLUSH_THRESHOLD) {
@@ -212,6 +212,8 @@ public class AuditTracker
     if (store.isEmpty()) {
       return;
     }
+
+    log.trace("Flushing {} AuditLog records", store.size());
 
     try {
       // We can't use entity manager here because we are in the middle of flush
@@ -259,16 +261,16 @@ public class AuditTracker
 
       int i = 0;
       for (var state : store.values()) {
-        var entity = state.entity;
-        var isCreate = state.oldValues == null;
+        var entity = state.getEntity();
+        var isCreate = state.getOldValues() == null;
 
         query.setParameter("txId" + i, txId);
         query.setParameter(
             "eventType" + i, isCreate ? AuditEventType.CREATE : AuditEventType.UPDATE);
         query.setParameter("relatedModel" + i, EntityHelper.getEntityClass(entity).getName());
         query.setParameter("relatedId" + i, entity.getId());
-        query.setParameter("currentState" + i, toJSON(state.values));
-        query.setParameter("previousState" + i, isCreate ? null : toJSON(state.oldValues));
+        query.setParameter("currentState" + i, toJSON(state.getValues()));
+        query.setParameter("previousState" + i, isCreate ? null : toJSON(state.getOldValues()));
         query.setParameter("user" + i, user);
         query.setParameter("processed" + i, false);
         query.setParameter("createdBy" + i, user);
@@ -295,6 +297,10 @@ public class AuditTracker
   private void processDelete() {
     final MetaFiles files = Beans.get(MetaFiles.class);
     for (Model entity : deleted) {
+      log.trace(
+          "Delete attachments for the entity {}#{}",
+          entity.getClass().getSimpleName(),
+          entity.getId());
       files.deleteAttachments(entity);
     }
   }
@@ -327,21 +333,6 @@ public class AuditTracker
   }
 
   private static record StoreKey(Class<? extends Model> entityClass, Long id) {}
-
-  static class BaseEntityState {
-    Model entity;
-    Map<String, Object> values;
-    Map<String, Object> oldValues;
-
-    public BaseEntityState() {}
-
-    public BaseEntityState(
-        Model entity, Map<String, Object> values, Map<String, Object> oldValues) {
-      this.entity = entity;
-      this.values = values;
-      this.oldValues = oldValues;
-    }
-  }
 
   @Singleton
   static class BeforeTransactionCompleteService {
