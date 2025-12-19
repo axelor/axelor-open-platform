@@ -315,7 +315,7 @@ function Footer({
           callOnRead: false,
         });
       }
-      handleClose(rec);
+      handleClose(rec, true);
     } catch {
       // TODO: show error
     }
@@ -381,13 +381,19 @@ function useClose(
   const ready = useAtomValue(readyAtom);
   const originalRef = useRef<DataRecord>(null);
   const getHandlerState = handler.getState;
+  const onPopupClose = params?.__onPopupClose;
+
+  const getFormRecord = useCallback(
+    () => getHandlerState?.().record,
+    [getHandlerState],
+  );
 
   useEffect(() => {
-    const record = getHandlerState?.().record;
+    const record = getFormRecord();
     if (originalRef.current == null && ready && record) {
       originalRef.current = { ...record };
     }
-  }, [getHandlerState, ready]);
+  }, [getFormRecord, ready]);
 
   const parentId = useRef<string>(null);
 
@@ -400,7 +406,7 @@ function useClose(
   const shouldReload = useCallback(
     (record?: DataRecord) => {
       if (record) return true;
-      const current = getHandlerState?.().record;
+      const current = getFormRecord();
       const original = originalRef.current;
       return (
         !current ||
@@ -409,7 +415,7 @@ function useClose(
         current?.version !== original?.version
       );
     },
-    [getHandlerState],
+    [getFormRecord],
   );
 
   const triggerReload = useCallback(() => {
@@ -427,15 +433,27 @@ function useClose(
   }, [params]);
 
   const handleClose = useCallback(
-    (record?: DataRecord) => {
+    (record?: DataRecord, isOk = false) => {
       const popupCanReload = params?.popup === "reload";
       const reload = shouldReload(record);
       if (popupCanReload && reload) {
         triggerReload();
       }
+
+      if (typeof onPopupClose === "function") {
+        onPopupClose(record ?? getFormRecord(), isOk);
+      }
+
       close(reload);
     },
-    [close, shouldReload, triggerReload, params?.popup],
+    [
+      close,
+      shouldReload,
+      triggerReload,
+      getFormRecord,
+      params?.popup,
+      onPopupClose,
+    ],
   );
 
   return handleClose;
