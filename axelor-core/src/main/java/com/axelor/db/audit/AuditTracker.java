@@ -37,16 +37,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.hibernate.FlushMode;
-import org.hibernate.action.spi.AfterTransactionCompletionProcess;
-import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** This class provides change tracking for auditing and notifications. */
-public class AuditTracker
-    implements BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
+public class AuditTracker {
 
   private static final Logger log = LoggerFactory.getLogger(AuditTracker.class);
 
@@ -311,7 +308,6 @@ public class AuditTracker
     }
   }
 
-  @Override
   public void doBeforeTransactionCompletion(SessionImplementor session) {
     fireBeforeCompleteEvent();
     processDelete();
@@ -324,7 +320,6 @@ public class AuditTracker
     session.flush();
   }
 
-  @Override
   public void doAfterTransactionCompletion(
       boolean success, SharedSessionContractImplementor session) {
     if (success && logCreated) {
