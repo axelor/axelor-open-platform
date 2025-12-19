@@ -569,7 +569,9 @@ export function processView(
       item.widget = "password";
     }
 
-    const isFormField = !["grid", "panel-related"].includes(view.type ?? "");
+    const isFormField =
+      meta.view?.type === "form" &&
+      !["panel-related"].includes(view.type ?? "");
 
     // convert dotted json fields
     if (isFormField && item.jsonField && item.name?.includes(".")) {
@@ -728,7 +730,8 @@ export function processView(
             type.indexOf("-to-many") === -1 &&
             field.visibleInGrid &&
             !field.forceHidden &&
-            view.items?.find((i) => i.name === item.name + "." + field.name) == null
+            view.items?.find((i) => i.name === item.name + "." + field.name) ==
+              null
           ) {
             items.push({ ...field, name: item.name + "." + field.name });
           }
