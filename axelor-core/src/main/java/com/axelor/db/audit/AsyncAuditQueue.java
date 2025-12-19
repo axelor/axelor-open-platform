@@ -11,6 +11,7 @@ import com.axelor.inject.Beans;
 import jakarta.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,8 @@ import org.slf4j.LoggerFactory;
 class AsyncAuditQueue implements AuditQueue {
 
   private static final Logger log = LoggerFactory.getLogger(AsyncAuditQueue.class);
+
+  private static final long SHUTDOWN_TIMEOUT_SECONDS = 30;
 
   private static final ExecutorService POOL =
       Executors.newSingleThreadExecutor(
@@ -55,13 +58,21 @@ class AsyncAuditQueue implements AuditQueue {
     }
   }
 
+  /**
+   * Lifecycle listener that shuts down the audit queue when the application stops.
+   *
+   * <p>It attempts to wait up to {@value #SHUTDOWN_TIMEOUT_SECONDS} seconds for existing tasks to
+   * complete before forcing a shutdown.
+   *
+   * @param event the application shutdown event.
+   */
   public void onAppShutdown(@Observes ShutdownEvent event) {
     log.info("Shutting down AuditQueue...");
 
     POOL.shutdown();
 
     try {
-      if (!POOL.awaitTermination(30, java.util.concurrent.TimeUnit.SECONDS)) {
+      if (!POOL.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
         log.debug("Audit queue did not terminate. Forcing shutdown...");
         POOL.shutdownNow();
       }
