@@ -38,10 +38,14 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This class provides change tracking for auditing and notifications. */
 public class AuditTracker
     implements BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
+
+  private static final Logger log = LoggerFactory.getLogger(AuditTracker.class);
 
   private final String txId;
 
@@ -52,10 +56,12 @@ public class AuditTracker
   private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
 
   private final Map<StoreKey, BaseEntityState> store = new HashMap<>();
+  private ObjectMapper mapper;
   private boolean logCreated = false;
 
   public AuditTracker() {
     this.txId = generateTxId();
+    this.mapper = Beans.get(ObjectMapper.class);
   }
 
   /**
@@ -85,10 +91,11 @@ public class AuditTracker
     return new UUID(msb, lsb).toString();
   }
 
-  private static String toJSON(Object value) {
+  private String toJSON(Object value) {
     try {
-      return Beans.get(ObjectMapper.class).writeValueAsString(value);
+      return mapper.writeValueAsString(value);
     } catch (Exception e) {
+      log.error("Failed to serialize entity values to JSON", e);
     }
     return null;
   }
