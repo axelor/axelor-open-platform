@@ -4,6 +4,8 @@
  */
 package com.axelor.db.audit;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.audit.db.AuditEventType;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
@@ -53,7 +55,10 @@ public class AuditTracker
   private final Set<Model> deleted = new HashSet<>();
 
   private static final SecureRandom random = new SecureRandom();
-  private static final int BATCH_SIZE = DBHelper.getJdbcBatchSize();
+  private static final int FLUSH_THRESHOLD =
+      AppSettings.get()
+          .getInt(AvailableAppSettings.AUDIT_LOGS_FLUSH_THRESHOLD, DBHelper.getJdbcBatchSize());
+  ;
 
   private final Map<StoreKey, BaseEntityState> store = new HashMap<>();
   private ObjectMapper mapper;
@@ -198,7 +203,7 @@ public class AuditTracker
       entityState.values.putAll(currentValues);
     }
 
-    if (store.size() >= BATCH_SIZE) {
+    if (store.size() >= FLUSH_THRESHOLD) {
       processStore(session);
     }
   }

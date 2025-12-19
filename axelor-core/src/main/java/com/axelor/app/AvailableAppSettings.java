@@ -39,6 +39,8 @@ public interface AvailableAppSettings {
   String APPLICATION_SCRIPT_CACHE_EXPIRE_TIME = "application.script.cache.expire-time";
   String APPLICATION_SCRIPT_TIMEOUT = "application.script.timeout";
 
+  String AUDIT_LOGS_FLUSH_THRESHOLD = "application.audit.logs-flush-threshold";
+
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
   String APPLICATION_OPENAPI_ENABLED = "application.openapi.enabled";
