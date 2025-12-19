@@ -309,7 +309,7 @@ public class AuditTracker
   @Override
   public void doAfterTransactionCompletion(
       boolean success, SharedSessionContractImplementor session) {
-    if (logCreated) {
+    if (success && logCreated) {
       Beans.get(AuditQueue.class).process(txId);
     }
   }
