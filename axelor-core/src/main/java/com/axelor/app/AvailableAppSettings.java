@@ -40,6 +40,9 @@ public interface AvailableAppSettings {
   String APPLICATION_SCRIPT_TIMEOUT = "application.script.timeout";
 
   String AUDIT_LOGS_FLUSH_THRESHOLD = "application.audit.logs-flush-threshold";
+  String AUDIT_PROCESSOR_BATCH_DELAY = "application.audit.processor.batch-delay";
+  String AUDIT_PROCESSOR_ACTIVITY_WINDOW = "application.audit.processor.activity-windows";
+  String AUDIT_PROCESSOR_BUSY_BACKOFF = "application.audit.processor.busy-backoff";
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 

@@ -6,6 +6,8 @@ package com.axelor.db.audit;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.audit.db.AuditEventType;
 import com.axelor.audit.db.AuditLog;
 import com.axelor.audit.db.repo.AuditLogRepository;
@@ -57,7 +59,13 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Service that processes pending audit logs asynchronously. */
+/**
+ * Service responsible for processing AuditLog.
+ *
+ * <p>This processor runs asynchronously (triggered by {@link AsyncAuditQueue}) and processes logs
+ * in small batches. It employs a "Back-Pressure" mechanism to ensure it does not compete with
+ * active user transactions for database resources.
+ */
 public class AuditProcessor {
 
   private static final Logger log = LoggerFactory.getLogger(AuditProcessor.class);
@@ -65,9 +73,13 @@ public class AuditProcessor {
   private static final int MAX_RETRY = 3;
 
   // Throttling constants
-  private static final long MIN_PAUSE_MS = 5;
-  private static final long ACTIVITY_PAUSE_MS = 200;
-  private static final long ACTIVITY_TIMEOUT_MS = 200; // Consider idle after 200ms of no activity
+  private static final long BATCH_DELAY_MS =
+      AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BATCH_DELAY, 5);
+  private static final long BUSY_BACKOFF_MS =
+      AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BUSY_BACKOFF, 200);
+  private static final long ACTIVITY_WINDOW_MS =
+      AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_ACTIVITY_WINDOW, 200);
+  ; // Consider idle after 200ms of no activity
 
   // The last time activity was signaled
   private static volatile long lastActivityTime = 0;
@@ -93,7 +105,7 @@ public class AuditProcessor {
   /** Process all pending audit logs. */
   @Transactional
   public void process() {
-    log.info("Starting audit log processing...");
+    log.info("Recovering audit logs...");
     process(this::findPending);
   }
 
@@ -104,6 +116,19 @@ public class AuditProcessor {
     process(() -> findPending(txId));
   }
 
+  /**
+   * Introduces a delay in execution for a specified duration.
+   *
+   * @param ms the time to pause in milliseconds
+   */
+  private void pause(long ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
   /** Core processing loop that fetches and processes audit logs in batches. */
   private void process(Supplier<List<AuditLog>> fetcher) {
     var totalProcessed = 0;
@@ -112,13 +137,8 @@ public class AuditProcessor {
     while (true) {
       // Check if main work is active - back off immediately
       if (isSystemBusy()) {
-        try {
-          Thread.sleep(ACTIVITY_PAUSE_MS);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          break;
-        }
-        continue; // Re-check before processing
+        pause(BUSY_BACKOFF_MS);
+        continue;
       }
 
       var batch = fetcher.get();
@@ -150,22 +170,28 @@ public class AuditProcessor {
       // Clear to avoid memory issues
       JPA.clear();
 
-      // Wait a bit before next batch to reduce DB load
-      try {
-        Thread.sleep(MIN_PAUSE_MS);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        break;
-      }
+      // Wait a bit before the next batch to prevent consuming 100% of resources (either CPU of DB
+      // access)
+      // so that other thread can also process. Especially in the case of massive audit log to
+      // process.
+      pause(BATCH_DELAY_MS);
     }
 
     log.info(
         "Audit log processing complete. Processed: {}, Failed: {}", totalProcessed, totalFailed);
   }
 
-  /** Check if system is busy with main work. Returns true if entity tracking happened recently. */
+  /**
+   * Determines whether the system is currently busy based on the recent activity in entity
+   * tracking. Compares the time elapsed since the last recorded activity with a predefined activity
+   * window.
+   *
+   * <p>To prioritize the user's transaction over background work
+   *
+   * @return true if the system is considered busy, false otherwise
+   */
   private boolean isSystemBusy() {
-    return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_TIMEOUT_MS;
+    return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_WINDOW_MS;
   }
 
   private List<Long> process(AuditLog auditLog) throws Exception {
@@ -592,6 +618,7 @@ public class AuditProcessor {
     try {
       return objectMapper.writeValueAsString(value);
     } catch (Exception e) {
+      log.error("Failed to serialize JSON", e);
     }
     return null;
   }
