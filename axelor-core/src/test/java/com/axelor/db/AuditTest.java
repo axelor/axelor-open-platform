@@ -19,9 +19,7 @@ import com.axelor.auth.db.User;
 import com.axelor.cache.CaffeineTest;
 import com.axelor.concurrent.ContextAware;
 import com.axelor.db.audit.AuditModule;
-import com.axelor.db.audit.AuditQueue;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
@@ -31,7 +29,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.function.Function;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -53,12 +50,6 @@ public class AuditTest extends JpaTest {
       super.configure();
       install(new AuditModule());
     }
-  }
-
-  @AfterAll
-  public static void afterAll() {
-    // Wait for audit queue to be processed (5 minutes max)
-    Beans.get(AuditQueue.class).await(5 * 60 * 1000);
   }
 
   @BeforeEach

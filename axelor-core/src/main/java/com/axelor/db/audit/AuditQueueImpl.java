@@ -9,11 +9,8 @@ import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
 import com.axelor.inject.Beans;
 import jakarta.inject.Singleton;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +19,7 @@ class AuditQueueImpl implements AuditQueue {
 
   private static final Logger log = LoggerFactory.getLogger(AuditQueueImpl.class);
 
-  private static final AtomicBoolean RUNNING = new AtomicBoolean(false);
-  private static final Queue<Runnable> QUEUE = new ConcurrentLinkedQueue<>();
-  private static final Executor POOL =
+  private static final ExecutorService POOL =
       Executors.newSingleThreadExecutor(
           (task) -> {
             var thread = new Thread(task);
@@ -36,69 +31,42 @@ class AuditQueueImpl implements AuditQueue {
 
   @Override
   public void process(String txId) {
-    submit(
+    Runnable task =
         ContextAware.of()
             .withTransaction(false)
-            .build(() -> Beans.get(AuditProcessor.class).process(txId)));
-  }
+            .build(
+                () -> {
+                  try {
+                    Beans.get(AuditProcessor.class).process(txId);
+                  } catch (Exception e) {
+                    log.error("Starting audit log processing for transaction ID: {}", txId);
+                  }
+                });
 
-  private void submit(Runnable task) {
-    QUEUE.add(task);
-    if (RUNNING.getAndSet(true)) {
-      return;
-    }
-    POOL.execute(
-        () -> {
-          Runnable next;
-          while ((next = QUEUE.poll()) != null) {
-            try {
-              next.run();
-            } catch (Exception e) {
-              log.error("Error processing audit task", e);
-            }
-          }
-          RUNNING.set(false);
-        });
-  }
-
-  @Override
-  public void await(long timeout) {
-    // Wait for currently running task to finish (if any)
-    final long startTime = System.currentTimeMillis();
-    while (RUNNING.get()) {
-      if (System.currentTimeMillis() - startTime > timeout) {
-        log.warn("Timeout waiting for current audit task to complete");
-        break;
-      }
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        break;
-      }
+    if (!POOL.isShutdown()) {
+      POOL.execute(task);
     }
   }
 
   public void onAppShutdown(@Observes ShutdownEvent event) {
     log.info("Shutting down AuditQueue...");
 
-    // Clear queued items first
-    QUEUE.clear();
+    POOL.shutdown();
 
-    // Wait for currently running task to finish (if any)
-    final long timeout = 30_000; // 30 seconds
-    this.await(timeout);
+    try {
+      if (!POOL.awaitTermination(30, java.util.concurrent.TimeUnit.SECONDS)) {
+        log.debug("Audit queue did not terminate. Forcing shutdown...");
+        POOL.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      POOL.shutdownNow();
+    }
   }
 
   public static class Noop implements AuditQueue {
 
     @Override
     public void process(String txId) {
-      // No operation
-    }
-
-    @Override
-    public void await(long timeout) {
       // No operation
     }
   }

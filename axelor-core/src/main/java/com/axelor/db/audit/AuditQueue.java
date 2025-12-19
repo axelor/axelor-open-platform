@@ -15,11 +15,4 @@ public interface AuditQueue {
    * @param txId the transaction ID
    */
   void process(String txId);
-
-  /**
-   * Await the completion of all audit tasks.
-   *
-   * @param timeout the maximum time to wait in milliseconds
-   */
-  void await(long timeout);
 }
