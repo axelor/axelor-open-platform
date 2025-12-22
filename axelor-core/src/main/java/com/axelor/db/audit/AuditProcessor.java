@@ -22,9 +22,9 @@ import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,6 @@ public class AuditProcessor {
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BUSY_BACKOFF, 200);
   private static final long ACTIVITY_WINDOW_MS =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_ACTIVITY_WINDOW, 200);
-  ; // Consider idle after 200ms of no activity
 
   // The last time activity was signaled
   private static volatile long lastActivityTime = 0;
@@ -117,17 +116,19 @@ public class AuditProcessor {
         break;
       }
 
-      var processedIds = new ArrayList<Long>();
+      // eliminate round-trips to the database
+      fetchLogsForBatch(batch);
+
+      var processedAuditWorkGroups = new ArrayList<AuditWorkGroup>();
 
       for (AuditWorkGroup auditWorkGroup : batch) {
-        List<AuditLog> auditLogs = auditWorkGroup.fetchLogs();
         try {
-          process(auditWorkGroup, auditLogs);
-          processedIds.addAll(auditLogs.stream().map(AuditLog::getId).toList());
-          totalProcessed += auditLogs.size();
+          process(auditWorkGroup);
+          processedAuditWorkGroups.add(auditWorkGroup);
+          totalProcessed++;
         } catch (Exception e) {
-          totalFailed += auditLogs.size();
-          handleError(auditWorkGroup, auditLogs, e);
+          totalFailed++;
+          handleError(auditWorkGroup, e);
         }
       }
 
@@ -135,8 +136,8 @@ public class AuditProcessor {
       JPA.flush();
 
       // Bulk delete successfully processed AuditLogs
-      if (!processedIds.isEmpty()) {
-        JPA.all(AuditLog.class).filter("self.id IN :ids").bind("ids", processedIds).delete();
+      if (!processedAuditWorkGroups.isEmpty()) {
+        deleteProcessedGroups(processedAuditWorkGroups);
       }
 
       // Clear to avoid memory issues
@@ -166,22 +167,16 @@ public class AuditProcessor {
     return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_WINDOW_MS;
   }
 
-  private void process(AuditWorkGroup group, List<AuditLog> logs) throws Exception {
-
-    // Check if already processed
-    if (logs.isEmpty()) {
+  private void process(AuditWorkGroup group) throws Exception {
+    if (group.getLogs().isEmpty()) {
       return;
     }
 
     log.trace("Processing audit logs for {} ", group);
 
-    if (logs.size() > 1) {
-      log.trace("Consolidating {} audit logs for {}", logs.size(), group);
-    }
-
     // Consolidate ALL changes from all audit logs in this transaction
-    var firstLog = logs.getFirst();
-    var lastLog = logs.getLast();
+    var firstLog = group.getFirstAuditLog();
+    var lastLog = group.getLastAuditLog();
     var oldValues = fromJSON(firstLog.getPreviousState());
     var values = fromJSON(lastLog.getCurrentState());
 
@@ -200,16 +195,9 @@ public class AuditProcessor {
       // Process the audit log
       service.process(entityState, lastLog.getUser());
     }
-
-    // Mark them processed
-    logs.forEach(
-        l -> {
-          l.setProcessed(true);
-          l.setProcessedOn(LocalDateTime.now());
-        });
   }
 
-  private void handleError(AuditWorkGroup group, List<AuditLog> logs, Exception e) {
+  private void handleError(AuditWorkGroup group, Exception e) {
     log.error("Failed to process audit logs for {}", group, e);
 
     var message = e.getMessage();
@@ -217,16 +205,28 @@ public class AuditProcessor {
       message = message.substring(0, 1000);
     }
 
-    for (AuditLog auditLog : logs) {
-      auditLog.setRetryCount(auditLog.getRetryCount() + 1);
-      auditLog.setErrorMessage(message);
-
-      if (auditLog.getRetryCount() >= MAX_RETRY) {
-        log.error("Max retries exceeded for audit log: {}", auditLog.getId());
-        auditLog.setProcessed(true); // Stop retrying
-        auditLog.setProcessedOn(LocalDateTime.now());
-      }
+    AuditLog auditLog = group.getFirstAuditLog();
+    boolean processed = false;
+    int maxRetry = auditLog.getRetryCount() + 1;
+    if (maxRetry >= MAX_RETRY) {
+      log.error("Max retries exceeded for audit logs group {}", group);
+      processed = true;
     }
+
+    JPA.em()
+        .createQuery(
+            """
+                  UPDATE AuditLog SET processed = :processed, retryCount = :retry, errorMessage = :message
+                  WHERE txId = :txId AND relatedModel = :relatedModel AND relatedId = :relatedId AND eventType = :eventType
+              """)
+        .setParameter("processed", processed)
+        .setParameter("retry", maxRetry)
+        .setParameter("message", message)
+        .setParameter("txId", group.getTxId())
+        .setParameter("relatedModel", group.getRelatedModel())
+        .setParameter("relatedId", group.getRelatedId())
+        .setParameter("eventType", group.getEventType())
+        .executeUpdate();
   }
 
   private Map<String, Object> parseValues(Class<?> entityClass, Map<String, Object> values) {
@@ -266,10 +266,64 @@ public class AuditProcessor {
     }
   }
 
+  private void deleteProcessedGroups(List<AuditWorkGroup> groups) {
+    String sql =
+        "DELETE FROM audit_log WHERE tx_id=? AND related_model=? AND related_id=? AND event_type=?";
+    JPA.em()
+        .unwrap(Session.class)
+        .doWork(
+            conn -> {
+              try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                for (AuditWorkGroup g : groups) {
+                  ps.setString(1, g.getTxId());
+                  ps.setString(2, g.getRelatedModel());
+                  ps.setObject(3, g.getRelatedId());
+                  ps.setString(4, g.getEventType().name());
+                  ps.addBatch();
+                }
+                ps.executeBatch();
+              }
+            });
+  }
+
+  /** Fetches all AuditLogs for the entire batch of groups in a single query. */
+  private void fetchLogsForBatch(List<AuditWorkGroup> batch) {
+    if (batch.isEmpty()) {
+      return;
+    }
+
+    var idsToFetch = new ArrayList<>();
+    // fast lookup map
+    Map<AuditWorkGroup, AuditWorkGroup> groupMap = new HashMap<>();
+
+    for (var g : batch) {
+      idsToFetch.add(g.getFirstAuditLogId());
+      idsToFetch.add(g.getLastAuditLogId());
+      groupMap.put(g, g);
+    }
+
+    List<AuditLog> logs =
+        JPA.em()
+            .createQuery("SELECT a FROM AuditLog a WHERE a.id IN :ids", AuditLog.class)
+            .setParameter("ids", idsToFetch)
+            .getResultList();
+
+    for (AuditLog log : logs) {
+      AuditWorkGroup tmpWorkGroup =
+          new AuditWorkGroup(
+              log.getTxId(), log.getRelatedModel(), log.getRelatedId(), log.getEventType());
+
+      AuditWorkGroup targetGroup = groupMap.get(tmpWorkGroup);
+      if (targetGroup != null) {
+        targetGroup.addAuditLog(log);
+      }
+    }
+  }
+
   private List<AuditWorkGroup> fetchNextBatch(String txId) {
     String sql =
         """
-        SELECT tx_id, related_model, related_id, event_type
+        SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id
         FROM audit_log
         WHERE processed = false
           AND (retry_count IS NULL OR retry_count < ?)
@@ -300,7 +354,9 @@ public class AuditProcessor {
                         rs.getString("tx_id"),
                         rs.getString("related_model"),
                         rs.getLong("related_id"),
-                        AuditEventType.valueOf(rs.getString("event_type"))));
+                        AuditEventType.valueOf(rs.getString("event_type")),
+                        rs.getLong("min_id"),
+                        rs.getLong("max_id")));
               }
             }
           }
@@ -309,61 +365,82 @@ public class AuditProcessor {
   }
 
   private static class AuditWorkGroup {
-    private final String txId;
-    private final String relatedModel;
-    private final Long relatedId;
-    private final AuditEventType eventType;
+
+    String txId;
+    String relatedModel;
+    Long relatedId;
+    Long firstAuditLogId;
+    Long lastAuditLogId;
+    AuditEventType eventType;
+
+    List<AuditLog> logs = new ArrayList<>();
 
     public AuditWorkGroup(
         String txId, String relatedModel, Long relatedId, AuditEventType eventType) {
+      this.eventType = eventType;
+      this.relatedId = relatedId;
+      this.relatedModel = relatedModel;
+      this.txId = txId;
+    }
+
+    public AuditWorkGroup(
+        String txId,
+        String relatedModel,
+        Long relatedId,
+        AuditEventType eventType,
+        Long firstAuditLogId,
+        Long lastAuditLogId) {
       this.txId = txId;
       this.relatedModel = relatedModel;
       this.relatedId = relatedId;
+      this.firstAuditLogId = firstAuditLogId;
+      this.lastAuditLogId = lastAuditLogId;
       this.eventType = eventType;
-    }
-
-    public String getTxId() {
-      return txId;
-    }
-
-    public String getRelatedModel() {
-      return relatedModel;
-    }
-
-    public Long getRelatedId() {
-      return relatedId;
     }
 
     public AuditEventType getEventType() {
       return eventType;
     }
 
-    /** Retrieves a list of audit logs for a specified audit work group. */
-    private List<AuditLog> fetchLogs() {
-      return JPA.all(AuditLog.class)
-          .filter(
-              """
-                      self.txId = :txId
-                      AND self.processed = false
-                      AND self.eventType = :eventType
-                      AND self.relatedModel = :relatedModel
-                      AND self.relatedId = :relatedId
-                      """)
-          .bind("txId", txId)
-          .bind("relatedId", relatedId)
-          .bind("relatedModel", relatedModel)
-          .bind("eventType", eventType)
-          .order("createdOn")
-          .fetch();
+    public Long getRelatedId() {
+      return relatedId;
     }
 
-    public String getDescription() {
-      return String.format("%s#%d (%s)", relatedModel, relatedId, eventType);
+    public String getRelatedModel() {
+      return relatedModel;
+    }
+
+    public String getTxId() {
+      return txId;
+    }
+
+    public Long getFirstAuditLogId() {
+      return firstAuditLogId;
+    }
+
+    public Long getLastAuditLogId() {
+      return lastAuditLogId;
+    }
+
+    public void addAuditLog(AuditLog log) {
+      this.logs.add(log);
+    }
+
+    public List<AuditLog> getLogs() {
+      return logs;
+    }
+
+    public AuditLog getFirstAuditLog() {
+      return logs.stream().min(Comparator.comparingLong(AuditLog::getId)).orElse(null);
+    }
+
+    public AuditLog getLastAuditLog() {
+      return logs.stream().max(Comparator.comparingLong(AuditLog::getId)).orElse(null);
     }
 
     @Override
     public String toString() {
-      return getDescription() + " [Tx: " + txId + "]";
+      return String.format("%s#%d (%s) [Tx: %s]", relatedModel, relatedId, eventType, txId);
     }
 
     @Override

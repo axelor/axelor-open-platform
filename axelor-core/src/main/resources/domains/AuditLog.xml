@@ -21,7 +21,6 @@
     <string name="currentState" large="true" />
     <string name="previousState" large="true" />
     <boolean name="processed" default="false" index="true" />
-    <datetime name="processedOn" />
     <string name="errorMessage" large="true" />
     <integer name="retryCount" default="0" index="true" />
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" index="false"/>
