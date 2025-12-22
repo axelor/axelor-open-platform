@@ -24,13 +24,10 @@
     <datetime name="processedOn" />
     <string name="errorMessage" large="true" />
     <integer name="retryCount" default="0" index="true" />
-    <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" />
+    <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" index="false"/>
 
-    <!-- Optimized index for findPending() query - covers filter + supports ordering -->
-    <index columns="processed,retryCount,txId,relatedModel,relatedId" />
-
-    <!-- Optimized index for findRelated() query - covers all filters + ordering -->
-    <index columns="txId,eventType,relatedModel,relatedId,processed,createdOn" />
+    <!-- Optimized index for AuditProcessor queries - covers all filters + ordering -->
+    <index columns="processed,txId,relatedModel,relatedId,eventType,createdOn,retry_count" name="audit_log_idx_processing"/>
   </entity>
 
   <enum name="AuditEventType">
