@@ -50,7 +50,7 @@ class AsyncAuditQueue implements AuditQueue {
                   try {
                     Beans.get(AuditProcessor.class).process(txId);
                   } catch (Exception e) {
-                    log.error("Starting audit log processing for transaction ID: {}", txId);
+                    log.error("Error in audit log processing for transaction ID: {}", txId);
                   }
                 });
 
