@@ -47,9 +47,6 @@
 
     <datetime name="receivedOn" index="true" />
 
-    <boolean name="emailSent" index="true" />
-    <datetime name="emailSentOn" />
-
     <index columns="relatedModel,relatedId" />
   </entity>
 
