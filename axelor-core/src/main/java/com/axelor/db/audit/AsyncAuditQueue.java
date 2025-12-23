@@ -10,8 +10,10 @@ import com.axelor.events.ShutdownEvent;
 import com.axelor.inject.Beans;
 import jakarta.inject.Singleton;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +29,16 @@ class AsyncAuditQueue implements AuditQueue {
 
   private static final Logger log = LoggerFactory.getLogger(AsyncAuditQueue.class);
 
+  private final AtomicLong failureCounter = new AtomicLong(0);
   private static final long SHUTDOWN_TIMEOUT_SECONDS = 30;
 
-  private static final ExecutorService POOL =
-      Executors.newSingleThreadExecutor(
+  private static final ThreadPoolExecutor POOL =
+      new ThreadPoolExecutor(
+          1,
+          1,
+          0L,
+          TimeUnit.MILLISECONDS,
+          new LinkedBlockingQueue<>(),
           (task) -> {
             var thread = new Thread(task);
             thread.setDaemon(true);
@@ -50,6 +58,7 @@ class AsyncAuditQueue implements AuditQueue {
                   try {
                     Beans.get(AuditProcessor.class).process(txId);
                   } catch (Exception e) {
+                    failureCounter.incrementAndGet();
                     log.error("Error in audit log processing for transaction ID: {}", txId);
                   }
                 });
@@ -57,6 +66,15 @@ class AsyncAuditQueue implements AuditQueue {
     if (!POOL.isShutdown()) {
       POOL.execute(task);
     }
+  }
+
+  @Override
+  public QueueStats getStatistics() {
+    return new QueueStats(
+        POOL.getQueue().size(),
+        POOL.getCompletedTaskCount(),
+        POOL.getActiveCount() > 0,
+        failureCounter.get());
   }
 
   /**

@@ -21,4 +21,15 @@ public interface AuditQueue {
    * @param txId the transaction ID
    */
   void process(String txId);
+
+  default QueueStats getStatistics() {
+    return new QueueStats(0, 0, false, 0);
+  }
+
+  record QueueStats(
+      int pending, // Pending items
+      long completed, // Total processed
+      boolean isActive, // Is busy?
+      long failure // Total errors
+      ) {}
 }
