@@ -5,7 +5,7 @@
 
   <module name="audit" package="com.axelor.audit.db" />
 
-  <entity name="AuditLog" table="AUDIT_LOG">
+  <entity name="AuditLog" table="AUDIT_LOG" jsonAttrs="false">
     <![CDATA[
     Stores raw audit data for asynchronous processing.
     Decouples entity changes from audit message generation.
