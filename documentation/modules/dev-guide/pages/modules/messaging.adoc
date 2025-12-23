@@ -95,12 +95,36 @@ For security and performance reasons, certain field types are automatically excl
 === Asynchronous Processing
 
 The audit tracking system processes tracking messages asynchronously after the user transaction.
-This allows to improve application responsiveness when creating many tracking messages.
+This allows improving application responsiveness when creating many tracking messages.
+
+**Adaptive Back-Pressure**
+
+To balance the system's resources between user experience (foreground tasks) and data consistency (background audit
+processing), an adaptive Back-Pressure mechanism is implemented. The following properties control how AuditLog records
+are managed and ensure the audit processor is "polite" when users are active but "persistent" enough to never fall too
+far behind.
+
+- **application.audit.logs.flush-threshold**: Maximum number of AuditLog entries buffered in memory before triggering
+an automatic flush to the database. Default to the JDBC batch size value where the default value is `20`.
+- **application.audit.logs.max-retry**: Limit how many times the processor will attempt to handle a specific group
+of logs before giving up. Default to `3`.
+- **application.audit.processor.batch-delay**: An interval in millisecond. The pause taken after successfully
+processing a batch and before starting the next one. Default to `5`. Prevent consuming 100% of resources in case of
+massive audit log records to process.
+- **application.audit.processor.activity-windows**: An interval in millisecond. Defines the time window to consider
+the system "Busy" after a user action. Default to `200`.
+- **application.audit.processor.busy-backoff-interval**: An interval in millisecond. The amount of time the processor
+sleeps when it detects the system is "Busy". Default to `200`.
+- **application.audit.processor.busy-backoff-max-retries**: A number. The maximum number of retries the audit processor
+will pause and retry when the system is detected as "Busy". Default to `3`. Prevents the audit processor from being
+permanently blocked during periods of sustained high load.
+- **application.audit.processor.batch-size**: AuditProcess batch size. Defines the number of audit log groups fetched
+and processed in a single transaction. Default to `100`.
 
 **Delayed Feedback**
 
-Tracking messages are not created immediately when a record is modified.
-Instead, they appear in the stream after a brief delay.
+Tracking messages are not created immediately when a record is created/updated. Instead, they appear in the stream
+after a brief delay.
 
 == Streams & Discussions
 

@@ -1,0 +1,61 @@
+= 8.1 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/8.1/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 8.x to 8.1.
+
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.1/CHANGELOG.md[changelog] for a detailed
+list of fixes, changes, and improvements introduced in 8.1.
+
+== Audit tracking
+
+Now, the audit tracking system processes tracking messages asynchronously after the user transaction. This allows
+improving application responsiveness when creating many tracking messages. So tracking messages are not created
+immediately when a record is created/updated. Instead, they appear in the stream after a brief delay till they are
+processed.
+
+`AuditLog` entity for persistent audit event storage with full state capture has been introduced. It supports retry
+logic with max retries and error tracking. Run the following SQL script to create the table :
+
+[source,sql]
+----
+create table audit_log
+(
+    id             bigint       not null    primary key,
+    archived       boolean,
+    version        integer,
+    created_on     timestamp(6),
+    updated_on     timestamp(6),
+    current_state  text,
+    error_message  text,
+    event_type     varchar(255) not null,
+    previous_state text,
+    processed      boolean,
+    related_id     bigint       not null,
+    related_model  varchar(255) not null,
+    retry_count    integer,
+    tx_id          varchar(255) not null,
+    created_by     bigint   constraint fk_ru17orlmi6rjhpojmeqrxbiok references auth_user,
+    updated_by     bigint   constraint fk_tbhw331n3l89dk629vmpxg4de references auth_user,
+    user_id        bigint   constraint fk_pyjqqm7hglp6pnwp3h8whian8 references auth_user
+);
+
+create index audit_log_idx_processing
+    on audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
+----
+
+For security and performance reasons, certain field types are automatically excluded from audit tracking:
+
+* **Security Sensitive**: Passwords and encrypted fields are never tracked.
+* **Large Data**: Binary fields (files, images) are excluded.
+* **Collections**: One-to-Many and Many-to-Many relationships are not supported.
+* **Transient**: Fields that are not persisted to the database.
+
+Adaptive back-pressure mechanism an be controlled with following properties : `application.audit.logs.flush-threshold`,
+`application.audit.processor.batch-delay`, `application.audit.processor.activity-windows`,
+`application.audit.processor.busy-backoff-interval`, `application.audit.processor.busy-backoff-max-retries` and
+`application.audit.processor.batch-size`.
+
+More information xref:dev-guide:modules/messaging.adoc[here].

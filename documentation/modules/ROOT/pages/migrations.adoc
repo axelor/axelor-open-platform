@@ -6,6 +6,7 @@
 
 NOTE: Please check the {product-changelog}[change log] for detailed list of changes
 
+* xref:migrations/migration-8.1.adoc[Migrate from 8.x to 8.1]
 * xref:migrations/migration-8.0.adoc[Migrate from 7.x to 8.0]
 * xref:migrations/migration-7.4.adoc[Migrate from 7.3 to 7.4]
 * xref:migrations/migration-7.3.adoc[Migrate from 7.2 to 7.3]
