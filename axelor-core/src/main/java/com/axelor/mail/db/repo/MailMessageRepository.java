@@ -87,7 +87,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
       builder.append(" WHERE ").append(String.join(" AND ", where));
     }
 
-    builder.append(" ORDER BY COALESCE(self.receivedOn, self.createdOn) DESC");
+    builder.append(" ORDER BY self.receivedOn DESC");
 
     var queryString = builder.toString();
     var query = JPA.em().createQuery(queryString, MailMessage.class);
@@ -369,15 +369,12 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
               + user.getVersion());
     }
 
-    LocalDateTime eventTime =
-        message.getReceivedOn() != null ? message.getReceivedOn() : message.getCreatedOn();
-
     details.put("$from", Resource.toMap(email, "address", "personal"));
     details.put("$author", Resource.toMapCompact(author));
     details.put("$files", files);
     details.put("$eventType", eventType);
     details.put("$eventText", eventText);
-    details.put("$eventTime", eventTime);
+    details.put("$eventTime", message.getReceivedOn());
 
     return details;
   }

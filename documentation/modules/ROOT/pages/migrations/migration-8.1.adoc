@@ -53,9 +53,18 @@ For security and performance reasons, certain field types are automatically excl
 * **Collections**: One-to-Many and Many-to-Many relationships are not supported.
 * **Transient**: Fields that are not persisted to the database.
 
-Adaptive back-pressure mechanism an be controlled with following properties : `application.audit.logs.flush-threshold`,
+Adaptive back-pressure mechanism can be controlled with the following properties : `application.audit.logs.flush-threshold`,
 `application.audit.processor.batch-delay`, `application.audit.processor.activity-windows`,
 `application.audit.processor.busy-backoff-interval`, `application.audit.processor.busy-backoff-max-retries` and
 `application.audit.processor.batch-size`.
+
+A new field `receivedOn` has been added on `MailMessage`. Run the following SQL script to adjust `mail_message` table
+change :
+
+[source,sql]
+----
+ALTER TABLE mail_message ADD COLUMN received_on timestamp(6);
+UPDATE mail_message set received_on = created_on;
+----
 
 More information xref:dev-guide:modules/messaging.adoc[here].
