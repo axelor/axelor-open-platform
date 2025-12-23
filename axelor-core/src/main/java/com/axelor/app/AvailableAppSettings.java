@@ -39,10 +39,15 @@ public interface AvailableAppSettings {
   String APPLICATION_SCRIPT_CACHE_EXPIRE_TIME = "application.script.cache.expire-time";
   String APPLICATION_SCRIPT_TIMEOUT = "application.script.timeout";
 
-  String AUDIT_LOGS_FLUSH_THRESHOLD = "application.audit.logs-flush-threshold";
+  String AUDIT_LOGS_FLUSH_THRESHOLD = "application.audit.logs.flush-threshold";
+  String AUDIT_LOGS_MAX_RETRY = "application.audit.logs.max-retry";
   String AUDIT_PROCESSOR_BATCH_DELAY = "application.audit.processor.batch-delay";
   String AUDIT_PROCESSOR_ACTIVITY_WINDOW = "application.audit.processor.activity-windows";
-  String AUDIT_PROCESSOR_BUSY_BACKOFF = "application.audit.processor.busy-backoff";
+  String AUDIT_PROCESSOR_BUSY_BACKOFF_INTERVAL =
+      "application.audit.processor.busy-backoff-interval";
+  String AUDIT_PROCESSOR_BUSY_BACKOFF_MAX_RETRIES =
+      "application.audit.processor.busy-backoff-max-retries";
+  String AUDIT_PROCESSOR_BATCH_SIZE = "application.audit.processor.batch-size";
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
