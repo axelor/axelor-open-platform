@@ -256,7 +256,7 @@ public class AuditProcessor {
         .createQuery(
             """
                   UPDATE AuditLog SET processed = :processed, retryCount = :retry, errorMessage = :message
-                  WHERE txId = :txId AND relatedModel = :relatedModel AND relatedId = :relatedId AND eventType = :eventType
+                  WHERE processed = false AND txId = :txId AND relatedModel = :relatedModel AND relatedId = :relatedId AND eventType = :eventType
               """)
         .setParameter("processed", processed)
         .setParameter("retry", maxRetry)
@@ -311,7 +311,7 @@ public class AuditProcessor {
    */
   private void deleteProcessedGroups(List<AuditWorkGroup> groups) {
     String sql =
-        "DELETE FROM audit_log WHERE tx_id=? AND related_model=? AND related_id=? AND event_type=?";
+        "DELETE FROM audit_log WHERE processed=false AND tx_id=? AND related_model=? AND related_id=? AND event_type=?";
     JPA.em()
         .unwrap(Session.class)
         .doWork(

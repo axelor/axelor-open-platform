@@ -14,15 +14,15 @@
     AuditLogProcessor consolidates these during background processing.
     ]]>
 
-    <string name="relatedModel" required="true" index="true" />
-    <long name="relatedId" required="true" index="true" />
-    <string name="txId" required="true" index="true" />
+    <string name="relatedModel" required="true" />
+    <long name="relatedId" required="true" />
+    <string name="txId" required="true" />
     <enum name="eventType" required="true" ref="AuditEventType" />
     <string name="currentState" large="true" />
     <string name="previousState" large="true" />
-    <boolean name="processed" default="false" index="true" />
+    <boolean name="processed" default="false" />
     <string name="errorMessage" large="true" />
-    <integer name="retryCount" default="0" index="true" />
+    <integer name="retryCount" default="0" />
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" index="false"/>
 
     <!-- Optimized index for AuditProcessor queries - covers all filters + ordering -->
