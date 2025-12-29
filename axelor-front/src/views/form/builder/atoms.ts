@@ -271,6 +271,7 @@ export const contextAtom = atom(
         context: _context,
         statesByName,
         parent,
+        fields,
       } = get(formAtom);
 
       let context: DataContext = {
@@ -283,12 +284,43 @@ export const contextAtom = atom(
       // set selected flag for o2m/m2m fields
       for (const name in statesByName) {
         const { selected } = statesByName[name];
-        if (selected && Array.isArray(context[name])) {
-          context[name] = context[name].map((value: DataRecord) =>
-            value.id && selected.includes(value.id)
-              ? { ...value, selected: true }
+
+        const setSelected = (list: DataRecord[], selectedIds: number[]) =>
+          list.map((value) =>
+            value.id
+              ? { ...value, selected: selectedIds.includes(value.id) }
               : value,
           );
+
+        if (selected) {
+          if (Array.isArray(context[name])) {
+            context[name] = setSelected(context[name], selected);
+          } else {
+            // for collection json fields
+            const [jsonField] = name.split(".");
+            const fieldName = name.slice(jsonField.length + 1);
+            const value = context[jsonField];
+            if (
+              fieldName &&
+              value &&
+              typeof value === "string" &&
+              fields?.[jsonField]?.json
+            ) {
+              try {
+                let jsonValue = JSON.parse(value);
+                const list = jsonValue[fieldName];
+                if (Array.isArray(list)) {
+                  jsonValue = {
+                    ...jsonValue,
+                    [fieldName]: setSelected(list, selected),
+                  };
+                  context[jsonField] = JSON.stringify(jsonValue);
+                }
+              } catch {
+                //handle error
+              }
+            }
+          }
         }
       }
 

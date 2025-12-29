@@ -1056,6 +1056,39 @@ const RecordEditor = memo(function RecordEditor({
 
         set(editorFormAtom, state);
 
+        // sync statesByName (for collection field selected state ) for json fields
+        const selectedStateJsonFields = Object.keys(state.statesByName)
+          .map((name) => {
+            const field = state.fields[name];
+            const widgetState = state.statesByName[name];
+            return widgetState?.selected && field?.jsonField
+              ? {
+                  name,
+                  selected: widgetState.selected,
+                  jsonField: field?.jsonField,
+                }
+              : { name };
+          })
+          .filter((item) => item?.jsonField);
+
+        if (selectedStateJsonFields.length > 0) {
+          // this selected state in parent form is used to fill selected in prepare context
+          set(parent, (draft) => ({
+            ...draft,
+            statesByName: {
+              ...draft.statesByName,
+              ...selectedStateJsonFields.reduce(
+                (states, { name, jsonField, selected }) => {
+                  const key = `${jsonField}.${name}`;
+                  const currState = draft.statesByName[key];
+                  return { ...states, [key]: { ...currState, selected } };
+                },
+                {},
+              ),
+            },
+          }));
+        }
+
         // the update is intended for dirty state changed
         // no value changes occurs through this update
         // also need to sync dirty with parent form dirty state
@@ -1085,7 +1118,7 @@ const RecordEditor = memo(function RecordEditor({
     });
 
   const { actionHandler: parentHandler } = useFormScope();
-  
+
   actionHandler.setSaveHandler(
     useCallback(
       async (record?: DataRecord) => parentHandler.save(record),
@@ -1105,7 +1138,6 @@ const RecordEditor = memo(function RecordEditor({
   actionHandler.setCloseHandler(
     useCallback(async () => parentHandler.close(), [parentHandler]),
   );
-
 
   const ds = useMemo(() => new DataStore(model), [model]);
   const load = useAtomCallback(

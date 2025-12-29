@@ -221,7 +221,8 @@ export function updateRecord(
 
     if (fields?.[key]?.json) {
       delete jsonFieldsValue[key];
-      newValue = newValue && compactJson(toJSON(newValue));
+      newValue =
+        newValue && compactJson(toJSON(newValue), { forContext: false });
     }
 
     let isSelectedChanged = false;
