@@ -122,14 +122,14 @@ public class AuditProcessor {
 
       // Process batch
       BatchResult result = processBatch(txId, currentOffset);
-      totalProcessed += result.succeed();
+      totalProcessed += result.succeeded();
       totalFailed += result.failed();
 
       // Move offset
       currentOffset += result.failed();
 
       // Everything processed, exit
-      if ((result.succeed() + result.failed()) < BATCH_SIZE) {
+      if ((result.succeeded() + result.failed()) < BATCH_SIZE) {
         break;
       }
 
@@ -149,7 +149,7 @@ public class AuditProcessor {
 
   @Transactional
   protected BatchResult processBatch(String txId, int offset) {
-    // compute audi work group
+    // compute audit work group
     List<AuditWorkGroup> batch = fetchNextBatch(txId, offset);
     if (batch.isEmpty()) {
       return new BatchResult(0, 0);
@@ -421,7 +421,7 @@ public class AuditProcessor {
     return result;
   }
 
-  protected record BatchResult(int succeed, int failed) {}
+  protected record BatchResult(int succeeded, int failed) {}
 
   private static class AuditWorkGroup {
 

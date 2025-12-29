@@ -42,7 +42,7 @@ public interface AvailableAppSettings {
   String AUDIT_LOGS_FLUSH_THRESHOLD = "application.audit.logs.flush-threshold";
   String AUDIT_LOGS_MAX_RETRY = "application.audit.logs.max-retry";
   String AUDIT_PROCESSOR_BATCH_DELAY = "application.audit.processor.batch-delay";
-  String AUDIT_PROCESSOR_ACTIVITY_WINDOW = "application.audit.processor.activity-windows";
+  String AUDIT_PROCESSOR_ACTIVITY_WINDOW = "application.audit.processor.activity-window";
   String AUDIT_PROCESSOR_BUSY_BACKOFF_INTERVAL =
       "application.audit.processor.busy-backoff-interval";
   String AUDIT_PROCESSOR_BUSY_BACKOFF_MAX_RETRIES =

@@ -26,7 +26,7 @@
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" index="false"/>
 
     <!-- Optimized index for AuditProcessor queries - covers all filters + ordering -->
-    <index columns="processed,txId,relatedModel,relatedId,eventType,createdOn,retry_count" name="audit_log_idx_processing"/>
+    <index columns="processed,txId,relatedModel,relatedId,eventType,createdOn,retryCount" name="audit_log_idx_processing"/>
   </entity>
 
   <enum name="AuditEventType">

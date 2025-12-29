@@ -16,5 +16,5 @@ description: |
   after a brief delay.
   - Adaptive back-pressure mechanism controlled with following properties : 
   `application.audit.logs.flush-threshold`, `application.audit.processor.batch-delay`, 
-  `application.audit.processor.activity-windows`, `application.audit.processor.busy-backoff-interval`, 
+  `application.audit.processor.activity-window`, `application.audit.processor.busy-backoff-interval`, 
   `application.audit.processor.busy-backoff-max-retries` and `application.audit.processor.batch-size`.
