@@ -6,6 +6,7 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.app.leader.LeaderElectionWorker;
 import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
@@ -53,6 +54,7 @@ public class AppStartup extends HttpServlet {
       log.error(e.getMessage(), e);
     }
 
+    LeaderElectionWorker.getInstance().start();
     startupEvent.fire(new StartupEvent());
     log.info("Ready to serve...");
   }
@@ -62,6 +64,7 @@ public class AppStartup extends HttpServlet {
     try {
       shutdownEvent.fire(new ShutdownEvent());
       jobRunner.shutdown();
+      LeaderElectionWorker.getInstance().stop();
       ReportExecutor.shutdown();
       FileStoreFactory.shutdown();
       RedissonProvider.shutdown();
