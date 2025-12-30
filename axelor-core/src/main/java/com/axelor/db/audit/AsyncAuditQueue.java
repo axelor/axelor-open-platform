@@ -7,10 +7,10 @@ package com.axelor.db.audit;
 import com.axelor.concurrent.ContextAware;
 import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
-import com.axelor.inject.Beans;
 import jakarta.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,7 +30,8 @@ class AsyncAuditQueue implements AuditQueue {
   private static final Logger log = LoggerFactory.getLogger(AsyncAuditQueue.class);
 
   private final AtomicLong failureCounter = new AtomicLong(0);
-  private static final long SHUTDOWN_TIMEOUT_SECONDS = 30;
+  private volatile boolean isActive = true;
+  private static final long SHUTDOWN_TIMEOUT_SECONDS = 20;
 
   private static final ThreadPoolExecutor POOL =
       new ThreadPoolExecutor(
@@ -56,7 +57,8 @@ class AsyncAuditQueue implements AuditQueue {
             .build(
                 () -> {
                   try {
-                    Beans.get(AuditProcessor.class).process(txId);
+                    AuditProcessor processor = new AuditProcessor(() -> isActive);
+                    processor.process(txId);
                   } catch (Exception e) {
                     failureCounter.incrementAndGet();
                     log.error("Error in audit log processing for transaction ID: {}", txId);
@@ -64,7 +66,10 @@ class AsyncAuditQueue implements AuditQueue {
                 });
 
     if (!POOL.isShutdown()) {
-      POOL.execute(task);
+      try {
+        POOL.execute(task);
+      } catch (RejectedExecutionException ignore) {
+      }
     }
   }
 
@@ -80,23 +85,30 @@ class AsyncAuditQueue implements AuditQueue {
   /**
    * Lifecycle listener that shuts down the audit queue when the application stops.
    *
-   * <p>It attempts to wait up to {@value #SHUTDOWN_TIMEOUT_SECONDS} seconds for existing tasks to
-   * complete before forcing a shutdown.
+   * <p>Shutdown as smoothly as possible: first stop accepting new tasks then wait up to {@value
+   * #SHUTDOWN_TIMEOUT_SECONDS} seconds for existing tasks to complete. If tasks are still running
+   * trigger signal to gracefully quit the process, then drain the queue.
    *
    * @param event the application shutdown event.
    */
   public void onAppShutdown(@Observes ShutdownEvent event) {
     log.info("Shutting down AuditQueue...");
 
+    // Stop accepting new tasks
     POOL.shutdown();
 
     try {
       if (!POOL.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
         log.debug("Audit queue did not terminate. Forcing shutdown...");
+        // Trigger signal for active tasks to stop
+        this.isActive = false;
+        // Drain queue and interrupt active task
         POOL.shutdownNow();
       }
     } catch (InterruptedException e) {
+      this.isActive = false;
       POOL.shutdownNow();
+      Thread.currentThread().interrupt();
     }
   }
 }

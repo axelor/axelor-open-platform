@@ -13,13 +13,12 @@ import com.axelor.db.Model;
 import com.axelor.db.audit.state.AuditState;
 import com.axelor.db.audit.state.EntityState;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailMessageTrackingService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.persist.Transactional;
-import jakarta.inject.Inject;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +49,9 @@ public class AuditProcessor {
   private static final int MAX_RETRY =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_LOGS_MAX_RETRY, 3);
 
-  @Inject private MailMessageTrackingService service;
-  @Inject private ObjectMapper objectMapper;
+  private final MailMessageTrackingService service;
+  private final ObjectMapper objectMapper;
+  private BooleanSupplier keepRunningSupplier;
 
   // Throttling constants
   private static final long BATCH_DELAY_MS =
@@ -64,6 +65,16 @@ public class AuditProcessor {
 
   // The last time activity was signaled
   private static volatile long lastActivityTime = 0;
+
+  public AuditProcessor() {
+    this.service = Beans.get(MailMessageTrackingService.class);
+    this.objectMapper = Beans.get(ObjectMapper.class);
+  }
+
+  public AuditProcessor(BooleanSupplier keepRunningSupplier) {
+    this();
+    this.keepRunningSupplier = keepRunningSupplier;
+  }
 
   /**
    * Signal that entity tracking is happening (called from AuditTracker). This tells the processor
@@ -103,6 +114,11 @@ public class AuditProcessor {
     }
   }
 
+  private boolean isShutdownRequest() {
+    return (keepRunningSupplier != null && !keepRunningSupplier.getAsBoolean())
+        || Thread.currentThread().isInterrupted();
+  }
+
   /** Core processing loop that fetches and processes audit logs in batches. */
   private void processPendingWork(String txId) {
     int currentOffset = 0;
@@ -112,6 +128,11 @@ public class AuditProcessor {
     int busyWaitCount = 0;
 
     while (true) {
+      // Check for shutdown
+      if (isShutdownRequest()) {
+        break;
+      }
+
       // Check if main work is active - back off immediately
       if (isSystemBusy() && busyWaitCount < BUSY_BACKOFF_MAX_RETRIES) {
         busyWaitCount++;
@@ -121,7 +142,8 @@ public class AuditProcessor {
       busyWaitCount = 0;
 
       // Process batch
-      BatchResult result = processBatch(txId, currentOffset);
+      int finalCurrentOffset = currentOffset;
+      BatchResult result = JPA.callInTransaction(() -> processBatch(txId, finalCurrentOffset));
       totalProcessed += result.succeeded();
       totalFailed += result.failed();
 
@@ -130,6 +152,11 @@ public class AuditProcessor {
 
       // Everything processed, exit
       if ((result.succeeded() + result.failed()) < BATCH_SIZE) {
+        break;
+      }
+
+      // Check for shutdown without waiting
+      if (isShutdownRequest()) {
         break;
       }
 
@@ -147,7 +174,6 @@ public class AuditProcessor {
         totalFailed);
   }
 
-  @Transactional
   protected BatchResult processBatch(String txId, int offset) {
     // compute audit work group
     List<AuditWorkGroup> batch = fetchNextBatch(txId, offset);
