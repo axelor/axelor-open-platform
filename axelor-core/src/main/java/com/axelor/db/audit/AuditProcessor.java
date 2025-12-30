@@ -12,6 +12,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.audit.state.AuditState;
 import com.axelor.db.audit.state.EntityState;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
@@ -92,7 +93,20 @@ public class AuditProcessor {
   /** Process all pending audit logs. */
   public void process() {
     log.info("Recovering audit logs...");
-    processPendingWork(null);
+
+    List<String> candidateTxIds = fetchCandidateTxIds(BATCH_SIZE);
+
+    if (candidateTxIds.isEmpty()) {
+      return;
+    }
+
+    for (String txId : candidateTxIds) {
+      if (isShutdownRequest()) {
+        break;
+      }
+      // Delegate to the specific processor
+      process(txId);
+    }
   }
 
   /** Process audit logs for a specific transaction ID. */
@@ -143,7 +157,16 @@ public class AuditProcessor {
 
       // Process batch
       int finalCurrentOffset = currentOffset;
-      BatchResult result = JPA.callInTransaction(() -> processBatch(txId, finalCurrentOffset));
+      BatchResult result;
+      try {
+        result = JPA.callInTransaction(() -> processBatch(txId, finalCurrentOffset));
+      } catch (Exception e) {
+        if (isLockingException(e)) {
+          break;
+        }
+        log.error("Unexpected error processing txId: {}", txId, e);
+        break;
+      }
       totalProcessed += result.succeeded();
       totalFailed += result.failed();
 
@@ -172,6 +195,25 @@ public class AuditProcessor {
         txId,
         totalProcessed,
         totalFailed);
+  }
+
+  /**
+   * Determines whether the given throwable or any of its causes represent a locking-related
+   * exception. Specifically, it checks for instances of {@code
+   * jakarta.persistence.PessimisticLockException}, {@code org.hibernate.PessimisticLockException},
+   * or {@code org.hibernate.exception.LockAcquisitionException}.
+   *
+   * @param e the throwable to examine; may be null
+   * @return {@code true} if the throwable or any of its causes is a locking-related exception,
+   *     {@code false} otherwise
+   */
+  private boolean isLockingException(Throwable e) {
+    if (e == null) return false;
+    if (e instanceof jakarta.persistence.PessimisticLockException
+        || e instanceof org.hibernate.PessimisticLockException
+        || e instanceof org.hibernate.exception.LockAcquisitionException) return true;
+    if (e.getCause() != null && e.getCause() != e) return isLockingException(e.getCause());
+    return false;
   }
 
   protected BatchResult processBatch(String txId, int offset) {
@@ -401,19 +443,25 @@ public class AuditProcessor {
    *     logs
    */
   private List<AuditWorkGroup> fetchNextBatch(String txId, int offset) {
-    String sql =
+    log.trace("Fetching next batch of audit logs with txId: {}, offset: {}", txId, offset);
+
+    String sqlTemplate =
         """
-        SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id
-        FROM audit_log
-        WHERE processed = false
-          AND (retry_count IS NULL OR retry_count < ?)
-        """
-            + (txId != null ? " AND tx_id = ? " : " ")
-            + """
+            WITH locked_rows AS (
+                 SELECT id, tx_id, related_model, related_id, event_type, created_on
+                 FROM audit_log
+                 WHERE processed = false
+                   AND tx_id = ?
+                 %s
+            )
+            SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id
+            FROM locked_rows
             GROUP BY tx_id, related_model, related_id, event_type
             ORDER BY MIN(created_on)
             LIMIT ? OFFSET ?
             """;
+
+    String sql = sqlTemplate.formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
 
     Session session = JPA.em().unwrap(Session.class);
     List<AuditWorkGroup> result = new ArrayList<>();
@@ -422,10 +470,7 @@ public class AuditProcessor {
         conn -> {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
-            ps.setInt(idx++, MAX_RETRY);
-            if (txId != null) {
-              ps.setString(idx++, txId);
-            }
+            ps.setString(idx++, txId);
             // Fetch small chunks
             ps.setInt(idx++, BATCH_SIZE);
             ps.setInt(idx++, offset);
@@ -444,6 +489,41 @@ public class AuditProcessor {
             }
           }
         });
+    return result;
+  }
+
+  /**
+   * Retrieves a list of candidate transaction IDs from the audit log table that have not been
+   * processed.
+   *
+   * @param limit the maximum number of transaction IDs to fetch from the database
+   * @return a list of unprocessed transaction IDs, ordered by the earliest creation time
+   */
+  private List<String> fetchCandidateTxIds(int limit) {
+    String sql =
+        """
+          SELECT tx_id
+          FROM audit_log
+          WHERE processed = false
+          GROUP BY tx_id
+          ORDER BY MIN(created_on)
+          LIMIT ?
+          """;
+
+    List<String> result = new ArrayList<>();
+    JPA.em()
+        .unwrap(Session.class)
+        .doWork(
+            conn -> {
+              try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, limit);
+                try (ResultSet rs = ps.executeQuery()) {
+                  while (rs.next()) {
+                    result.add(rs.getString(1));
+                  }
+                }
+              }
+            });
     return result;
   }
 

@@ -4,10 +4,16 @@
  */
 package com.axelor.app.leader;
 
+import com.axelor.concurrent.ContextAware;
+import com.axelor.db.audit.AuditProcessor;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.tenants.TenantConfig;
+import com.axelor.db.tenants.TenantConfigProvider;
+import com.axelor.inject.Beans;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +28,8 @@ import org.slf4j.LoggerFactory;
  * <p>The class uses a scheduled task to periodically attempt to acquire leadership or verify the
  * continued validity of the leader's lock. It operates on a single background thread to manage the
  * election process.
+ *
+ * <p>Only available on PostgreSQL databases
  */
 public class LeaderElectionWorker {
 
@@ -33,13 +41,15 @@ public class LeaderElectionWorker {
   private static final long ADVISORY_LOCK_ID = 6432543124L;
 
   /** The interval between election attempts in seconds. */
-  private static final int ELECTION_INTERVAL_SECONDS = 5;
+  private static final int ELECTION_INTERVAL_SECONDS = 300;
 
   /** The scheduler shutdown timeout in seconds. */
   private static final long SHUTDOWN_TIMEOUT_SECONDS = 20;
 
   /** Indicates if the current node holds the leader lock. */
   private volatile boolean isLeader = false;
+
+  private volatile boolean isActive = true;
 
   /** The scheduler for the election loop. */
   private volatile ScheduledExecutorService scheduler;
@@ -65,6 +75,16 @@ public class LeaderElectionWorker {
       }
     }
     return instance;
+  }
+
+  /** Executes the main workflow of the leader election worker. */
+  private void work() {
+    attemptToBecomeLeader();
+    if (!this.isLeader) {
+      return;
+    }
+
+    processAuditLog();
   }
 
   /**
@@ -146,33 +166,6 @@ public class LeaderElectionWorker {
     }
   }
 
-  /**
-   * Stops the leader election service gracefully.
-   *
-   * <p>This shuts down the scheduler, interrupts any running thread, and closes the database
-   * connection (releasing the lock).
-   */
-  public synchronized void stop() {
-    if (!isRunning()) {
-      return;
-    }
-
-    log.info("Stopping Leader Election Worker...");
-    scheduler.shutdown();
-    try {
-      if (!scheduler.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-        scheduler.shutdownNow();
-      }
-    } catch (InterruptedException e) {
-      scheduler.shutdownNow();
-      Thread.currentThread().interrupt();
-    }
-
-    releaseLock();
-    scheduler = null;
-    log.info("Leader Election Worker stopped.");
-  }
-
   /** Resets internal leadership state and closes the connection. */
   private void releaseLock() {
     isLeader = false;
@@ -193,12 +186,43 @@ public class LeaderElectionWorker {
   }
 
   /**
+   * Stops the leader election service gracefully.
+   *
+   * <p>This shuts down the scheduler, interrupts any running thread, and closes the database
+   * connection (releasing the lock).
+   */
+  public synchronized void stop() {
+    if (!isRunning()) {
+      return;
+    }
+
+    log.info("Stopping Leader Election Worker...");
+    this.isActive = false;
+    scheduler.shutdown();
+    try {
+      if (!scheduler.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+        scheduler.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      scheduler.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
+
+    releaseLock();
+    scheduler = null;
+    log.info("Leader Election Worker stopped.");
+  }
+
+  /**
    * Starts the background leader election service.
    *
    * <p>This initializes a single-thread scheduler with a Daemon thread. The election process runs
    * immediately (0 delay) and repeats every {@value #ELECTION_INTERVAL_SECONDS} seconds.
    */
   public synchronized void start() {
+    if (!DBHelper.isPostgreSQL()) {
+      return;
+    }
     if (isRunning()) {
       log.trace("Leader Election Worker is already running.");
       return;
@@ -210,8 +234,7 @@ public class LeaderElectionWorker {
               t.setDaemon(true);
               return t;
             });
-    scheduler.scheduleWithFixedDelay(
-        this::attemptToBecomeLeader, 0, ELECTION_INTERVAL_SECONDS, TimeUnit.SECONDS);
+    scheduler.scheduleWithFixedDelay(this::work, 0, ELECTION_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
     log.info("Leader Election Worker started.");
   }
@@ -232,5 +255,34 @@ public class LeaderElectionWorker {
    */
   protected boolean isRunning() {
     return scheduler != null && !scheduler.isShutdown();
+  }
+
+  /*
+   * -------------------------
+   * Process Audit Logs
+   * -------------------------
+   */
+
+  private void processAuditLog() {
+    Beans.get(TenantConfigProvider.class).findAll().stream()
+        .filter(x -> Boolean.TRUE.equals(x.getActive()))
+        .map(TenantConfig::getTenantId)
+        .filter(Objects::nonNull)
+        .forEach(this::processAuditLog);
+  }
+
+  private void processAuditLog(String tenantId) {
+    ContextAware.of()
+        .withTenantId(tenantId)
+        .build(
+            () -> {
+              try {
+                AuditProcessor processor = new AuditProcessor(() -> isActive);
+                processor.process();
+              } catch (Exception e) {
+                log.error("Error in audit log processing for tenant: {}", tenantId);
+              }
+            })
+        .run();
   }
 }
