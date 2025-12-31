@@ -25,7 +25,7 @@ import "./editor.scss";
 function Link(props) {
   return (
     <a unselectable="on" alt="Action" {...props}>
-      <Icon icon={props.icon} fill/>
+      <Icon icon={props.icon} fill />
     </a>
   );
 }
@@ -357,13 +357,45 @@ function HTMLEditor({
     cancelEvent(e);
   }
 
+  /**
+   * Normalizes HTML content by detecting and converting effectively empty HTML to an empty string.
+   *
+   * This function identifies HTML that appears to have content but is semantically empty,
+   * such as lone &lt;br&gt; tags or empty paragraph elements, and returns an empty string
+   * for such cases. If the HTML contains meaningful content, the original value is returned unchanged.
+   *
+   * Rich text editors often leave behind "visual noise" — empty paragraphs or stray &lt;br&gt; tags
+   * when the user clears the content. This function ensures that such pseudo-empty content is
+   * treated as truly empty, which is helpful for validation (i.e., required).
+   *
+   * @param {string} html - The HTML string to normalize.
+   * @return {string} The original HTML if it contains meaningful content, or
+   * an empty string if the HTML is empty or contains only empty elements.
+   */
+  function normalizeEmptyHtml(html) {
+    if (!html) {
+      return "";
+    }
+    const normalized = html.replace(/\s+/g, "").toLowerCase();
+    if (normalized === "<br>" || normalized === "<br/>") {
+      return "";
+    }
+    const nonEmptyHTML = normalized
+      .replace(/<p><br\/?><\/p>/g, "")
+      .replace(/<p><\/p>/g, "");
+    return nonEmptyHTML ? html : "";
+  }
+
   function handleChange(e) {
-    htmlRef.current = e.target.value;
-    onChange?.(e);
+    const normalizedValue = normalizeEmptyHtml(e.target.value);
+    htmlRef.current = normalizedValue;
+    onChange?.({ target: { value: normalizedValue } });
   }
 
   function handleBlur(e) {
-    onBlur?.(e);
+    const normalizedValue = normalizeEmptyHtml(e.target.value);
+    htmlRef.current = normalizedValue;
+    onBlur?.({ target: { value: normalizedValue } });
   }
 
   function emitChange() {
