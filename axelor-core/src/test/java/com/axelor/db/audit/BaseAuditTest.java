@@ -67,7 +67,8 @@ public class BaseAuditTest extends JpaTest {
       try {
         Thread.sleep(Duration.ofMillis(pauseTimeMillis));
         log.info(
-            "Waiting for audit queue to drain {} tasks...", auditQueue.getStatistics().pending());
+            "Waiting for audit queue to drain {} tasks...",
+            (auditQueue.getStatistics().pending() + 1));
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         break;
