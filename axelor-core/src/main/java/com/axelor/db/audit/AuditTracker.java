@@ -7,6 +7,7 @@ package com.axelor.db.audit;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.audit.db.AuditEventType;
+import com.axelor.audit.db.AuditLog;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -20,6 +21,7 @@ import com.axelor.db.tracking.ModelTracking;
 import com.axelor.event.Event;
 import com.axelor.events.internal.BeforeTransactionComplete;
 import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -147,13 +149,18 @@ public class AuditTracker {
       Object[] state,
       Object[] previousState) {
 
-    // Signal activity to audit processor (skip audit's own entities)
-    AuditProcessor.signalActivity(entity);
+    // Don't track AuditLog & MailMessage entities
+    if (entity instanceof AuditLog || entity instanceof MailMessage) {
+      return;
+    }
 
     var track = getTrack(entity);
     if (track == null) {
       return;
     }
+
+    // Signal activity to audit processor (skip audit's own entities)
+    AuditProcessor.signalActivity(entity);
 
     // Store FULL entity state (required for condition evaluation in tracking messages)
     var currentValues = new HashMap<String, Object>();
