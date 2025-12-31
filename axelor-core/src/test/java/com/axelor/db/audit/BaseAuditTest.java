@@ -56,19 +56,21 @@ public class BaseAuditTest extends JpaTest {
   @AfterEach
   public void afterEach() {
     AuditQueue auditQueue = Beans.get(AuditQueue.class);
-    if (auditQueue.getStatistics().pending() > 0) {
-      log.info(
-          "Waiting for audit queue to drain {} tasks...", auditQueue.getStatistics().pending());
-    }
 
-    int retry = 0;
-    int maxRetry = 10;
-    int pauseTime = 2000 / maxRetry;
-    while (auditQueue.getStatistics().pending() > 0 && retry++ < maxRetry) {
+    int pauseTimeMillis = 2000;
+    int maxWaitingMinutes = 5;
+    long currentMillis = System.currentTimeMillis();
+    // Wait to drain the queue or timeout
+    while ((auditQueue.getStatistics().pending() > 0 || auditQueue.getStatistics().isActive())
+        && Duration.ofMillis(System.currentTimeMillis() - currentMillis).toMinutes()
+            < maxWaitingMinutes) {
       try {
-        Thread.sleep(Duration.ofMillis(pauseTime));
+        Thread.sleep(Duration.ofMillis(pauseTimeMillis));
+        log.info(
+            "Waiting for audit queue to drain {} tasks...", auditQueue.getStatistics().pending());
       } catch (InterruptedException e) {
-        // ignore
+        Thread.currentThread().interrupt();
+        break;
       }
     }
   }
