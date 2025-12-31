@@ -71,6 +71,9 @@ public class MailMessageTrackingService {
     final MailMessage message = new MailMessage();
 
     final ModelTracking track = AuditTracker.getTrack(entity);
+    if (track == null) {
+      return;
+    }
 
     final Map<String, Object> values = state.getValues();
     final Map<String, Object> oldValues = state.getOldValues();
