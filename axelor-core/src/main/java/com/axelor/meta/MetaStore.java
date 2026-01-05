@@ -147,6 +147,11 @@ public final class MetaStore {
 
   public static Map<String, Object> findFields(
       final Class<?> modelClass, final Collection<String> names) {
+    return findFields(modelClass, names, null);
+  }
+
+  public static Map<String, Object> findFields(
+      final Class<?> modelClass, final Collection<String> names, String jsonModel) {
     final Map<String, Object> data = new HashMap<>();
     final Mapper mapper = Mapper.of(modelClass);
     final Map<String, Property> fieldsMap = new LinkedHashMap<>();
@@ -211,6 +216,14 @@ public final class MetaStore {
       perms.put("massUpdate", false);
     }
 
+    data.put("perms", perms);
+    data.put("fields", fields);
+
+    // Don't process dotted json fields for custom models if jsonModel is not given
+    if (MetaJsonRecord.class.isAssignableFrom(modelClass) && StringUtils.isBlank(jsonModel)) {
+      return data;
+    }
+
     // find dotted json fields
     final Map<String, Map<String, Object>> jsonFields = new HashMap<>();
     for (String name : names) {
@@ -224,7 +237,11 @@ public final class MetaStore {
         continue;
       }
       if (!jsonFields.containsKey(first)) {
-        jsonFields.put(first, findJsonFields(modelClass.getName(), first));
+        var jsonAttrs =
+            StringUtils.isBlank(jsonModel)
+                ? findJsonFields(modelClass.getName(), first)
+                : findJsonFields(jsonModel);
+        jsonFields.put(first, jsonAttrs);
       }
       final Map<String, Object> jsonField = jsonFields.get(first);
       if (jsonField != null && jsonField.containsKey(field)) {
@@ -236,9 +253,6 @@ public final class MetaStore {
         }
       }
     }
-
-    data.put("perms", perms);
-    data.put("fields", fields);
 
     return data;
   }

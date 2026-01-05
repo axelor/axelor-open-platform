@@ -167,7 +167,7 @@ public class ViewService extends AbstractService {
       meta.putAll(MetaStore.findFields(modelClass, names));
     } else if (MetaJsonRecord.class.getName().equals(model)) {
       names.add("attrs");
-      meta.putAll(MetaStore.findFields(modelClass, names));
+      meta.putAll(MetaStore.findFields(modelClass, names, jsonModel));
       jsonFields.put("attrs", MetaStore.findJsonFields(jsonModel));
     }
 
@@ -317,10 +317,10 @@ public class ViewService extends AbstractService {
       if (ObjectUtils.notEmpty(jsonFieldsMap)) {
         data.put("jsonFields", jsonFieldsMap);
       }
-      if (MetaJsonRecord.class.getName().equals(model)) {
+      if (MetaJsonRecord.class.isAssignableFrom(modelClass)) {
         names.add("name");
       }
-      data.putAll(MetaStore.findFields(modelClass, names));
+      data.putAll(MetaStore.findFields(modelClass, names, jsonModel));
     }
 
     response.setData(data);
