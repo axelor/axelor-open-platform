@@ -1,7 +1,0 @@
----
-title: Fix findFields to consider jsonModel for custom models
-type: fix
-description: |
-  Fix findFields returning wrong field metadata when different JSON models
-  have fields with the same name. The method now correctly filters fields
-  by jsonModel to avoid returning data from unrelated custom models.

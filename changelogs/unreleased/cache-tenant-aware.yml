@@ -1,8 +1,0 @@
----
-title: Implement tenant-aware AxelorCache
-type: feature
-description: |
-  By default, when multi-tenancy is active, the cache automatically segregates entries based
-  on the current tenant context.
-  Use `CacheBuilder#nonTenantAware()` to disable this behavior and allow the cache
-  to be shared globally across all tenants.

@@ -1,7 +1,0 @@
----
-title: Don't show automatic attrs on form view when there is at least one manual custom field
-type: fix
-description: |
-  Don't show automatic attrs on form view when there is at least one manual custom field,
-  e.g. `<field name="attrs.customField" />`
-  Static widgets on grid view (like `button`) do not prevent automatic attrs.

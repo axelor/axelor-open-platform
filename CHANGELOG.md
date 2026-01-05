@@ -1,3 +1,106 @@
+## 8.0.4 (2026-01-05)
+
+#### Feature
+
+* Implement tenant-aware AxelorCache
+
+  <details>
+  
+  By default, when multi-tenancy is active, the cache automatically segregates entries based
+  on the current tenant context.
+  Use `CacheBuilder#nonTenantAware()` to disable this behavior and allow the cache
+  to be shared globally across all tenants.
+  
+  </details>
+
+#### Fix
+
+* Fix connect/disconnect lines in gantt view
+* Fix bind close action in popup view
+
+  <details>
+  
+  When header/footer is hidden then it should still bind close handler properly
+  so that action handler can close the view.
+  
+  </details>
+
+* Fix kanban record opening permission check (canView/read)
+
+  <details>
+  
+  Allow opening a record in form view from the kanban view
+  when either read or canView permission is granted.
+  
+  </details>
+
+* Fix MFA form email resend timer
+
+  <details>
+  
+  Fix initial email resend timer when email method is default.
+  Fix email resend timer on browser refresh.
+  
+  </details>
+
+* Fix adding custom button in grid view customization
+* Fix auto-selection of created record in M2O widget
+
+  <details>
+  
+  When a record is created through the many-to-one widget using the popup form,
+  the record is persisted via an action. After clicking **OK**, the newly created
+  record should be automatically selected in the M2O widget.
+  
+  </details>
+
+* Fix findFields to consider jsonModel for custom models
+
+  <details>
+  
+  Fix findFields returning wrong field metadata when different JSON models
+  have fields with the same name. The method now correctly filters fields
+  by jsonModel to avoid returning data from unrelated custom models.
+  
+  </details>
+
+* Fix action-attrs support on tooolbar/menubar
+
+  <details>
+  
+  Fix changing title of toolbar buttons and menubar items in form view.
+  Also add support for title/hidden/readonly attributes for cards/kanban/dms/grid views.
+  
+  </details>
+
+* Improve DMS upload notification visibility and statuses
+
+  <details>
+  
+  Keep the DMS upload panel visible briefly after uploads complete, show accurate titles for running/failed/complete states, and add missing translations.
+  
+  </details>
+
+* Don't show automatic attrs on form view when there is at least one manual custom field
+
+  <details>
+  
+  Don't show automatic attrs on form view when there is at least one manual custom field,
+  e.g. `<field name="attrs.customField" />`
+  Static widgets on grid view (like `button`) do not prevent automatic attrs.
+  
+  </details>
+
+* Apply tenant-aware for database-dependent caches
+
+  <details>
+  
+  Use tenant-aware caches for MFAService, I18nBundle, and MetaStore.
+  Any cache that contains database-dependent data should be tenant-aware.
+  
+  </details>
+
+
 ## 8.0.3 (2025-12-04)
 
 #### Fix

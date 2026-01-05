@@ -1,5 +1,0 @@
----
-title: Improve DMS upload notification visibility and statuses
-type: fix
-description: |
-  Keep the DMS upload panel visible briefly after uploads complete, show accurate titles for running/failed/complete states, and add missing translations.
