@@ -1,6 +1,0 @@
----
-title: Fix kanban record opening permission check (canView/read)
-type: fix
-description: |
-  Allow opening a record in form view from the kanban view
-  when either read or canView permission is granted.

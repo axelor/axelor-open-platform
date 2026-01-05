@@ -1,6 +1,0 @@
----
-title: Fix bind close action in popup view
-type: fix
-description: |
-  When header/footer is hidden then it should still bind close handler properly
-  so that action handler can close the view.

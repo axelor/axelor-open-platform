@@ -1,3 +1,60 @@
+## 7.4.8 (2026-01-05)
+
+#### Feature
+
+* Handle non-entities gracefully in bulk update safety check
+
+#### Fix
+
+* Fix connect/disconnect lines in gantt view
+* Fix bind close action in popup view
+
+  <details>
+  
+  When header/footer is hidden then it should still bind close handler properly
+  so that action handler can close the view.
+  
+  </details>
+
+* Fix kanban record opening permission check (canView/read)
+
+  <details>
+  
+  Allow opening a record in form view from the kanban view
+  when either read or canView permission is granted.
+  
+  </details>
+
+* Fix auto-selection of created record in M2O widget
+
+  <details>
+  
+  When a record is created through the many-to-one widget using the popup form,
+  the record is persisted via an action. After clicking **OK**, the newly created
+  record should be automatically selected in the M2O widget.
+  
+  </details>
+
+* Fix findFields to consider jsonModel for custom models
+
+  <details>
+  
+  Fix findFields returning wrong field metadata when different JSON models
+  have fields with the same name. The method now correctly filters fields
+  by jsonModel to avoid returning data from unrelated custom models.
+  
+  </details>
+
+* Fix action-attrs support on tooolbar/menubar
+
+  <details>
+  
+  Fix changing title of toolbar buttons and menubar items in form view.
+  Also add support for title/hidden/readonly attributes for cards/kanban/dms/grid views.
+  
+  </details>
+
+
 ## 7.4.7 (2025-12-01)
 
 #### Feature
