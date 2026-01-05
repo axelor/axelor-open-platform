@@ -40,6 +40,9 @@ importers:
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@uiw/color-convert':
+        specifier: ^2.9.0
+        version: 2.9.0(@babel/runtime@7.28.4)
       '@uiw/react-color-block':
         specifier: ^2.9.0
         version: 2.9.0(@babel/runtime@7.28.4)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)

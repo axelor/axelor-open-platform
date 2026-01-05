@@ -1,18 +1,19 @@
-import Block from "@uiw/react-color-block";
-import Chrome from "@uiw/react-color-chrome";
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 
-import { Box, Button, ClickAwayListener, Popper } from "@axelor/ui";
+import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
+import {
+  ColorPicker as ColorPickerComponent,
+  colorToHex,
+  useColorPicker,
+} from "@/components/color-picker";
 import { i18n } from "@/services/client/i18n";
+import { ColorResult } from "@uiw/color-convert";
+
 import { FieldControl, FieldProps } from "../../builder";
 
-import colors from "@/styles/legacy/_colors.module.scss";
 import styles from "./color-picker.module.scss";
-
-const DEFAULT_COLOR = { h: 0, s: 0, v: 0, a: 1 };
 
 export function ColorPicker(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
@@ -20,56 +21,39 @@ export function ColorPicker(props: FieldProps<string>) {
   const { colorPickerShowAlpha = true } = widgetAttrs;
 
   const [value, setValue] = useAtom(valueAtom);
-  const [color, setColor] = useState<any>({});
+  // Color selected in the color picker popover
+  const [color, setColor] = useState<ColorResult | null>(null);
 
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [element, setElement] = useState<EventTarget | null>(null);
-
-  const isValueHex = useMemo(
-    () => /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(value ?? ""),
-    [value],
-  );
-
-  const handleShowColorPicker = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setColor({});
-      setShowColorPicker(true);
-      setElement(e.target);
-    },
-    [],
-  );
-
-  const handleCloseColorPicker = useCallback(() => {
+  const onColorPickerClose = useCallback(() => {
     if (color?.hexa) {
       setValue(lite || !colorPickerShowAlpha ? color.hex : color.hexa, true);
     }
-
-    setShowColorPicker(false);
+    setColor(null);
   }, [color, colorPickerShowAlpha, lite, setValue]);
 
-  const handleOnChange = useCallback((newColor: any) => {
-    setColor(newColor);
-  }, []);
+  const { open: openPicker, pickerPopoverProps } = useColorPicker({
+    onClose: onColorPickerClose,
+  });
+
+  const handleShowColorPicker = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setColor(null);
+      openPicker(e.currentTarget);
+    },
+    [openPicker],
+  );
 
   const handleResetColor = useCallback(() => {
-    setColor({});
+    setColor(null);
     setValue("", true);
   }, [setValue]);
 
-  const colorPalette = useMemo(() => {
-    return [
-      "orange",
-      "yellow",
-      "lightgreen",
-      "green",
-      "cyan",
-      "blue",
-      "bluegrey",
-      "red",
-      "pink",
-      "purple",
-    ].map((colorName) => colors[colorName]);
-  }, []);
+  /**
+   * Current hex color code, either from the color picker or the record value
+   */
+  const currentHexaColor = useMemo(() => {
+    return colorToHex(color?.hexa) ?? colorToHex(value) ?? undefined;
+  }, [color, value]);
 
   return (
     <FieldControl {...props}>
@@ -89,9 +73,11 @@ export function ColorPicker(props: FieldProps<string>) {
           <Box
             className={styles.colorPreview}
             style={{
-              backgroundColor: showColorPicker ? (color?.hexa ?? value) : value,
+              backgroundColor: currentHexaColor,
               cursor: readonly ? "default" : "pointer",
             }}
+            role="button"
+            tabIndex={-1}
             {...(!readonly && { onClick: handleShowColorPicker })}
           />
         </Box>
@@ -103,39 +89,19 @@ export function ColorPicker(props: FieldProps<string>) {
             border={false}
             onClick={handleResetColor}
             title={i18n.get("Remove color")}
+            tabIndex={-1}
           >
             <MaterialIcon icon="close" />
           </Button>
         )}
       </Box>
-      <Popper
-        open={showColorPicker}
-        shadow
-        rounded
-        target={element as HTMLElement}
-        placement={lite ? "bottom" : "bottom-start"}
-      >
-        <ClickAwayListener onClickAway={handleCloseColorPicker}>
-          <Box>
-            {lite ? (
-              <Block
-                colors={colorPalette}
-                color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
-                onChange={handleOnChange}
-              />
-            ) : (
-              <Chrome
-                inputType={"hexa" as any}
-                showAlpha={colorPickerShowAlpha}
-                showEyeDropper={false}
-                showColorPreview={false}
-                color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
-                onChange={handleOnChange}
-              />
-            )}
-          </Box>
-        </ClickAwayListener>
-      </Popper>
+      <ColorPickerComponent
+        {...pickerPopoverProps}
+        lite={lite}
+        showAlpha={colorPickerShowAlpha}
+        value={currentHexaColor}
+        onChange={setColor}
+      />
     </FieldControl>
   );
 }

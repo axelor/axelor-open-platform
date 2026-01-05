@@ -1,7 +1,6 @@
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
 import { produce } from "immer";
-import Color from "color";
 import React, {
   ChangeEvent,
   ChangeEventHandler,
@@ -11,20 +10,18 @@ import React, {
   useState,
 } from "react";
 
-import {
-  AdornedInput,
-  Input,
-  Box,
-  ClickAwayListener,
-  clsx,
-  Popper,
-} from "@axelor/ui";
+import { AdornedInput, Input, Box, clsx } from "@axelor/ui";
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import defaultTheme from "@/hooks/use-app-theme/themes/default.json";
 import darkTheme from "@/hooks/use-app-theme/themes/dark.json";
-import Chrome from "@uiw/react-color-chrome";
+import {
+  ColorPicker,
+  colorToHex,
+  useColorPicker,
+} from "@/components/color-picker";
 import { deepGet, deepSet } from "@/utils/objects";
+import { ColorResult } from "@uiw/color-convert";
 
 import { Select } from "../select";
 import {
@@ -296,8 +293,6 @@ function PropertyEditor(
   );
 }
 
-const DefaultColor = { h: 0, s: 0, v: 0, a: 1 };
-
 function ColorInput({
   invalid,
   readonly,
@@ -311,20 +306,20 @@ function ColorInput({
   placeholder?: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
 }) {
-  const [target, setTarget] = useState<HTMLElement | null>(null);
-  const show = Boolean(target);
-
-  const handleClose = useCallback(() => {
-    setTarget(null);
-  }, []);
+  const { open, pickerPopoverProps } = useColorPicker();
 
   const color = useMemo(() => {
-    try {
-      return Color(value).hex();
-    } catch {
-      return placeholder || DefaultColor;
-    }
+    return colorToHex(value) ?? colorToHex(placeholder) ?? null;
   }, [placeholder, value]);
+
+  const handleChange = useCallback(
+    (result: ColorResult) => {
+      onChange({
+        target: { value: result.hsva?.a < 1 ? result.hexa : result.hex },
+      } as ChangeEvent<HTMLInputElement>);
+    },
+    [onChange],
+  );
 
   return (
     <>
@@ -344,35 +339,17 @@ function ColorInput({
             style={{
               backgroundColor: value || placeholder || "transparent",
             }}
-            onClick={(e) => !readonly && setTarget(e.target as HTMLElement)}
+            onClick={(e) => !readonly && open(e.currentTarget)}
           />
         }
         onChange={onChange}
       />
-      <Popper
-        open={show}
-        shadow
-        rounded
-        target={target as HTMLElement}
-        placement={"bottom-start"}
-      >
-        <ClickAwayListener onClickAway={handleClose}>
-          <Box>
-            <Chrome
-              inputType={"hexa" as any}
-              showAlpha={true}
-              showEyeDropper={false}
-              showColorPreview={false}
-              color={color}
-              onChange={(e) =>
-                onChange({
-                  target: { value: e.hex },
-                } as ChangeEvent<HTMLInputElement>)
-              }
-            />
-          </Box>
-        </ClickAwayListener>
-      </Popper>
+      <ColorPicker
+        {...pickerPopoverProps}
+        showAlpha={true}
+        value={color}
+        onChange={handleChange}
+      />
     </>
   );
 }
