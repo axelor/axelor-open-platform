@@ -638,6 +638,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const canNew = hasButton("new");
   const canEdit = hasButton("edit");
+  const canView = hasButton("view");
   const canDelete = hasButton("delete");
 
   useShortcuts({
@@ -703,13 +704,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
           onCollapse={onCollapse}
           onLoadMore={onLoadMore}
           onCardMove={onMove}
-          onCardClick={onView}
           {...(canDelete && { onCardDelete: onDelete })}
           {...(canNew && { onCardAdd: onCreate })}
           {...(canEdit && {
             onCardEdit: hasEditPopup ? onEditInPopup : onEdit,
           })}
-          {...({} as any)}
+          {...(canView && {
+            onCardClick: onView,
+          })}
         />
       </Box>
     </Box>

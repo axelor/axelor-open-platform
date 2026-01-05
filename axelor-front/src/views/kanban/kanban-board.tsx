@@ -100,28 +100,24 @@ function RecordRenderer({
           key: "edit",
           text: i18n.get("Edit"),
           hidden: !canEdit,
-          onClick: () => onCardEdit && onCardEdit({ record, column }),
+          onClick: () => onCardEdit?.({ record, column }),
         },
         {
           key: "delete",
           text: i18n.get("Delete"),
           hidden: !canDelete,
-          onClick: () => onCardDelete && onCardDelete({ record, column }),
+          onClick: () => onCardDelete?.({ record, column }),
         },
       ],
     },
   ];
 
-  const showActions = canEdit || canDelete;
-
   const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (canEdit && onCardClick) {
-        onCardClick({ record, column });
-      }
-    },
-    [canEdit, onCardClick, record, column],
+    () => onCardClick?.({ record, column }),
+    [onCardClick, record, column],
   );
+
+  const showActions = commandItems.some((item) => !item.hidden);
 
   return (
     <Box
