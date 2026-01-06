@@ -3,7 +3,7 @@ import { createElement, memo, useMemo } from "react";
 
 export function sanitize(text: string) {
   return DOMPurify.sanitize(text, {
-    FORBID_TAGS: ['style'],
+    FORBID_TAGS: ['style', 'form'],
   });
 }
 

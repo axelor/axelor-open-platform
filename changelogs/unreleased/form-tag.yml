@@ -1,0 +1,3 @@
+---
+title: Disallow `form` tag in DOMPurify sanitization
+type: fix
