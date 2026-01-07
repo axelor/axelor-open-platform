@@ -1022,7 +1022,6 @@ function DMSGridRow(props: GridRowProps) {
     <>
       <Box
         ref={ref}
-        position="relative"
         {...{
           style,
           className: legacyClassNames(className, gridRowStyles.row, {
