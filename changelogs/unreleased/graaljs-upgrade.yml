@@ -1,0 +1,9 @@
+---
+title: Upgrade GraalJS to 25.0.1 and optimize JavaScript integration
+type: feature
+description: |
+  - Upgrade GraalJS from 24.2.2 to 25.0.1
+  - Add shared engine and source caching for improved performance
+  - Implement AutoCloseable on JavaScriptScriptHelper for proper context cleanup
+  - Replace allowAllAccess(true) with explicit permissions for better security
+  - Set ECMAScript version to 2024 (stable release)

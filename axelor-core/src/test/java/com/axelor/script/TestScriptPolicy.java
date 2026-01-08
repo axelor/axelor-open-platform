@@ -184,129 +184,130 @@ class TestScriptPolicy {
   // - Denied property access returns empty object instead of throwing exception
   @Test
   void testJavaScript() {
-    ScriptHelper helper = new JavaScriptScriptHelper(new SimpleBindings());
+    try (JavaScriptScriptHelper helper = new JavaScriptScriptHelper(new SimpleBindings())) {
+      // Allowed by annotation
+      assertEquals(
+          "AllowedByAnnotation",
+          helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myMethod()"));
+      assertEquals(
+          "InnerAllowedByAnnotation",
+          helper.eval(
+              "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerAllowed).myMethod()"));
+      assertEquals(
+          "InnerDefault",
+          helper.eval(
+              "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDefault).myMethod()"));
 
-    // Allowed by annotation
-    assertEquals(
-        "AllowedByAnnotation",
-        helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myMethod()"));
-    assertEquals(
-        "InnerAllowedByAnnotation",
-        helper.eval(
-            "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerAllowed).myMethod()"));
-    assertEquals(
-        "InnerDefault",
-        helper.eval(
-            "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDefault).myMethod()"));
+      // Allowed by configuration
+      assertEquals(
+          "AllowedByConfiguration",
+          helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticMethod()"));
+      assertEquals(
+          "InnerAllowedByConfiguration",
+          helper.eval(
+              "com.axelor.script.policy.AllowedByConfiguration.InnerAllowed.myStaticMethod()"));
 
-    // Allowed by configuration
-    assertEquals(
-        "AllowedByConfiguration",
-        helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticMethod()"));
-    assertEquals(
-        "InnerAllowedByConfiguration",
-        helper.eval(
-            "com.axelor.script.policy.AllowedByConfiguration.InnerAllowed.myStaticMethod()"));
+      // denied by configuration
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticMethod()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "com.axelor.script.policy.DeniedByConfiguration.InnerDenied.myStaticMethod()"));
 
-    // denied by configuration
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "com.axelor.script.policy.DeniedByConfiguration.InnerDenied.myStaticMethod()"));
+      // Denied by default
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("com.axelor.script.policy.DeniedByDefault.myStaticMethod()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval("com.axelor.script.policy.DeniedByDefault.InnerDenied.myStaticMethod()"));
 
-    // Denied by default
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("com.axelor.script.policy.DeniedByDefault.myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("com.axelor.script.policy.DeniedByDefault.InnerDenied.myStaticMethod()"));
+      assertEquals(
+          "SubAllowedByAnnotation",
+          helper.eval("__bean__(com.axelor.script.policy.SubAllowedByAnnotation).myMethod()"));
 
-    assertEquals(
-        "SubAllowedByAnnotation",
-        helper.eval("__bean__(com.axelor.script.policy.SubAllowedByAnnotation).myMethod()"));
+      assertEquals(
+          "SubAllowedByConfiguration",
+          helper.eval("com.axelor.script.policy.SubAllowedByConfiguration.myStaticMethod()"));
 
-    assertEquals(
-        "SubAllowedByConfiguration",
-        helper.eval("com.axelor.script.policy.SubAllowedByConfiguration.myStaticMethod()"));
+      // Service method calls
+      assertEquals(
+          "Hello, World!", helper.eval("__bean__(com.axelor.script.policy.MyService).myMethod()"));
+      assertEquals(
+          "myYetAnotherMethod",
+          helper.eval("__bean__(com.axelor.script.policy.MyService).myYetAnotherMethod()"));
+      assertEquals(
+          2, helper.eval("__bean__(com.axelor.script.policy.MyOtherService).myOtherMethod()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "__bean__(com.axelor.script.policy.MyYetAnotherService).myYetAnotherMethod()"));
 
-    // Service method calls
-    assertEquals(
-        "Hello, World!", helper.eval("__bean__(com.axelor.script.policy.MyService).myMethod()"));
-    assertEquals(
-        "myYetAnotherMethod",
-        helper.eval("__bean__(com.axelor.script.policy.MyService).myYetAnotherMethod()"));
-    assertEquals(
-        2, helper.eval("__bean__(com.axelor.script.policy.MyOtherService).myOtherMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(com.axelor.script.policy.MyYetAnotherService).myYetAnotherMethod()"));
+      // Property access
+      assertEquals(
+          "AllowedByAnnotation",
+          helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myValue"));
+      assertEquals(
+          "AllowedByConfiguration",
+          helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticValue"));
+      assertTrue(
+          ObjectUtils.isEmpty(
+              helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticValue")));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("__bean__(com.axelor.script.policy.DeniedByConfiguration).myValue"));
 
-    // Property access
-    assertEquals(
-        "AllowedByAnnotation",
-        helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myValue"));
-    assertEquals(
-        "AllowedByConfiguration",
-        helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticValue"));
-    assertTrue(
-        ObjectUtils.isEmpty(
-            helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticValue")));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("__bean__(com.axelor.script.policy.DeniedByConfiguration).myValue"));
+      // Constant access
+      assertEquals("myConstant", helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT"));
+      assertEquals(
+          List.of("hello", "world"),
+          helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT_LIST"));
+      assertEquals(
+          "myOtherConstant", helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT"));
+      assertEquals(
+          List.of("hello", "world"),
+          helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT_LIST"));
+      assertTrue(
+          ObjectUtils.isEmpty(
+              helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT")));
+      assertTrue(
+          ObjectUtils.isEmpty(
+              helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT_LIST")));
 
-    // Constant access
-    assertEquals("myConstant", helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT"));
-    assertEquals(
-        List.of("hello", "world"),
-        helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT_LIST"));
-    assertEquals(
-        "myOtherConstant", helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT"));
-    assertEquals(
-        List.of("hello", "world"),
-        helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT_LIST"));
-    assertTrue(
-        ObjectUtils.isEmpty(
-            helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT")));
-    assertTrue(
-        ObjectUtils.isEmpty(
-            helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT_LIST")));
+      // Service returning instance of denied class
+      assertDoesNotThrow(
+          () ->
+              helper.eval(
+                  """
+                  const myService = __bean__(com.axelor.script.policy.MyService);
+                  const a = myService.myYetAnotherMethod();
 
-    // Service returning instance of denied class
-    assertDoesNotThrow(
-        () ->
-            helper.eval(
-                """
-                const myService = __bean__(com.axelor.script.policy.MyService);
-                const a = myService.myYetAnotherMethod();
-
-                if (a !== "myYetAnotherMethod") {
-                  throw new Error("Should be allowed");
-                }
-
-                const myYetAnotherService = myService.getMyYetAnotherService();
-
-                try {
-                  const b = myYetAnotherService.MY_CONSTANT;
-                  if (b?.length > 0) {
-                    throw new Exception("Should be denied");
+                  if (a !== "myYetAnotherMethod") {
+                    throw new Error("Should be allowed");
                   }
-                } catch (e) {
-                  // Denied as expected
-                }
-                """));
+
+                  const myYetAnotherService = myService.getMyYetAnotherService();
+
+                  try {
+                    const b = myYetAnotherService.MY_CONSTANT;
+                    if (b?.length > 0) {
+                      throw new Exception("Should be denied");
+                    }
+                  } catch (e) {
+                    // Denied as expected
+                  }
+                  """));
+    }
   }
 
   @Test

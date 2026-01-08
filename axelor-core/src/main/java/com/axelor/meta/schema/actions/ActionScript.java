@@ -62,8 +62,9 @@ public class ActionScript extends Action {
     if (Boolean.TRUE.equals(script.transactional)) {
       bindings.put(KEY_EM, JPA.em());
     }
+    ScriptHelper helper = getScriptHelper(bindings);
     try {
-      getScriptHelper(bindings).eval(script.code.trim(), bindings);
+      helper.eval(script.code.trim(), bindings);
     } catch (ScriptException e) {
       if ("<eval>".equals(e.getFileName())) {
         e =
@@ -75,6 +76,15 @@ public class ActionScript extends Action {
       response.setException(e);
     } catch (Exception e) {
       response.setException(e);
+    } finally {
+      // Close JavaScript context if applicable
+      if (helper instanceof AutoCloseable closeable) {
+        try {
+          closeable.close();
+        } catch (Exception ignored) {
+          // ignore close exceptions
+        }
+      }
     }
     return response;
   }

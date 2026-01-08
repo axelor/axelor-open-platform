@@ -118,11 +118,12 @@ public class TestJsonContext extends ScriptTest {
     assertEquals("Hello!!!", ctx.get("name"));
     assertTrue(ctx.get("world") instanceof Map);
 
-    final ScriptHelper sh = new JavaScriptScriptHelper(ctx);
-    final Object name = sh.eval("name");
-    assertEquals("Hello!!!", name);
-    assertNotNull(sh.eval("contact"));
-    assertTrue(sh.eval("world") instanceof MetaJsonRecord);
-    assertTrue(sh.eval("world.price") instanceof BigDecimal);
+    try (JavaScriptScriptHelper sh = new JavaScriptScriptHelper(ctx)) {
+      final Object name = sh.eval("name");
+      assertEquals("Hello!!!", name);
+      assertNotNull(sh.eval("contact"));
+      assertTrue(sh.eval("world") instanceof MetaJsonRecord);
+      assertTrue(sh.eval("world.price") instanceof BigDecimal);
+    }
   }
 }

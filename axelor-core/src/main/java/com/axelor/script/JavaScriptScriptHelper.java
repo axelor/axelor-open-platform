@@ -4,21 +4,72 @@
  */
 package com.axelor.script;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.rpc.Context;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.script.Bindings;
 import javax.script.ScriptException;
+import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.PolyglotAccess;
+import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.management.ExecutionListener;
 
-public class JavaScriptScriptHelper extends AbstractScriptHelper {
+public class JavaScriptScriptHelper extends AbstractScriptHelper implements AutoCloseable {
 
-  private org.graalvm.polyglot.Context context;
+  private static final int DEFAULT_CACHE_SIZE = 500;
+  private static final int DEFAULT_CACHE_EXPIRE_TIME = 60;
 
-  private long timeout;
+  private static final Engine ENGINE;
+  private static final LoadingCache<String, Source> SOURCE_CACHE;
+  private static final Source SCOPE_INIT_SOURCE;
 
   private static final ScriptPolicy SCRIPT_POLICY = ScriptPolicy.getInstance();
+
+  static {
+    var settings = AppSettings.get();
+    var cacheSize =
+        settings.getInt(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_SIZE, DEFAULT_CACHE_SIZE);
+    var cacheExpireTime =
+        settings.getInt(
+            AvailableAppSettings.APPLICATION_SCRIPT_CACHE_EXPIRE_TIME, DEFAULT_CACHE_EXPIRE_TIME);
+
+    ENGINE = Engine.newBuilder().option("engine.WarnInterpreterOnly", "false").build();
+
+    SOURCE_CACHE =
+        Caffeine.newBuilder()
+            .maximumSize(cacheSize)
+            .expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
+            .build(code -> Source.newBuilder("js", code, "<eval>").build());
+
+    try {
+      SCOPE_INIT_SOURCE =
+          Source.newBuilder(
+                  "js",
+                  """
+                  Object.setPrototypeOf(globalThis, new Proxy(Object.prototype, {
+                    has(target, key) {
+                      return key in __scope || key in target;
+                    },
+                    get(target, key, receiver) {
+                      return Reflect.get((key in __scope) ? __scope : target, key, receiver);
+                    }
+                  }))""",
+                  "<scope-init>")
+              .build();
+    } catch (Exception e) {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+
+  private org.graalvm.polyglot.Context context;
+  private long timeout;
 
   public JavaScriptScriptHelper(Bindings bindings) {
     this.setBindings(bindings);
@@ -40,27 +91,18 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
 
   private org.graalvm.polyglot.Context createContext(Bindings bindings) {
     org.graalvm.polyglot.Context ctx =
-        org.graalvm.polyglot.Context.newBuilder()
+        org.graalvm.polyglot.Context.newBuilder("js")
+            .engine(ENGINE)
             .allowExperimentalOptions(true)
-            .allowAllAccess(true)
+            .allowHostAccess(HostAccess.ALL)
             .allowHostClassLookup(this::lookup)
-            .option("engine.WarnInterpreterOnly", "false")
+            .allowPolyglotAccess(PolyglotAccess.ALL)
             .option("js.nashorn-compat", "true")
-            .option("js.ecmascript-version", "latest")
+            .option("js.ecmascript-version", "2024")
             .build();
 
     ctx.getBindings("js").putMember("__scope", new JavaScriptScope(bindings, SCRIPT_POLICY));
-    ctx.eval(
-        "js",
-        """
-        Object.setPrototypeOf(globalThis, new Proxy(Object.prototype, {\
-          has(target, key) {\
-            return key in __scope || key in target;\
-          },\
-          get(target, key, receiver) {\
-            return Reflect.get((key in __scope) ? __scope : target, key, receiver);\
-          }\
-        }))""");
+    ctx.eval(SCOPE_INIT_SOURCE);
 
     return ctx;
   }
@@ -93,13 +135,14 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
     }
   }
 
-  public Object doEval(String expr, Bindings bindings) throws ScriptException {
+  private Object doEval(String expr, Bindings bindings) throws ScriptException {
     if (getBindings() != bindings) {
       throw new IllegalArgumentException(
           "Evaluating JavaScript with different bindings is not supported.");
     }
 
-    final Value value = context.eval("js", expr);
+    final Source source = SOURCE_CACHE.get(expr);
+    final Value value = context.eval(source);
 
     if (value.isException()) {
       throw value.throwException();
@@ -130,5 +173,13 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
     if (value.hasMembers()) return value.as(Map.class);
 
     throw new ScriptException("Invalid result from script: " + expr);
+  }
+
+  @Override
+  public void close() {
+    if (context != null) {
+      context.close();
+      context = null;
+    }
   }
 }
