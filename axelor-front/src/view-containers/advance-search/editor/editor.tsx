@@ -3,7 +3,8 @@ import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
-import { Box, Button, Divider, Input } from "@axelor/ui";
+import { Box, Button, clsx, Divider, Input } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select } from "@/components/select";
@@ -24,6 +25,20 @@ import { BooleanRadio, RelationalWidget } from "./components";
 import { Criteria } from "./criteria";
 
 import styles from "./editor.module.scss";
+
+const ARCHIVE_OPTIONS: {
+  title: string;
+  value: AdvancedSearchState["archiveType"];
+}[] = [
+  {
+    title: i18n.get("Archived only"),
+    value: "archived",
+  },
+  {
+    title: i18n.get("Include archived"),
+    value: "all",
+  },
+];
 
 export const getEditorDefaultState = () =>
   ({
@@ -92,13 +107,13 @@ export function Editor({
       [stateAtom],
     ),
   );
-  const [archived, setArchived] = useAtom(
+  const [archiveType, setArchiveType] = useAtom(
     useMemo(
       () =>
         focusAtom(
           stateAtom,
-          (o) => o.archived,
-          (o, v) => ({ ...o, archived: v }),
+          (o) => o.archiveType,
+          (o, v) => ({ ...o, archiveType: v }),
         ),
       [stateAtom],
     ),
@@ -369,15 +384,29 @@ export function Editor({
             { label: i18n.get("or"), value: "or" },
           ]}
         />
-        <FormControl title={i18n.get("Show archived")}>
-          <Input
-            type="checkbox"
-            checked={Boolean(archived)}
-            onChange={({ target: { checked } }) => setArchived(checked)}
-            name={"archived"}
-            m={0}
+        <Box title={i18n.get("Archived records options")}>
+          <Select
+            className={clsx(styles.archivedSelect, {
+              [styles.activeArchive]: archiveType !== "default",
+            })}
+            multiple={false}
+            clearIcon={archiveType !== "default" ? undefined : false}
+            autoComplete={false}
+            options={ARCHIVE_OPTIONS}
+            inputStartAdornment={
+              <BootstrapIcon
+                className={styles.archiveIcon}
+                icon={archiveType !== "default" ? "archive-fill" : "archive"}
+              />
+            }
+            optionKey={(x) => x.value!}
+            optionLabel={(x) => x.title}
+            optionEqual={(x, y) => x.value === y.value}
+            onChange={(val) => setArchiveType(val?.value || "default")}
+            value={ARCHIVE_OPTIONS.find((x) => x.value === archiveType)}
+            renderValue={() => null}
           />
-        </FormControl>
+        </Box>
       </Box>
       <Box
         d="flex"

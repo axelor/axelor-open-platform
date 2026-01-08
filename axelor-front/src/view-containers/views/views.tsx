@@ -252,6 +252,7 @@ const DataViews = memo(function DataViews({
       atom<AdvancedSearchState>({
         search: {},
         editor: { criteria: [] },
+        archiveType: "default",
       }),
     [],
   );
@@ -317,7 +318,10 @@ const DataViews = memo(function DataViews({
         ..._state,
         domains,
         items,
-        archived: showArchived,
+        archiveType:
+          (showArchived === true
+            ? "all"
+            : "default") as AdvancedSearchState["archiveType"],
         fields: {
           ..._state.fields,
           ...fields,

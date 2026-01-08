@@ -25,7 +25,7 @@ import { useSession } from "@/hooks/use-session";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { Criteria } from "@/services/client/data.types";
+import { Criteria, Filter } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { removeFilter, saveFilter } from "@/services/client/meta";
 import {
@@ -47,6 +47,7 @@ import { useFields } from "./editor/utils";
 import { FilterList } from "./filter-list";
 import { AdvancedSearchState } from "./types";
 import {
+  fillArchiveCriteria,
   findContextField,
   getExportFieldNames,
   getFreeSearchCriteria,
@@ -218,6 +219,7 @@ export function AdvanceSearch({
           filterType: "all",
           editor: getEditorDefaultState(),
           contextField: null,
+          archiveType: "default",
         });
       },
       [stateAtom],
@@ -237,7 +239,7 @@ export function AdvanceSearch({
     useCallback(
       (get, set) => {
         const state = get(stateAtom);
-        const { fields, searchText, archived: _archived } = state;
+        const { searchText, archiveType } = state;
 
         if (!searchText) return handleApply();
 
@@ -253,13 +255,19 @@ export function AdvanceSearch({
           return freeSearch ? freeSearchList.includes(item.name!) : true;
         });
 
+        const { _archived, operator, criteria } = fillArchiveCriteria(
+          archiveType,
+          getFreeSearchCriteria(searchText, viewItems, state.fields),
+          "or",
+        );
+
         set(stateAtom, {
           ...state,
           applied: true,
           query: {
             _archived,
-            operator: "or",
-            criteria: getFreeSearchCriteria(searchText, viewItems, fields),
+            operator,
+            criteria,
           },
         });
 
