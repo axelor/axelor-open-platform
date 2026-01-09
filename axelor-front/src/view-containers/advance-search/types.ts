@@ -26,6 +26,7 @@ export type AdvancedSearchState = {
   };
   contextField?: ContextField;
   appliedContextField?: ContextField;
+  applied?: boolean;
   archived?: boolean;
   searchText?: string;
   searchTextLabel?: string;

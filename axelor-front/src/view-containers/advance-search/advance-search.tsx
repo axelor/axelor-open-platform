@@ -2,8 +2,10 @@ import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import {
   KeyboardEvent,
+  Ref,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -53,6 +55,10 @@ import {
 
 import styles from "./advance-search.module.scss";
 
+export type AdvanceSearchHandler = {
+  clear: () => void;
+};
+
 export interface AdvanceSearchProps {
   dataStore: DataStore;
   stateAtom: AdvancedSearchAtom;
@@ -60,7 +66,9 @@ export interface AdvanceSearchProps {
   customSearch?: boolean;
   freeSearch?: string;
   items?: View["items"];
-  onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
+  ref?: Ref<AdvanceSearchHandler>;
+  onSearch: () => Promise<SearchResult | void>;
+  onReset?: () => void;
 }
 
 export function AdvanceSearch({
@@ -70,7 +78,9 @@ export function AdvanceSearch({
   freeSearch = "all",
   canExport = true,
   customSearch = true,
+  ref,
   onSearch,
+  onReset,
 }: AdvanceSearchProps) {
   const [open, setOpen] = useState(false);
   const { data: sessionInfo } = useSession();
@@ -174,39 +184,54 @@ export function AdvanceSearch({
     useCallback(
       (get, set, hasEditorApply?: boolean) => {
         const state = get(stateAtom);
-        set(stateAtom, prepareAdvanceSearchQuery(state, hasEditorApply));
+        set(stateAtom, {
+          ...prepareAdvanceSearchQuery(state, hasEditorApply),
+          applied: true,
+        });
         onSearch?.();
       },
       [stateAtom, onSearch],
     ),
   );
 
-  const handleClear = useAtomCallback(
+  const clearState = useAtomCallback(
     useCallback(
-      (get, set, shouldApply: boolean = true) => {
+      (get, set) => {
         const state = get(stateAtom);
-        const { domains, filters } = state;
         set(stateAtom, {
           ...state,
           search: {},
-          domains: domains?.map((d) =>
+          domains: state.domains?.map((d) =>
             d.checked ? { ...d, checked: false } : d,
           ),
-          filters: filters?.map((f) =>
+          filters: state.filters?.map((f) =>
             f.checked ? { ...f, checked: false } : f,
           ),
+          query: {
+            criteria: [],
+            _domains: undefined,
+            _archived: undefined,
+          },
+          applied: false,
           searchText: "",
           searchTextLabel: "",
           filterType: "all",
           editor: getEditorDefaultState(),
           contextField: null,
         });
-        shouldApply && handleApply();
-        handleClose();
       },
-      [stateAtom, handleApply, handleClose],
+      [stateAtom],
     ),
   );
+
+  const handleClear = useCallback(() => {
+    clearState();
+
+    const handleReset = onReset ?? handleApply;
+
+    handleReset();
+    handleClose();
+  }, [clearState, handleApply, handleClose, onReset]);
 
   const handleFreeSearch = useAtomCallback(
     useCallback(
@@ -230,6 +255,7 @@ export function AdvanceSearch({
 
         set(stateAtom, {
           ...state,
+          applied: true,
           query: {
             _archived,
             operator: "or",
@@ -464,6 +490,14 @@ export function AdvanceSearch({
     [],
   );
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      clear: clearState,
+    }),
+    [clearState],
+  );
+
   return (
     <Box className={styles.root} ref={containerRef}>
       <SearchInput
@@ -609,11 +643,7 @@ function SearchInput({
     return (
       <Box rounded border d="flex" p={1} pe={2}>
         <Box d="flex" flex={1}>
-          <Tag
-            title={label}
-            color="primary"
-            onRemove={() => onClear?.()}
-          />
+          <Tag title={label} color="primary" onRemove={() => onClear?.()} />
         </Box>
         <Box
           d="flex"

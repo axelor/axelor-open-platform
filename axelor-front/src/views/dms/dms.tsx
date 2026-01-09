@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniq from "lodash/uniq";
@@ -30,7 +30,10 @@ import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { sanitize } from "@/utils/sanitize.ts";
-import { AdvanceSearch } from "@/view-containers/advance-search";
+import {
+  AdvanceSearch,
+  AdvanceSearchHandler,
+} from "@/view-containers/advance-search";
 import {
   usePopupHandlerAtom,
   useSetPopupHandlers,
@@ -131,12 +134,14 @@ export function Dms(props: ViewProps<GridView>) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const isDMSFromPopup = ROOT.id !== null;
 
   // tree state
   const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([root]);
   const [expanded, setExpanded] = useState<TreeRecord["id"][]>([root.id]);
   const [selected, setSelected] = useState<TreeRecord["id"]>(root.id);
   const [showTree, setShowTree] = useState<boolean | undefined>(undefined);
+  const advancedSearchHandler = useRef<AdvanceSearchHandler | null>(null);
 
   const { orderBy, rows, selectedRows } = state;
   const uploadSize = session?.data?.upload?.maxSize ?? 0;
@@ -247,8 +252,6 @@ export function Dms(props: ViewProps<GridView>) {
     setDetailsId(null);
   }, []);
 
-  const shouldSearch = useRef(true);
-
   const onTreeSearch = useCallback(() => {
     const treeDS = new DataStore(dataStore.model);
     const wheres = [
@@ -289,44 +292,44 @@ export function Dms(props: ViewProps<GridView>) {
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
-        if (!shouldSearch.current) {
-          shouldSearch.current = true;
-          return Promise.resolve(undefined);
-        }
+        const {
+          applied,
+          query = {},
+          searchText = "",
+        } = searchAtom ? get(searchAtom) : {};
 
-        const { query = {}, searchText = "" } = searchAtom
-          ? get(searchAtom)
-          : {};
+        const domains = [action.domain];
 
-        let domain: string;
-        if (searchText?.trim()) {
-          domain = `self.isDirectory = FALSE${
-            root.id ? ` AND self.parent.id = ${root.id}` : ""
-          }`;
-
-          if (selected !== root.id) {
-            // Prevent duplicated search on node change
-            shouldSearch.current = false;
-            selectNode(root);
+        if (applied) {
+          // Search from advance search
+          const isFreeSearch = searchText?.trim()?.length > 0;
+          if (isFreeSearch) {
+            domains.push("self.isDirectory = false");
+          }
+          if (isDMSFromPopup) {
+            domains.push(`self.parent.id = ${root.id}`);
           }
         } else {
-          domain = selected
-            ? `self.parent.id = ${selected}`
-            : "self.parent IS NULL";
+          // Search on selected node
+          domains.push(
+            selected ? `self.parent.id = ${selected}` : "self.parent IS NULL",
+          );
         }
 
         const sortBy = orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         );
 
+        const filterDomains = domains.filter((s) => (s ?? "").trim());
+
         return dataStore
           .search({
             sortBy,
             filter: {
               ...query,
-              _domain: `${
-                action.domain ? `${action.domain} AND ` : ""
-              }${domain}`,
+              _domain: filterDomains.length
+                ? filterDomains.join(" AND ")
+                : undefined,
             },
             // reset offset is not provided (ie, not using PageText)
             offset: 0,
@@ -364,16 +367,29 @@ export function Dms(props: ViewProps<GridView>) {
           });
       },
       [
+        isDMSFromPopup,
         searchAtom,
         orderBy,
         dataStore,
         action.domain,
-        selectNode,
         root,
         selected,
       ],
     ),
   );
+
+  const isRequiredToResetRoot = selected !== root.id;
+
+  const onAdvancedSearch = useCallback(async () => {
+    if (isRequiredToResetRoot) {
+      // It will search on it's own as node change
+      selectNode(root);
+    } else {
+      // As root is same, so need to perform search
+      // after advanced search apply/reset
+      onSearch();
+    }
+  }, [onSearch, selectNode, isRequiredToResetRoot, root]);
 
   const onNew = useCallback(
     async (title: string, inputValue?: string, data?: TreeRecord) => {
@@ -641,31 +657,24 @@ export function Dms(props: ViewProps<GridView>) {
     [dataStore, onSearch],
   );
 
-  const clearSearch = useAtomCallback(
+  const handleNodeSelect = useAtomCallback(
     useCallback(
-      (get, set) => {
-        if (searchAtom) {
-          set(searchAtom, (prev) => {
-            return {
-              ...prev,
-              query: {
-                criteria: [],
-              },
-              searchText: undefined,
-            };
-          });
+      (get, set, record: TreeRecord) => {
+        const hasApplied = searchAtom ? get(searchAtom)?.applied : false;
+
+        advancedSearchHandler.current?.clear?.();
+
+        selectNode(record);
+
+        // case : advanced search is applied so node is root
+        // when clicking on home directory or home icon in breadcrumb
+        // it should serve same result as earlier
+        if (record.id === root.id && hasApplied) {
+          onSearch();
         }
       },
-      [searchAtom],
+      [selectNode, root.id, searchAtom, onSearch],
     ),
-  );
-
-  const handleNodeSelect = useCallback(
-    (record: TreeRecord) => {
-      selectNode(record);
-      clearSearch();
-    },
-    [selectNode, clearSearch],
   );
 
   const handleNodeExpand = useCallback((record: TreeRecord) => {
@@ -728,13 +737,29 @@ export function Dms(props: ViewProps<GridView>) {
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
   const records = useDataStore(dataStore, (ds) => ds.records);
+
+  const hasSearchResults = useAtomValue(
+    useMemo(
+      () =>
+        searchAtom ? selectAtom(searchAtom, (s) => s.applied) : atom(false),
+      [searchAtom],
+    ),
+  );
+
   const breadcrumbs = useMemo(() => {
+    if (hasSearchResults) {
+      return [
+        { ...root, _home: true },
+        { $displayName: i18n.get("Search results") },
+      ];
+    }
     function collect(parentId: TreeRecord["id"]): TreeRecord[] {
       const item = treeRecords.find((r) => r.id === parentId);
       return item ? collect(item["parent.id"]).concat([item]) : [];
     }
     return collect(selected);
-  }, [treeRecords, selected]);
+  }, [treeRecords, selected, root, hasSearchResults]);
+
   const detailRecord = useMemo(
     () => (detailsId ? records.find((r) => r.id === detailsId) : null),
     [records, detailsId],
@@ -920,12 +945,14 @@ export function Dms(props: ViewProps<GridView>) {
             <Box d="flex" className={styles.toolbar}>
               {searchAtom && (
                 <AdvanceSearch
+                  ref={advancedSearchHandler}
                   stateAtom={searchAtom}
                   dataStore={dataStore}
                   items={view.items}
                   customSearch={view.customSearch}
                   freeSearch={view.freeSearch}
-                  onSearch={onSearch}
+                  onSearch={onAdvancedSearch}
+                  onReset={onAdvancedSearch}
                 />
               )}
               <Box
@@ -1071,14 +1098,22 @@ function Breadcrumbs({
             (item.$displayName ?? item.fileName)
           );
         }
+        function renderLink() {
+          return (
+            <Link onClick={() => onSelect?.(item)} title={item.fileName}>
+              {render()}
+            </Link>
+          );
+        }
+        const isSelectedItem = selected === item.id;
         return (
           <Box key={ind} as="li">
-            {selected === item.id && item.id ? (
+            {item._home ? (
+              renderLink()
+            ) : item.id === undefined || isSelectedItem ? (
               <Box as="span">{render()}</Box>
             ) : (
-              <Link onClick={() => onSelect?.(item)} title={item.fileName}>
-                {render()}
-              </Link>
+              renderLink()
             )}
             {ind < data.length - 1 && (
               <Box as="span" color="secondary">
