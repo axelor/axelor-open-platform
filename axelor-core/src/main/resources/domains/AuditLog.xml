@@ -16,7 +16,7 @@
 
     <string name="relatedModel" required="true" />
     <long name="relatedId" required="true" />
-    <string name="txId" required="true" />
+    <string name="txId" required="true" title="Transaction ID"/>
     <enum name="eventType" required="true" ref="AuditEventType" />
     <string name="currentState" large="true" />
     <string name="previousState" large="true" />
