@@ -165,9 +165,9 @@ public class EntityGenerator {
     }
     mergedEntities.put(entity.getName(), entity);
 
-    if (doLookup) {
-      lookupSuperClasses(entity);
+    lookupSuperClasses(entity);
 
+    if (doLookup) {
       Optional.ofNullable(entity.getTrack())
           .ifPresent(
               track ->
