@@ -8,3 +8,4 @@ description: |
   - Upgrade Undertow from 2.3.20.Final to 2.3.21.Final
   - Upgrade Hibernate from 6.6.36.Final to 6.6.40.Final
   - Upgrade Resteasy from 6.2.14.Final to 6.2.15.Final
+  - Upgrade Tomcat from 10.1.49 to 10.1.50
