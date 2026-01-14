@@ -98,7 +98,7 @@ libs.jakarta_mail = [
   "org.eclipse.angus:jakarta.mail:2.0.5",
   "org.eclipse.angus:angus-activation:2.0.3"
 ]
-libs.greenmail = "com.icegreen:greenmail-junit5:2.1.7"
+libs.greenmail = "com.icegreen:greenmail-junit5:2.1.8"
 libs.websocket_api = [
   "jakarta.websocket:jakarta.websocket-api:2.1.1",
   "jakarta.websocket:jakarta.websocket-client-api:2.1.1"

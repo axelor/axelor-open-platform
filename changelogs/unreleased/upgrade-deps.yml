@@ -10,3 +10,4 @@ description: |
   - Upgrade Resteasy from 6.2.14.Final to 6.2.15.Final
   - Upgrade Tomcat from 10.1.49 to 10.1.50
   - Upgrade Swagger from 2.2.40 to 2.2.41
+  - Upgrade Greenmail from 2.1.7 to 2.1.8
