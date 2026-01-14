@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.0.xsd">
 
   <!-- DMSFile views -->
-  <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false">
+  <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false" freeSearch="fileName">
     <field name="typeIcon" widget="Icon"/>
     <field name="fileName"/>
     <field name="downloadIcon" widget="icon"/>
