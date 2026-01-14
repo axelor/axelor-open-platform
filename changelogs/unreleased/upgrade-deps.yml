@@ -4,4 +4,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Upgrade Quartz from 2.5.1 to 2.5.2
-
+  - Upgrade Logback from 1.5.21 to 1.5.24
