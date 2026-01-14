@@ -13,3 +13,4 @@ description: |
   - Upgrade Greenmail from 2.1.7 to 2.1.8
   - Upgrade Moxy from 4.0.8 to 4.0.9
   - Upgrade pac4j from 6.2.2 to 6.3.1
+  - Upgrade Redisson from 3.51.0 to 3.52.0
