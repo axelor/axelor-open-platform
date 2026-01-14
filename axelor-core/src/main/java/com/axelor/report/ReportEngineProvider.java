@@ -8,7 +8,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
-import com.lowagie.text.FontFactory;
+import org.openpdf.text.FontFactory;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import java.io.File;
