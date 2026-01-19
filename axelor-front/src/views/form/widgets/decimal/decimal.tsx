@@ -218,7 +218,7 @@ export function Decimal(props: FieldProps<string | number>) {
             type="number"
             min={min}
             max={max}
-            step={step}
+            step={"any"}
             id={uid}
             ref={setInputElement}
             placeholder={placeholder}
