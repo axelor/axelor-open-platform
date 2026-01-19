@@ -132,7 +132,7 @@ libs.redisson = [
   // overrides jackson version used
   "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
-libs.hazelcast = "com.hazelcast:hazelcast:5.5.0"
+libs.hazelcast = "com.hazelcast:hazelcast:5.6.0"
 libs.caffeine = [
   "com.github.ben-manes.caffeine:caffeine:${versions.caffeine}",
   "com.github.ben-manes.caffeine:jcache:${versions.caffeine}"
