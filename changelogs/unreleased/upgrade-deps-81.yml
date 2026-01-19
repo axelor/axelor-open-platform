@@ -4,3 +4,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Upgrade Byte Buddy from 1.17.8 to 1.18.4
+  - Upgrade ASM from 9.8 to 9.9.1

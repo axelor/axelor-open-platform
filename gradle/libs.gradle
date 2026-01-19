@@ -25,7 +25,7 @@ versions.slf4j = "2.0.17"
 
 versions.tomcat = "10.1.50"
 
-versions.asm = "9.8"
+versions.asm = "9.9.1"
 
 versions.flyway = "11.11.2"
 
