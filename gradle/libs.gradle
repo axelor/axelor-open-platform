@@ -27,7 +27,7 @@ versions.tomcat = "10.1.50"
 
 versions.asm = "9.9.1"
 
-versions.flyway = "11.11.2"
+versions.flyway = "11.20.2"
 
 // unit testing
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
