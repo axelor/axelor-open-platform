@@ -8,3 +8,4 @@ description: |
   - Upgrade Snakeyaml from 2.4 to 2.5
   - Upgrade Jsoup from 1.21.2 to 1.22.1
   - Upgrade Flyway from 11.11.2 to 11.20.2
+  - Upgrade Junit from 5.13.4 to 5.14.2
