@@ -291,7 +291,7 @@ libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:7.0.4'
 libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.4.0"
 libs.commons_csv = [
   "org.apache.commons:commons-csv:1.14.1",
-  "commons-io:commons-io:2.20.0"
+  "commons-io:commons-io:2.21.0"
 ]
 
 // BIRT Runtime
