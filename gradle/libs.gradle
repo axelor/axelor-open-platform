@@ -12,7 +12,8 @@ versions.redisson = "3.52.0"
 versions.groovy = "4.0.29"
 versions.graal_js = "24.2.2"
 versions.resteasy = "6.2.15.Final"
-versions.jackson = "2.19.4"
+versions.jackson = "2.21.0"
+versions.jackson_annotations = "2.21"
 versions.shiro = "2.0.6"
 versions.buji_pac4j = "9.1.0"
 versions.jakartaee_pac4j = "8.0.1"
@@ -238,7 +239,7 @@ libs.swagger_jaxrs2 = [
 libs.jackson_libs = [
   "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
   "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
-  "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
+  "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_annotations}",
   "com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:${versions.jackson}",
   excludeGuava("com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}"),
   "com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
