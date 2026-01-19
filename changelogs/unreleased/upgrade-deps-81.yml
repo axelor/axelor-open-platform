@@ -1,0 +1,6 @@
+title: Upgrade backend dependencies
+type: Change
+description: |
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Byte Buddy from 1.17.8 to 1.18.4
