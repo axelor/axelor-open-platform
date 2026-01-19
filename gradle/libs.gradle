@@ -346,11 +346,7 @@ libs.birt_runtime = [
   birt_module("org.eclipse.birt.report.engine"),
   birt_module("org.eclipse.birt.report.item.crosstab.core"),
   birt_module("org.eclipse.birt.report.model.adapter.oda"),
-  dependencies.create(birt_module("uk.co.spudsoft.birt.emitters.excel")) {
-    exclude group: "org.apache.commons", module: "commons-compress"
-  },
-  // CVE-2025-48924
-  "org.apache.commons:commons-compress:1.28.0"
+  birt_module("uk.co.spudsoft.birt.emitters.excel")
 ]
 
 // Quartz Scheduler
