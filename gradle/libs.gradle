@@ -380,16 +380,11 @@ libs.jasypt = "org.jasypt:jasypt:1.9.3"
 
 libs.picocli = "info.picocli:picocli:4.7.7"
 
-libs.minio = [
-  dependencies.create("io.minio:minio:8.5.17") {
-    exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
-    exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
-    exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
-    exclude group: "org.apache.commons", module: "commons-compress"
-  },
-  // CVE-2025-48924
-  "org.apache.commons:commons-compress:1.28.0"
-]
+libs.minio = dependencies.create("io.minio:minio:8.6.0") {
+  exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
+  exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
+  exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+}
 
 libs.totp = dependencies.create('dev.samstevens.totp:totp:1.7.1') {
   exclude group: 'com.beust', module: 'jcommander'

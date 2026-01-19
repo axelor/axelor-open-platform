@@ -11,3 +11,4 @@ description: |
   - Upgrade Junit from 5.13.4 to 5.14.2
   - Upgrade Apache Commons IO from 2.20.0 to 2.21.0
   - Upgrade Guava from 33.4.8 to 33.5.0
+  - Upgrade Minio from 8.5.17 to 8.6.0
