@@ -97,7 +97,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
                 item.as ? { ...node, [item.as]: node[item.name] } : node,
               record,
             ),
-            _draggable: draggable || isSameModelTree,
+            _draggable: draggable && isSameModelTree,
             _droppable: node === view.nodes?.[0] || isSameModelTree,
             $key: `${model}:${record.id}`,
           }) as unknown as TreeRecord,
