@@ -4,18 +4,12 @@
 
 .tree {
   --bs-table-bg: var(--bs-body-bg);
-  --bs-table-active-bg: var(--ax-grid-active-bg, var(--bs-secondary-bg));
-  --bs-table-hover-bg: var(--ax-grid-hover-bg, var(--bs-secondary-bg));
-  --bs-table-striped-bg: var(--ax-grid-strip-bg, var(--bs-table-bg));
-  --bs-table-border-color: var(--ax-grid-border-color, var(--bs-border-color));
-  --bs-table-th-font-weight: var(--ax-grid-header-font-weight, 600);
+  --bs-table-active-bg: var(--bs-table-striped-bg);
   --bs-table-th-bg: var(--ax-grid-header-bg, var(--bs-tertiary-bg));
-  --bs-table-cell-padding: 0.35rem;
 }
 
 .placeholder {
   min-height: 4rem;
-  background-color: var(--bs-gray-100);
   border: 1px dashed var(--bs-border-color);
   margin: 0.25rem;
 } 
