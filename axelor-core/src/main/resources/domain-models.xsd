@@ -1148,6 +1148,13 @@
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
+    <xsd:attribute name="allocationSize" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>
+          The amount to increment by when allocating sequence numbers from the sequence.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="EnumItem">

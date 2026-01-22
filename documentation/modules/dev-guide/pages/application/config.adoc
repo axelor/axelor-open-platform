@@ -219,6 +219,8 @@ Choose the right option by environment :
 | `application.theme` | CSS theme | default theme
 | `application.locale` | default locale | system default
 | `application.base-url` | base url of the application |
+| `application.entity.sequence.default_allocation_size` | global default entity allocation size |
+| `application.entity.sequence.<SEQUENCE_NAME>.allocation_size` | per-entity sequence allocation size |
 | `application.polling-interval` | how often client polls in seconds (ie, menu tags fetch), < 1 means disabled | 10
 | `application.multi-tenancy` | enable multi-tenancy | false
 | `application.config-provider` | `if-feature` custom class |

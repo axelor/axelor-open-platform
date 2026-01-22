@@ -77,6 +77,10 @@ public interface AvailableAppSettings {
   String APPLICATION_CACHE_SHIRO_CONFIG_PREFIX = "application.cache.shiro.config.";
   String APPLICATION_CACHE_SHIRO_CONFIG_PATH = APPLICATION_CACHE_SHIRO_CONFIG_PREFIX + "path";
 
+  String APPLICATION_ENTITY_SEQUENCE_PATH = "application.entity.sequence.";
+  String APPLICATION_ENTITY_SEQUENCE_GLOBAL_DEFAULT_ALLOCATION_SIZE =
+      APPLICATION_ENTITY_SEQUENCE_PATH + "default_allocation_size";
+
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";

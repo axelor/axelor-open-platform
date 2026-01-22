@@ -100,6 +100,9 @@ public class Entity implements BaseType<Entity> {
   @XmlAttribute(name = "repository")
   private String repositoryType;
 
+  @XmlAttribute(name = "allocationSize")
+  private int allocationSize;
+
   private static final Logger logger = LoggerFactory.getLogger(Entity.class);
 
   @XmlElements({
@@ -386,6 +389,14 @@ public class Entity implements BaseType<Entity> {
 
   public void setTable(String value) {
     this.table = value;
+  }
+
+  public int getAllocationSize() {
+    return allocationSize;
+  }
+
+  public void setAllocationSize(int allocationSize) {
+    this.allocationSize = allocationSize;
   }
 
   public Property getNameField() {

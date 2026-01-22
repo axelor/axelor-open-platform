@@ -884,16 +884,14 @@ public abstract class Property {
     }
 
     String name = entity.getTable() + "_SEQ";
+    JavaAnnotation entitySequenceAnnotation =
+        new JavaAnnotation("com.axelor.db.hibernate.sequence.EntitySequence")
+            .param("name", "{0:s}", name);
+    if (entity.getAllocationSize() > 0) {
+      entitySequenceAnnotation.param("allocationSize", String.valueOf(entity.getAllocationSize()));
+    }
 
-    return List.of(
-        new JavaAnnotation("jakarta.persistence.Id"),
-        new JavaAnnotation("jakarta.persistence.GeneratedValue")
-            .param("strategy", "{0:m}", "jakarta.persistence.GenerationType.SEQUENCE")
-            .param("generator", "{0:s}", name),
-        new JavaAnnotation("jakarta.persistence.SequenceGenerator")
-            .param("name", "{0:s}", name)
-            .param("sequenceName", "{0:s}", name)
-            .param("allocationSize", "{0:l}", 1));
+    return List.of(new JavaAnnotation("jakarta.persistence.Id"), entitySequenceAnnotation);
   }
 
   private JavaAnnotation $equalsInclude(Entity entity) {

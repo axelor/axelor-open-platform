@@ -2,6 +2,8 @@
 :toc:
 :toc-title:
 
+== Definition
+
 The entity classes represents domain models and are defined using xml format.
 
 Each file should have proper declaration:
@@ -74,6 +76,10 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 * `strategy=[SINGLE|JOINED|CLASS]` - inheritance strategy (default is SINGLE)
 * `equalsIncludeAll` - whether to include all the simple non-function fields in equality test (default is false)
 * `jsonAttrs` - whether to enable/disable generating "attrs" json field
+* `allocationSize` - the amount to increment by when allocating sequence numbers from the sequence
+
+[discrete]
+=== strategy
 
 The `strategy` attribute can be used on base entity only. Each strategy results in a different database structure with
 specific trade-offs regarding performance and data integrity.
@@ -98,8 +104,90 @@ performance: queries targeting the parent entity can become extremely slow as da
 operations).
 ====
 
+[discrete]
+=== persistable
+
 The `persistable` attribute can be used to define a non-persistable entity class
 annotated with `@MappedSuperclass` that can be used as base class of other entities.
+
+[discrete]
+=== allocationSize
+
+The `allocationSize` attribute controls ID generation performance by determining how many IDs Hibernate pre-allocates
+from the database sequence in a single call.
+
+When Hibernate requests one value from the sequence, the database increments the sequence by the given `allocationSize`
+and gives a "block" of, let's say 50 IDs (e.g., 100–149). Hibernate keeps these in RAM and assigns them instantly. It
+only calls the DB again when it runs out (after the 50th insert). So with, let's say `allocationSize=50`, you save 49
+database round trips per block, significantly improving insert performance in high-volume scenarios.
+
+The default allocation size is `1` for backward compatibility, meaning every insert requires a database call. While
+this ensures strict sequential IDs, it impacts performance.
+
+Here is how to determinate the right value:
+
+[cols="*"]
+|===
+| Allocation Size | Use Case | Trade-offs
+
+| **1** | Low-volume entities, when strict sequential IDs are required | Slowest: DB call per insert
+| **10-20** | Medium-volume entities (users, products) | Balanced performance and waste
+| **50-100** | High-volume entities (logs, events, orders) | Best performance, more wasted IDs on restart
+|===
+
+- **ID Gaps:** IDs may not be strictly sequential, especially in multi-instance deployments
+- **Wasted IDs:** Restarting an application instance loses any unused cached IDs
+- **Multi-Instance:** Each application instance maintains its own independent ID cache
+- **No Collisions:** Despite gaps, ID uniqueness is guaranteed across all instances
+
+**Global Default:**
+
+[source,properties]
+----
+# Set default allocation size for all sequences
+application.entity.sequence.default_allocation_size = 50
+----
+
+**Per-Entity Configuration:**
+
+You can override the allocation size for specific sequences using:
+
+[source,properties]
+----
+# Format: application.entity.sequence.<SEQUENCE_NAME>.allocation_size
+application.entity.sequence.MY_ENTITY_SEQ.allocation_size = 100
+application.entity.sequence.MY_ENTITY_2_SEQ.allocation_size = 20
+application.entity.sequence.MY_ENTITY_3_SEQ.allocation_size = 1
+----
+
+**Configuration Priority:**
+
+The allocation size is determined in the following order (highest to lowest priority):
+
+1. `allocationSize` defined in entity XML definition
+2. Per-entity configuration: `application.entity.sequence.<SEQUENCE_NAME>.allocation_size`
+3. Global default: `application.entity.sequence.default_allocation_size`
+4. Fallback default: `1`
+
+[WARNING]
+====
+**Database Sequence Alignment**
+
+The allocation size configuration must match the database sequence's `INCREMENT BY` value. Mismatches can cause
+ID collisions, gaps, or other unexpected behavior. Make sure to CREATE or ALTER the database sequence with the right
+increment :
+
+[source,sql]
+----
+-- in case of a new entity
+CREATE SEQUENCE MY_ENTITY_SEQ START WITH 1 INCREMENT BY 50;
+-- in case of existing entity
+ALTER SEQUENCE MY_ENTITY_SEQ INCREMENT BY 50;
+----
+====
+
+[discrete]
+=== `<module>` tag
 
 The `<module>` tag can be used to define package names of the generated entities and repositories:
 
@@ -594,7 +682,7 @@ The `<index>` tag can be used to define a composite index.
 An index can be defined on a field using `index` attribute.
 A custom index name can be provided (starting with 'idx_' prefix), else default
 index name is generated using table name and column name.
-By default, all reference fields, namecolumn, name and code are automatically indexed.
+By default, all reference fields, namecolumn, name, and code are automatically indexed.
 
 [source,xml]
 ----
