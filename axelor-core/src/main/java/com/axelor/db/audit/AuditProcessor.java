@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import org.hibernate.Session;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,13 +93,13 @@ public class AuditProcessor {
 
   /** Process all pending audit logs. */
   public void process() {
-    log.info("Recovering audit logs...");
-
     List<String> candidateTxIds = fetchCandidateTxIds(BATCH_SIZE);
 
     if (candidateTxIds.isEmpty()) {
       return;
     }
+
+    log.info("Recovering audit logs...");
 
     for (String txId : candidateTxIds) {
       if (isShutdownRequest()) {
@@ -201,7 +202,8 @@ public class AuditProcessor {
    * Determines whether the given throwable or any of its causes represent a locking-related
    * exception. Specifically, it checks for instances of {@code
    * jakarta.persistence.PessimisticLockException}, {@code org.hibernate.PessimisticLockException},
-   * or {@code org.hibernate.exception.LockAcquisitionException}.
+   * or {@code org.hibernate.exception.LockAcquisitionException} or {@code
+   * org.postgresql.util.PSQLException} with 55P03 SQL state.
    *
    * @param e the throwable to examine; may be null
    * @return {@code true} if the throwable or any of its causes is a locking-related exception,
@@ -209,6 +211,8 @@ public class AuditProcessor {
    */
   private boolean isLockingException(Throwable e) {
     if (e == null) return false;
+    if (e instanceof PSQLException psqlException && "55P03".equals(psqlException.getSQLState()))
+      return true;
     if (e instanceof jakarta.persistence.PessimisticLockException
         || e instanceof org.hibernate.PessimisticLockException
         || e instanceof org.hibernate.exception.LockAcquisitionException) return true;
