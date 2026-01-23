@@ -1,3 +1,60 @@
+## 8.0.5 (2026-01-23)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Quartz from 2.5.1 to 2.5.2
+  - Upgrade Logback from 1.5.21 to 1.5.25
+  - Upgrade Undertow from 2.3.20.Final to 2.3.21.Final
+  - Upgrade Hibernate from 6.6.36.Final to 6.6.40.Final
+  - Upgrade Resteasy from 6.2.14.Final to 6.2.15.Final
+  - Upgrade Tomcat from 10.1.49 to 10.1.50
+  - Upgrade Swagger from 2.2.40 to 2.2.41
+  - Upgrade Greenmail from 2.1.7 to 2.1.8
+  - Upgrade Moxy from 4.0.8 to 4.0.9
+  - Upgrade pac4j from 6.2.2 to 6.3.1
+  - Upgrade Redisson from 3.51.0 to 3.52.0
+  - Upgrade PostgreSQL JDBC driver from 42.7.8 to 42.7.9
+  - Upgrade BIRT from 4.21.0 to 4.22.0
+  
+  Due to OpenPDF library upgrade, import statements using `com.lowagie` package should be migrated to `org.openpdf`.
+  
+  </details>
+
+#### Fix
+
+* Fix step validation in decimal input widget
+* Fix alpha transparency usage in theme editor
+* Fix check draggable attribute in tree view node
+* Fix dms grid auto scroll issue on cell selection
+* Fix generating extended entities not included in project
+
+  <details>
+  
+  Extended entities having a super class were wrongly generated in project : Entities in a 'SINGLE_TABLE' hierarchy 
+  shouldn't be annotated with `@Table` (the root class declares the table mapping for the hierarchy). Issue only 
+  happens with entities declared in module dependencies (project dependencies not concerned).
+  
+  </details>
+
+* Disallow `form` tag in DOMPurify sanitization
+* Normalize empty HTML content in HTML widget
+
+  <details>
+  
+  Treat HTML editor output that contains only whitespace or <br> tags as empty.
+  This prevents leftover <br> content when clearing the field and allows required
+  validation to work as expected.
+  
+  </details>
+
+* Fix perform advanced search on entire dms tree
+
 ## 8.0.4 (2026-01-05)
 
 #### Feature

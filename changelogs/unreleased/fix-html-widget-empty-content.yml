@@ -1,7 +1,0 @@
----
-title: Normalize empty HTML content in HTML widget
-type: fix
-description: |
-  Treat HTML editor output that contains only whitespace or <br> tags as empty.
-  This prevents leftover <br> content when clearing the field and allows required
-  validation to work as expected.

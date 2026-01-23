@@ -1,7 +1,0 @@
----
-title: Fix generating extended entities not included in project
-type: fix
-description: |
-  Extended entities having a super class were wrongly generated in project : Entities in a 'SINGLE_TABLE' hierarchy 
-  shouldn't be annotated with `@Table` (the root class declares the table mapping for the hierarchy). Issue only 
-  happens with entities declared in module dependencies (project dependencies not concerned).
