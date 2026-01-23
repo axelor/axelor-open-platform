@@ -382,6 +382,7 @@ Run the following SQL script to create the table :
 
 [source,sql]
 ----
+create sequence auth_user_token_seq;
 create table auth_user_token (
     id           bigint not null primary key,
     archived     boolean,
@@ -413,6 +414,7 @@ Run the following SQL script to create the table:
 
 [source,sql]
 ----
+CREATE SEQUENCE auth_mfa_seq;
 CREATE TABLE auth_mfa (
 	id bigint NOT NULL,
 	archived bool NULL,
@@ -493,6 +495,15 @@ use the provided storage APIs (`MetaFiles`/`FileStoreFactory`) to manage files. 
 both file system and object storage backends. If you are using BIRT reports (or any other report templates) that were
 originally designed for the local file system, you may need to adapt them to use the storage abstraction layer instead of
 relying on local file paths. More details xref:dev-guide:modules/reports.adoc[here].
+
+Run the following SQL script to update the `meta_file` table :
+
+[source,sql]
+----
+ALTER TABLE meta_file ADD store_type integer;
+UPDATE meta_file SET store_type = 1;
+ALTER TABLE meta_file ALTER COLUMN store_type SET NOT NULL;
+----
 
 Temporary file management was moved from `com.axelor.meta.MetaFiles` to `com.axelor.file.temp.TempFiles`
 and will use the new `data.upload.temp-dir` property:
@@ -757,6 +768,8 @@ For the migration, you need to alter the table `meta_filter` with the following 
 
 [source,sql]
 ----
+DROP INDEX IF EXISTS meta_filter_name_idx;
+ALTER TABLE public.meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
 ALTER TABLE meta_filter DROP COLUMN name;
 CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
 ----
