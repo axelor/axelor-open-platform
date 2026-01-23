@@ -21,6 +21,7 @@ logic with max retries and error tracking. Run the following SQL script to creat
 
 [source,sql]
 ----
+create sequence audit_log_seq;
 create table audit_log
 (
     id             bigint       not null    primary key,
