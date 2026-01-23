@@ -8,7 +8,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
-import org.openpdf.text.FontFactory;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import java.io.File;
@@ -16,6 +15,7 @@ import java.net.MalformedURLException;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.ReportEngine;
+import org.openpdf.text.FontFactory;
 
 @Singleton
 public class ReportEngineProvider implements Provider<IReportEngine> {
