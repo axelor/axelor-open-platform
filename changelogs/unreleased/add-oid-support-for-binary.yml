@@ -1,8 +1,0 @@
----
-title: Add `oid` database type for binary fields
-type: feature
-description: |
-  Since 8.0, `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
-  binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
-  headaches and should only be used for specific "streaming" use cases. For compatibility reasons, this adds support to 
-  use `oid` database type for `binary` fields. This can be enabled by adding `large="true"` attribute on field definition.

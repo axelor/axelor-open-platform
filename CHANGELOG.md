@@ -1,3 +1,31 @@
+## 8.0.6 (2026-01-27)
+
+#### Feature
+
+* Add `oid` database type support for binary fields
+
+  <details>
+  
+  Since 8.0, `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
+  binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
+  headaches and should only be used for specific "streaming" use cases. For compatibility reasons, this adds support to 
+  use `oid` database type for `binary` fields. This can be enabled by adding `large="true"` attribute on field definition.
+  
+  </details>
+
+#### Deprecate
+
+* The `sequential` attribute on `entity` definition is now deprecated
+
+  <details>
+  
+  Since Hibernate 6.x, it creates a sequence per entity hierarchy instead of a single sequence `hibernate_sequence`.
+  So the `sequential` attribute is no longer needed and should be removed from entity definitions. It is marked as 
+  deprecated and will be removed in further version. All entities will now use their own sequence.
+  
+  </details>
+
+
 ## 8.0.5 (2026-01-23)
 
 #### Change
