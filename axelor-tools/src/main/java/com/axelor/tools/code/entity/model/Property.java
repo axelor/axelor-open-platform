@@ -982,10 +982,10 @@ public abstract class Property {
       return annotations;
     }
 
-    if (isTrue(large) || type == PropertyType.BINARY) {
+    if (isTrue(large) && type == PropertyType.BINARY) {
       return List.of(
-          new JavaAnnotation("jakarta.persistence.Basic")
-              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
+          new JavaAnnotation("org.hibernate.annotations.JdbcTypeCode")
+              .param("value", "{0:m}", "java.sql.Types.BLOB"));
     }
 
     return null;
