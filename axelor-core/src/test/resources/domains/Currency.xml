@@ -5,7 +5,7 @@
 
   <module name="test" package="com.axelor.test.db"/>
 
-  <entity name="Currency" table="TEST_CURRENCY" sequential="true">
+  <entity name="Currency" table="TEST_CURRENCY">
 
     <string name="code" required="true" unique="true"/>
     <string name="name" required="true" unique="true"/>

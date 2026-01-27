@@ -5,7 +5,7 @@
 
   <module name="test" package="com.axelor.test.db"/>
 
-  <entity name="FieldTypes" table="FIELD_TYPES" sequential="true">
+  <entity name="FieldTypes" table="FIELD_TYPES">
 
     <string name="string"/>
     <date name="localDate"/>

@@ -1,0 +1,7 @@
+---
+title: The `sequential` attribute on `entity` definition is now deprecated
+type: deprecate
+description: |
+  Since Hibernate 6.x, it creates a sequence per entity hierarchy instead of a single sequence `hibernate_sequence`.
+  So the `sequential` attribute is no longer needed and should be removed from entity definitions. It is marked as 
+  deprecated and will be removed in further version. All entities will now use their own sequence.

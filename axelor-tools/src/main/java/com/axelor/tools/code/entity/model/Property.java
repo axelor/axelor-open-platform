@@ -876,7 +876,7 @@ public abstract class Property {
       return null;
     }
 
-    if (isFalse(entity.getSequential()) || isTrue(entity.getMappedSuperClass())) {
+    if (isTrue(entity.getMappedSuperClass())) {
       return List.of(
           new JavaAnnotation("jakarta.persistence.Id"),
           new JavaAnnotation("jakarta.persistence.GeneratedValue")
