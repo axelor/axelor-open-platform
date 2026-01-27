@@ -91,14 +91,22 @@ headaches and should only be used for specific "streaming" use cases.
 +
 [source,sql]
 ----
-ALTER TABLE my_table
-ALTER COLUMN my_binary TYPE bytea
-USING CASE
-    WHEN my_binary IS NULL THEN NULL
-    WHEN EXISTS(SELECT 1 FROM pg_largeobject_metadata WHERE oid = my_binary)
-    THEN lo_get(my_binary)
-    ELSE NULL
+CREATE OR REPLACE FUNCTION safe_lo_get(oid_value oid)
+RETURNS bytea AS $$
+BEGIN
+    IF oid_value IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM pg_largeobject_metadata WHERE oid = oid_value) THEN
+        RETURN lo_get(oid_value);
+    ELSE
+        RETURN NULL;
+    END IF;
 END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE my_table ALTER COLUMN my_binary TYPE bytea USING safe_lo_get(my_binary);
 ----
 +
 *Cleanup:* You will have orphaned large objects in `pg_largeobject` that are no longer referenced by anything. PostgreSQL provides
@@ -996,3 +1004,190 @@ attribute was still present in xsd.
 fields now no longer need `record.` prefix. Update your js expressions, templates, and EvalRefSelect `x-eval-*`
 attributes according.
 * Remove method `JPA#withTransaction(Supplier)` in favor of `JPA#callInTransaction(Supplier)`
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+-- MetaSequence
+CREATE SEQUENCE IF NOT EXISTS meta_sequence_seq;
+SELECT setval('meta_sequence_seq', (SELECT MAX(id) FROM meta_sequence))
+
+-- MFA
+
+CREATE SEQUENCE auth_mfa_seq;
+CREATE TABLE auth_mfa (
+	id bigint NOT NULL,
+	archived bool NULL,
+	"version" integer NULL,
+	created_on timestamp(6) NULL,
+	updated_on timestamp(6) NULL,
+	default_method integer NULL,
+	email varchar(255) NULL,
+	email_code varchar(255) NULL,
+	email_code_expires_at timestamp(6) NULL,
+	enabled bool NULL,
+	is_email_validated bool NULL,
+	is_totp_validated bool NULL,
+	recovery_codes text NULL,
+	totp_secret varchar(255) NULL,
+	created_by bigint NULL,
+	updated_by bigint NULL,
+	"owner" bigint NOT NULL,
+	CONSTRAINT auth_mfa_pkey PRIMARY KEY (id),
+	CONSTRAINT uk_qlaks9iymof66mwqotodtpyg2 UNIQUE (owner),
+	CONSTRAINT fk_2yt0vnr9h8h8sxg1co544m64q FOREIGN KEY (created_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_o5nfu3rveqcse0hmkd54r5m4p FOREIGN KEY (updated_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_qlaks9iymof66mwqotodtpyg2 FOREIGN KEY ("owner") REFERENCES auth_user(id)
+);
+CREATE INDEX auth_mfa_owner_idx ON auth_mfa USING btree (owner);
+
+-- UserToken
+
+create sequence auth_user_token_seq;
+create table auth_user_token (
+    id           bigint not null primary key,
+    archived     boolean,
+    version      integer,
+    created_on   timestamp(6),
+    updated_on   timestamp(6),
+    expires_at   timestamp(6) not null,
+    last_used_at timestamp(6),
+    name         varchar(255) not null,
+    token_digest varchar(255) not null,
+    token_key    varchar(255) not null constraint uk_2yewhucjnwii7ljwbnt3bj3ll unique,
+    created_by   bigint constraint fk_o7822fne5ugastp3rtdqom43v references auth_user,
+    updated_by   bigint constraint fk_3yyw8xkkmkygcjayajg21jfvr references auth_user,
+    owner        bigint       not null constraint fk_3nsst639s8kn304497trbed5q references auth_user
+);
+
+create index auth_user_token_owner_idx on auth_user_token (owner);
+
+-- binary fields
+
+CREATE OR REPLACE FUNCTION safe_lo_get(oid_value oid)
+RETURNS bytea AS $$
+BEGIN
+    IF oid_value IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM pg_largeobject_metadata WHERE oid = oid_value) THEN
+        RETURN lo_get(oid_value);
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE team_team
+    ALTER COLUMN image TYPE bytea
+        USING safe_lo_get(image);
+
+ALTER TABLE auth_user
+    ALTER COLUMN image TYPE bytea
+        USING safe_lo_get(image);
+
+-- MetaFile change
+
+ALTER TABLE meta_file ADD store_type integer;
+UPDATE meta_file SET store_type = 1;
+ALTER TABLE meta_file ALTER COLUMN store_type SET NOT NULL;
+
+-- MetaFilter change
+
+DROP INDEX IF EXISTS meta_filter_name_idx;
+ALTER TABLE meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
+ALTER TABLE meta_filter DROP COLUMN name;
+CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+
+-- datetime change
+
+alter table team_task alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_task alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table team_team alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_team alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table team_topic alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_topic alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_group alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_group alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_password_reset_token alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_password_reset_token alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_password_reset_token alter column expire_at type timestamp(6) using expire_at::timestamp(6);
+alter table auth_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_role alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_role alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_user alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_user alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_user alter column activate_on type timestamp(6) using activate_on::timestamp(6);
+alter table auth_user alter column expires_on type timestamp(6) using expires_on::timestamp(6);
+alter table auth_user alter column password_updated_on type timestamp(6) using password_updated_on::timestamp(6);
+alter table dms_file alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_file alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table dms_file_tag alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_file_tag alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table dms_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_address alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_address alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_flags alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_flags alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_follower alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_follower alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_message alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_message alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_action alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_action alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_action_menu alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_action_menu alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_attachment alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_attachment alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_enum alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_enum alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_field alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_field alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_file alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_file alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_filter alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_filter alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_field alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_field alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_model alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_model alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_record alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_record alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_menu alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_menu alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_model alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_model alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_module alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_module alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_permission_rule alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_permission_rule alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_schedule alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_schedule alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_schedule_param alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_schedule_param alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_select alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_select alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_select_item alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_select_item alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_sequence alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_sequence alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_theme alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_theme alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_view alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_view alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_view_custom alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_view_custom alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+
+-- drop shared sequence and function (only used for migration)
+
+drop sequence hibernate_sequence;
+DROP FUNCTION safe_lo_get(oid);
+----
