@@ -79,25 +79,109 @@ Hibernate 6.6 is compliant with Jakarta Persistence 3.1 and is a major part of t
 
 ==== Column Types (on PostgreSQL)
 
-[cols="4"]
-|===
-| Column Type | Hibernate 5.x | Hibernate 6.6 | Notes
-| binary | oid | bytea | https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/Hibernate_User_Guide.html#basic-bytearray[`@Lob` not used anymore]
-| decimal | numeric(19, 2) | numeric(38, 2) | Default precision has changed
-| datetime | timestamp | timestamp(6) | Explicit default precision (no difference)
-| datetime (tz) | timestamp | timestamptz(6) | https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html#ddl-timezones[Timezone and offset storage]
-| time | time | time(6) | Explicit default precision (no difference)
-|===
+- *binary*: `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
+binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
+headaches and should only be used for specific "streaming" use cases.
++
+*Impact:* Critical for schema validation. Requires converting existing `oid` to `bytea`.
++
+*Optional:* If you still want to use `oid` database type, use `large="true"` attribute on fields.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table
+ALTER COLUMN my_binary TYPE bytea
+USING CASE
+    WHEN my_binary IS NULL THEN NULL
+    WHEN EXISTS(SELECT 1 FROM pg_largeobject_metadata WHERE oid = my_binary)
+    THEN lo_get(my_binary)
+    ELSE NULL
+END;
+----
++
+*Cleanup:* You will have orphaned large objects in `pg_largeobject` that are no longer referenced by anything. PostgreSQL provides
+the `vacuumlo` utility to clean them up.
 
-==== https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html#logical-1-1-unique[Hibernate creates a UNIQUE constraint on the database for logical one-to-one associations marked as optional]
+- *decimal*: `decimal` fields declared in domains without a custom `scale` and `precison`, now default to precision
+`38` (previously often 19) to better align with SQL standards.
++
+*Impact:* Critical for schema validation. Requires converting to new precision.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_amount TYPE numeric(38, 2);
+----
++
 
-==== https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/Hibernate_User_Guide.html#basic-String[@Lob is not used anymore for large strings]
+- *datetime*: `datetime` fields declared in domains now map to `timestamp(6) without time zone` (6 digits of fractional
+seconds, i.e., microseconds) instead of `timestamp without time zone` (with no params).
++
+*Impact:* Minimal. Postgres `timestamp` defaults to microsecond precision (6) anyway. Only aligned with Hibernate 6's
+expectations.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_date TYPE timestamp(6) without time zone;
+----
++
 
-Now using `@Column(length=LONG32)` for text type. See:
+- *datetime (tz)*: same as `datetime` for the microsecond precision but also map to `with time zone` instead of
+`without time zone`. It shifts data from being "Wall Clock Time" (what a clock on the wall says) to "Absolute Time"
+(a specific moment in the universe).
++
+*Impact:* Critical for schema validation. Requires converting "wall clock" time to "absolute" time.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table
+ALTER COLUMN my_zoned_date TYPE timestamp(6) with time zone
+USING my_zoned_date AT TIME ZONE 'Europe/Paris'; -- check your timezone
+----
++
+WARNING: Replace `Europe/Paris` with your specific database instance time zone (mostly JVM/server timezone). Verify migration
+on a staging database before.
 
-* https://docs.jboss.org/hibernate/stable/orm/javadocs/org/hibernate/Length.html#LONG32
-* https://www.postgresql.org/docs/current/datatype-character.html#DATATYPE-CHARACTER-TABLE
-* https://www.postgresql.org/docs/current/storage-toast.html
+- *time*: same as `datatime`, `time` fields declared in domains now map to `time(6) without time zone` (6 digits of fractional
+seconds, i.e., microseconds) instead of `time without time zone` (with no params).
++
+*Impact:* Minimal. Postgres `time` defaults to microsecond precision (6) anyway. Only aligned with Hibernate 6's
+expectations.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_time TYPE time(6) without time zone;
+----
++
+
+- *Logical @OneToOne UNIQUE constraint*: Hibernate now always generates a UNIQUE constraint on the foreign key column
+for `@OneToOne` associations.
++
+*Impact:* Critical for schema validation. Requires adding the unique constraint.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ADD CONSTRAINT uk_my_fk UNIQUE (my_fk_column);
+----
++
+WARNING: You cannot add a UNIQUE constraint if you already have "bad data" (duplicates) where multiple rows refer to
+the same foreign ID. You must clean that up first.
+
+TIP: Create a fresh database and let Hibernate generate the schema from scratch. Compare it with your existing
+production schema to identify all differences. Run migration SQL scripts on a local / staging environment first and
+verify data integrity.
+
 
 === Query Changes
 
