@@ -448,7 +448,7 @@
         <xsd:attribute name="large" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              Whether the text value is large (use default LOB length).
+              Whether the text value is large (use bytea database type).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -551,6 +551,13 @@
           <xsd:annotation>
             <xsd:documentation>
             Specify whether the field is encrypted.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="large" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the binary value is large (Reference to a Large Object stored in pg_largeobject system table).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

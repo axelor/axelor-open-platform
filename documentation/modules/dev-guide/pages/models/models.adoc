@@ -437,10 +437,20 @@ The `<binary>` field is used to store binary blobs.
 
 | `image` | if the field is intended to store image data
 | `encrypted` | whether the field is encrypted
+| `large` | whether the data is very large
 |===
 
 TIP: only use this field for small or non-reusable binary data, prefer using
 an `many-to-one` to `com.axelor.meta.db.MetaFile`.
+
+By default, a binary field is mapped to a `bytea` database type. When using `large="true"`, it will map it to an `oid`
+database type. It references to a large object stored in `pg_largeobject` system table. Use it only when data
+stored is very large and needs streaming access but also considers the following downsides :
+
+- Manual cleanup needed: Deleting a row doesn't delete the Large Object. You need to call `lo_unlink()` or use the `lo`
+extension with triggers to avoid orphaned data.
+- Harder to backup/restore: Since OIDs are stored in a global system table (`pg_largeobject`), they can complicate
+backups.
 
 example:
 
