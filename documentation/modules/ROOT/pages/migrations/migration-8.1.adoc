@@ -65,6 +65,7 @@ change :
 [source,sql]
 ----
 ALTER TABLE mail_message ADD COLUMN received_on timestamp(6);
+CREATE INDEX mail_message_received_on_idx ON mail_message (received_on);
 UPDATE mail_message set received_on = created_on;
 ----
 
