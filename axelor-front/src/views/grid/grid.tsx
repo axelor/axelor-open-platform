@@ -230,6 +230,12 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
+  const { treeLimit, treeField, treeFieldTitle } = view;
+  const widget = toKebabCase(view.widget ?? "");
+  const isExpandable = widget === "expandable";
+  const isTreeGrid = treeField && widget === "tree-grid";
+  const hasGridExpandableView = isExpandable || isTreeGrid;
+
   const { editable: _editable, onDelete: onDeleteAction, inlineHelp } = view;
   const canShowHelp = !sessionData?.user?.noHelp && inlineHelp;
 
@@ -325,12 +331,22 @@ function GridInner(props: ViewProps<GridView>) {
 
   const doSearch = useCallback(
     async (options: SearchOptions = {}) => {
+      const _records = dataStore.records;
+
       const result = await dataStore.search(getSearchOptions(options));
+
       searchResultRef.current = result;
       refreshSummaryBar(result);
+
+      // as data store records same, so no updates
+      // for tree-grid, force reset records to provide reload to expandable form
+      if (hasGridExpandableView && dataStore.records === _records) {
+        setRecords([...result.records]);
+      }
+
       return result;
     },
-    [dataStore, refreshSummaryBar, getSearchOptions],
+    [dataStore, hasGridExpandableView, refreshSummaryBar, getSearchOptions],
   );
 
   const onSearch = useAfterActions(doSearch);
@@ -1152,11 +1168,6 @@ function GridInner(props: ViewProps<GridView>) {
 
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
   const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
-
-  const { treeLimit, treeField, treeFieldTitle } = view;
-  const widget = toKebabCase(view.widget ?? "");
-  const isExpandable = widget === "expandable";
-  const isTreeGrid = treeField && widget === "tree-grid";
 
   const { data: expandableSummaryMeta } = useAsync(async () => {
     const { summaryView, model } = view;

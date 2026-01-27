@@ -200,6 +200,8 @@ function DashletListMenu(
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
+  const { onRefresh } = props;
+
   const onExport = useAtomCallback(
     useCallback(
       async (get) => {
@@ -234,7 +236,7 @@ function DashletListMenu(
               [classes.itemActionEnabled]: canPrev,
             }),
             disabled: !canPrev,
-            onClick: () => dataStore.search({ offset: offset - limit }),
+            onClick: () => onRefresh?.({ offset: offset - limit }),
           },
           {
             key: "next",
@@ -246,7 +248,7 @@ function DashletListMenu(
               [classes.itemActionEnabled]: canNext,
             }),
             disabled: !canNext,
-            onClick: () => dataStore.search({ offset: offset + limit }),
+            onClick: () => onRefresh?.({ offset: offset + limit }),
           },
           {
             key: "new",
