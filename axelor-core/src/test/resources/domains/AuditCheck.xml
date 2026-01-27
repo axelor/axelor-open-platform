@@ -5,7 +5,7 @@
 
   <module name="test" package="com.axelor.test.db"/>
 
-  <entity name="AuditCheck" table="AUDIT_CHECK" sequential="true">
+  <entity name="AuditCheck" table="AUDIT_CHECK">
     <string name="name"/>
     <string name="email"/>
     <string name="empSeq" sequence="seq.emp.id"/>

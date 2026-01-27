@@ -68,7 +68,7 @@
     <!-- should not have 'attrs' json field as we define one json field -->
   </entity>
 
-  <entity name="Country" sequential="false" jsonAttrs="true">
+  <entity name="Country" jsonAttrs="true">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <string name="extra" json="true" />
@@ -77,7 +77,7 @@
     <!-- should have 'attrs' json field as well -->
   </entity>
 
-  <entity name="Contact" sequential="true" equalsIncludeAll="true" cacheable="false">
+  <entity name="Contact" equalsIncludeAll="true" cacheable="false">
     <string name="empId" sequence="emp.seq"/>
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>

@@ -64,7 +64,6 @@ Let's see with an example:
 A domain model is defined using `<entity>` tag, it supports some attributes.
 
 * `name` - name of the Entity (should begin with upper case letter)
-* `sequential` - whether to use a new ID sequence (default is true)
 * `cacheable` - whether to make this entity cacheable (default is false)
 * `repository=[none|default|abstract]` - how to generate repository class
 * `table` - table name for the entity

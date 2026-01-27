@@ -110,7 +110,6 @@ re-generate code for only modified files.
 A domain model is defined using `<entity>` tag, it supports some attributes.
 
 * `cacheable` - whether to make this entity cacheable
-* `sequential` - whether to use a new ID sequence
 * `repository=[none|default|abstract]` - how to generate repository class
 
 And we define model fields as the child nodes. Following fields are supported:

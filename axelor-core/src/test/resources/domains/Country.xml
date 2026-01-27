@@ -5,7 +5,7 @@
 
   <module name="test" package="com.axelor.test.db"/>
 
-  <entity name="Country" table="CONTACT_COUNTRY" sequential="true">
+  <entity name="Country" table="CONTACT_COUNTRY">
 
     <string name="code" required="true" initParam="true"/>
     <string name="name" required="true" initParam="true"/>

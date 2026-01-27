@@ -5,7 +5,7 @@
 
   <module name="axelor-core" package="com.axelor.meta.db"/>
 
-  <entity name="MetaSequence" table="META_SEQUENCE" sequential="false">
+  <entity name="MetaSequence" table="META_SEQUENCE">
     <![CDATA[
     This object stores custom sequences.
     ]]>

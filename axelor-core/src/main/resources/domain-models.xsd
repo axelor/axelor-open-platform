@@ -1043,6 +1043,7 @@
         <xsd:documentation>
           Whether the records of this entity should be in
           unique sequence (else a global sequence will be used).
+          DEPRECATED: shouldn't be used, will use a sequence per entity
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

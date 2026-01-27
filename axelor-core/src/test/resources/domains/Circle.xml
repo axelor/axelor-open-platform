@@ -5,7 +5,7 @@
 
   <module name="test" package="com.axelor.test.db"/>
 
-  <entity name="Circle" table="CONTACT_CIRCLE" sequential="true">
+  <entity name="Circle" table="CONTACT_CIRCLE">
 
     <string name="code" required="true" initParam="true"/>
     <string name="name" required="true" initParam="true"/>

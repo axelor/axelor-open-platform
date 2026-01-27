@@ -182,6 +182,59 @@ TIP: Create a fresh database and let Hibernate generate the schema from scratch.
 production schema to identify all differences. Run migration SQL scripts on a local / staging environment first and
 verify data integrity.
 
+==== Non sequential sequences support
+
+Hibernate 6.x changed the default ID generation strategy to use one sequence per entity hierarchy instead of a single
+shared sequence `hibernate_sequence`.
+
+The `sequential` attribute on `<entity>` XML definitions is no longer supported and will be ignored (attribute still
+exists in XSD but will be removed in a further version).
+
+*Previous behavior:*
+
+- `sequential="true"` (default): Entity uses its own dedicated sequence (`<entity_name>_seq`)
+- `sequential="false"`: Entity shares the global `hibernate_sequence`
+
+*New behavior:*
+
+- All entities now use their own dedicated sequence (`<entity_name>_seq`)
+- The sequential `attribute` is deprecated and has no effect
+- The shared `hibernate_sequence` is no longer used
+
+For the migration, identify all entities that were configured with `sequential="false"`. These entities were previously
+using the shared `hibernate_sequence`. For each entity concerned, create a dedicated sequence initialized with a safe
+starting value and remove the sequential attribute in XML definition.
+
+[source,sql]
+----
+-- Create sequences for tables specified in `tables` array
+DO $$
+DECLARE
+    tbl TEXT;
+    max_id BIGINT;
+    tables TEXT[] := ARRAY['my_entity'];
+BEGIN
+    FOREACH tbl IN ARRAY tables
+    LOOP
+        EXECUTE format('SELECT MAX(id) FROM %I', tbl) INTO max_id;
+        EXECUTE format('CREATE SEQUENCE IF NOT EXISTS %I', tbl || '_seq');
+        IF max_id IS NOT NULL THEN
+            EXECUTE format('SELECT setval(%L, %s)', tbl || '_seq', max_id);
+        END IF;
+        RAISE NOTICE 'Created %_seq with last_value=%', tbl, COALESCE(max_id, 1);
+    END LOOP;
+END $$;
+
+-- Drop unused shared sequence
+drop sequence hibernate_sequence;
+----
+
+AOP has one built-in entity `MetaSequence` concerned by this change. Here is the associated migration script :
+[source,sql]
+----
+CREATE SEQUENCE IF NOT EXISTS meta_sequence_seq;
+SELECT setval('meta_sequence_seq', (SELECT MAX(id) FROM meta_sequence))
+----
 
 === Query Changes
 
@@ -853,7 +906,7 @@ For the migration, you need to alter the table `meta_filter` with the following 
 [source,sql]
 ----
 DROP INDEX IF EXISTS meta_filter_name_idx;
-ALTER TABLE public.meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
+ALTER TABLE meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
 ALTER TABLE meta_filter DROP COLUMN name;
 CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
 ----

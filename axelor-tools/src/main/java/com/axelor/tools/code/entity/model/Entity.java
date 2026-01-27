@@ -74,9 +74,6 @@ public class Entity implements BaseType<Entity> {
 
   @XmlTransient Property nameField;
 
-  @XmlAttribute(name = "sequential")
-  private Boolean sequential;
-
   @XmlAttribute(name = "jsonAttrs")
   private Boolean jsonAttrs;
 
@@ -203,7 +200,6 @@ public class Entity implements BaseType<Entity> {
     dynamicUpdate = getFields().stream().anyMatch(p -> p.isVirtual() && notTrue(p.getTransient()));
     nameField = getFields().stream().filter(p -> isTrue(p.getNameField())).findFirst().orElse(null);
 
-    sequential = notFalse(sequential);
     equalsAll = isTrue(equalsAll);
   }
 
@@ -394,14 +390,6 @@ public class Entity implements BaseType<Entity> {
 
   public Property getNameField() {
     return nameField;
-  }
-
-  public Boolean getSequential() {
-    return sequential;
-  }
-
-  public void setSequential(Boolean sequential) {
-    this.sequential = sequential;
   }
 
   public Boolean getJsonAttrs() {
