@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: 0.5.9
-        version: 0.5.9(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.7(@types/react@19.1.13))(@types/node@22.18.5)(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(scheduler@0.26.0)
+        specifier: 0.6.0
+        version: 0.6.0(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.7(@types/react@19.1.13))(@types/node@22.18.5)(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(scheduler@0.26.0)
       '@babel/standalone':
         specifier: ^7.28.4
         version: 7.28.4
@@ -225,8 +225,8 @@ packages:
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
 
-  '@axelor/ui@0.5.9':
-    resolution: {integrity: sha512-qEvmcHZuu9cfj4jRpv8Uecwz1odrz1ZANNPQX78Mc/qQWue4p5S8WWVy3rZi8il+rbXZp8fqB3JFJP7yAkMZxw==}
+  '@axelor/ui@0.6.0':
+    resolution: {integrity: sha512-uJ1mWrijPJNA6iPqMczBNTWLMQJGbVCtq0sII6rmQwkc0EHGPZS7L1NinzA1jP9TvuG47KvhgAjGnHAFm4EXbQ==}
     engines: {node: '>=22.17'}
     peerDependencies:
       react: ^19.1.1
@@ -3404,7 +3404,7 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
 
-  '@axelor/ui@0.5.9(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.7(@types/react@19.1.13))(@types/node@22.18.5)(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(scheduler@0.26.0)':
+  '@axelor/ui@0.6.0(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.7(@types/react@19.1.13))(@types/node@22.18.5)(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(scheduler@0.26.0)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@floating-ui/react': 0.27.16(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
