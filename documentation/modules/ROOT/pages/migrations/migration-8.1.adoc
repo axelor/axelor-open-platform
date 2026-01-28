@@ -21,8 +21,8 @@ logic with max retries and error tracking. Run the following SQL script to creat
 
 [source,sql]
 ----
-create sequence audit_log_seq;
-create table audit_log
+CREATE SEQUENCE audit_log_seq START WITH 1 INCREMENT BY 100;
+CREATE TABLE audit_log
 (
     id             bigint       not null    primary key,
     archived       boolean,
@@ -43,8 +43,8 @@ create table audit_log
     user_id        bigint   constraint fk_pyjqqm7hglp6pnwp3h8whian8 references auth_user
 );
 
-create index audit_log_idx_processing
-    on audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
+CREATE INDEX audit_log_idx_processing
+    ON audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
 ----
 
 For security and performance reasons, certain field types are automatically excluded from audit tracking:
