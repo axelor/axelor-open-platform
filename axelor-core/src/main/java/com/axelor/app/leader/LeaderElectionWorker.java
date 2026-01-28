@@ -274,6 +274,7 @@ public class LeaderElectionWorker {
   private void processAuditLog(String tenantId) {
     ContextAware.of()
         .withTenantId(tenantId)
+        .withTransaction(false)
         .build(
             () -> {
               try {
