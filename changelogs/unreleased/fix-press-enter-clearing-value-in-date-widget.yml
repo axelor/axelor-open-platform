@@ -1,0 +1,5 @@
+---
+title: Fix press enter on date widget should not clear value
+type: fix
+description: |
+  Fixed by upgrading react-datepicker from 7.5.0 to 7.6.0.
