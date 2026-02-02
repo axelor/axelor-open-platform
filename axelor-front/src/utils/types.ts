@@ -105,3 +105,32 @@ export function isEmpty(
     (typeof value === "string" && (strict ? value : value.trim()) === "")
   );
 }
+
+/**
+ * Determines if the given value is conformed to the standard 36-character UUID format.
+ *
+ * @param value The value to be checked.
+ * @return A boolean indicating whether the value is a valid UUID.
+ */
+export function isUUID(value: any): value is string {
+  if (!isString(value) || value?.length !== 36) {
+    return false;
+  }
+
+  for (let i = 0; i < 36; i++) {
+    const c = value[i];
+    if (i === 8 || i === 13 || i === 18 || i === 23) {
+      if (c !== "-") return false;
+    } else {
+      if (
+        !(
+          (c >= "0" && c <= "9") ||
+          (c >= "a" && c <= "f") ||
+          (c >= "A" && c <= "F")
+        )
+      )
+        return false;
+    }
+  }
+  return true;
+}

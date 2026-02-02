@@ -45,6 +45,7 @@ export const SERVER_TYPES: string[] = [
   "text",
   "binary",
   "enum",
+  "uuid",
   "one-to-one",
   "many-to-one",
   "one-to-many",

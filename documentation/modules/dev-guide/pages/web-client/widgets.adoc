@@ -118,6 +118,18 @@ for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
 * `x-step`: amount to increment or decrement on each step. Accept negative and decimal/integer values. Default to `1`.
 
+== UUID
+
+The `Uuid` widget is used for `uuid` data fields. The input provides a mask for user guidance, helping to format
+the value correctly.
+
+[source,xml]
+----
+<field name="productUid" widget="Uuid"/>
+----
+
+image::widgets/uuid.png[]
+
 == Slider
 
 The `Slider` widget works on `integer` and `decimal` fields. It provides the ability to select a value within a range.

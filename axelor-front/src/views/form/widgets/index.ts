@@ -72,5 +72,6 @@ export * from "./theme-select";
 export * from "./time";
 export * from "./toggle";
 export * from "./url";
+export * from "./uuid";
 export * from "./widget-select";
 export * from "./wkf-status";
