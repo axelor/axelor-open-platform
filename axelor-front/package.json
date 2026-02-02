@@ -52,7 +52,7 @@
     "react-dom": "^19.1.1",
     "react-error-boundary": "^6.0.0",
     "react-grid-layout": "1.4.3",
-    "react-international-phone": "^4.6.0",
+    "react-international-phone": "^4.7.0",
     "react-router": "^7.9.3",
     "react-text-mask": "^5.5.0",
     "react-transition-group": "^4.4.5",
