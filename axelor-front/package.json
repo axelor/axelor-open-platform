@@ -33,7 +33,7 @@
     "@uiw/react-color-block": "^2.9.4",
     "@uiw/react-color-chrome": "^2.9.4",
     "bootstrap-sass": "2.3.2",
-    "bunshi": "^2.1.5",
+    "bunshi": "^2.2.0",
     "color": "^5.0.3",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",

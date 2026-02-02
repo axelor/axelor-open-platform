@@ -53,8 +53,8 @@ importers:
         specifier: 2.3.2
         version: 2.3.2(patch_hash=8244e2704d64c19ee4e2f3796f1f96b3903d19d5a8ce1214bffcbf4c80ca308a)
       bunshi:
-        specifier: ^2.1.5
-        version: 2.1.5(react@19.1.1)
+        specifier: ^2.2.0
+        version: 2.2.0(react@19.1.1)
       color:
         specifier: ^5.0.3
         version: 5.0.3
@@ -1520,8 +1520,8 @@ packages:
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
-  bunshi@2.1.5:
-    resolution: {integrity: sha512-zO+qxwd2aBV+XUIf7LjL1G3lx5CtvbtXZD+WMkM9KD+RN0iFtitDVX2QDu/wzdQIj8hyXJlGDfVEfeoqhAVEfA==}
+  bunshi@2.2.0:
+    resolution: {integrity: sha512-s97ZI9apyF4AgvG5l/zql0X+RY5cZtBKbMKGeB5t+2JbXPdXpa1/XRn/ryMLHYHJ2FAhtK1bvOFcqsehi8UWZw==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16'
@@ -5035,7 +5035,7 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
-  bunshi@2.1.5(react@19.1.1):
+  bunshi@2.2.0(react@19.1.1):
     optionalDependencies:
       react: 19.1.1
 
