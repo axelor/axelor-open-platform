@@ -42,6 +42,6 @@
   margin-right: auto;
   cursor: pointer;
   &:hover {
-    background-color: var(--bs-secondary-bg);
+    background-color: var(--ax-theme-dropdown-link-hover-bg, var(--bs-tertiary-bg));
   }
 }
