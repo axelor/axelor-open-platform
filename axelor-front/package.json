@@ -44,7 +44,7 @@
     "jotai-immer": "^0.4.1",
     "jsdom": "^26.1.0",
     "libphonenumber-js": "^1.12.36",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "monaco-editor": "^0.52.2",
     "parse5": "^8.0.0",
     "react": "^19.1.1",
