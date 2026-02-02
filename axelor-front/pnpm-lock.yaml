@@ -107,8 +107,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0(react@19.2.4)
       react-grid-layout:
-        specifier: 1.4.3
-        version: 1.4.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 2.2.2
+        version: 2.2.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-international-phone:
         specifier: ^4.7.0
         version: 4.7.0(react@19.2.4)
@@ -152,9 +152,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.11)
-      '@types/react-grid-layout':
-        specifier: ^1.3.5
-        version: 1.3.5
       '@types/react-text-mask':
         specifier: ^5.4.14
         version: 5.4.14
@@ -1222,9 +1219,6 @@ packages:
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
-
-  '@types/react-grid-layout@1.3.5':
-    resolution: {integrity: sha512-WH/po1gcEcoR6y857yAnPGug+ZhkF4PaTUxgAbwfeSH/QOgVSakKHBXoPGad/sEznmkiaK3pqHk+etdWisoeBQ==}
 
   '@types/react-text-mask@5.4.14':
     resolution: {integrity: sha512-VkQuH+7Ol+ue/EFe9EFqJAmDe3ay5VML29l3aJkdzAriMhiprJOmdAFjZ3jOT6p3+nBgEUHxaQtUgg8k8Sk5wA==}
@@ -2778,8 +2772,8 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  react-grid-layout@1.4.3:
-    resolution: {integrity: sha512-maZJfspM5aDmO/1kJj1U13HQ44rh6svcV7VQPOU9c2UfZhh8Z5AuZb+iVrzETWjsisHBYD3e2zckVovUnqvGHA==}
+  react-grid-layout@2.2.2:
+    resolution: {integrity: sha512-yNo9pxQWoxHWRAwHGSVT4DEGELYPyQ7+q9lFclb5jcqeFzva63/2F72CryS/jiTIr/SBIlTaDdyjqH+ODg8oBw==}
     peerDependencies:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
@@ -4688,10 +4682,6 @@ snapshots:
     dependencies:
       '@types/react': 19.2.11
 
-  '@types/react-grid-layout@1.3.5':
-    dependencies:
-      '@types/react': 19.2.11
-
   '@types/react-text-mask@5.4.14':
     dependencies:
       '@types/react': 19.2.11
@@ -6251,7 +6241,7 @@ snapshots:
     dependencies:
       react: 19.2.4
 
-  react-grid-layout@1.4.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-grid-layout@2.2.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       clsx: 2.1.1
       fast-equals: 4.0.3
