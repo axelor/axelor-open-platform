@@ -122,8 +122,8 @@ importers:
         specifier: ^4.4.5
         version: 4.4.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       signature_pad:
-        specifier: ^5.1.1
-        version: 5.1.1
+        specifier: ^5.1.3
+        version: 5.1.3
       swagger-ui-react:
         specifier: ^5.30.2
         version: 5.30.2(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -2987,8 +2987,8 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
-  signature_pad@5.1.1:
-    resolution: {integrity: sha512-BT5JJygS5BS0oV+tffPRorIud6q17bM7v/1LdQwd0o6mTqGoI25yY1NjSL99OqkekWltS4uon6p52Y8j1Zqu7g==}
+  signature_pad@5.1.3:
+    resolution: {integrity: sha512-zyxW5vuJVnQdGcU+kAj9FYl7WaAunY3kA5S7mPg0xJiujL9+sPAWfSQHS5tXaJXDUa4FuZeKhfdCDQ6K3wfkpQ==}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -6455,7 +6455,7 @@ snapshots:
 
   siginfo@2.0.0: {}
 
-  signature_pad@5.1.1: {}
+  signature_pad@5.1.3: {}
 
   slash@3.0.0: {}
 
