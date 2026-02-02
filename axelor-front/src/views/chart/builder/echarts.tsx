@@ -52,28 +52,27 @@ export function ECharts({
     const instance = chart.current;
     if (onClick && instance) {
       instance.on("click", function (event: any) {
-        const { seriesName, data } = event || {};
+        const { seriesName, data: eData } = event || {};
         const context =
-          data?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
-          data?.raw?.[0];
+          eData?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
+          eData?.raw?.[0];
         onClick(context?._original ?? context);
       });
     }
   }, [seriesBy, onClick]);
 
   useEffect(() => {
-    chart.current &&
-      width &&
-      height &&
+    if (chart.current && width && height) {
       chart.current.resize({
         height,
         width,
       });
+    }
   }, [height, width]);
 
   useEffect(() => {
     if (chart.current) {
-      const $options = { ...options };
+      const $options = { ...options } as echarts.EChartsOption;
       if (isRTL) {
         if ($options.yAxis) {
           $options.yAxis = {
@@ -95,7 +94,7 @@ export function ECharts({
             legend: undefined,
           }),
           color: getColor(type, data.config?.colors, data.config?.shades),
-        } as echarts.EChartsOption,
+        },
         !isMerge,
         lazyUpdate,
       );
