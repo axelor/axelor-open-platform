@@ -104,8 +104,8 @@ importers:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
       react-error-boundary:
-        specifier: ^6.0.0
-        version: 6.0.0(react@19.2.4)
+        specifier: ^6.1.0
+        version: 6.1.0(react@19.2.4)
       react-grid-layout:
         specifier: 1.4.3
         version: 1.4.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -2773,10 +2773,10 @@ packages:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
 
-  react-error-boundary@6.0.0:
-    resolution: {integrity: sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA==}
+  react-error-boundary@6.1.0:
+    resolution: {integrity: sha512-02k9WQ/mUhdbXir0tC1NiMesGzRPaCsJEWU/4bcFrbY1YMZOtHShtZP6zw0SJrBWA/31H0KT9/FgdL8+sPKgHA==}
     peerDependencies:
-      react: '>=16.13.1'
+      react: ^18.0.0 || ^19.0.0
 
   react-grid-layout@1.4.3:
     resolution: {integrity: sha512-maZJfspM5aDmO/1kJj1U13HQ44rh6svcV7VQPOU9c2UfZhh8Z5AuZb+iVrzETWjsisHBYD3e2zckVovUnqvGHA==}
@@ -6247,9 +6247,8 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  react-error-boundary@6.0.0(react@19.2.4):
+  react-error-boundary@6.1.0(react@19.2.4):
     dependencies:
-      '@babel/runtime': 7.28.2
       react: 19.2.4
 
   react-grid-layout@1.4.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):

@@ -179,7 +179,7 @@ function ViewError({ error, resetErrorBoundary }: FallbackProps) {
   return (
     <ErrorBox
       status={500}
-      error={session.data?.user?.technical ? error : undefined}
+      error={session.data?.user?.technical ? (error as Error) : undefined}
       onReset={handleReset}
     />
   );
