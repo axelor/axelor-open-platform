@@ -98,8 +98,8 @@ importers:
         specifier: ^19.1.1
         version: 19.1.1
       react-datepicker:
-        specifier: ^8.7.0
-        version: 8.7.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: ^9.1.0
+        version: 9.1.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
@@ -2726,11 +2726,15 @@ packages:
     peerDependencies:
       react: ^15.3.0 || 16 || 17 || 18
 
-  react-datepicker@8.7.0:
-    resolution: {integrity: sha512-r5OJbiLWc3YiVNy69Kau07/aVgVGsFVMA6+nlqCV7vyQ8q0FUOnJ+wAI4CgVxHejG3i5djAEiebrF8/Eip4rIw==}
+  react-datepicker@9.1.0:
+    resolution: {integrity: sha512-lOp+m5bc+ttgtB5MHEjwiVu4nlp4CvJLS/PG1OiOe5pmg9kV73pEqO8H0Geqvg2E8gjqTaL9eRhSe+ZpeKP3nA==}
     peerDependencies:
+      date-fns-tz: ^3.0.0
       react: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    peerDependenciesMeta:
+      date-fns-tz:
+        optional: true
 
   react-debounce-input@3.3.0:
     resolution: {integrity: sha512-VEqkvs8JvY/IIZvh71Z0TC+mdbxERvYF33RcebnodlsUZ8RSgyKe2VWaHXv4+/8aoOgXLxWrdsYs2hDhcwbUgA==}
@@ -6195,7 +6199,7 @@ snapshots:
       prop-types: 15.8.1
       react: 19.1.1
 
-  react-datepicker@8.7.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  react-datepicker@9.1.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
       '@floating-ui/react': 0.27.16(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       clsx: 2.1.1
