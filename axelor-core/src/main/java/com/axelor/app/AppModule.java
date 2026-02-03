@@ -10,7 +10,6 @@ import com.axelor.event.EventModule;
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
-import com.axelor.meta.db.repo.MetaJsonReferenceUpdater;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
 import com.axelor.meta.loader.ViewWatcherObserver;
@@ -47,9 +46,6 @@ public class AppModule extends AbstractModule {
 
     // Observe changes for views
     bind(ViewObserver.class);
-
-    // Observe updates to fix m2o names in json values
-    bind(MetaJsonReferenceUpdater.class);
 
     // Logger injection support
     install(new LoggerModule());

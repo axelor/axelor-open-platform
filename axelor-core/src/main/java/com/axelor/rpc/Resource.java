@@ -29,6 +29,7 @@ import com.axelor.db.Repository;
 import com.axelor.db.ValueEnum;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.hibernate.type.JsonFunction;
+import com.axelor.db.json.JsonReferenceCascader;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -1324,6 +1325,10 @@ public class Resource<T extends Model> {
             if (bean instanceof User user) {
               handleUserSave(user, (Map) record);
             }
+
+            // Snapshot old attrs BEFORE manage() flushes the entity to DB
+            var jsonCascader = Beans.get(JsonReferenceCascader.class);
+            jsonCascader.beforeSave(bean);
 
             bean = JPA.manage(bean);
             if (repository != null) {

@@ -674,13 +674,10 @@ export function processView(
           field.title = field.title || field.autoTitle;
         }
         const colSpan = (field.widgetAttrs || {}).colSpan || field.colSpan;
-        if (field.type === "one-to-many") {
-          field.type = "many-to-many";
-          field.canSelect = false;
-        }
         if (
           field.type === "separator" ||
-          (field.type === "many-to-many" && !field.widget)
+          ((field.type === "many-to-many" || field.type === "one-to-many") &&
+            !field.widget)
         ) {
           field.colSpan = colSpan || 12;
         }

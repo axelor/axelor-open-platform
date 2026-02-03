@@ -104,17 +104,6 @@ public class JsonContext extends SimpleBindings {
     }
   }
 
-  private void ensureManaged(Object value) {
-    if (value instanceof Model bean) {
-      if (bean.getId() == null || bean.getId() <= 0) {
-        throw new IllegalArgumentException();
-      }
-    }
-    if (value instanceof Collection<?> collection) {
-      collection.forEach(this::ensureManaged);
-    }
-  }
-
   private void propagate() {
     context.put(jsonField, toJson(this));
   }
@@ -202,11 +191,6 @@ public class JsonContext extends SimpleBindings {
 
   @Override
   public Object put(String name, Object value) {
-    try {
-      ensureManaged(value);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("cannot set unsaved values to field: " + name);
-    }
     try {
       return super.put(name, value);
     } finally {

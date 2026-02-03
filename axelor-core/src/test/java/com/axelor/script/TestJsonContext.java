@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -51,11 +50,7 @@ public class TestJsonContext extends ScriptTest {
     context.put("guardian", all(Contact.class).fetchOne());
     assertTrue(context.asType(Contact.class).getAttrs().contains("guardian"));
 
-    try {
-      context.put("guardian", new Contact());
-      fail();
-    } catch (IllegalArgumentException e) {
-    }
+    context.put("guardian", new Contact());
   }
 
   @Test

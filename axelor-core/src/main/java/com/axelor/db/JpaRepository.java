@@ -4,6 +4,8 @@
  */
 package com.axelor.db;
 
+import com.axelor.db.json.JsonReferenceCascader;
+import com.axelor.db.json.JsonReferenceUpdater;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -86,7 +88,17 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   @Override
   public T save(T entity) {
-    return JPA.save(entity);
+    var jsonManager = Beans.get(JsonReferenceCascader.class);
+    var jsonUpdater = Beans.get(JsonReferenceUpdater.class);
+    jsonManager.beforeSave(entity);
+    try {
+      T saved = JPA.save(entity);
+      jsonManager.afterSave(saved);
+      jsonUpdater.afterSave(saved);
+      return saved;
+    } finally {
+      jsonManager.clearSaveState(entity);
+    }
   }
 
   /**
@@ -112,6 +124,7 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   @Override
   public void remove(T entity) {
+    Beans.get(JsonReferenceCascader.class).beforeRemove(entity);
     // detach orphan o2m records
     detachChildren(entity);
     JPA.remove(entity);

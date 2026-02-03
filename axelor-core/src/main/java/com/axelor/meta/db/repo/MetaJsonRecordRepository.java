@@ -9,7 +9,6 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.hibernate.type.JsonFunction;
-import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
@@ -88,8 +87,13 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 
   @Override
   public MetaJsonRecord save(MetaJsonRecord entity) {
-    final MetaJsonModelRepository models = Beans.get(MetaJsonModelRepository.class);
-    final MetaJsonModel model = models.findByName(entity.getJsonModel());
+    final MetaJsonModel model =
+        Query.of(MetaJsonModel.class)
+            .filter("self.name = :name")
+            .bind("name", entity.getJsonModel())
+            .autoFlush(false)
+            .cacheable()
+            .fetchOne();
     // set name value
     if (model != null && model.getNameField() != null) {
       entity.setName((String) new JsonContext(entity).get(model.getNameField()));
