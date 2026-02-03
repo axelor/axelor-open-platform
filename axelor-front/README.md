@@ -4,7 +4,7 @@ The next generation web frontend of Axelor.
 
 ## Pre-requisites
 
-- node >= v22.17
+- node >= v24.13
 - pnpm >= 10
 
 ```bash

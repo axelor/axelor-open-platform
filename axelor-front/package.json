@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": ">=22.17"
+    "node": ">=24.13.0"
   },
   "engineStrict": true,
   "scripts": {
@@ -65,7 +65,7 @@
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.23",
-    "@types/node": "^25.2.0",
+    "@types/node": "^24.10.10",
     "@types/react": "^19.2.11",
     "@types/react-dom": "^19.2.3",
     "@types/react-text-mask": "^5.4.14",
