@@ -515,19 +515,21 @@ public class AuditProcessor {
           """;
 
     List<String> result = new ArrayList<>();
-    JPA.em()
-        .unwrap(Session.class)
-        .doWork(
-            conn -> {
-              try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, limit);
-                try (ResultSet rs = ps.executeQuery()) {
-                  while (rs.next()) {
-                    result.add(rs.getString(1));
-                  }
-                }
+
+    JPA.JDBCWork work =
+        conn -> {
+          try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+              while (rs.next()) {
+                result.add(rs.getString(1));
               }
-            });
+            }
+          }
+        };
+
+    JPA.runInTransaction(() -> JPA.jdbcWork(work));
+
     return result;
   }
 
