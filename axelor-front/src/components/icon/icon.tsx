@@ -12,8 +12,8 @@ import {
 import { forwardRef } from "react";
 
 /**
- * Map removed material icons with their equivalency in order to maintained compatibility
- * From 2024-05-14 to 2025-03-21 : see https://material-symbols-changelog.vercel.app/
+ * Map removed material icons with their equivalency to maintained compatibility
+ * See https://material-symbols-changelog.vercel.app/
  */
 const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   // 2024-05-14
@@ -55,7 +55,7 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   grade: "star",
   // 2024-11-15
   add_to_photos: "library_add",
-// 2025-02-10
+  // 2025-02-10
   brightness_high: "brightness_7",
   brightness_low: "brightness_5",
   cloudy_snowing: "weather_snowy",
@@ -127,6 +127,12 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   // 2025-09-19
   motion_photos_off: "motion_sensor_idle",
   transcribe: "record_voice_over",
+  // 2025-10-16
+  battery_saver: "battery_plus",
+  // 2025-10-30
+  heart_arrow: "favorite",
+  // 2025-11-21
+  volume_down_alt: "volume_down",
 };
 
 export type IconProps = {

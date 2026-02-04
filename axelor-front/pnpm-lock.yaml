@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: 0.6.0
-        version: 0.6.0(@popperjs/core@2.11.8)(@types/node@24.10.10)(@types/react-dom@19.2.3(@types/react@19.2.11))(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
+        specifier: 0.6.1
+        version: 0.6.1(@popperjs/core@2.11.8)(@types/node@24.10.10)(@types/react-dom@19.2.3(@types/react@19.2.11))(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@babel/standalone':
         specifier: ^7.29.0
         version: 7.29.0
@@ -224,12 +224,12 @@ packages:
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
-  '@axelor/ui@0.6.0':
-    resolution: {integrity: sha512-uJ1mWrijPJNA6iPqMczBNTWLMQJGbVCtq0sII6rmQwkc0EHGPZS7L1NinzA1jP9TvuG47KvhgAjGnHAFm4EXbQ==}
-    engines: {node: '>=22.17'}
+  '@axelor/ui@0.6.1':
+    resolution: {integrity: sha512-sPR4ebVTEEx5zUjVlTsOidzhvGJIxeYYTx7NwdvRWgjI4XnYTAlhR/qL94MBU9LUlwhIf2N91FmwRrhWag6THA==}
+    engines: {node: '>=24.13.0'}
     peerDependencies:
-      react: ^19.1.1
-      react-dom: ^19.1.1
+      react: ^19.2.4
+      react-dom: ^19.2.4
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -718,11 +718,11 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@material-symbols/font-400@0.36.4':
-    resolution: {integrity: sha512-LwAcIPPn99ET2R4WPYu3VtbNd/vxZYV9iIE96oHkSUhkqdJVATWqj7UwGnmHQ6z1FkisvixGz5MMx9OBIv60Hg==}
+  '@material-symbols/font-400@0.40.2':
+    resolution: {integrity: sha512-Ibyypche5VmVB0ZNZd9Ytt9BSHhNr34ZTbFycfXY4Gnbs6mf+jYRblTGosHWWzw010mhJMewfnuW8nnk1XI9Ag==}
 
-  '@material-symbols/metadata@0.36.4':
-    resolution: {integrity: sha512-D2kh5fLSNKVllVEIbB/qDth59BPdcdDVFhWrLYlSreQy+0TjICJZAIeMZkPEh+WLJZvyGQDGHq790b83/91rZg==}
+  '@material-symbols/metadata@0.40.2':
+    resolution: {integrity: sha512-ZalDHlL0iaJR7ppM425K5aosrP+dQu714HmuEM4cZOqGj/+5NIjJiPLpiqNGqQBuxN2xuglBTmKLAFE5E6qyfQ==}
 
   '@monaco-editor/loader@1.7.0':
     resolution: {integrity: sha512-gIwR1HrJrrx+vfyOhYmCZ0/JcWqG5kbfG7+d3f/C1LXk2EvzAbHSg3MQ5lO2sMlo9izoAZ04shohfKLVT6crVA==}
@@ -1955,8 +1955,8 @@ packages:
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
-  focus-trap@7.8.0:
-    resolution: {integrity: sha512-/yNdlIkpWbM0ptxno3ONTuf+2g318kh2ez3KSeZN5dZ8YC6AAmgeWz+GasYYiBJPFaYcSAPeu4GfhUaChzIJXA==}
+  focus-trap@8.0.0:
+    resolution: {integrity: sha512-Aa84FOGHs99vVwufDMdq2qgOwXPC2e9U66GcqBhn1/jEHPDhJaP8PYhkIbqG9lhfL5Kddk/567lj46LLHYCRUw==}
 
   follow-redirects@1.15.11:
     resolution: {integrity: sha512-deG2P0JfjrTxl50XGCDyfI97ZGVCxIpfKYmfyrQ54n5FO/0gfIES8C/Psl6kWVDolizcaaxZJnTS0QSMxvnsBQ==}
@@ -2092,9 +2092,6 @@ packages:
   ignore@7.0.5:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
-
-  immer@10.2.0:
-    resolution: {integrity: sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw==}
 
   immer@11.1.3:
     resolution: {integrity: sha512-6jQTc5z0KJFtr1UgFpIL3N9XSC3saRaI9PwWtzM2pSqkNGtiNkYY2OSwkOGDK2XcTRcLb1pi/aNkKZz0nxVH4Q==}
@@ -3321,23 +3318,23 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@axelor/ui@0.6.0(@popperjs/core@2.11.8)(@types/node@24.10.10)(@types/react-dom@19.2.3(@types/react@19.2.11))(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
+  '@axelor/ui@0.6.1(@popperjs/core@2.11.8)(@types/node@24.10.10)(@types/react-dom@19.2.3(@types/react@19.2.11))(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@floating-ui/react': 0.27.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@fluentui/priority-overflow': 9.2.1
       '@fluentui/react-context-selector': 9.2.14(@types/react-dom@19.2.3(@types/react@19.2.11))(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@hello-pangea/dnd': 18.0.1(@types/react@19.2.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@material-symbols/font-400': 0.36.4
-      '@material-symbols/metadata': 0.36.4
+      '@material-symbols/font-400': 0.40.2
+      '@material-symbols/metadata': 0.40.2
       '@types/qrcode': 1.5.6
       bootstrap: 5.3.8(@popperjs/core@2.11.8)
       bootstrap-icons: 1.13.1
       color: 5.0.3
       csstype: 3.2.3
       dayjs: 1.11.19
-      focus-trap: 7.8.0
-      immer: 10.2.0
+      focus-trap: 8.0.0
+      immer: 11.1.3
       jsbarcode: 3.12.3
       qrcode: 1.5.4
       react: 19.2.4
@@ -3797,9 +3794,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@material-symbols/font-400@0.36.4': {}
+  '@material-symbols/font-400@0.40.2': {}
 
-  '@material-symbols/metadata@0.36.4': {}
+  '@material-symbols/metadata@0.40.2': {}
 
   '@monaco-editor/loader@1.7.0':
     dependencies:
@@ -5347,7 +5344,7 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  focus-trap@7.8.0:
+  focus-trap@8.0.0:
     dependencies:
       tabbable: 6.4.0
 
@@ -5483,8 +5480,6 @@ snapshots:
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
-
-  immer@10.2.0: {}
 
   immer@11.1.3: {}
 
