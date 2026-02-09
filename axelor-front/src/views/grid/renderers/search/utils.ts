@@ -106,7 +106,7 @@ function getSearchCriteria(
 
   const getFilterCriteria = (_field: Field, value: any) => {
     const item = (items || []).find((item) => item?.name === _field?.name);
-    const field = { ...item, ..._field } as Field;
+    const field = { ...item, ..._field, widget: item?.widget ?? _field.widget } as Field;
     let type = toKebabCase(field.type || "");
     let op = "like";
     let options = {};
