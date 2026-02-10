@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react";
 import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
 import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
+import path from "node:path";
 import { ProxyOptions, loadEnv, mergeConfig } from "vite";
 import { ViteUserConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
@@ -26,7 +27,7 @@ const proxyAll: ProxyOptions = {
   xfwd: true,
   bypass(req, res, options) {
     // Compare pathname without any query params
-    const pathname = req.url.split('?')[0];
+    const pathname = req.url.split("?")[0];
     if (
       pathname === base ||
       pathname === base + "index.html" ||
@@ -54,6 +55,15 @@ export default mergeConfig(
   defineConfig({
     plugins,
     base,
+    resolve: {
+      ...conf?.resolve,
+      alias: {
+        ...conf?.resolve?.alias,
+        react: path.resolve(__dirname, "./node_modules/react"),
+        "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      },
+      dedupe: [...(conf?.resolve?.dedupe ?? []), "react", "react-dom"],
+    },
     server: {
       proxy: {
         [`${base}websocket`]: proxyWs,
