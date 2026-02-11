@@ -52,6 +52,14 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: "react",
+        replacement: path.resolve(__dirname, "./node_modules/react"),
+      },
+      {
+        find: "react-dom",
+        replacement: path.resolve(__dirname, "./node_modules/react-dom"),
+      },
+      {
         find: /^~(.*)/,
         replacement: "$1",
       },
@@ -60,6 +68,7 @@ export default defineConfig({
         replacement: path.join(__dirname, "src", "$1"),
       },
     ],
+    dedupe: ["react", "react-dom"],
   },
   build: {
     /**
