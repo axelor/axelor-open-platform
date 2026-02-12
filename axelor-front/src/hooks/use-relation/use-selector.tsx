@@ -249,16 +249,21 @@ function Footer({
               handleClose();
               onCreate();
             }}
+            data-testid="btn-create"
           >
             {i18n.get("Create")}
           </Button>
         </Box>
       )}
       <Box d="flex" g={2} ms={"auto"}>
-        <Button variant="secondary" onClick={() => handleClose()}>
+        <Button
+          variant="secondary"
+          onClick={() => handleClose()}
+          data-testid="btn-cancel"
+        >
           {i18n.get("Close")}
         </Button>
-        <Button variant="primary" onClick={handleOk}>
+        <Button variant="primary" onClick={handleOk} data-testid="btn-confirm">
           {i18n.get("OK")}
         </Button>
       </Box>

@@ -11,7 +11,7 @@ import {
   type JSX,
 } from "react";
 
-import { clsx, Box, Button, useClassNames } from "@axelor/ui";
+import { clsx, Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import {
@@ -222,7 +222,6 @@ function Header({
   setMaximized: React.Dispatch<React.SetStateAction<boolean>>;
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const classNames = useClassNames();
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
   const handleClose = useClose(handler, close, params);
@@ -240,22 +239,36 @@ function Header({
     <Box d="flex" g={2}>
       {HeaderComp && <HeaderComp close={close} />}
       <Box d="flex" g={2} alignItems="center">
-        <MaterialIcon
-          icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-          className={styles.icon}
-          onClick={() => setExpanded((prev) => !prev)}
-        />
-        <MaterialIcon
-          icon={maximized ? "fullscreen_exit" : "fullscreen"}
-          className={styles.icon}
-          onClick={() => setMaximized((prev) => !prev)}
-        />
-        <Box
-          as="button"
-          tabIndex={0}
-          className={classNames("btn-close")}
-          onClick={onClose}
-        />
+        <ButtonGroup d={"flex"} gap={8} className={styles.btnGroup}>
+          <Button
+            tabIndex={0}
+            onClick={() => setExpanded((prev) => !prev)}
+            data-testid={"btn-toggle-content"}
+            title={i18n.get("Toggle content")}
+          >
+            <MaterialIcon
+              icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            />
+          </Button>
+          <Button
+            tabIndex={0}
+            d="flex"
+            onClick={() => setMaximized((prev) => !prev)}
+            data-testid={"btn-toggle-fullscreen"}
+            title={i18n.get("Toggle fullscreen")}
+          >
+            <MaterialIcon icon={maximized ? "fullscreen_exit" : "fullscreen"} />
+          </Button>
+          <Button
+            tabIndex={0}
+            d="flex"
+            onClick={onClose}
+            data-testid={"btn-close"}
+            title={i18n.get("Close")}
+          >
+            <MaterialIcon icon={"close"} />
+          </Button>
+        </ButtonGroup>
       </Box>
     </Box>
   );

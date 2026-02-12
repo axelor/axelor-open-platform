@@ -248,11 +248,19 @@ function Footer({
       <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
         {FooterComp && <FooterComp close={onClose} />}
         <Box d="flex" g={2}>
-          <Button variant="secondary" onClick={() => handler.close?.()}>
+          <Button
+            variant="secondary"
+            onClick={() => handler.close?.()}
+            data-testid={"btn-cancel"}
+          >
             {i18n.get("Close")}
           </Button>
           {hasOk && popupCanSave && (
-            <Button variant="primary" onClick={handleOk}>
+            <Button
+              variant="primary"
+              onClick={handleOk}
+              data-testid={"btn-confirm"}
+            >
               {i18n.get("OK")}
             </Button>
           )}

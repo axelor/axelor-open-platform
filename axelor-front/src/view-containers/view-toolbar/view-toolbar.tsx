@@ -427,7 +427,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
         },
         onClick: () => switchToView(key),
       };
-    });
+    }) as CommandItemProps[];
   }, [views, viewType, switchToView]);
 
   const farItems = useMemo(() => {

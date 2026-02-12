@@ -81,6 +81,7 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
         className={styles.editor}
         onSubmit={onApply}
         onKeyDown={handleKeyDown}
+        data-testid={"page-limit-form"}
       >
         <Input
           name="limit"
@@ -90,8 +91,9 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
           onFocus={(e) => e.target.select()}
           autoFocus
           style={{ width: "5rem" }}
+          data-testid={"page-limit"}
         />
-        <Button variant="secondary" type="submit">
+        <Button variant="secondary" type="submit" data-testid={"btn-apply"}>
           {i18n.get("Apply")}
         </Button>
       </form>

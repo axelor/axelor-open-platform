@@ -384,7 +384,7 @@ export function ModalDialog(props: DialogOptions) {
                   type="button"
                   variant={button.variant}
                   onClick={() => button.onClick(onCloseDialog)}
-                  data-testid={`btn:${button.name}`}
+                  data-testid={`btn-${button.name}`}
                 >
                   {button.title}
                 </Button>

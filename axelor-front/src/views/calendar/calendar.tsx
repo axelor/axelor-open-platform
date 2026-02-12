@@ -392,6 +392,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
                       close(true);
                     }
                   }}
+                  data-testid={"btn-delete"}
                 >
                   {i18n.get("Delete")}
                 </Button>
