@@ -23,5 +23,5 @@ export const AccessibleButton = withStyled(Box)((props, ref) => {
     };
   }, [element]);
 
-  return <Box ref={mergedRef} rounded focusRing role="button" {...props} />;
+  return <Box ref={mergedRef} rounded role="button" {...props} />;
 });

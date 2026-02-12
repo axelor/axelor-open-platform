@@ -44,7 +44,7 @@ export function Toggle(props: FieldProps<boolean>) {
         className={styles.toggle}
         onClick={handleClick}
         data-testid="input"
-        aria-pressed={value}
+        aria-pressed={value || undefined}
       >
         <Icon
           icon={ico}

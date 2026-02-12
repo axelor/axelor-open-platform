@@ -39,7 +39,6 @@ export function Html(props: FieldProps<string>) {
     >
       {readonly ? (
         <ViewerComponent
-          id={id}
           className={clsx({
             [styles.viewer]: translatable,
           })}

@@ -45,7 +45,6 @@ export function Rating(props: FieldProps<number>) {
     <FieldControl {...props} inputId={id}>
       {ready && (
         <AxRating
-          id={id}
           value={Number(value)}
           text={text}
           icon={ratingIcon}
