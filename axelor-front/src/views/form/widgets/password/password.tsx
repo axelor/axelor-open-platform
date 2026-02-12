@@ -138,6 +138,7 @@ function CopyPasswordButton({ text }: Readonly<{ text: string }>) {
           shadow
           arrow
           rounded
+          role={"status"}
         >
           <Box className={styles.copyToClipboard}>{i18n.get("Copied")}</Box>
         </Popper>

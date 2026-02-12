@@ -374,6 +374,7 @@ export function OneToManyEdit({
         open={popup}
         target={inputRef.current}
         placement="bottom-start"
+        role={"presentation"}
       >
         <Box d="flex">
           <ClickAwayListener onClickAway={handleClickAway}>

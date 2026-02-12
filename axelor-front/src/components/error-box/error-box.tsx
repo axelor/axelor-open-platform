@@ -129,6 +129,7 @@ export function ErrorBoxFooter({ error }: { error: Error }) {
           shadow
           arrow
           rounded
+          role={"status"}
         >
           <Box className={passwordStyles.copyToClipboard}>
             {i18n.get("Copied")}

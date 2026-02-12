@@ -46,6 +46,7 @@ export function Tooltip({
         placement="top"
         arrow
         shadow
+        role={"tooltip"}
       >
         <ClickAwayListener onClickAway={onClickAway}>
           <Box

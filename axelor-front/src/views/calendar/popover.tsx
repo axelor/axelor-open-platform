@@ -87,7 +87,15 @@ export function Popover({
   );
 
   return (
-    <Popper open shadow rounded arrow target={element} placement="bottom">
+    <Popper
+      open
+      shadow
+      rounded
+      arrow
+      target={element}
+      placement="bottom"
+      role={"dialog"}
+    >
       <ClickAwayListener onClickAway={onClose}>
         <div className={styles.popover}>
           <div className={styles.header}>

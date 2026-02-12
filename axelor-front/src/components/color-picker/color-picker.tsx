@@ -96,6 +96,7 @@ export function ColorPicker({
       target={target as HTMLElement}
       placement={lite ? "bottom" : "bottom-start"}
       arrow={false}
+      role={"dialog"}
     >
       <ClickAwayListener onClickAway={onClose}>
         <Box>
