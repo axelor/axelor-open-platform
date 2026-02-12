@@ -811,6 +811,7 @@ function KanbanCard({
         open={popover}
         target={divRef.current}
         offset={[0, 4]}
+        role={"tooltip"}
       >
         <Box
           style={{

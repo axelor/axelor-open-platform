@@ -218,9 +218,16 @@ function ColumnRenderer({
       flexGrow={1}
       flexDirection="column"
       className={styles.column}
+      data-testid={"content"}
     >
-      <Box d="flex" mb={1} p={2} justifyContent="space-between">
-        <Box d="flex">
+      <Box
+        d="flex"
+        mb={1}
+        p={2}
+        justifyContent="space-between"
+        data-testid={"header"}
+      >
+        <Box d="flex" data-testid={"title"}>
           <Button d="flex" onClick={handleCollapse} border={false} p={0} me={2}>
             <BootstrapIcon icon="chevron-down" />
           </Button>
@@ -231,10 +238,11 @@ function ColumnRenderer({
         <Box
           alignSelf="center"
           style={{ fontSize: "small" }}
+          data-testid={"pager"}
         >{`${column?.records?.length}/${page.totalCount ?? 0}`}</Box>
       </Box>
       {canCreate && onCardAdd && (
-        <Box d="flex" g={2}>
+        <Box d="flex" g={2} data-testid={"add-record"}>
           <Input
             ps={2}
             pe={2}
@@ -265,6 +273,7 @@ function ColumnRenderer({
           column={column}
           readonly={readonly}
           className={styles["record-list"]}
+          data-testid={"cards"}
         />
         {hasMore && !noData && (
           <Box d="flex" flexDirection="column" justifyContent="center" py={2}>
@@ -432,6 +441,7 @@ export function KanbanBoard({
       className={className}
       onCardMove={onCardMove}
       ColumnProps={ColumnProps}
+      data-testid="kanban"
     />
   );
 }
