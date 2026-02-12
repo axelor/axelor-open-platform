@@ -31,19 +31,17 @@ export function Barcode(props: FieldProps<string>) {
     return (
       <FieldControl {...props}>
         {isBarcodeValid && (
-          <div data-testid="barcode" data-value={value}>
-            <BarcodeUi
-              value={value}
-              height={height}
-              barWidth={barcodeWidth}
-              lineColor={barcodeLineColor}
-              displayValue={barcodeDisplayValue}
-              backgroundColor={barcodeBackgroundColor}
-              format={barcodeFormat}
-              onInvalid={() => setIsBarcodeValid(false)}
-              data-testid="barcode"
-            />
-          </div>
+          <BarcodeUi
+            value={value}
+            height={height}
+            barWidth={barcodeWidth}
+            lineColor={barcodeLineColor}
+            displayValue={barcodeDisplayValue}
+            backgroundColor={barcodeBackgroundColor}
+            format={barcodeFormat}
+            onInvalid={() => setIsBarcodeValid(false)}
+            data-testid="barcode"
+          />
         )}
       </FieldControl>
     );

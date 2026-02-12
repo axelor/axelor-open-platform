@@ -15,7 +15,7 @@ export function QrCode(props: FieldProps<string>) {
   if (readonly && value)
     return (
       <FieldControl {...props} inputId={id}>
-        <QrCodeUi id={id} value={value} height={height} data-testid="input" />
+        <QrCodeUi id={id} value={value} height={height} data-testid="qrcode" />
       </FieldControl>
     );
 
