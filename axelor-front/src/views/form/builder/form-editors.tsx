@@ -739,10 +739,11 @@ function useItemsFamily({
   const items = useAtomValue(itemsAtom);
   const isCleanInitial = !!initialItem && isClean(initialItem);
 
+  const itemsLength = items?.length;
   const ensureValid = useAtomCallback(
     useCallback(
       (get) => {
-        if (initialItem || items?.length === 0) {
+        if (initialItem || itemsLength === 0) {
           return setInvalid(widgetAtom, false);
         }
         const currItems = get(itemsAtom);
@@ -756,7 +757,7 @@ function useItemsFamily({
         itemsAtom,
         setInvalid,
         widgetAtom,
-        items?.length,
+        itemsLength,
       ],
     ),
   );
@@ -1002,6 +1003,7 @@ const RecordEditor = memo(function RecordEditor({
   const [loaded, setLoaded] = useState<DataRecord>({});
   const checkInvalidRef = useRef<() => void>(null);
 
+  /* eslint-disable react-hooks/refs */
   const editorAtom = useMemo(() => {
     const getRecord = (_value: DataRecord) => {
       const value = _value || EMPTY_RECORD;
@@ -1073,6 +1075,7 @@ const RecordEditor = memo(function RecordEditor({
       },
     );
   }, [editorFormAtom, loaded, parent, schema, valueAtom]);
+  /* eslint-enable react-hooks/refs */
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, EMPTY_RECORD, {
@@ -1170,7 +1173,9 @@ const RecordEditor = memo(function RecordEditor({
     ),
   );
 
-  checkInvalidRef.current = checkInvalid;
+  useEffect(() => {
+    checkInvalidRef.current = checkInvalid;
+  }, [checkInvalid]);
 
   const idRef = useRef<number>(null);
   const id = useAtomValue(
@@ -1254,6 +1259,7 @@ function JsonEditor(props: FormEditorProps) {
   );
 
   const editorFieldsRef = useRef<Record<string, JsonField>>({});
+  /* eslint-disable react-hooks/refs */
   const editorFieldsAtom = useMemo(() => {
     return atom((get) => {
       if (
@@ -1294,6 +1300,7 @@ function JsonEditor(props: FormEditorProps) {
       return editorFieldsRef.current;
     });
   }, [formAtom, jsonFields, modelFields]);
+  /* eslint-enable react-hooks/refs */
 
   const editorFields = useAtomValue(editorFieldsAtom);
   const jsonEditor = useMemo(
@@ -1325,6 +1332,7 @@ function JsonEditorInner({
   const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
   const jsonValueRef = useRef<DataRecord>(null);
 
+  /* eslint-disable react-hooks/refs */
   const jsonAtom = useMemo(() => {
     return atom(
       (get) => {
@@ -1373,6 +1381,7 @@ function JsonEditorInner({
       },
     );
   }, [formAtom, jsonModel, jsonNameField, valueAtom]);
+  /* eslint-enable react-hooks/refs */
 
   const jsonLayout = schema.jsonModel ? FormViewLayout : undefined;
   const jsonEditor = useMemo(() => {

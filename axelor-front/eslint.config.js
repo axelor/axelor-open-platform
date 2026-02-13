@@ -36,6 +36,7 @@ export default tseslint.config(
       // https://typescript-eslint.io/rules/no-shadow/
       "no-shadow": "off",
       "@typescript-eslint/no-shadow": "warn",
+      "react-hooks/set-state-in-effect": "off",
       // Disallow specified modules when loaded by import
       "no-restricted-imports": [
         "error",

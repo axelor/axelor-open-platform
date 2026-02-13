@@ -15,6 +15,7 @@ import {
   CommandItem,
   CommandItemProps,
   RenderCommandItemProps,
+  useRefs,
 } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
@@ -485,6 +486,8 @@ export function ViewToolBar(props: ViewToolBarProps) {
     typeof pageTextOrComp === "function" ? pageTextOrComp : undefined;
 
   const { ref, width } = useResizeDetector();
+  const actionsContainerRef = useRef<HTMLDivElement | null>(null);
+  const handleRef = useRefs(ref, actionsContainerRef);
 
   return (
     <Box
@@ -499,7 +502,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
         items={actions}
         data-testid="common-actions"
       />
-      <Box ref={ref} d="flex" className={styles.extra} gap={2}>
+      <Box ref={handleRef} d="flex" className={styles.extra} gap={2}>
         {(toolbar?.length > 0 || menubar?.length > 0) && (
           <ToolbarActions
             buttons={toolbar}
@@ -508,7 +511,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             getActionData={getActionData}
             actionExecutor={actionExecutor}
             recordHandler={recordHandler}
-            parentRef={ref}
+            parentRef={actionsContainerRef}
             parentWidth={width}
           />
         )}

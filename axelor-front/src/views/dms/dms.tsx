@@ -1037,7 +1037,9 @@ function DMSGridRow(props: GridRowProps) {
     type: DMS_NODE_TYPE,
     item: { data: data, index, type: DMS_NODE_TYPE },
   });
-  dragRef(ref);
+  useEffect(() => {
+    dragRef(ref);
+  }, [dragRef]);
 
   useEffect(() => {
     dragPreviewRef(emptyImage, { captureDraggingState: true });

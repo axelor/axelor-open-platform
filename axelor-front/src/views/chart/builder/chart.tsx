@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef } from "react";
+import { memo, useEffect, useState } from "react";
 import { Box } from "@axelor/ui";
 
 import { useWidgetComp } from "./hooks";
@@ -9,14 +9,18 @@ import classes from "./chart.module.scss";
 export const Chart = memo(function Chart(props: ChartProps) {
   const { type } = props;
   const { data: ChartComponent } = useWidgetComp(type!);
-  const { ref, height, width } = useResizeDetector();
-  const values = useRef({ height, width });
+  const { ref, height: _height, width: _width } = useResizeDetector();
+  const [height, setHeight] = useState(_height);
+  const [width, setWidth] = useState(_width);
 
-  const [$height, $width] = useMemo(() => {
-    height && (values.current.height = height);
-    width && (values.current.width = width);
-    return [height || values.current.height, width || values.current.width];
-  }, [height, width]);
+  useEffect(() => {
+    if (_height) {
+      setHeight(_height);
+    }
+    if (_width) {
+      setWidth(_width);
+    }
+  }, [_height, _width]);
 
   return (
     <Box
@@ -27,8 +31,8 @@ export const Chart = memo(function Chart(props: ChartProps) {
       flex={1}
       className={classes.chart}
     >
-      {ChartComponent && $height && $width ? (
-        <ChartComponent width={$width} height={$height} {...props} />
+      {ChartComponent && height && width ? (
+        <ChartComponent width={width} height={height} {...props} />
       ) : null}
     </Box>
   );

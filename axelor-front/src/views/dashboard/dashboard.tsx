@@ -272,10 +272,10 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   }, [hasViewCustomize, items, view, layouts]);
 
   useEffect(() => {
-    if (ref.current && width) {
+    if (width) {
       window.dispatchEvent(new Event("resize"));
     }
-  }, [ref, width]);
+  }, [width]);
 
   const onSearchValueChanged = useCallback((values: DataRecord) => {
     setContext((vals) => ({ ...vals, ...values }));

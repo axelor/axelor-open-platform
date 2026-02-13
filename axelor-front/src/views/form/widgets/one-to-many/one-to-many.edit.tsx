@@ -51,6 +51,7 @@ export function OneToManyEdit({
   const [popup, setPopup] = useState(false);
   const [state, setState] = useGridState();
   const [value, setValue] = useAtom(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     useMemo(
       () =>
         atom(
@@ -87,7 +88,7 @@ export function OneToManyEdit({
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputEl, setInputEl] = useState<HTMLInputElement | null>(null);
   const popupRef = useRef(false);
   const [records, setRecords] = useState<DataRecord[]>([]);
 
@@ -144,6 +145,7 @@ export function OneToManyEdit({
   });
 
   const onSearch = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
       const unsaved = (value || []).filter((x) => !ids.includes(x.id));
@@ -181,9 +183,8 @@ export function OneToManyEdit({
   );
 
   const focusInput = useCallback(() => {
-    const input = inputRef.current;
-    input && input.focus?.();
-  }, []);
+    inputEl && inputEl.focus?.();
+  }, [inputEl]);
 
   const onPopupViewInit = useCallback(() => {
     popupRef.current = true;
@@ -341,7 +342,7 @@ export function OneToManyEdit({
   return (
     <Box ref={containerRef} d="flex">
       <TextField
-        ref={inputRef}
+        ref={setInputEl}
         readOnly
         autoFocus={focus}
         value={`(${value?.length || 0})`}
@@ -376,7 +377,7 @@ export function OneToManyEdit({
       <Popper
         className={styles.popper}
         open={popup}
-        target={inputRef.current}
+        target={inputEl}
         placement="bottom-start"
         role={"presentation"}
       >

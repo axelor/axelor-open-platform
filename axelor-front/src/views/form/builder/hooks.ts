@@ -13,28 +13,22 @@ import { ValueAtom } from "./types";
 
 import * as WIDGETS from "../widgets";
 
-export function useWidget(schema: Schema) {
-  const compRef = useRef<React.ElementType>(null);
-  if (compRef.current) {
-    return compRef.current;
-  }
-
+export function useWidget(schema: Schema): React.ElementType | null {
   const name = toCamelCase(schema.widget) as keyof typeof WIDGETS;
   const editName = `${name}Edit` as keyof typeof WIDGETS;
   const type = toCamelCase(schema.serverType) as keyof typeof WIDGETS;
 
-  const Comp =
-    (schema.inGridEditor && WIDGETS[editName]) ||
-    WIDGETS[name] ||
-    WIDGETS[type];
-
-  compRef.current = Comp as React.ElementType;
-
-  if (!(name in WIDGETS)) {
-    console.log("Unknown widget:", schema.widget);
-  }
-
-  return compRef.current;
+  return useMemo(() => {
+    if (!(name in WIDGETS)) {
+      console.log("Unknown widget:", schema.widget);
+    }
+    return (
+      (schema.inGridEditor && WIDGETS[editName]) ||
+      WIDGETS[name] ||
+      WIDGETS[type] ||
+      null
+    );
+  }, [name, editName, type, schema.inGridEditor, schema.widget]);
 }
 
 const defaultFormatter = <T>(value?: T | null) =>

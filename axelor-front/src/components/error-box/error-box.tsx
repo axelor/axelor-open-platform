@@ -93,7 +93,7 @@ export function ErrorBox({
 }
 
 export function ErrorBoxFooter({ error }: { error: Error }) {
-  const divRef = useRef<HTMLInputElement>(null);
+  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [copied, setCopied] = useState(false);
 
   const copyStackTrace = useCallback(async () => {
@@ -116,7 +116,7 @@ export function ErrorBoxFooter({ error }: { error: Error }) {
     navigator.clipboard && (
       <Box d="flex" flex={1}>
         <Button outline variant="primary" onClick={copyStackTrace}>
-          <Box d="flex" as="span" ref={divRef}>
+          <Box d="flex" as="span" ref={setTargetElement}>
             <BootstrapIcon icon={copied ? "check-lg" : "copy"} />
             {i18n.get("Copy to clipboard")}
           </Box>
@@ -124,7 +124,7 @@ export function ErrorBoxFooter({ error }: { error: Error }) {
         <Popper
           placement="bottom"
           open={copied}
-          target={divRef.current}
+          target={targetElement}
           offset={[0, 4]}
           shadow
           arrow

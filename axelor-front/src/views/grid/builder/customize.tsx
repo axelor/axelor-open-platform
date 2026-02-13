@@ -101,10 +101,9 @@ function CustomizeDialog({
           return schemaItem;
         });
 
-      view.customViewShared = shared;
-
       return {
         ...view,
+        customViewShared: shared,
         items,
       } as GridView;
     },

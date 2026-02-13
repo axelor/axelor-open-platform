@@ -25,7 +25,7 @@ import { useSession } from "@/hooks/use-session";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { Criteria, Filter } from "@/services/client/data.types";
+import { Criteria } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { removeFilter, saveFilter } from "@/services/client/meta";
 import {
@@ -171,7 +171,7 @@ export function AdvanceSearch({
     ),
   );
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
 
   const { name, params } = useViewAction();
   const filterView = (params || {})["search-filters"] || `act:${name}`;
@@ -507,7 +507,7 @@ export function AdvanceSearch({
   );
 
   return (
-    <Box className={styles.root} ref={containerRef}>
+    <Box className={styles.root} ref={setContainerRef}>
       <SearchInput
         readonly={freeSearch === "none"}
         label={searchTextLabel}
@@ -521,7 +521,7 @@ export function AdvanceSearch({
         bg="body"
         open={open}
         className={styles.popper}
-        target={containerRef.current}
+        target={containerRef}
         placement={`bottom-${rtl ? "end" : "start"}`}
         onClose={handleClose}
       >

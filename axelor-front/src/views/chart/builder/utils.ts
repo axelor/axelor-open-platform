@@ -696,19 +696,18 @@ export function prepareTheme(type: ChartType) {
     },
     label: { color },
     emphasis: {
-      label: { color }
-    }
+      label: { color },
+    },
   };
 }
 
 export function useIsDiscrete(chartView?: ChartView) {
-  return (
-    useMemo(
-      () =>
-        chartView?.series?.some(
-          (item) => !item.groupBy || item.groupBy === chartView.xAxis,
-        ),
-      [chartView],
-    ) ?? false
+  const isDiscrete = useMemo(
+    () =>
+      chartView?.series?.some(
+        (item) => !item.groupBy || item.groupBy === chartView.xAxis,
+      ),
+    [chartView],
   );
+  return isDiscrete ?? false;
 }

@@ -67,7 +67,10 @@ function DashletTitle({
   schema: Schema;
 }) {
   const { formAtom } = useFormScope();
-  const widgetAtom = useRef(createWidgetAtom({ schema, formAtom })).current;
+  const widgetAtom = useMemo(
+    () => createWidgetAtom({ schema, formAtom }),
+    [schema, formAtom],
+  );
 
   const dashlet = useAtomValue(useDashletHandlerAtom());
   const displayTitle = dashlet.title || title;

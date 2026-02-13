@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Box, Button, Popper } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
@@ -97,7 +97,7 @@ function ShowPasswordButton({
  * Renders nothing if the clipboard API is not available.
  */
 function CopyPasswordButton({ text }: Readonly<{ text: string }>) {
-  const ref = useRef<HTMLElement>(null);
+  const [ref, setRef] = useState<HTMLElement | null>(null);
   const [copied, setCopied] = useState(false);
 
   const handleCopyPassword = useCallback(async () => {
@@ -126,14 +126,14 @@ function CopyPasswordButton({ text }: Readonly<{ text: string }>) {
           as="span"
           onClick={handleCopyPassword}
           title={i18n.get("Copy to clipboard")}
-          ref={ref}
+          ref={setRef}
         >
           <BootstrapIcon icon={copied ? "check-lg" : "copy"} />
         </Button>
         <Popper
           placement="bottom"
           open={copied}
-          target={ref.current}
+          target={ref}
           offset={[0, 4]}
           shadow
           arrow

@@ -127,6 +127,9 @@ export function ExpandableFormView({
   const showConfirmDirty = useViewConfirmDirty();
   const getErrors = useGetErrors();
 
+  // Intentionally capture the initial record only — the expandable form manages
+  // its own state via editorFormAtom and should not reset when the grid row updates.
+  // eslint-disable-next-line react-hooks/refs
   const editorRecord = useRef(record).current;
   const editorFormAtom = useMemo(
     () =>

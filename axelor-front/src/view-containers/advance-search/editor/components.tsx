@@ -43,7 +43,7 @@ const TextField = forwardRef<
 });
 
 function DateField(props: ComponentProps<typeof DateComponent>) {
-  const schema = useRef({ type: "date" }).current;
+  const schema = useMemo(() => ({ type: "date" }), []);
   return <DateComponent trapFocus {...props} schema={schema} />;
 }
 

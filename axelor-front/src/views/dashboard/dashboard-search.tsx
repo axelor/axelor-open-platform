@@ -1,5 +1,5 @@
 import { Box } from "@axelor/ui";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { ScopeProvider } from "bunshi/react";
 import { useAtomValue } from "jotai";
 
@@ -40,7 +40,7 @@ export function DashboardSearch({
 }) {
   const formRef = useRef<HTMLDivElement>(null);
 
-  const record = useRef<DataRecord>({}).current;
+  const record = useMemo<DataRecord>(() => ({}), []);
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
 

@@ -145,8 +145,8 @@ function GridInner(props: ViewProps<GridView>) {
   const { hasButton } = useViewPerms(meta);
 
   const viewRoute = useViewRoute();
-  const pageSetRef = useRef(false);
   const searchResultRef = useRef<SearchResult | null>(null);
+  const [pageSet, setPageSet] = useState(false);
   const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
   const saveIdRef = useRef<number>(null);
@@ -725,15 +725,18 @@ function GridInner(props: ViewProps<GridView>) {
   const minPage = 1;
   const maxPage = Math.ceil(totalCount / limit);
   const hasRowSelected = !!selectedRows?.length;
+
   const currentPage = useMemo(() => {
     if (dashlet) return 0;
-    const hasPageSet = pageSetRef.current;
-    pageSetRef.current = true;
-    if (hasPageSet || dataStore.records.length === 0) {
+    if (pageSet || dataStore.records.length === 0) {
       return +(viewRoute?.id || 1);
     }
     return Math.floor(offset / limit) + 1;
-  }, [dataStore, offset, limit, viewRoute?.id, dashlet]);
+  }, [dataStore, offset, limit, viewRoute?.id, dashlet, pageSet]);
+
+  useEffect(() => {
+    if (!pageSet) setPageSet(true);
+  }, [pageSet]);
 
   const updatePage = useCallback(
     (page: number) => {

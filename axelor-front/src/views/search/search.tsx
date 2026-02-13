@@ -60,7 +60,7 @@ export function Search(props: ViewProps<SearchView>) {
       }),
     [],
   );
-  const record = useRef({}).current;
+  const record = useMemo(() => ({}), []);
   const { meta } = props;
   const { view } = meta;
   const { name, selects, actionMenus, limit = DEFAULT_SEARCH_PAGE_SIZE } = view;

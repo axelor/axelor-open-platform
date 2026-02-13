@@ -34,5 +34,6 @@ export function useRoute() {
     refs.current = { location, navigate };
   }, [location, navigate]);
 
+  // eslint-disable-next-line react-hooks/refs
   return useMemo(() => ({ ...refs.current, redirect }), [redirect]);
 }

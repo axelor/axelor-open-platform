@@ -166,6 +166,7 @@ function RefItemInner(
 
   const valRef = useRef<DataRecord>(null);
 
+  /* eslint-disable react-hooks/refs */
   const refAtom: ValueAtom<DataRecord> = useMemo(() => {
     return atom(
       (get) => {
@@ -188,6 +189,7 @@ function RefItemInner(
       },
     );
   }, [relatedValueAtom, valueAtom]);
+  /* eslint-enable react-hooks/refs */
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),

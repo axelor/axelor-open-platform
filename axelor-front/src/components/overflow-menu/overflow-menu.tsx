@@ -39,9 +39,9 @@ export function OverflowMenu<T>({
     useOverflowMenu<HTMLDivElement>();
 
   const [show, setShow] = useState(false);
-  const targetRef = useRef<HTMLDivElement>(null);
+  const [targetElement, setTargetElement] = useState<HTMLDivElement | null>(null);
 
-  const iconRef = useRefs(ref, targetRef);
+  const iconRef = useRefs(ref, setTargetElement);
 
   function showMenu() {
     setShow(true);
@@ -66,7 +66,7 @@ export function OverflowMenu<T>({
       </Box>
       <Menu
         className={styles.menu}
-        target={targetRef.current}
+        target={targetElement}
         show={show}
         onHide={hideMenu}
       >

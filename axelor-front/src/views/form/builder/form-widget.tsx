@@ -66,13 +66,13 @@ export function FormWidget(props: FormWidgetProps) {
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom]),
   );
 
-  const readonly =
-    useAtomValue(
-      useMemo(
-        () => selectAtom(widgetAtom, (a) => a.attrs.readonly),
-        [widgetAtom],
-      ),
-    ) || props.readonly;
+  const attrReadonly = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetAtom, (a) => a.attrs.readonly),
+      [widgetAtom],
+    ),
+  );
+  const readonly = attrReadonly || props.readonly;
 
   const required = useAtomValue(
     useMemo(
@@ -183,7 +183,7 @@ function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {
     return valueAtom ? (
       <FormField component={Comp} {...widgetProps} valueAtom={valueAtom} />
     ) : (
-      <Comp {...widgetProps} />
+      React.createElement(Comp, widgetProps)
     );
   }
   return <Unknown {...widgetProps} />;

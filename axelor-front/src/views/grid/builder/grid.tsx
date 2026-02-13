@@ -604,26 +604,27 @@ export const Grid = forwardRef<
     [],
   );
 
-  const RowDetailsRenderer = useMemo(() => {
-    return ({
-      data,
-      onClose,
-    }: GridRowProps & {
-      onClose?: () => void;
-    }) =>
-      expandViewMeta ? (
-        <ExpandableFormView
-          gridView={view}
-          meta={expandViewMeta}
-          record={data.record!}
-          onUpdate={onUpdate}
-          onSave={onSave}
-          onDiscard={handleRecordDiscard}
-          onClose={onClose}
-        />
-      ) : null;
-    // eslint-disable-next-line
-  }, [view, onSave, onUpdate, expandViewMeta]);
+  const RowDetailsRenderer = useMemo(
+    () =>
+      ({
+        data,
+        onClose,
+      }: GridRowProps & {
+        onClose?: () => void;
+      }) =>
+        expandViewMeta ? (
+          <ExpandableFormView
+            gridView={view}
+            meta={expandViewMeta}
+            record={data.record!}
+            onUpdate={onUpdate}
+            onSave={onSave}
+            onDiscard={handleRecordDiscard}
+            onClose={onClose}
+          />
+        ) : null,
+    [view, onSave, onUpdate, expandViewMeta, handleRecordDiscard],
+  );
 
   useImperativeHandle(
     ref,
