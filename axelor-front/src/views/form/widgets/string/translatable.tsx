@@ -1,7 +1,7 @@
-import { Box, Divider, Input, InputLabel, clsx } from "@axelor/ui";
+import { Box, Button, Divider, Input, InputLabel, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -28,6 +28,7 @@ function Translations({
 }) {
   const [value, setValue] = useState(originalValue);
   const [translations, setTranslations] = useState<DataRecord[]>([]);
+  const valueInputId = useId();
 
   const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -72,26 +73,33 @@ function Translations({
   return (
     <Box d="flex" flex={1} flexDirection="column">
       <Box flex={1}>
-        <InputLabel>{i18n.get("Value")}</InputLabel>
+        <InputLabel htmlFor={valueInputId}>{i18n.get("Value")}</InputLabel>
         <Input
+          id={valueInputId}
           data-input
           type="text"
           value={value}
           onChange={handleValueChange}
+          data-testid="original-value"
         />
       </Box>
-      <Box my={2} flex={1}>
+      <Box my={2} flex={1} aria-hidden="true">
         <Divider />
       </Box>
-      <Box className={styles.list} flex={1}>
-        <Box gap={5}>
+      <Box
+        className={styles.list}
+        flex={1}
+        role="list"
+        aria-label={i18n.get("Translations")}
+      >
+        <Box gap={5} aria-hidden="true">
           <InputLabel>{i18n.get("Translation")}</InputLabel>
           <InputLabel>{i18n.get("Language")}</InputLabel>
         </Box>
         {translations.map((value, ind) => {
           if (value.$removed) return null;
           return (
-            <Box key={ind} gap={5} my={2}>
+            <Box key={ind} gap={5} my={2} role="listitem">
               <Box>
                 <Input
                   data-input
@@ -101,6 +109,8 @@ function Translations({
                   value={value.message || ""}
                   invalid={!value.message}
                   onChange={(e) => handleChange("message", e.target.value, ind)}
+                  data-testid={`translation-message-${ind}`}
+                  aria-label={i18n.get("Translation text")}
                 />
               </Box>
               <Box d="flex" alignItems="center" gap={4}>
@@ -114,23 +124,39 @@ function Translations({
                   onChange={(e) =>
                     handleChange("language", e.target.value, ind)
                   }
+                  data-testid={`translation-language-${ind}`}
+                  aria-label={i18n.get("Language code")}
                 />
-                <MaterialIcon
-                  icon="close"
-                  className={styles.icon}
+                <Button
+                  p={0}
+                  d="flex"
+                  justifyContent={"center"}
                   onClick={() =>
                     value.id
                       ? handleChange("$removed", true, ind)
                       : handleRemove(ind)
                   }
-                />
+                  data-testid={`btn-remove-translation-${ind}`}
+                  title={i18n.get("Remove translation")}
+                >
+                  <MaterialIcon icon="close" />
+                </Button>
               </Box>
             </Box>
           );
         })}
       </Box>
       <Box>
-        <MaterialIcon icon="add" className={styles.icon} onClick={handleAdd} />
+        <Button
+          p={0}
+          d="flex"
+          justifyContent={"center"}
+          onClick={handleAdd}
+          data-testid="btn-add-translation"
+          title={i18n.get("Add translation")}
+        >
+          <MaterialIcon icon="add" />
+        </Button>
       </Box>
     </Box>
   );
@@ -258,11 +284,14 @@ export function Translatable({
   const showModal = useTranslateModal({ value, onValueChange, onUpdate });
 
   return (
-    <span
+    <Button
       onClick={showModal}
-      className={clsx(styles.container, styles[position], className)}
+      className={clsx(styles[position], className)}
+      aria-haspopup="dialog"
+      aria-label={i18n.get("Manage translations")}
+      data-testid="btn-manage-translations"
     >
       <MaterialIcon icon="flag" fill />
-    </span>
+    </Button>
   );
 }
