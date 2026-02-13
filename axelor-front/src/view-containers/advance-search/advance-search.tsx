@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { Box, Divider, FocusTrap, TextField, useTheme } from "@axelor/ui";
+import { Box, Button, Divider, FocusTrap, TextField, useTheme } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 import {
   MaterialIcon,
@@ -532,7 +532,7 @@ export function AdvanceSearch({
         >
           <FocusTrap initialFocus={false} enabled={open}>
             <Box d="flex" flexDirection="column">
-              <Box d="flex" alignItems="flex-start">
+              <Box d="flex" alignItems="flex-start" data-testid={"header"}>
                 <Box as="p" mb={0} me={1} p={1} fontWeight="bold">
                   {i18n.get("Advanced Search")}
                 </Box>
@@ -542,10 +542,17 @@ export function AdvanceSearch({
                   onKeyDown={handleFilterSearchKeyDown}
                   value={searchText}
                   className={styles.searchFiltersInput}
+                  data-testid={"filters-input"}
                 />
-                <Box as="span" className={styles.icon} onClick={handleClose}>
+                <Button
+                  d={"flex"}
+                  justifyContent={"center"}
+                  className={styles.icon}
+                  onClick={handleClose}
+                  data-testid={"btn-close"}
+                >
                   <MaterialIcon icon="close" />
-                </Box>
+                </Button>
               </Box>
               <Divider />
               <Box
@@ -553,6 +560,7 @@ export function AdvanceSearch({
                 className={styles.filterList}
                 alignItems="flex-start"
                 mb={customSearch ? 0 : 1}
+                data-testid={"filters-list"}
               >
                 {(domains || []).length > 0 && (
                   <FilterList
@@ -560,6 +568,7 @@ export function AdvanceSearch({
                     items={domainsFiltered}
                     disabled={filterType === "single"}
                     onFilterCheck={handleDomainCheck}
+                    data-testid={"default-filters-list"}
                   />
                 )}
                 {(filters || []).length > 0 && (
@@ -568,6 +577,7 @@ export function AdvanceSearch({
                     items={filtersFiltered}
                     disabled={filterType === "single"}
                     onFilterCheck={handleFilterCheck}
+                    data-testid={"my-filters-list"}
                   />
                 )}
                 {!customSearch && !domains?.length && !filters?.length && (
@@ -679,6 +689,7 @@ function SearchInput({
       readOnly={readonly}
       value={value}
       className={styles.searchInput}
+      data-testid={"advance-search-input"}
       onChange={(e) => setValue(e.target.value)}
       {...(readonly
         ? {

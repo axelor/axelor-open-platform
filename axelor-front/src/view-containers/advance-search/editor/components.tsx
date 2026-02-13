@@ -292,7 +292,13 @@ export function BooleanRadio({
   onChange: ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
-    <Box d="flex" alignItems="center" ms={1} me={1}>
+    <Box
+      d="flex"
+      alignItems="center"
+      ms={1}
+      me={1}
+      data-testid={"editor-operator"}
+    >
       {options.map(({ value, label }, index: number) => (
         <Box as="label" d="flex" alignItems="center" key={index} me={2}>
           <Input

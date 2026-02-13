@@ -330,7 +330,14 @@ export function Editor({
     id && title && filters?.find((f) => f.id === id)?.title !== title;
 
   return (
-    <Box d="flex" flexDirection="column" alignItems="start" pt={2} g={2}>
+    <Box
+      d="flex"
+      flexDirection="column"
+      alignItems="start"
+      pt={2}
+      g={2}
+      data-testid={"filters-editor"}
+    >
       {(contextFields?.length ?? 0) > 0 && (
         <Box d="flex" alignItems="center" g={2}>
           <Box d="flex" alignItems="center">
@@ -405,6 +412,7 @@ export function Editor({
             onChange={(val) => setArchiveType(val?.value || "default")}
             value={ARCHIVE_OPTIONS.find((x) => x.value === archiveType)}
             renderValue={() => null}
+            data-testid={"editor-archive"}
           />
         </Box>
       </Box>
@@ -414,6 +422,8 @@ export function Editor({
         alignItems="flex-start"
         g={2}
         w={100}
+        data-testid={"editor-criteria"}
+        role={"list"}
       >
         {criteria.map((item, index: number) => (
           <Criteria
@@ -427,20 +437,35 @@ export function Editor({
         ))}
       </Box>
       <Box d="flex" alignItems="center">
-        <Button variant="link" size="sm" onClick={handleCriteriaAdd}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={handleCriteriaAdd}
+          data-testid={"btn-add"}
+        >
           {i18n.get("Add filter")}
         </Button>
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
-        <Button variant="link" size="sm" onClick={() => onClear?.()}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => onClear?.()}
+          data-testid={"btn-clear-editor"}
+        >
           {i18n.get("Clear")}
         </Button>
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
         {canExport && (
-          <Button variant="link" size="sm" onClick={() => onExport?.()}>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => onExport?.()}
+            data-testid={"btn-export"}
+          >
             {i18n.get("Export")}
           </Button>
         )}
@@ -449,7 +474,12 @@ export function Editor({
         </Box>
         {canExportFull && canExport && (
           <>
-            <Button variant="link" size="sm" onClick={() => onExport?.(true)}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => onExport?.(true)}
+              data-testid={"btn-export-full"}
+            >
               {i18n.get("Export full")}
             </Button>
             <Box className={styles.divider}>
@@ -457,7 +487,12 @@ export function Editor({
             </Box>
           </>
         )}
-        <Button variant="link" size="sm" onClick={() => onApply?.()}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => onApply?.()}
+          data-testid={"btn-apply"}
+        >
           {i18n.get("Apply")}
         </Button>
       </Box>
@@ -470,6 +505,7 @@ export function Editor({
             placeholder={i18n.get("Save filter as")}
             value={title}
             onChange={(e) => handleChange("title", e.target.value)}
+            data-testid={"filter-title"}
           />
           {canShare && (
             <FormControl title={i18n.get("Share")}>
@@ -481,6 +517,7 @@ export function Editor({
                 }
                 name={"shared"}
                 m={0}
+                data-testid={"can-share"}
               />
             </FormControl>
           )}
@@ -492,6 +529,7 @@ export function Editor({
               size="sm"
               variant="primary"
               onClick={() => handleFilterSave()}
+              data-testid={"btn-save"}
             >
               {id ? i18n.get("Update") : i18n.get("Save")}
             </Button>
@@ -502,6 +540,7 @@ export function Editor({
               size="sm"
               variant="primary"
               onClick={() => handleFilterSave(true)}
+              data-testid={"btn-save-as"}
             >
               {i18n.get("Save as")}
             </Button>
@@ -512,6 +551,7 @@ export function Editor({
               size="sm"
               variant="danger"
               onClick={() => handleFilterRemove()}
+              data-testid={"btn-delete"}
             >
               {i18n.get("Delete")}
             </Button>
