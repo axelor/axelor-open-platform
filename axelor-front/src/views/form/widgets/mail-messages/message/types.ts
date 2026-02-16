@@ -60,7 +60,7 @@ export type Message = {
   $eventType?: Message["type"];
   $files?: MessageFile[];
   $from?: MessageAuthor;
-  $canDelete?: boolean;
+  createdBy?: { id: number; [key: string]: any };
   $name?: string;
   $thread?: boolean;
   $numReplies?: number;

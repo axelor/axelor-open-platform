@@ -7,6 +7,7 @@ package com.axelor.web.socket;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import jakarta.websocket.EncodeException;
+import jakarta.websocket.SendHandler;
 import jakarta.websocket.Session;
 import java.io.IOException;
 import org.apache.shiro.subject.Subject;
@@ -22,11 +23,21 @@ public abstract class Channel {
   public abstract void onMessage(Session session, Message message);
 
   public void send(Session session, Object data) throws IOException, EncodeException {
+    Message message = createMessage(data);
+    session.getBasicRemote().sendObject(message);
+  }
+
+  public void sendAsync(Session session, Object data, SendHandler handler) {
+    Message message = createMessage(data);
+    session.getAsyncRemote().sendObject(message, handler);
+  }
+
+  private Message createMessage(Object data) {
     Message message = new Message();
     message.setChannel(getName());
     message.setType(MessageType.MSG);
     message.setData(data);
-    session.getBasicRemote().sendObject(message);
+    return message;
   }
 
   public boolean isEnabled() {

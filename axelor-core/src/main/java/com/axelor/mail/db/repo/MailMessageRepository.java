@@ -13,7 +13,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.MailException;
@@ -26,7 +25,6 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
-import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.mail.internet.InternetAddress;
@@ -324,7 +322,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     final Map<String, Object> details = Resource.toMap(message, fields);
     final List<Object> files = new ArrayList<>();
 
-    final MailFlags flags = flagsRepo.findBy(message, AuthUtils.getUser());
+    final User authUser = AuthUtils.getUser();
+    final MailFlags flags = authUser != null ? flagsRepo.findBy(message, authUser) : null;
     final List<MetaAttachment> attachments = findAttachments(message);
 
     for (MetaAttachment attachment : attachments) {
@@ -338,11 +337,14 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     }
 
     String eventType = message.getType();
-    String eventText = I18n.get("updated document");
+    String eventText = /*$$(*/ "updated document" /*)*/;
     if (MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
         || MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)) {
-      eventText = I18n.get("added comment");
-      details.put("$canDelete", Objects.equal(message.getCreatedBy(), AuthUtils.getUser()));
+      eventText = /*$$(*/ "added comment" /*)*/;
+      User createdBy = message.getCreatedBy();
+      if (createdBy != null) {
+        details.put("createdBy", Map.of("id", createdBy.getId(), "code", createdBy.getCode()));
+      }
     }
 
     final MailAddress email = message.getFrom();

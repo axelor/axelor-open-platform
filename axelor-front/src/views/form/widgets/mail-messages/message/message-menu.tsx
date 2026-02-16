@@ -3,6 +3,7 @@ import { useId, useCallback, useState } from "react";
 import { clsx, Box, Menu, MenuItem } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { i18n } from "@/services/client/i18n";
+import { session } from "@/services/client/session";
 
 import { Message, MessageFlag } from "./types";
 
@@ -25,7 +26,8 @@ export function MessageMenu({
   const baseId = useId();
   const menuId = `${baseId}-menu`;
   const _t = i18n.get;
-  const { $flags, $thread, $canDelete } = data;
+  const { $flags, $thread, createdBy } = data;
+  const $canDelete = createdBy?.id === session.info?.user?.id;
   const { isRead, isStarred, isArchived } = ($flags || {}) as MessageFlag;
 
   const showMenu = useCallback(() => {

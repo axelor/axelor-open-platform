@@ -44,7 +44,7 @@ function MessageEvent({ data }: { data: TYPES.Message }) {
   return (
     <>
       {" "}
-      {$eventText} {" - "}
+      {$eventText && i18n.get($eventText)} {" - "}
       <Box as="a" title={moment($eventTime).format("L LT")}>
         {moment($eventTime).fromNow()}
       </Box>
@@ -336,7 +336,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
 
 export function MessageBox({
   isMail,
-  inputProps: MessageInputProps,
+  inputProps: messageInputProps,
   data,
   fields,
   jsonFields,
@@ -400,7 +400,7 @@ export function MessageBox({
             <MessageInput
               focus={false}
               onSave={onComment}
-              {...MessageInputProps}
+              {...messageInputProps}
             />
           )}
         </Box>

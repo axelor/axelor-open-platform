@@ -14,7 +14,8 @@ import {
 } from "@/view-containers/views/scope";
 import { focusAtom } from "@/utils/atoms";
 import { FormAtom, WidgetProps } from "../../builder";
-import { useAfterActions, useFormRefresh } from "../../builder/scope";
+import { useAfterActions } from "../../builder/scope";
+import { getMailChannelService } from "./mail-channel.service";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
 import { DataSource } from "./utils";
@@ -45,8 +46,14 @@ async function findMessages(
 }
 
 export function MailMessages({ formAtom, schema }: WidgetProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [pagination, setPagination] = useState({
+  const [state, setState] = useState<{
+    messages: Message[];
+    hasNext: boolean;
+    offset: number;
+    limit: number;
+    total: number;
+  }>({
+    messages: [],
     hasNext: false,
     offset: 0,
     limit: schema.limit ?? 10,
@@ -54,7 +61,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   });
   const { name } = useViewAction();
   const { model, modelId: recordId } = schema;
-  const { offset, limit } = pagination;
+  const { messages, offset, limit, hasNext, total } = state;
   const { fetchTags } = useTags();
 
   const [filter, setFilter] = useState<string | undefined>(schema.filter);
@@ -126,9 +133,10 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         return null;
       };
 
-      setMessages((messages) => {
+      setState((prev) => {
+        const updated = [...prev.messages];
         for (const flags of allFlags) {
-          const message = findMessage(messages, flags.messageId);
+          const message = findMessage(updated, flags.messageId);
           if (!message) {
             console.error(`Failed to find message ${flags.messageId}`);
             continue;
@@ -138,7 +146,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
             ...flags,
           } as MessageFlag;
         }
-        return [...messages];
+        return { ...prev, messages: updated };
       });
     },
     [fetchTags],
@@ -160,25 +168,24 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       });
 
       if (parent) {
-        setMessages((msgs) => {
+        setState((prev) => {
+          const msgs = [...prev.messages];
           const msgInd = msgs.findIndex((x) => `${x.id}` === `${parent}`);
           if (msgInd > -1) {
             msgs[msgInd] = { ...msgs[msgInd], $children: data };
           }
-          return [...msgs];
+          return { ...prev, messages: msgs };
         });
       } else {
-        setMessages((msgs) =>
-          reset
+        setState((prev) => ({
+          ...prev,
+          ...options,
+          messages: reset
             ? data.map((msg: any) => ({
-                ...(msgs.find((x) => x.id === msg.id) || {}),
+                ...(prev.messages.find((x) => x.id === msg.id) || {}),
                 ...msg,
               }))
-            : [...msgs, ...data],
-        );
-        setPagination((pagination) => ({
-          ...pagination,
-          ...options,
+            : [...prev.messages, ...data],
           total: totalRecords,
           hasNext: hasNextPage,
         }));
@@ -204,12 +211,19 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       if (result) {
         const [msg] = result;
         if (!data.parent) {
-          setMessages((msgs) => [msg, ...msgs]);
-          setPagination((pager) => ({
-            ...pager,
-            total: pager.total + 1,
-            offset: pager.offset + 1,
-          }));
+          setState((prev) => {
+            const filtered = prev.messages.filter((x) => x.id !== msg.id);
+            const updated = [msg, ...filtered];
+            const messageCount = updated.length - prev.messages.length;
+            return {
+              ...prev,
+              messages: updated,
+              ...(messageCount > 0 && {
+                total: prev.total + messageCount,
+                offset: prev.offset + messageCount,
+              }),
+            };
+          });
         }
         return msg;
       }
@@ -220,33 +234,36 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const removeComment = useCallback(
     async (record: Message) => {
       const isRemoved = await DataSource.remove(record.id);
-      const msgIndex = messages.findIndex(
-        (x) => `${x.id}` === `${record?.parent?.id || record.id}`,
-      );
-      if (isRemoved && msgIndex > -1) {
+      if (!isRemoved) return;
+
+      setState((prev) => {
+        const msgs = [...prev.messages];
+        const msgIndex = msgs.findIndex(
+          (x) => `${x.id}` === `${record?.parent?.id || record.id}`,
+        );
+        if (msgIndex === -1) return prev;
+
         if (record?.parent?.id) {
-          const $children = messages[msgIndex].$children || [];
+          const $children = [...(msgs[msgIndex].$children || [])];
           const $ind = $children.findIndex((x) => `${x.id}` === `${record.id}`);
           if ($ind > -1) {
             $children.splice($ind, 1);
-            messages[msgIndex] = {
-              ...messages[msgIndex],
-              $children: $children,
-            };
+            msgs[msgIndex] = { ...msgs[msgIndex], $children };
           }
+          return { ...prev, messages: msgs };
         } else {
-          messages.splice(msgIndex, 1);
-          setPagination((pager) => ({
-            ...pager,
-            total: pager.total - 1,
-            offset: pager.offset - 1,
-          }));
+          msgs.splice(msgIndex, 1);
+          return {
+            ...prev,
+            messages: msgs,
+            total: prev.total - 1,
+            offset: prev.offset - 1,
+          };
         }
-        setMessages([...messages]);
-      }
+      });
       fetchTags();
     },
-    [messages, fetchTags],
+    [fetchTags],
   );
 
   const handleFlagsAction = useCallback(
@@ -276,7 +293,8 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       if (reload) {
         fetchAll({ offset: 0, limit }, true);
       } else {
-        setMessages((messages) => {
+        setState((prev) => {
+          const messages = [...prev.messages];
           const msgIndex = messages.findIndex(
             (x) => `${x.id}` === `${msg?.parent?.id || msg.id}`,
           );
@@ -303,7 +321,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
                   $flags: Object.assign({}, messages[msgIndex].$flags, flag),
                 }),
           };
-          return [...messages];
+          return { ...prev, messages };
         });
       }
 
@@ -324,10 +342,150 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
     onRefresh();
   }, [onRefresh]);
 
-  // register form:refresh
-  useFormRefresh(onRefresh);
+  // Subscribe to mail channel (SUB on mount, UNS on unmount)
+  useEffect(() => {
+    const mailChannelService = getMailChannelService();
+    return mailChannelService.subscribe();
+  }, []);
 
-  const { total } = pagination;
+  // Join/leave room on recordId change (JOIN/LEFT only)
+  useEffect(() => {
+    if (isMessageBox || !recordId || recordId <= 0) return;
+
+    const mailChannelService = getMailChannelService();
+    return mailChannelService.joinRoom(
+      model,
+      recordId,
+      (messages) => {
+        setState((prev) => {
+          const existingIds = new Set(prev.messages.map((m) => m.id));
+          const newMessages = messages.filter((m) => !existingIds.has(m.id));
+          if (newMessages.length === 0) return prev;
+          return {
+            ...prev,
+            messages: [...newMessages, ...prev.messages],
+            total: prev.total + newMessages.length,
+            offset: prev.offset + newMessages.length,
+          };
+        });
+      },
+      (deletedIds) => {
+        const deletedSet = new Set(deletedIds);
+        setState((prev) => {
+          let deletedCount = 0;
+          const messages = prev.messages
+            .filter((m) => {
+              if (deletedSet.has(m.id!)) {
+                deletedCount++;
+                return false;
+              }
+              return true;
+            })
+            .map((m) => {
+              if (!m.$children?.length) return m;
+              const $children = m.$children.filter(
+                (c) => !deletedSet.has(c.id!),
+              );
+              return $children.length !== m.$children.length
+                ? { ...m, $children }
+                : m;
+            });
+          if (deletedCount === 0 && messages.length === prev.messages.length)
+            return prev;
+          return {
+            ...prev,
+            messages,
+            total: prev.total - deletedCount,
+            offset: Math.max(0, prev.offset - deletedCount),
+          };
+        });
+      },
+    );
+  }, [model, recordId, isMessageBox]);
+
+  // Stable string encoding only id/relatedModel/relatedId of top-level messages.
+  // Doesn't change when $children are updated, so deletions don't cause re-joining.
+  const messageBoxRoomKey = useMemo(() => {
+    if (!isMessageBox) return "";
+    return messages
+      .filter((m) => m.relatedId && m.relatedModel)
+      .map((m) => `${m.id}::${m.relatedModel}::${m.relatedId}`)
+      .join("|");
+  }, [isMessageBox, messages]);
+
+  const messageBoxRooms = useMemo(() => {
+    return messageBoxRoomKey
+      .split("|")
+      .filter(Boolean)
+      .map((key) => {
+        const [messageId, relatedModel, relatedId] = key.split("::");
+        return {
+          messageId: Number(messageId),
+          relatedModel,
+          relatedId: Number(relatedId),
+        };
+      });
+  }, [messageBoxRoomKey]);
+
+  // Join/leave rooms for MessageBox threads to handle DELETED events
+  useEffect(() => {
+    if (!messageBoxRooms.length) return;
+
+    const mailChannelService = getMailChannelService();
+    const cleanups = messageBoxRooms.map(
+      ({ relatedId, relatedModel, messageId }) =>
+        mailChannelService.joinRoom(
+          relatedModel,
+          relatedId,
+          (newMessages) => {
+            setState((prev) => {
+              const msgs = [...prev.messages];
+              const idx = msgs.findIndex((m) => m.id === messageId);
+              if (idx === -1) return prev;
+              const existingIds = new Set(
+                (msgs[idx].$children || []).map((c) => c.id),
+              );
+              const toAdd = newMessages.filter((m) => !existingIds.has(m.id));
+              if (!toAdd.length) return prev;
+              msgs[idx] = {
+                ...msgs[idx],
+                $children: [
+                  ...toAdd.map((msg) => ({ ...msg, $thread: true })),
+                  ...(msgs[idx].$children || []),
+                ],
+                $numReplies: (msgs[idx].$numReplies ?? 0) + toAdd.length,
+              };
+              return { ...prev, messages: msgs };
+            });
+          },
+          (deletedIds) => {
+            const deletedSet = new Set(deletedIds);
+            setState((prev) => {
+              const msgs = [...prev.messages];
+              const idx = msgs.findIndex((m) => m.id === messageId);
+              if (idx === -1) return prev;
+              const $children = (msgs[idx].$children || []).filter(
+                (c) => !deletedSet.has(c.id!),
+              );
+              if ($children.length === msgs[idx].$children?.length) return prev;
+              const deletedCount =
+                (msgs[idx].$children?.length ?? 0) - $children.length;
+              msgs[idx] = {
+                ...msgs[idx],
+                $children,
+                $numReplies: Math.max(
+                  0,
+                  (msgs[idx].$numReplies ?? 0) - deletedCount,
+                ),
+              };
+              return { ...prev, messages: msgs };
+            });
+          },
+        ),
+    );
+
+    return () => cleanups.forEach((c) => c());
+  }, [messageBoxRooms]);
 
   return (
     <>
@@ -350,7 +508,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           onComment={postComment}
           onCommentRemove={removeComment}
           onAction={handleFlagsAction}
-          {...(pagination.hasNext ? { onLoad: loadMore } : {})}
+          {...(hasNext ? { onLoad: loadMore } : {})}
         />
       )}
     </>

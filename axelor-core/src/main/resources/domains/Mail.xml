@@ -48,6 +48,8 @@
     <datetime name="receivedOn" index="true" />
 
     <index columns="relatedModel,relatedId" />
+
+    <entity-listener class="com.axelor.mail.event.MailMessageListener" />
   </entity>
 
   <entity name="MailFlags" table="MAIL_FLAGS" cacheable="true" repository="none">

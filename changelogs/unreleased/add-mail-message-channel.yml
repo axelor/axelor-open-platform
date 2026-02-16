@@ -1,0 +1,7 @@
+---
+title: Add real-time mail message updates
+type: feature
+description: |
+  The mail messages widget now supports real-time updates via WebSocket.
+  This is necessary since the introduction of asynchronous audit tracking.
+  The implementation also supports distributed environments using Redis/Valkey for message broadcasting.
