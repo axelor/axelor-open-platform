@@ -1,0 +1,8 @@
+---
+title: Include date range and view mode in calendar context
+type: feature
+description: |
+  In calendar views, the context now includes the following information:
+  - `_calendarViewMode`: current view type (day, week, or month)
+  - `_calendarStartDate`: first visible date of the viewport (inclusive)
+  - `_calendarEndDate`: last visible date of the viewport (exclusive)

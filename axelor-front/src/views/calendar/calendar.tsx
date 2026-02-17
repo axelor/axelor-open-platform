@@ -1,6 +1,6 @@
 import { useAtomCallback } from "jotai/utils";
 import deepGet from "lodash/get";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
@@ -24,7 +24,6 @@ import { findView } from "@/services/client/meta-cache";
 import { CalendarView, Field, FormView } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { DataStore } from "@/services/client/data-store";
 import {
   useViewContext,
   useViewTab,
@@ -99,6 +98,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return [...new Set([...fieldNames, ...itemNames])];
   }, [meta.fields, eventStart, eventStop, colorBy]);
 
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+
   const fetchItems = useAtomCallback(
     useCallback(
       async (get, set, start: Date, end: Date) => {
@@ -142,18 +146,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
           };
         }
 
-        const opts: SearchOptions = {
-          limit: -1,
-          fields: searchNames,
-          filter: {
-            criteria: [criteria],
-          },
+        let filter: SearchOptions["filter"] = {
+          criteria: [criteria],
         };
 
         if (searchAtom) {
           const { query = {} } = get(searchAtom);
           if (query.criteria?.length) {
-            opts.filter = {
+            filter = {
               ...query,
               operator: "and",
               criteria: [
@@ -162,19 +162,31 @@ export function Calendar(props: ViewProps<CalendarView>) {
               ],
             };
           } else {
-            opts.filter = { ...opts.filter, ...query, criteria: [criteria] };
+            filter = { ...filter, ...query, criteria: [criteria] };
           }
         }
 
-        if (dashlet && opts.filter) {
+        if (dashlet) {
           const { _domainAction, ...formContext } = getViewContext() ?? {};
-          const { _domainContext } = opts.filter;
-          opts.filter._domainContext = {
-            ..._domainContext,
+          filter._domainContext = {
+            ...filter._domainContext,
             ...formContext,
           };
-          opts.filter._domainAction = _domainAction;
+          filter._domainAction = _domainAction;
         }
+
+        filter._domainContext = {
+          ...filter._domainContext,
+          _calendarViewMode: modeRef.current,
+          _calendarStartDate: start,
+          _calendarEndDate: end,
+        };
+
+        const opts: SearchOptions = {
+          limit: -1,
+          fields: searchNames,
+          filter,
+        };
 
         const { records } = await dataStore.search(opts);
         return records;
