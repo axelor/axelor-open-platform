@@ -109,6 +109,9 @@
     ],
     "onlyBuiltDependencies": [
       "esbuild"
-    ]
+    ],
+    "overrides": {
+      "axios": "1.13.5"
+    }
   }
 }
