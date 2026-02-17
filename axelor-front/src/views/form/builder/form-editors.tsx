@@ -419,22 +419,42 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const titleActions = !readonly && (
     <div className={styles.actions}>
       {canEdit && canShowIcon("edit") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Edit")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Edit")}
+          data-testid={"btn-edit"}
+        >
           <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
         </Box>
       )}
       {canView && !canEdit && canShowIcon("view") && (
-        <Box d="flex" alignItems="center" title={i18n.get("View")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("View")}
+          data-testid={"btn-view"}
+        >
           <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
         </Box>
       )}
       {canSelect && canShowIcon("select") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Select")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Select")}
+          data-testid={"btn-select"}
+        >
           <MaterialIcon icon="search" onClick={handleSelect} />
         </Box>
       )}
       {canRemove && canShowIcon("clear") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Clear")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Clear")}
+          data-testid={"btn-clear"}
+        >
           <MaterialIcon icon="cancel" onClick={handleDelete} />
         </Box>
       )}
