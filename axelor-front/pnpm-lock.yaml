@@ -76,9 +76,6 @@ importers:
       jotai-immer:
         specifier: ^0.4.1
         version: 0.4.1(immer@11.1.4)(jotai@2.17.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4))
-      jsdom:
-        specifier: ^28.0.0
-        version: 28.0.0
       libphonenumber-js:
         specifier: ^1.12.36
         version: 1.12.36
@@ -173,6 +170,9 @@ importers:
       globals:
         specifier: ^17.3.0
         version: 17.3.0
+      jsdom:
+        specifier: ^28.0.0
+        version: 28.0.0
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
