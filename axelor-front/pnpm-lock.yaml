@@ -17,8 +17,8 @@ importers:
         specifier: 0.6.2
         version: 0.6.2(@popperjs/core@2.11.8)(@types/node@24.10.13)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@babel/standalone':
-        specifier: ^7.29.0
-        version: 7.29.0
+        specifier: ^7.29.1
+        version: 7.29.1
       '@fullcalendar/core':
         specifier: ^6.1.20
         version: 6.1.20
@@ -310,8 +310,8 @@ packages:
     resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/standalone@7.29.0':
-    resolution: {integrity: sha512-ZbVDXDodISaxYugID/OCXRv6kMnADgTnHqNtSm2oBq4vHI81uFkbxXtdlSlguYe3BB4HiFwZ5kxa1kjrLMOuWg==}
+  '@babel/standalone@7.29.1':
+    resolution: {integrity: sha512-z42abD0C6fiHfgLyCWw8PYv6FCJ0IGVtSCxXk/NPykWO5LNIEGfdLDJ3HdYqlPcAhwtQ3oKH1PvNj2JGpTxQKg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
@@ -3448,7 +3448,7 @@ snapshots:
 
   '@babel/runtime@7.28.6': {}
 
-  '@babel/standalone@7.29.0': {}
+  '@babel/standalone@7.29.1': {}
 
   '@babel/template@7.28.6':
     dependencies:
