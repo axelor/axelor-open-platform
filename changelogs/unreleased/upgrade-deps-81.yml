@@ -3,7 +3,7 @@ type: Change
 description: |
   Here is the list of backend dependencies upgraded :
   
-  - Upgrade Byte Buddy from 1.17.8 to 1.18.4
+  - Upgrade Byte Buddy from 1.17.8 to 1.18.5
   - Upgrade ASM from 9.8 to 9.9.1
   - Upgrade Snakeyaml from 2.4 to 2.5
   - Upgrade Jsoup from 1.21.2 to 1.22.1
