@@ -219,8 +219,8 @@ libs.resteasy_server = [
   dependencies.create("org.jboss.resteasy:resteasy-undertow:${versions.resteasy}") {
     exclude module: "jandex", group: "org.jboss"
   },
-  "io.undertow:undertow-core:2.3.21.Final",
-  "io.undertow:undertow-servlet:2.3.21.Final"
+  "io.undertow:undertow-core:2.3.23.Final",
+  "io.undertow:undertow-servlet:2.3.23.Final"
 ]
 
 libs.swagger_jaxrs2 = [
