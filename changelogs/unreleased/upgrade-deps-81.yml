@@ -20,3 +20,4 @@ description: |
   - Upgrade Swagger from 2.2.41 to 2.2.43
   - Upgrade Undertow from 2.3.21.Final to 2.3.23.Final
   - Upgrade Hibernate ORM from 6.6.40.Final to 6.6.42.Final
+  - Upgrade Jakarta JAXB API from 4.0.4 to 4.0.5
