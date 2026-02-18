@@ -108,7 +108,7 @@ libs.jakarta_annotation = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.7.9"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.7.10"
 libs.jdbc_mysql = "com.mysql:mysql-connector-j:9.4.0"
 
 // Hibernate

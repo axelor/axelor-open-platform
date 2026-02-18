@@ -13,3 +13,4 @@ description: |
   - Upgrade Guava from 33.4.8 to 33.5.0
   - Upgrade Minio from 8.5.17 to 8.6.0
   - Upgrade Jackson from 2.19.4 to 2.21.0
+  - Upgrade PostgreSQL JDBC from 42.7.9 to 42.7.10
