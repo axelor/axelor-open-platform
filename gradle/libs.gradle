@@ -24,7 +24,7 @@ versions.junit5 = "5.14.2"
 
 versions.slf4j = "2.0.17"
 
-versions.tomcat = "10.1.50"
+versions.tomcat = "10.1.52"
 
 versions.asm = "9.9.1"
 

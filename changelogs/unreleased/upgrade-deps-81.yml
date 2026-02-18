@@ -14,3 +14,4 @@ description: |
   - Upgrade Minio from 8.5.17 to 8.6.0
   - Upgrade Jackson from 2.19.4 to 2.21.0
   - Upgrade PostgreSQL JDBC from 42.7.9 to 42.7.10
+  - Upgrade Tomcat from 10.1.50 to 10.1.52
