@@ -19,3 +19,4 @@ description: |
   - Upgrade Logback from 1.5.25 to 1.5.32
   - Upgrade Swagger from 2.2.41 to 2.2.43
   - Upgrade Undertow from 2.3.21.Final to 2.3.23.Final
+  - Upgrade Hibernate ORM from 6.6.40.Final to 6.6.42.Final
