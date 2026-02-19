@@ -24,12 +24,12 @@ class Observer implements Comparable<Observer> {
   public final Method method;
   public final Type eventActualType;
   public final Class<?> eventRawType;
-  public final Class<?> declaringClass;
+  final Class<?> bindingClass;
 
   private int priority;
   private Set<Annotation> qualifiers = new HashSet<>();
 
-  public Observer(Method method) {
+  Observer(Method method, Class<?> bindingClass) {
     assert method.getParameters().length == 1;
     final Parameter param = method.getParameters()[0];
 
@@ -44,7 +44,7 @@ class Observer implements Comparable<Observer> {
 
     this.method = method;
     this.method.setAccessible(true);
-    this.declaringClass = method.getDeclaringClass();
+    this.bindingClass = bindingClass;
     this.eventActualType = param.getParameterizedType();
     this.eventRawType = param.getType();
   }
@@ -81,13 +81,12 @@ class Observer implements Comparable<Observer> {
 
   public static boolean isObserver(Method method) {
     return !Modifier.isAbstract(method.getModifiers())
-        && !Modifier.isAbstract(method.getDeclaringClass().getModifiers())
         && method.getParameterCount() == 1
         && method.getParameters()[0].isAnnotationPresent(Observes.class);
   }
 
   public void invoke(Object event) {
-    Object target = Beans.get(this.declaringClass);
+    Object target = Beans.get(this.bindingClass);
     try {
       method.invoke(target, event);
     } catch (InvocationTargetException e) {
@@ -113,16 +112,22 @@ class Observer implements Comparable<Observer> {
     if (!(obj instanceof Observer)) return false;
     if (this == obj) return true;
     final Observer other = (Observer) obj;
-    return Objects.equals(method, other.method);
+    return Objects.equals(method, other.method) && Objects.equals(bindingClass, other.bindingClass);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(31, method);
+    return Objects.hash(31, method, bindingClass);
   }
 
   @Override
   public String toString() {
-    return "Observer(method=" + method + ", qualifiers=" + qualifiers + ")";
+    return "Observer(method="
+        + method
+        + ", bindingClass="
+        + bindingClass
+        + ", qualifiers="
+        + qualifiers
+        + ")";
   }
 }

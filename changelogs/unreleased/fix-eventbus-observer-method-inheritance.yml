@@ -1,0 +1,11 @@
+---
+title: Support observer method inheritance in EventBus
+type: fix
+description: |
+  Observer methods are now inherited by subclasses, as required by the CDI specification.
+  Previously, only methods declared directly on the bound class were discovered; inherited
+  observer methods were silently ignored.
+
+  Overriding rules are also respected: if a subclass overrides an observer method, only the
+  overriding version is invoked (the parent version is suppressed), matching standard Java
+  method override semantics.

@@ -13,12 +13,15 @@ import com.google.inject.spi.LinkedKeyBinding;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 class EventBus {
@@ -51,12 +55,34 @@ class EventBus {
         .map(Entry::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
-        .flatMap(t -> Arrays.stream(t.getDeclaredMethods()))
-        .filter(Observer::isObserver)
-        .map(Observer::new)
+        .flatMap(this::getAllObservers)
         .forEach(o -> observers.computeIfAbsent(o.eventRawType, k -> new ArrayList<>()).add(o));
     observers.values().forEach(items -> Collections.sort(items, Observer::compareTo));
     return observers;
+  }
+
+  /**
+   * Walks the full class hierarchy of {@code bindingClass} collecting all observer methods,
+   * including ones inherited from superclasses. When a subclass overrides a superclass observer
+   * method, only the subclass version is kept.
+   */
+  private Stream<Observer> getAllObservers(Class<?> bindingClass) {
+    final List<Observer> result = new ArrayList<>();
+    final Set<String> seenSignatures = new HashSet<>();
+    Class<?> current = bindingClass;
+    while (current != null && current != Object.class) {
+      for (Method method : current.getDeclaredMethods()) {
+        if (Observer.isObserver(method)
+            && (current == bindingClass || !Modifier.isPrivate(method.getModifiers()))) {
+          final String signature = method.getName() + Arrays.toString(method.getParameterTypes());
+          if (seenSignatures.add(signature)) {
+            result.add(new Observer(method, bindingClass));
+          }
+        }
+      }
+      current = current.getSuperclass();
+    }
+    return result.stream();
   }
 
   private List<Observer> find(Class<?> runtimeType, Type eventType, Set<Annotation> qualifiers) {
