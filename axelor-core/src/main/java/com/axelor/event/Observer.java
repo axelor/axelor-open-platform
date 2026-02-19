@@ -45,8 +45,11 @@ class Observer implements Comparable<Observer> {
     this.method = method;
     this.method.setAccessible(true);
     this.bindingClass = bindingClass;
-    this.eventActualType = param.getParameterizedType();
-    this.eventRawType = param.getType();
+
+    final TypeToken<?> resolvedEventType =
+        TypeToken.of(bindingClass).resolveType(param.getParameterizedType());
+    this.eventActualType = resolvedEventType.getType();
+    this.eventRawType = resolvedEventType.getRawType();
   }
 
   public boolean matches(Type eventType, Set<Annotation> qualifiers) {
