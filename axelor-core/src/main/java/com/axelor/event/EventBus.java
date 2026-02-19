@@ -20,7 +20,6 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,7 @@ class EventBus {
 
   private final Injector injector;
 
-  private final AtomicReference<Map<Class<?>, List<Observer>>> observersRef =
-      new AtomicReference<>();
+  private final AtomicReference<List<Observer>> observersRef = new AtomicReference<>();
 
   private final LoadingCache<Class<?>, Map<Entry<Type, Set<Annotation>>, List<Observer>>>
       observersCache = Caffeine.newBuilder().weakKeys().build(k -> new ConcurrentHashMap<>());
@@ -48,17 +46,15 @@ class EventBus {
     this.injector = injector;
   }
 
-  private Map<Class<?>, List<Observer>> findObservers() {
-    final Map<Class<?>, List<Observer>> observers = new HashMap<>();
-    injector.getAllBindings().entrySet().stream()
+  private List<Observer> findObservers() {
+    return injector.getAllBindings().entrySet().stream()
         .filter(entry -> !(entry.getValue() instanceof LinkedKeyBinding))
         .map(Entry::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
         .flatMap(this::getAllObservers)
-        .forEach(o -> observers.computeIfAbsent(o.eventRawType, k -> new ArrayList<>()).add(o));
-    observers.values().forEach(items -> Collections.sort(items, Observer::compareTo));
-    return observers;
+        .sorted(Observer::compareTo)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -85,27 +81,23 @@ class EventBus {
     return result.stream();
   }
 
-  private List<Observer> find(Class<?> runtimeType, Type eventType, Set<Annotation> qualifiers) {
-    final List<Observer> found =
-        observersRef
-            .updateAndGet(observers -> observers != null ? observers : findObservers())
-            .getOrDefault(runtimeType, Collections.emptyList());
+  private List<Observer> find(Type eventType, Set<Annotation> qualifiers) {
+    final List<Observer> allObservers =
+        observersRef.updateAndGet(observers -> observers != null ? observers : findObservers());
     final Set<Annotation> annotations =
         Optional.ofNullable(qualifiers).orElse(Collections.emptySet());
 
-    return found.stream()
+    return allObservers.stream()
         .filter(o -> o.matches(eventType, annotations))
         .collect(Collectors.toList());
   }
 
   public void fire(Object event, Type eventType, Set<Annotation> qualifiers) {
-    final Class<?> eventClass = event.getClass();
     final Map<Entry<Type, Set<Annotation>>, List<Observer>> observersByTypeAndQualifiers =
-        observersCache.get(eventClass);
+        observersCache.get(event.getClass());
     final List<Observer> foundObservers =
         observersByTypeAndQualifiers.computeIfAbsent(
-            new SimpleImmutableEntry<>(eventType, qualifiers),
-            k -> find(eventClass, k.getKey(), k.getValue()));
+            new SimpleImmutableEntry<>(eventType, qualifiers), k -> find(k.getKey(), k.getValue()));
     foundObservers.forEach(o -> o.invoke(event));
   }
 }
