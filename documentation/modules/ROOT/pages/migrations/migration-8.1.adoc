@@ -70,3 +70,7 @@ UPDATE mail_message set received_on = created_on;
 ----
 
 More information xref:dev-guide:modules/messaging.adoc[here].
+
+== Dependencies upgrade
+
+Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.

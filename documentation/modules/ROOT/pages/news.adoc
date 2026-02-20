@@ -5,6 +5,21 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 8.1
+
+The main highlights are :
+
+- Rearchitected entire audit tracking system to asynchronous queue-based processing
+- Make the UI fully testable with E2E frameworks (Playwright, Cypress, etc.) and compliant with accessibility standards
+- Allows fine-grained control over database sequence allocation sizes
+- Add SummaryBar feature in grid views, showing aggregated information for selected rows or current page or from custom
+action results
+- Add support to display archived records only from advance search
+- Allow dragging files directly onto binary / binary-link / image widgets, bypassing the traditional file picker dialog
+
+Please check the {github-repo-url}/blob/8.1/CHANGELOG.md[change log] for a detailed list of changes and
+the xref:ROOT:migrations/migration-8.1.adoc[8.1 migration guide].
+
 == 8.0
 
 The main highlights are :
