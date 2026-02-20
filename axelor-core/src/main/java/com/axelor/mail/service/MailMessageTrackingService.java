@@ -204,11 +204,7 @@ public class MailMessageTrackingService {
         message.setRelatedName(mapper.getNameField().get(entity).toString());
       }
     } catch (Exception e) {
-      log.error(
-          "Unable to retrieve the name field of the record {}#{}",
-          entityClass.getName(),
-          entity.getId(),
-          e);
+      // Ignore null name field
     }
 
     if (previousState == null && track.isSubscribe()) {
