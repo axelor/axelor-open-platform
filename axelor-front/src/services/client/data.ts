@@ -249,7 +249,14 @@ export class DataSource {
     const formData = new FormData();
     const url = `ws/rest/${this.model}/upload`;
 
-    formData.append("file", file);
+    let fileToUpload = file;
+    if (file.type === "message/rfc822") {
+      fileToUpload = new File([file], file.name, {
+        type: "application/octet-stream",
+      });
+    }
+    
+    formData.append("file", fileToUpload);
     formData.append("field", field);
     formData.append("request", JSON.stringify({ data }));
 

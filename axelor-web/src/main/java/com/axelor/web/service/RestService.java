@@ -400,6 +400,9 @@ public class RestService extends ResourceService {
     final boolean isAttachment = MetaFile.class.getName().equals(getModel());
     final String field = fieldPart.getBodyAsString();
     final InputStream fileStream = filePart.getBody(InputStream.class, null);
+    if (fileStream == null) {
+      return new Response().fail("file stream to upload is missing or empty");
+    }
 
     if (!isAttachment) {
       ByteArrayOutputStream out = new ByteArrayOutputStream();

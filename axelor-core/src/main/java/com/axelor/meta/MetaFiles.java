@@ -261,6 +261,7 @@ public class MetaFiles {
    */
   public File upload(InputStream chunk, long startOffset, long fileSize, String fileId)
       throws IOException {
+    Objects.requireNonNull(chunk, "input stream can't be null");
     final Path tmp = TempFiles.findTempFile(fileId);
     if ((fileSize > -1 && startOffset > fileSize)
         || (Files.exists(tmp) && Files.size(tmp) != startOffset)
