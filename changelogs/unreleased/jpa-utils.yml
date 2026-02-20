@@ -1,8 +1,0 @@
----
-title: Implement findById and getReferenceById in entity repositories
-type: feature
-description: |
-  Implement two new methods in entity repositories : 
-  
-  - `findById(Long id)` : same as `find(Long id)` but return an Optional
-  - `getReferenceById(Long id)` : retrieves a reference (proxy) to an entity without immediately loading its state

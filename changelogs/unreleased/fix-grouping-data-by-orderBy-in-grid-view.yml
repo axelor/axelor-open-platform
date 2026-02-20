@@ -1,6 +1,0 @@
----
-title: Update sorting behavior in grouped grids
-type: change
-description: |
-  On grouped grids, the grouped results can become inconsistent due to sorted fields. This automatically prioritizes 
-  grouping fields in the sort order to ensure consistent grouping records through pagination.

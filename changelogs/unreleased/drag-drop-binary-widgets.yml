@@ -1,6 +1,0 @@
----
-title: Add drag-and-drop support into the widget area
-type: feature
-description: |
-  Add support to simply drag and drop files directly into binary/binary-link/image widgets. Users can now drag files 
-  from their desktop or file explorer directly into the widget area, bypassing the traditional system file picker dialog

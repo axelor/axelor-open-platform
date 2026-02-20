@@ -1,7 +1,0 @@
----
-title: Allow displaying archived records only from advance search
-type: feature
-description: |
-  Show archived boolean is replaced by selection as follow
-  - Include archived : include the archived records
-  - Only archived    : only display the archived records.

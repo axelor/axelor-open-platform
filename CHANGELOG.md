@@ -1,3 +1,238 @@
+## 8.1.0 (2026-02-20)
+
+#### Feature
+
+* Add support to custom entity sequence allocation size
+
+  <details>
+  
+  Allows specifying custom allocation size for sequences used by entities. This can be useful for optimizing 
+  performance.
+  
+  This allows to provide custom entity sequence allocation size in multiple ways:
+  - From xml entity definition itself, using `allocationSize` attribute
+  - Sequence specific configuration defined in application settings,
+  `application.entity.sequence.%MY_SEQ%.allocation_size`
+  - Global default allocation size : `application.entity.sequence.default_allocation_size`
+  
+  When `allocationSize` is 1, it forces Hibernate to execute a `SELECT nextval('seq')` query for every single entity 
+  saved. Having an `allocationSize` greater than 1 is the performance tuner for database inserts. It controls how
+  many IDs Hibernate fetches from the database in a single network call.
+  
+  </details>
+
+* Add drag-and-drop support into the widget area
+
+  <details>
+  
+  Add support to simply drag and drop files directly into binary/binary-link/image widgets. Users can now drag files 
+  from their desktop or file explorer directly into the widget area, bypassing the traditional system file picker dialog
+  
+  </details>
+
+* Add summary bar feature in grid view
+
+  <details>
+  
+  The summary bar can be used to show summary by the selected rows, page and action in a grid view.
+  
+  </details>
+
+* Include date range and view mode in calendar context
+
+  <details>
+  
+  In calendar views, the context now includes the following information:
+  - `_calendarViewMode`: current view type (day, week, or month)
+  - `_calendarStartDate`: first visible date of the viewport (inclusive)
+  - `_calendarEndDate`: last visible date of the viewport (exclusive)
+  
+  </details>
+
+* Improve React-based HTML applications embedded
+
+  <details>
+  
+  React-based HTML applications embedded can now retrieve some information (theme/language/...) and subscribe to 
+  changes via a listener pattern.
+  
+  </details>
+
+* Allow displaying archived records only from advance search
+
+  <details>
+  
+  Show archived boolean is replaced by selection as follow
+  - Include archived : include the archived records
+  - Only archived    : only display the archived records.
+  
+  </details>
+
+* Asynchronous Queue-Based Audit Tracking
+
+  <details>
+  
+  Improved audit tracking with asynchronous queue-based processing to improve the performance.
+  Now the listener performs a lightweight capture of raw data and inserts simple `AuditLog` rows into the database. The 
+  main operation has no more complex logic executed, reducing the execution time. After the transaction commits, a 
+  background thread picks up the AuditLog entries and handle the tracking process : generate the associated mail message 
+  and emails sending.
+  
+  - Introduce `AuditLog` entity for persistent audit event storage with full state capture. It support retry logic 
+  with max retries and error tracking.
+  - For security and performance reasons, certain field types are automatically excluded from audit tracking : 
+  passwords/encrypted/binary/collection and transient fields.
+  - Tracking messages are not created immediately when a record is created/updated. Instead, they appear in the stream 
+  after a brief delay.
+  - Adaptive back-pressure mechanism controlled with following properties : 
+  `application.audit.logs.flush-threshold`, `application.audit.processor.batch-delay`, 
+  `application.audit.processor.activity-window`, `application.audit.processor.busy-backoff-interval`, 
+  `application.audit.processor.busy-backoff-max-retries` and `application.audit.processor.batch-size`.
+  
+  </details>
+
+* Add `oid` database type for binary fields
+
+  <details>
+  
+  Since 8.0, `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
+  binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
+  headaches and should only be used for specific "streaming" use cases. For compatibility reasons, this adds support to 
+  use `oid` database type for `binary` fields. This can be enabled by adding `large="true"` attribute on field definition.
+  
+  </details>
+
+* Implement findById and getReferenceById in entity repositories
+
+  <details>
+  
+  Implement two new methods in entity repositories : 
+  
+  - `findById(Long id)` : same as `find(Long id)` but return an Optional
+  - `getReferenceById(Long id)` : retrieves a reference (proxy) to an entity without immediately loading its state
+  
+  </details>
+
+* Add real-time mail message updates
+
+  <details>
+  
+  The mail messages widget now supports real-time updates via WebSocket.
+  This is necessary since the introduction of asynchronous audit tracking.
+  The implementation also supports distributed environments using Redis/Valkey for message broadcasting.
+  
+  </details>
+
+#### Change
+
+* Update sorting behavior in grouped grids
+
+  <details>
+  
+  On grouped grids, the grouped results can become inconsistent due to sorted fields. This automatically prioritizes 
+  grouping fields in the sort order to ensure consistent grouping records through pagination.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Byte Buddy from 1.17.8 to 1.18.5
+  - Upgrade ASM from 9.8 to 9.9.1
+  - Upgrade Snakeyaml from 2.4 to 2.5
+  - Upgrade Jsoup from 1.21.2 to 1.22.1
+  - Upgrade Flyway from 11.11.2 to 11.20.3
+  - Upgrade Junit from 5.13.4 to 5.14.3
+  - Upgrade Apache Commons IO from 2.20.0 to 2.21.0
+  - Upgrade Guava from 33.4.8 to 33.5.0
+  - Upgrade Minio from 8.5.17 to 8.6.0
+  - Upgrade Jackson from 2.19.4 to 2.21.0
+  - Upgrade PostgreSQL JDBC from 42.7.9 to 42.7.10
+  - Upgrade Tomcat from 10.1.50 to 10.1.52
+  - Upgrade Groovy from 4.0.29 to 4.0.30
+  - Upgrade Logback from 1.5.25 to 1.5.32
+  - Upgrade Swagger from 2.2.41 to 2.2.43
+  - Upgrade Undertow from 2.3.21.Final to 2.3.23.Final
+  - Upgrade Hibernate ORM from 6.6.40.Final to 6.6.42.Final
+  - Upgrade Jakarta JAXB API from 4.0.4 to 4.0.5
+  
+  </details>
+
+#### Deprecate
+
+* The `sequential` attribute on `entity` definition is now deprecated
+
+  <details>
+  
+  Since Hibernate 6.x, it creates a sequence per entity hierarchy instead of a single sequence `hibernate_sequence`.
+  So the `sequential` attribute is no longer needed and should be removed from entity definitions. It is marked as 
+  deprecated and will be removed in further version. All entities will now use their own sequence.
+  
+  </details>
+
+#### Fix
+
+* Automatically initialize jsonModel field for custom model forms
+
+  <details>
+  
+  When creating a new record in a custom model form view, the jsonModel field
+  is now automatically set to match the view's jsonModel value.
+  
+  This ensures custom model records are properly initialized with the correct
+  jsonModel identifier without requiring additional backend actions or manual
+  intervention.
+  
+  </details>
+
+* Fix search on grid multi-select widget field
+* Fix observer lookup for plain class event hierarchies
+
+  <details>
+  
+  Observers whose event parameter is a supertype are now correctly invoked when a subtype event
+  is fired. For example, an observer declared as `onModel(@Observes ModelEvent e)` is now
+  triggered when a `ContactEvent extends ModelEvent` is fired, as required by the CDI
+  specification.
+  
+  Previously, observer lookup used an exact class match, so supertype observers were never
+  notified for subtype events.
+  
+  </details>
+
+* Support observer method inheritance in EventBus
+
+  <details>
+  
+  Observer methods are now inherited by subclasses, as required by the CDI specification.
+  Previously, only methods declared directly on the bound class were discovered; inherited
+  observer methods were silently ignored.
+  
+  Overriding rules are also respected: if a subclass overrides an observer method, only the
+  overriding version is invoked (the parent version is suppressed), matching standard Java
+  method override semantics.
+  
+  </details>
+
+* Fix theme builder typography properties path
+* Resolve generic type variables in inherited observer methods
+
+  <details>
+  
+  When an observer method is declared in a generic base class (e.g. `onSave(@Observes SaveEvent<T>
+  event)`), the event parameter type is now correctly resolved to the concrete type argument
+  supplied by the subclass (e.g. `SaveEvent<Contact>` for `class ContactHandler extends
+  GenericHandler<Contact>`).
+  
+  Previously, the unresolved type variable `T` was used for matching, causing generic observer
+  methods to either never match or match too broadly.
+  
+  </details>
+
+
 ## 8.0.5 (2026-01-23)
 
 #### Change
