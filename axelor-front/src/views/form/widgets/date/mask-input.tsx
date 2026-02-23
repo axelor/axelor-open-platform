@@ -1,4 +1,4 @@
-import React, { FocusEvent, KeyboardEvent, forwardRef } from "react";
+import React, { FocusEvent, KeyboardEvent, forwardRef, useEffect, useRef } from "react";
 import ReactTextMask, { MaskedInputProps } from "react-text-mask";
 import { Input, InputProps } from "@axelor/ui";
 
@@ -22,7 +22,12 @@ const PLACEHOLDER = "_";
 export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
   (props, ref) => {
     const [showMask, setShowMask] = React.useState(false);
+    const frameRef = useRef<number>(0);
     const { onFocus, onKeyDown, onBlur, onChange } = props;
+
+    useEffect(() => {
+      return () => cancelAnimationFrame(frameRef.current);
+    }, []);
 
     function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
       if (["Delete", "Backspace"].includes(e.key)) {
@@ -42,9 +47,9 @@ export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
     function handleFocus(event: FocusEvent<HTMLInputElement>) {
       const inputEl = event.currentTarget;
       setShowMask(true);
-      setTimeout(function () {
+      frameRef.current = requestAnimationFrame(function () {
         moveCaretToStart(inputEl);
-      }, 10);
+      });
       onFocus?.(event);
     }
 
