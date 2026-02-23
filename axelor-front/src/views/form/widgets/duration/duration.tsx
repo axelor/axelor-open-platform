@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import padStart from "lodash/padStart";
-import { useCallback, useId, useMemo } from "react";
+import { FocusEventHandler, useCallback, useId, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
@@ -49,14 +49,12 @@ const toNumber = (val: string | number) =>
   (isNaN(val as number) ? 0 : val) as number;
 
 function toValue(value: string) {
+  if (!value || value.includes("_")) return null;
   const [hr, min, secs = 0] = value
-    .replace(/_/g, "0")
     .split(":")
     .map((x) => toNumber(parseInt(x)));
   return hr * 60 * 60 + min * 60 + secs;
 }
-
-const isValid = (value: string) => !value.includes("_");
 
 export function Duration(props: FieldProps<string | number>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
@@ -73,12 +71,25 @@ export function Duration(props: FieldProps<string | number>) {
     [big, seconds],
   );
 
-  const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
-    validate: isValid,
-    format,
-    parse: toValue,
-    schema,
-  });
+  const { value, text, setText, onChange, onBlur, onKeyDown } = useInput(
+    valueAtom,
+    {
+      format,
+      parse: toValue,
+      schema,
+    },
+  );
+
+  const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
+    (e) => {
+      onBlur(e);
+      const val = e.target.value;
+      if (!val || val.includes("_")) {
+        setText("");
+      }
+    },
+    [onBlur, setText],
+  );
 
   const displayText = useMemo(
     () => toText(value, { big, seconds }) ?? "",
@@ -101,7 +112,7 @@ export function Duration(props: FieldProps<string | number>) {
           invalid={invalid}
           required={required}
           onChange={onChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onKeyDown={onKeyDown}
           mask={[
             ...(big ? [/\d/] : []),
