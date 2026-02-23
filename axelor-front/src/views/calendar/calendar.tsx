@@ -176,6 +176,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         }
 
         filter._domainContext = {
+          ...dataStore.options?.filter?._domainContext,
           ...filter._domainContext,
           _calendarViewMode: modeRef.current,
           _calendarStartDate: start,

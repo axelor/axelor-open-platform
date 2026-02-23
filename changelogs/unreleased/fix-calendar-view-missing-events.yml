@@ -1,0 +1,8 @@
+---
+title: Fix lost action-view context in calendar views
+type: fix
+description: |
+  Calendar views with context-based domains (e.g. `self.user.id = :_userId`) displayed
+  no events because the calendar widget's `_domainContext` overwrote the action-view's
+  context variables during filter merge. The DataStore's original context is now preserved
+  by spreading it first when building the calendar's domain context.
