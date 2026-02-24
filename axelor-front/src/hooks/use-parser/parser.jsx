@@ -27,7 +27,11 @@ function ScopeTransformer({ types: t, template }) {
       "checkFunction",
       `function %%name%%(obj, key) {
         const value = obj[key];
-        if (value === Function) throw new Error("Access to 'Function' is not allowed.");
+        if (value === Function
+          || value === (async function(){}).constructor
+          || value === (function*(){}).constructor
+          || value === (async function*(){}).constructor
+        ) throw new Error("Access to 'Function' is not allowed.");
         if (value === React.createElement) throw new Error("Access to 'React.createElement' is not allowed.");
         if (value === React.createFactory) throw new Error("Access to 'React.createFactory' is not allowed.");
         if (value === React.cloneElement) throw new Error("Access to 'React.cloneElement' is not allowed.");
