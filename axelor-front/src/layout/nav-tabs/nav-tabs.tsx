@@ -48,7 +48,7 @@ export function useNavTabsSize() {
 export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const { active, items: tabs, popups, open, close } = useTabs();
   const { data: sessionInfo } = useSession();
-  const activeTabId = active?.id;
+  const activeTabId = active?.id ?? null;
 
   const [menuTarget, setMenuTarget] = useState<HTMLElement | null>(null);
   const [menuOffset, setMenuOffset] = useState<[number, number]>([0, 0]);
