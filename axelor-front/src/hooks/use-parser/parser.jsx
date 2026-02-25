@@ -4,7 +4,21 @@ import React from "react";
 
 import { sanitize } from "@/utils/sanitize";
 
-const blockedList = ["eval", "Function", "Reflect", "Proxy"];
+const blockedList = [
+  "eval",
+  "Function",
+  "Reflect",
+  "Proxy",
+  "Object",
+  "globalThis",
+  "window",
+  "self",
+  "document",
+  "__proto__",
+  "prototype",
+  "constructor",
+];
+const blockedProps = new Set(blockedList);
 const sanitizeURL = ["xlinkHref", "src", "href", "action", "formAction"];
 
 function ScopeTransformer({ types: t, template }) {
@@ -47,6 +61,25 @@ function ScopeTransformer({ types: t, template }) {
       `function %%name%%(value) {
         const isJavaScriptProtocol = /^[\\u0000-\\u001F ]*j[\\r\\n\\t]*a[\\r\\n\\t]*v[\\r\\n\\t]*a[\\r\\n\\t]*s[\\r\\n\\t]*c[\\r\\n\\t]*r[\\r\\n\\t]*i[\\r\\n\\t]*p[\\r\\n\\t]*t[\\r\\n\\t]*\\:/i;
         if (typeof value === 'string' && isJavaScriptProtocol.test(value)) throw new Error("javascript: URLs are not allowed.");
+        return value;
+      }`
+    );
+  }
+
+  function validateProperty(file) {
+    return addHelper(
+      file,
+      "checkProperty",
+      `function %%name%%(key) {
+        const blocked = ${JSON.stringify(Array.from(blockedProps))};
+        if (typeof key === 'symbol') {
+          throw new Error("Access to symbol properties is not allowed.");
+        }
+        const value = key == null ? key : String(key);
+        if (typeof value === 'string' && blocked.includes(value)) {
+          throw new Error("Access to '" + key + "' is not allowed.");
+        }
+        // Return the normalized key so coercion happens once and cannot mutate later.
         return value;
       }`
     );
@@ -256,6 +289,9 @@ function ScopeTransformer({ types: t, template }) {
 
         path.replaceWith(t.memberExpression(ctx, node));
       },
+      ThisExpression(path) {
+        throw path.buildCodeFrameError("Access to 'this' is not allowed.");
+      },
       JSXAttribute(path, state) {
         const { node } = path;
         const { name, value } = node;
@@ -312,6 +348,18 @@ function ScopeTransformer({ types: t, template }) {
             ? node.property.quasis[0].value.raw
             : node.property.name || node.property.value;
 
+        if (blockedProps.has(name)) {
+          throw path.buildCodeFrameError(
+            `Access to '${name}' is not allowed.`
+          );
+        }
+
+        if (node.computed) {
+          node.property = t.callExpression(validateProperty(state.file), [
+            node.property,
+          ]);
+        }
+
         const isCreateElement = () =>
           node.loc &&
           ["createElement", "createFactory", "cloneElement"].includes(name);
@@ -358,6 +406,18 @@ function ScopeTransformer({ types: t, template }) {
           node.property.quasis.length === 1
             ? node.property.quasis[0].value.raw
             : node.property.name || node.property.value;
+
+        if (blockedProps.has(name)) {
+          throw path.buildCodeFrameError(
+            `Access to '${name}' is not allowed.`
+          );
+        }
+
+        if (node.computed) {
+          node.property = t.callExpression(validateProperty(state.file), [
+            node.property,
+          ]);
+        }
 
         const isCreateElement = () =>
           node.loc &&

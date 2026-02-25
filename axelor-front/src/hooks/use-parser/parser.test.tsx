@@ -24,6 +24,19 @@ const context = {
 };
 
 describe("parser", () => {
+  const expectParseOrRunToThrow = (expr: string, ctx: any) => {
+    let fn;
+
+    try {
+      fn = parser.parse(expr);
+    } catch (err) {
+      expect(err).toBeDefined();
+      return;
+    }
+
+    expect(() => fn(ctx)).toThrow();
+  };
+
   it("should parse react template", async () => {
     const template = `
     <ul className={css} style={{width: 100}}>
@@ -83,8 +96,7 @@ describe("parser", () => {
     ];
 
     for (let expr of cases) {
-      let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrow();
+      expectParseOrRunToThrow(expr, context);
     }
   });
 
@@ -97,18 +109,7 @@ describe("parser", () => {
     ];
 
     for (let expr of cases) {
-      let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrow();
-    }
-  });
-
-  it("should not allow access to `eval` and `Function`", () => {
-    const cases = [
-      `eval('console.log(1)')`,
-      `new Function('x', 'console.log(x)')(1)`,
-    ];
-    for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrow();
+      expectParseOrRunToThrow(expr, context);
     }
   });
 
@@ -161,21 +162,6 @@ describe("parser", () => {
     expect(() =>
       parser.parse(`<a href={y}>Test</a> | <a href=""></a>`)(ctx)
     ).not.toThrow();
-  });
-
-  it("should handle expressions with class declaration", () => {
-    const fn = parser.parse(`
-    class Hello {
-      #message;
-      constructor(msg) { this.#message = msg; }
-      get message() { return this.#message;}
-      say() { return this.#message; }
-    }
-    const hello = new Hello('Hello!!!');
-    hello.say();
-    `);
-    const res = fn({});
-    expect(res).toEqual("Hello!!!");
   });
 
   it("should trap access to dom elements", async () => {
@@ -280,15 +266,28 @@ describe("parser", () => {
     expect(input).toBeDefined();
   });
 
-  it("should evaluate script in strict mode", () => {
-    const fn = parser.parse(`
+  it("should not allow access to `this`", () => {
+    const expr = `
     function test() {
       return this;
     }
     test();
-    `);
-    const res = fn(context);
-    expect(res).toBeUndefined();
+    `;
+    expect(() => parser.parse(expr)).toThrow();
+  });
+
+  it("should block `this.eval`, `this.Function`, and prototype pollution", () => {
+    const cases = [
+      `this.eval('console.log("this.eval")')`,
+      `this.Function('console.log("this.Function")')()`,
+      `({}).__proto__.polluted1 = 'yes'`,
+      `Array.prototype.polluted2 = 'yes'`,
+      `String[['prototype']].polluted3 = 'yes'`,
+      `let i = 0; class S extends String { toString() { return i++ ? 'prototype' : 'dummy' } }; String[new S()].polluted = 'yes'`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
   });
 
   it('should not allow re-declaring "React"', () => {
