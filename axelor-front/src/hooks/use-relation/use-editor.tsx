@@ -237,7 +237,7 @@ function Footer({
   );
 
   const handleOk = useSingleClickHandler(handleConfirm);
-  
+
   const { attachmentItem } = handler;
 
   return (

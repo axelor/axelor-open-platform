@@ -311,7 +311,7 @@ export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   colorField?: string;
   imageField?: string;
   accept?: string;
-  popupMaximized?: string;
+  popupMaximized?: "editor" | "selector" | "all";
   jsonModel?: string;
   hilites?: Hilite[];
   tooltip?: Tooltip;

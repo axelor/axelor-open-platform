@@ -24,6 +24,7 @@ export type SelectorOptions = {
   model: string;
   title?: string;
   multiple?: boolean;
+  maximize?: boolean;
   view?: GridView;
   viewName?: string;
   viewParams?: ActionView["params"];
@@ -47,6 +48,7 @@ export function useSelector() {
       viewParams,
       orderBy,
       multiple,
+      maximize,
       domain,
       context,
       limit,
@@ -92,6 +94,7 @@ export function useSelector() {
       id,
       tab,
       open: true,
+      maximize,
       onClose: () => {
         onClose?.();
       },
@@ -224,9 +227,12 @@ function Footer({
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
-  const handleClose = useCallback((result = false) => {
-    close(result);
-  }, [close]);
+  const handleClose = useCallback(
+    (result = false) => {
+      close(result);
+    },
+    [close],
+  );
 
   const handleConfirm = useCallback(async () => {
     const state = handler.data as GridState;

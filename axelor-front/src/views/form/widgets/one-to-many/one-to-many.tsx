@@ -45,6 +45,7 @@ import {
   useEditor,
   useEditorInTab,
   useSelector,
+  isPopupMaximized,
 } from "@/hooks/use-relation";
 import { useSchemaTestId } from "@/hooks/use-testid";
 import { SearchOptions, SearchResult } from "@/services/client/data";
@@ -1215,6 +1216,7 @@ function OneToManyInner({
         model,
         record: { id: null },
         readonly: false,
+        maximize: isPopupMaximized(schema, "editor"),
         viewName: formView,
         context: {
           _parent: getContext(),
@@ -1245,6 +1247,7 @@ function OneToManyInner({
       title,
       model,
       formView,
+      schema,
       getContext,
       isManyToMany,
       isCollectionTree,
@@ -1377,6 +1380,7 @@ function OneToManyInner({
       id: selectorId,
       model,
       multiple: true,
+      maximize: isPopupMaximized(schema, "selector"),
       viewName: gridView,
       orderBy: orderBy,
       domain: _domain,
@@ -1399,6 +1403,7 @@ function OneToManyInner({
     model,
     gridView,
     domain,
+    schema,
     searchLimit,
     getContext,
     beforeSelect,
