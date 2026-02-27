@@ -1,11 +1,12 @@
 import { useSetAtom } from "jotai";
 import uniq from "lodash/uniq";
-import { useCallback, useEffect, useMemo, useReducer, useState, type JSX } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type JSX } from "react";
 
 import {
   Box,
   Tree as TreeComponent,
   DndProvider as TreeProvider,
+  TreeHandle,
   TreeNode as TreeRecord,
   TreeSortColumn,
 } from "@axelor/ui";
@@ -18,7 +19,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
-import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
+import { DEFAULT_PAGE_SIZE, getDefaultPageSize } from "@/utils/app-settings.ts";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
@@ -36,10 +37,22 @@ import {
   NodeText as NodeTextComponent,
   NodeTextProps,
 } from "./renderers/node-text";
+import { LoadMoreTreeRow } from "./types";
 import { createContextParams } from "../form/builder/utils";
 import { getNodeOfTreeRecord } from "./utils";
 
 import styles from "./tree.module.scss";
+
+function isTreeFieldItem(item: TreeField | { type?: string }): item is TreeField {
+  return item.type === "field";
+}
+
+type ChildrenCacheEntry = {
+  records: TreeRecord[];
+  totalCount: number;
+  parentRecord: TreeRecord;
+  node: TreeNode;
+};
 
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
@@ -47,6 +60,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const [records, setRecords] = useState<TreeRecord[]>([]);
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
   const [resetCount, doReset] = useReducer((c) => c + 1, 0);
+  const treeRef = useRef<TreeHandle | null>(null);
+  const childrenCacheRef = useRef<Map<string, ChildrenCacheEntry>>(new Map());
+  const loadingMoreRef = useRef<Set<string>>(new Set());
   const getViewContext = useViewContext();
 
   const getContext = useCallback(
@@ -71,11 +87,14 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const getSearchOptions = useCallback(
     (node: TreeNode): Partial<SearchOptions> => {
       const { items = [] } = node;
+      const treeFields = items.filter(isTreeFieldItem);
       if (sortColumns.length === 0) return {};
       return {
         sortBy: sortColumns
           .map((col) => {
-            const $item = items.find((item: any) => item.as === col.name);
+            const $item = treeFields.find(
+              (item) => item.as === col.name,
+            );
             return $item
               ? `${col.order === "desc" ? "-" : ""}${$item.name}`
               : null;
@@ -87,19 +106,22 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   );
 
   const toTreeData = useCallback(
-    (node: TreeNode, records: DataRecord[]) => {
+    (node: TreeNode, treeRecords: DataRecord[]) => {
       const { model, draggable, items = [] } = node;
-      return records.map(
-        (record) =>
+      const treeFields = items.filter(isTreeFieldItem);
+      return treeRecords.map(
+        (treeRecord) =>
           ({
-            ...(items as TreeField[]).reduce(
-              (node, item) =>
-                item.as ? { ...node, [item.as]: node[item.name] } : node,
-              record,
+            ...treeFields.reduce(
+              (nextRecord, item) =>
+                item.as
+                  ? { ...nextRecord, [item.as]: nextRecord[item.name] }
+                  : nextRecord,
+              treeRecord,
             ),
             _draggable: draggable && isSameModelTree,
             _droppable: node === view.nodes?.[0] || isSameModelTree,
-            $key: `${model}:${record.id}`,
+            $key: `${model}:${treeRecord.id}`,
           }) as unknown as TreeRecord,
       );
     },
@@ -119,7 +141,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const columns = useMemo(() => {
     return (view.columns || []).map((column) => {
-      const attrs: any = {
+      const attrs: { title: string; width?: number } = {
         title: column.title || column.autoTitle || toTitleCase(column.name),
       };
       const type = toKebabCase(column.type ?? "");
@@ -184,6 +206,8 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const onSearch = useAfterActions(doSearch);
 
   const onRefresh = useCallback(async () => {
+    childrenCacheRef.current.clear();
+    loadingMoreRef.current.clear();
     doReset();
     await onSearch({});
   }, [doReset, onSearch]);
@@ -195,13 +219,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     onRefresh,
   });
 
-  const onSearchNode = useCallback(
-    async (treeNode: TreeRecord) => {
-      const node = getNodeOfTreeRecord(view, treeNode, true);
+  const searchChildNode = useCallback(
+    async (
+      treeNode: TreeRecord,
+      node: TreeNode,
+      options: Partial<SearchOptions> = {},
+    ) => {
       const { _domainAction, ..._domainContext } = getContext() ?? {};
-
-      if (!node) return [];
-
       const { model, domain, parent, items = [] } = node;
       const countOn = isSameModelTree ? parent : "";
       const fields = uniq(items.map((item) => item.name)) as string[];
@@ -222,12 +246,131 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         },
       });
 
-      return toTreeData(
-        node,
-        (await ds.search(getSearchOptions(node))).records,
-      );
+      return ds.search({
+        ...getSearchOptions(node),
+        limit: getDefaultPageSize(),
+        ...options,
+      });
     },
-    [view, isSameModelTree, toTreeData, getContext, getSearchOptions],
+    [isSameModelTree, getContext, getSearchOptions],
+  );
+
+  const makeLoadMoreNode = useCallback(
+    (parentKey: string, loaded: number, total: number): TreeRecord => {
+      const loadMoreData: LoadMoreTreeRow = {
+        $key: `load-more:${parentKey}`,
+        _children: false,
+        _loadMore: true,
+        _parentKey: parentKey,
+        _loadMoreLoaded: loaded,
+        _loadMoreTotal: total,
+      };
+      return {
+        ...loadMoreData,
+        data: loadMoreData,
+        children: false,
+      };
+    },
+    [],
+  );
+
+  const onSearchNode = useCallback(
+    async (treeNode: TreeRecord) => {
+      const node = getNodeOfTreeRecord(view, treeNode, true);
+      if (!node) return [];
+
+      const parentKey = treeNode.$key as string;
+      const cached = childrenCacheRef.current.get(parentKey);
+
+      if (cached) {
+        const result = [...cached.records];
+        if (cached.totalCount > cached.records.length) {
+          result.push(
+            makeLoadMoreNode(
+              parentKey,
+              cached.records.length,
+              cached.totalCount,
+            ),
+          );
+        }
+        return result;
+      }
+
+      const searchResult = await searchChildNode(treeNode, node);
+      const treeData = toTreeData(node, searchResult.records);
+      const total = searchResult.page.totalCount ?? 0;
+
+      childrenCacheRef.current.set(parentKey, {
+        records: treeData,
+        totalCount: total,
+        parentRecord: treeNode,
+        node,
+      });
+
+      const result = [...treeData];
+      if (total > treeData.length) {
+        result.push(makeLoadMoreNode(parentKey, treeData.length, total));
+      }
+      return result;
+    },
+    [view, toTreeData, searchChildNode, makeLoadMoreNode],
+  );
+
+  const onLoadMoreChildren = useCallback(
+    async (parentKey: string) => {
+      if (loadingMoreRef.current.has(parentKey)) return;
+
+      const cached = childrenCacheRef.current.get(parentKey);
+      if (!cached) return;
+      if (cached.records.length >= cached.totalCount) return;
+
+      loadingMoreRef.current.add(parentKey);
+      try {
+        const searchResult = await searchChildNode(
+          cached.parentRecord,
+          cached.node,
+          {
+            offset: cached.records.length,
+          },
+        );
+        const newTreeData = toTreeData(cached.node, searchResult.records);
+        const totalCount = searchResult.page.totalCount ?? cached.totalCount;
+
+        childrenCacheRef.current.set(parentKey, {
+          ...cached,
+          records: [...cached.records, ...newTreeData],
+          totalCount: Math.max(totalCount, cached.records.length + newTreeData.length),
+        });
+
+        await treeRef.current?.reloadChildren(parentKey);
+      } finally {
+        loadingMoreRef.current.delete(parentKey);
+      }
+    },
+    [toTreeData, searchChildNode],
+  );
+
+  const nodeRenderer = useMemo(
+    () => (props: NodeProps) => (
+      <NodeComponent
+        {...props}
+        view={view}
+        actionExecutor={actionExecutor}
+        onLoadMore={onLoadMoreChildren}
+      />
+    ),
+    [view, actionExecutor, onLoadMoreChildren],
+  );
+
+  const nodeTextRenderer = useMemo(
+    () => (props: NodeTextProps) => (
+      <NodeTextComponent
+        {...props}
+        view={view}
+        actionExecutor={actionExecutor}
+      />
+    ),
+    [view, actionExecutor],
   );
 
   const handleNodeMove = useCallback(
@@ -281,8 +424,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         return {
           ...record,
           data: (items as TreeField[]).reduce(
-            (data, item) =>
-              item.as ? { ...data, [item.as]: data[item.name] } : data,
+            (itemData, item) =>
+              item.as
+                ? { ...itemData, [item.as]: itemData[item.name] }
+                : itemData,
             { ...data, ...result },
           ),
         };
@@ -293,7 +438,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   );
 
   const handleSort = useCallback((cols?: TreeSortColumn[]) => {
-    cols && setSortColumns(cols);
+    if (!cols) return;
+    childrenCacheRef.current.clear();
+    loadingMoreRef.current.clear();
+    setSortColumns(cols);
   }, []);
 
   useAsyncEffect(async () => {
@@ -346,24 +494,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   } = dataStore?.page || {};
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
-
-  const nodeRenderer = useMemo(
-    () => (props: NodeProps) => (
-      <NodeComponent {...props} view={view} actionExecutor={actionExecutor} />
-    ),
-    [view, actionExecutor],
-  );
-
-  const nodeTextRenderer = useMemo(
-    () => (props: NodeTextProps) => (
-      <NodeTextComponent
-        {...props}
-        view={view}
-        actionExecutor={actionExecutor}
-      />
-    ),
-    [view, actionExecutor],
-  );
 
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
@@ -420,6 +550,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       )}
       <TreeProvider>
         <TreeComponent
+          ref={treeRef}
           className={styles.tree}
           columns={columns}
           records={records}

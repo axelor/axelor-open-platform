@@ -1,0 +1,9 @@
+---
+title: Add Load more option for tree view child nodes
+type: feature
+description: |
+  Tree view child nodes are now loaded in pages using the default page size
+  instead of all at once. When more children exist, a "Load more" row appears
+  at the end of the list. Previously loaded children are cached so
+  re-expanding a node does not trigger additional server calls. Refresh and
+  sort clear the cache.
