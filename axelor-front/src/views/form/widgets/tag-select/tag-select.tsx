@@ -15,6 +15,7 @@ import {
   useEditor,
   useEditorInTab,
   useSelector,
+  isPopupMaximized,
 } from "@/hooks/use-relation";
 import { useOptionLabel } from "../many-to-one/utils";
 import { DataSource } from "@/services/client/data";
@@ -214,6 +215,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         viewName: formView,
         record,
         readonly: readonly || !canEdit,
+        maximize: isPopupMaximized(schema, "editor"),
         context: {
           _parent: getContext(),
         },
@@ -228,6 +230,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       formView,
       readonly,
       canEdit,
+      schema,
       getContext,
       handleSelect,
     ],
@@ -266,6 +269,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       viewName: gridView,
       orderBy: sortBy,
       multiple: true,
+      maximize: isPopupMaximized(schema, "selector"),
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
@@ -288,6 +292,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     target,
     gridView,
     sortBy,
+    schema,
     searchLimit,
     value,
     handleChange,

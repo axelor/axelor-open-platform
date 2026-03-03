@@ -21,6 +21,7 @@ import {
   useEnsureRelated,
   useFieldRelated,
   useSelector,
+  isPopupMaximized,
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
@@ -119,6 +120,7 @@ export function ManyToOne(
         viewName: formView,
         record: $record,
         readonly,
+        maximize: isPopupMaximized(schema, "editor"),
         context: {
           _parent: getContext(),
         },
@@ -133,6 +135,7 @@ export function ManyToOne(
       title,
       target,
       formView,
+      schema,
       getContext,
       handleChange,
     ],
@@ -186,6 +189,7 @@ export function ManyToOne(
       viewName: gridView,
       orderBy: sortBy,
       multiple: false,
+      maximize: isPopupMaximized(schema, "selector"),
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
@@ -207,6 +211,7 @@ export function ManyToOne(
     target,
     gridView,
     sortBy,
+    schema,
     searchLimit,
     ensureRelated,
     handleChange,
