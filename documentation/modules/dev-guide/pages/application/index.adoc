@@ -146,6 +146,69 @@ The `include 'modules:axelor-contact'` line tells gradle to include the module
 `axelor-contact` in current build cycle. It is required to list all the modules
 used by the application in `settings.gradle` file.
 
+=== Axelor Enterprise edition usage
+
+The application also comes with an enterprise edition that brings new features such as studio, global search support,
+advance import/export, etc... Documentation for EE-specific features is marked with: `(🏷️ EE only)`
+
+To use the enterprise edition :
+
+1. Contact the sales team to obtain a commercial license
+
+2. Configure the registry
++
+.~/.gradle/gradle.properties
+[source,properties]
+----
+axelor_ee_registry_url=https://repository.axelor.com/nexus/repository/maven-enterprise/
+axelor_ee_registry_user=<your-username>
+axelor_ee_registry_password=<your-password>
+----
+
+3. Add EE maven repository to the project :
++
+.settings.gradle
+[source,gradle]
+----
+pluginManagement {
+  repositories {
+    //...
+    mavenCentral()
+    maven {
+      url = uri(providers.gradleProperty("axelor_ee_registry_url").get())
+      credentials {
+        username providers.gradleProperty("axelor_ee_registry_user").get()
+        password providers.gradleProperty("axelor_ee_registry_password").get()
+      }
+    }
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    //...
+    mavenCentral()
+    maven {
+      url = uri(providers.gradleProperty("axelor_ee_registry_url").get())
+      credentials {
+        username providers.gradleProperty("axelor_ee_registry_user").get()
+        password providers.gradleProperty("axelor_ee_registry_password").get()
+      }
+    }
+  }
+}
+----
+
+4. Enable enterprise edition in `gradle.properties` file:
++
+.gradle.properties
+[source,properties]
+----
+axelor.platform.ee = true
+----
+
+5. Build the application : `./gradlew -xtest clean build`
+
 === AOP dependencies resolution
 
 By default, Gradle resolves dependency version conflicts by using the newest version
