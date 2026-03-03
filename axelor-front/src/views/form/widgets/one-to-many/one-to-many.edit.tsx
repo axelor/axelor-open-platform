@@ -12,7 +12,7 @@ import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
-import { useEditor, useSelector } from "@/hooks/use-relation";
+import { useEditor, useSelector, isPopupMaximized } from "@/hooks/use-relation";
 import { SearchOptions } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -211,6 +211,7 @@ export function OneToManyEdit({
         model,
         record,
         readonly,
+        maximize: isPopupMaximized(schema, "editor"),
         viewName: formView,
         context: {
           _parent: getContext(),
@@ -227,6 +228,7 @@ export function OneToManyEdit({
       model,
       views,
       formView,
+      schema,
       getContext,
       setValue,
       showEditor,
@@ -260,6 +262,7 @@ export function OneToManyEdit({
     showSelector({
       model,
       multiple: true,
+      maximize: isPopupMaximized(schema, "selector"),
       viewName: gridView,
       domain: domain,
       orderBy: sortBy,
@@ -292,6 +295,7 @@ export function OneToManyEdit({
     gridView,
     domain,
     sortBy,
+    schema,
     getContext,
     searchLimit,
     canNew,

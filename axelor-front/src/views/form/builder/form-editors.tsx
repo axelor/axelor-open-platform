@@ -12,7 +12,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useEditor, useEditorInTab, useSelector } from "@/hooks/use-relation";
+import { useEditor, useEditorInTab, useSelector, isPopupMaximized } from "@/hooks/use-relation";
 import { usePermitted } from "@/hooks/use-permitted";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -349,6 +349,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           onSelect: (record) => set(valueAtom, record, true),
           record: $record,
           readonly: _readonly,
+          maximize: isPopupMaximized(schema, "editor"),
           viewName: formViewName,
         });
       },
@@ -356,6 +357,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         model,
         formViewName,
         isPermitted,
+        schema,
         showEditor,
         showEditorInTab,
         title,
@@ -371,6 +373,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           model,
           domain,
           orderBy,
+          maximize: isPopupMaximized(schema, "selector"),
           context: get(formAtom).record,
           limit: searchLimit,
           viewName: gridViewName,
@@ -389,6 +392,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         gridViewName,
         model,
         orderBy,
+        schema,
         searchLimit,
         canNew,
         showSelector,
