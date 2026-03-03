@@ -1,0 +1,8 @@
+---
+title: Fix sandbox bypass via async/generator function constructors
+type: security
+description: |
+  The expression parser sandbox only blocked the regular `Function` constructor,
+  allowing code execution through `AsyncFunction`, `GeneratorFunction`, and
+  `AsyncGeneratorFunction` constructors obtained via `.constructor` on async,
+  generator, and async generator function instances.
