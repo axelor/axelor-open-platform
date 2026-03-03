@@ -202,17 +202,13 @@ function GridInner(props: ViewProps<GridView>) {
     selectedRows: viewSelectedRows,
   });
 
+  const getGridState = useAtomCallback(
+    useCallback((get) => get(gridStateAtom), [gridStateAtom]),
+  );
+
   const selector = action?.name?.startsWith("$selector");
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
   const [records, setRecords] = useState(dataStore.records);
-
-  useEffect(
-    () =>
-      dataStore.subscribe((ds) => {
-        setRecords(ds.records);
-      }),
-    [dataStore],
-  );
 
   const onColumnCustomize = useCustomizePopup({
     view,
@@ -235,6 +231,34 @@ function GridInner(props: ViewProps<GridView>) {
   const isExpandable = widget === "expandable";
   const isTreeGrid = treeField && widget === "tree-grid";
   const hasGridExpandableView = isExpandable || isTreeGrid;
+
+  useEffect(() => {
+    // as data store records same, so no updates
+    // for tree-grid, force reset records to provide reload to expandable form
+    if (hasGridExpandableView) {
+      return dataStore.subscribe(
+        (ds) => {
+          const expandedIds = new Set(
+            getGridState()
+              .rows.filter((row) => row.expand)
+              .map((row) => row.record.id),
+          );
+          setRecords(
+            expandedIds.size > 0
+              ? ds.records.map((record) =>
+                  expandedIds.has(record.id) ? { ...record } : record,
+                )
+              : ds.records,
+          );
+        },
+        { force: true },
+      );
+    }
+
+    return dataStore.subscribe((ds) => {
+      setRecords(ds.records);
+    });
+  }, [dataStore, hasGridExpandableView, getGridState]);
 
   const { editable: _editable, onDelete: onDeleteAction, inlineHelp } = view;
   const canShowHelp = !sessionData?.user?.noHelp && inlineHelp;
@@ -331,22 +355,12 @@ function GridInner(props: ViewProps<GridView>) {
 
   const doSearch = useCallback(
     async (options: SearchOptions = {}) => {
-      const _records = dataStore.records;
-
       const result = await dataStore.search(getSearchOptions(options));
-
       searchResultRef.current = result;
       refreshSummaryBar(result);
-
-      // as data store records same, so no updates
-      // for tree-grid, force reset records to provide reload to expandable form
-      if (hasGridExpandableView && dataStore.records === _records) {
-        setRecords([...result.records]);
-      }
-
       return result;
     },
-    [dataStore, hasGridExpandableView, refreshSummaryBar, getSearchOptions],
+    [dataStore, refreshSummaryBar, getSearchOptions],
   );
 
   const onSearch = useAfterActions(doSearch);
