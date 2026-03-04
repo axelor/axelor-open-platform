@@ -35,10 +35,12 @@ const proxyAll: ProxyOptions = {
       pathname === base + "@react-refresh" ||
       pathname.startsWith(base + "@id/") ||
       pathname.startsWith(base + "@vite/") ||
+      pathname.startsWith(base + ".vite/") ||
+      pathname.startsWith(base + "__vite_ping") ||
       pathname.startsWith(base + "node_modules/") ||
       /\/theme\/([^.]+)\.json/.test(pathname)
     ) {
-      return pathname;
+      return req.url;
     }
   },
 };
