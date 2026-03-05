@@ -386,17 +386,18 @@ function ScopeTransformer({ types: t, template }) {
           throw path.buildCodeFrameError("Dynamic import() is not allowed.");
         }
       },
-      ObjectProperty(path) {
+      ObjectProperty(path, state) {
         const { node } = path;
         if (!t.isObjectPattern(path.parent)) return;
         let key;
-        if (t.isIdentifier(node.key)) {
+        if (t.isIdentifier(node.key) && !node.computed) {
           key = node.key.name;
         } else if (t.isStringLiteral(node.key)) {
           key = node.key.value;
         } else if (
           t.isTemplateLiteral(node.key) &&
-          node.key.quasis.length === 1
+          node.key.quasis.length === 1 &&
+          node.key.expressions.length === 0
         ) {
           key = node.key.quasis[0].value.raw;
         }
@@ -404,6 +405,12 @@ function ScopeTransformer({ types: t, template }) {
           throw path.buildCodeFrameError(
             `Access to '${key}' is not allowed.`
           );
+        }
+        // Wrap dynamic computed keys with runtime validation
+        if (node.computed && !key) {
+          node.key = t.callExpression(validateProperty(state.file), [
+            node.key,
+          ]);
         }
       },
       JSXAttribute(path, state) {

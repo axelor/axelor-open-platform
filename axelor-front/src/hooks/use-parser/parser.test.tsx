@@ -344,6 +344,16 @@ describe("parser", () => {
     }
   });
 
+  it("should block computed destructuring with dynamic blocked keys", () => {
+    const cases = [
+      `const key = "construct" + "or"; const {[key]: C} = "".sub; C("console.log(1)")()`,
+      `const x = "or"; const {[\`construct\${x}\`]: C} = "".sub; C("console.log(1)")()`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
   it("should not allow dynamic import()", () => {
     const cases = [
       `import('some-module')`,
