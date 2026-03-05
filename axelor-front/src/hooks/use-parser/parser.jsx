@@ -19,6 +19,12 @@ const blockedList = [
   "constructor",
 ];
 const blockedProps = new Set(blockedList);
+const allowedObjectMethods = new Set([
+  "entries",
+  "keys",
+  "values",
+  "fromEntries",
+]);
 const sanitizeURL = ["xlinkHref", "src", "href", "action", "formAction"];
 
 function ScopeTransformer({ types: t, template }) {
@@ -211,9 +217,17 @@ function ScopeTransformer({ types: t, template }) {
           t.optionalMemberExpression(obj, prop, computed, true)
       : (obj, prop, computed) => t.memberExpression(obj, prop, computed);
 
+    const isAllowedObjectAccess =
+      t.isIdentifier(node.object) &&
+      node.object.name === "Object" &&
+      !node.computed &&
+      t.isIdentifier(node.property) &&
+      allowedObjectMethods.has(node.property.name);
+
     const obj =
       node.object.name &&
       !isReact(node.object) &&
+      !isAllowedObjectAccess &&
       !scope.hasBinding(node.object.name)
         ? makeMember(ctx, node.object, node.computed)
         : node.object;
@@ -319,9 +333,20 @@ function ScopeTransformer({ types: t, template }) {
           blockedList.includes(node.name) &&
           (parent.computed || parent.property !== node)
         ) {
-          throw path.buildCodeFrameError(
-            `Access to '${node.name}' is not allowed.`
-          );
+          // Allow Object.entries/keys/values/fromEntries
+          const isAllowedObjectAccess =
+            node.name === "Object" &&
+            (t.isMemberExpression(parent) ||
+              t.isOptionalMemberExpression(parent)) &&
+            !parent.computed &&
+            parent.object === node &&
+            t.isIdentifier(parent.property) &&
+            allowedObjectMethods.has(parent.property.name);
+          if (!isAllowedObjectAccess) {
+            throw path.buildCodeFrameError(
+              `Access to '${node.name}' is not allowed.`
+            );
+          }
         }
 
         if (isReact(node)) {

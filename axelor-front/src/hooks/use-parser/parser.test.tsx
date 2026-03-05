@@ -113,6 +113,39 @@ describe("parser", () => {
     }
   });
 
+  it("should allow Object.entries/keys/values/fromEntries", () => {
+    const ctx = {
+      obj: { a: 1, b: 2, c: 3 },
+      pairs: [
+        ["x", 10],
+        ["y", 20],
+      ],
+    };
+    expect(parser.parse("Object.entries(obj)")(ctx)).toEqual([
+      ["a", 1],
+      ["b", 2],
+      ["c", 3],
+    ]);
+    expect(parser.parse("Object.keys(obj)")(ctx)).toEqual(["a", "b", "c"]);
+    expect(parser.parse("Object.values(obj)")(ctx)).toEqual([1, 2, 3]);
+    expect(parser.parse("Object.fromEntries(pairs)")(ctx)).toEqual({
+      x: 10,
+      y: 20,
+    });
+  });
+
+  it("should still block disallowed Object methods", () => {
+    const cases = [
+      `Object.assign({}, {a: 1})`,
+      `Object.create(null)`,
+      `Object.defineProperty({}, 'x', {value: 1})`,
+      `Object.getPrototypeOf({})`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
   it("should not allow access to `eval` and `Function`", () => {
     const cases = [
       `eval('console.log(1)')`,
