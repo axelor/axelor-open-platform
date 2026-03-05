@@ -195,13 +195,11 @@ function ScopeTransformer({ types: t, template }) {
   let ctx;
   let usingSanitize;
 
-  let isVisited = (() => {
-    let visited = [];
-    return (v) => {
-      if (visited.includes(v)) return true;
-      visited.push(v);
-    };
-  })();
+  const visited = new WeakSet();
+  const isVisited = (v) => {
+    if (visited.has(v)) return true;
+    visited.add(v);
+  };
 
   const jsxMemberObject = Symbol();
   const isReact = (node) => t.isIdentifier(node) && node.name === "React";
