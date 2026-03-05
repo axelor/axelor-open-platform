@@ -284,6 +284,8 @@ describe("parser", () => {
       `Array.prototype.polluted2 = 'yes'`,
       `String[['prototype']].polluted3 = 'yes'`,
       `let i = 0; class S extends String { toString() { return i++ ? 'prototype' : 'dummy' } }; String[new S()].polluted = 'yes'`,
+      `const {"__proto__": P} = {}; P.polluted = "yes"`,
+      `const {["__proto__"]: P} = {}; P.polluted = "yes"`,
     ];
     for (let expr of cases) {
       expectParseOrRunToThrow(expr, context);
@@ -292,6 +294,29 @@ describe("parser", () => {
 
   it('should not allow re-declaring "React"', () => {
     const cases = [`function test(React) {}`, `const React = {}`];
+    for (let expr of cases) {
+      expect(() => parser.parse(expr)).toThrow();
+    }
+  });
+
+  it("should block destructuring with blocked string-literal keys", () => {
+    const cases = [
+      `const {"constructor": C} = "".sub; C("console.log(1)")()`,
+      `const {"constructor": C} = [].map; C("console.log(1)")()`,
+      `const {["constructor"]: C} = "".sub; C("console.log(1)")()`,
+      `const {\`constructor\`: C} = "".sub; C("console.log(1)")()`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
+  it("should not allow dynamic import()", () => {
+    const cases = [
+      `import('some-module')`,
+      `import('data:text/javascript,export default 1')`,
+      `const m = import('some-module')`,
+    ];
     for (let expr of cases) {
       expect(() => parser.parse(expr)).toThrow();
     }

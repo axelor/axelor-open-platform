@@ -292,6 +292,34 @@ function ScopeTransformer({ types: t, template }) {
       ThisExpression(path) {
         throw path.buildCodeFrameError("Access to 'this' is not allowed.");
       },
+      "ImportExpression|Import"(path) {
+        throw path.buildCodeFrameError("Dynamic import() is not allowed.");
+      },
+      CallExpression(path) {
+        if (path.node.callee.type === "Import") {
+          throw path.buildCodeFrameError("Dynamic import() is not allowed.");
+        }
+      },
+      ObjectProperty(path) {
+        const { node } = path;
+        if (!t.isObjectPattern(path.parent)) return;
+        let key;
+        if (t.isIdentifier(node.key)) {
+          key = node.key.name;
+        } else if (t.isStringLiteral(node.key)) {
+          key = node.key.value;
+        } else if (
+          t.isTemplateLiteral(node.key) &&
+          node.key.quasis.length === 1
+        ) {
+          key = node.key.quasis[0].value.raw;
+        }
+        if (key && blockedProps.has(key)) {
+          throw path.buildCodeFrameError(
+            `Access to '${key}' is not allowed.`
+          );
+        }
+      },
       JSXAttribute(path, state) {
         const { node } = path;
         const { name, value } = node;
