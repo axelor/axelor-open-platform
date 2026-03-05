@@ -60,6 +60,20 @@ function ScopeTransformer({ types: t, template }) {
     );
   }
 
+  function validateOptionalFunction(file) {
+    return addHelper(
+      file,
+      "checkOptionalFunction",
+      `function %%name%%(obj, key) {
+        if (obj == null) return undefined;
+        return %%checkFunction%%(obj, key);
+      }`,
+      {
+        checkFunction: validateFunction(file),
+      }
+    );
+  }
+
   function validateURL(file) {
     return addHelper(
       file,
@@ -212,6 +226,8 @@ function ScopeTransformer({ types: t, template }) {
 
   function handleMemberExpression(path, state, isOptional) {
     const { node, scope } = path;
+    if (isVisited(node)) return;
+    const originalProperty = node.property;
     const makeMember = isOptional
       ? (obj, prop, computed) =>
           t.optionalMemberExpression(obj, prop, computed, true)
@@ -229,7 +245,7 @@ function ScopeTransformer({ types: t, template }) {
       !isReact(node.object) &&
       !isAllowedObjectAccess &&
       !scope.hasBinding(node.object.name)
-        ? makeMember(ctx, node.object, node.computed)
+        ? makeMember(ctx, node.object, false)
         : node.object;
 
     const name =
@@ -246,7 +262,7 @@ function ScopeTransformer({ types: t, template }) {
 
     if (node.computed) {
       node.property = t.callExpression(validateProperty(state.file), [
-        node.property,
+        originalProperty,
       ]);
     }
 
@@ -254,30 +270,42 @@ function ScopeTransformer({ types: t, template }) {
       node.loc &&
       ["createElement", "createFactory", "cloneElement"].includes(name);
     const isConstructor = () => name === "constructor";
+    const isStaticComputedProperty =
+      t.isStringLiteral(originalProperty) ||
+      t.isNumericLiteral(originalProperty) ||
+      t.isBooleanLiteral(originalProperty) ||
+      t.isNullLiteral(originalProperty) ||
+      (t.isTemplateLiteral(originalProperty) &&
+        originalProperty.expressions.length === 0);
+    const isDynamicComputedProperty = node.computed && !isStaticComputedProperty;
 
     // don't allow access to 'constructor' and `React.createElement` methods
     if (
       !t.isAssignmentExpression(path.container) &&
       (isConstructor() ||
         isCreateElement() ||
-        (t.isTemplateLiteral(node.property) &&
-          node.property.expressions.length) ||
-        (node.computed &&
-          (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
+        (t.isTemplateLiteral(originalProperty) &&
+          originalProperty.expressions.length) ||
+        isDynamicComputedProperty)
     ) {
-      path.replaceWith(
-        t.callExpression(validateFunction(state.file), [
-          obj,
-          t.isIdentifier(node.property) && !node.computed
-            ? t.stringLiteral(node.property.name)
-            : node.property,
-        ])
-      );
+      const validator = isOptional
+        ? validateOptionalFunction(state.file)
+        : validateFunction(state.file);
+      const replacement = t.callExpression(validator, [
+        obj,
+        t.isIdentifier(node.property) && !node.computed
+          ? t.stringLiteral(node.property.name)
+          : node.property,
+      ]);
+      isVisited(replacement);
+      path.replaceWith(replacement);
     } else if (
       (node.loc || node.object[jsxMemberObject]) &&
       obj !== node.object
     ) {
-      path.replaceWith(makeMember(obj, node.property, node.computed));
+      const replacement = makeMember(obj, node.property, node.computed);
+      isVisited(replacement);
+      path.replaceWith(replacement);
     }
   }
 

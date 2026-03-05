@@ -179,6 +179,16 @@ describe("parser", () => {
     expect(parser.parse("props?.data?.id")(context)).toBeUndefined();
   });
 
+  it("should support optional chaining with computed properties", () => {
+    expect(parser.parse(`props?.["data"]`)({ props: undefined })).toBeUndefined();
+    expect(
+      parser.parse(`const key = "data"; props?.[key]`)({ props: undefined })
+    ).toBeUndefined();
+    expect(
+      parser.parse(`const key = "data"; props?.[key]?.id`)({ props: undefined })
+    ).toBeUndefined();
+  });
+
   it("should not allow javascript: URLs", () => {
     // eslint-disable-next-line no-script-url
     const ctx = { x: `javascript: alert(1)`, y: "some?value=1" };
