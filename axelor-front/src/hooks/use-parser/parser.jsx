@@ -204,6 +204,69 @@ function ScopeTransformer({ types: t, template }) {
   const jsxMemberObject = Symbol();
   const isReact = (node) => t.isIdentifier(node) && node.name === "React";
 
+  function handleMemberExpression(path, state, isOptional) {
+    const { node, scope } = path;
+    const makeMember = isOptional
+      ? (obj, prop, computed) =>
+          t.optionalMemberExpression(obj, prop, computed, true)
+      : (obj, prop, computed) => t.memberExpression(obj, prop, computed);
+
+    const obj =
+      node.object.name &&
+      !isReact(node.object) &&
+      !scope.hasBinding(node.object.name)
+        ? makeMember(ctx, node.object, node.computed)
+        : node.object;
+
+    const name =
+      t.isTemplateLiteral(node.property) &&
+      node.property.quasis.length === 1
+        ? node.property.quasis[0].value.raw
+        : node.property.name || node.property.value;
+
+    if (blockedProps.has(name)) {
+      throw path.buildCodeFrameError(
+        `Access to '${name}' is not allowed.`
+      );
+    }
+
+    if (node.computed) {
+      node.property = t.callExpression(validateProperty(state.file), [
+        node.property,
+      ]);
+    }
+
+    const isCreateElement = () =>
+      node.loc &&
+      ["createElement", "createFactory", "cloneElement"].includes(name);
+    const isConstructor = () => name === "constructor";
+
+    // don't allow access to 'constructor' and `React.createElement` methods
+    if (
+      !t.isAssignmentExpression(path.container) &&
+      (isConstructor() ||
+        isCreateElement() ||
+        (t.isTemplateLiteral(node.property) &&
+          node.property.expressions.length) ||
+        (node.computed &&
+          (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
+    ) {
+      path.replaceWith(
+        t.callExpression(validateFunction(state.file), [
+          obj,
+          t.isIdentifier(node.property) && !node.computed
+            ? t.stringLiteral(node.property.name)
+            : node.property,
+        ])
+      );
+    } else if (
+      (node.loc || node.object[jsxMemberObject]) &&
+      obj !== node.object
+    ) {
+      path.replaceWith(makeMember(obj, node.property, node.computed));
+    }
+  }
+
   return {
     visitor: {
       Program: {
@@ -360,122 +423,10 @@ function ScopeTransformer({ types: t, template }) {
         }
       },
       OptionalMemberExpression(path, state) {
-        const { node, scope } = path;
-        const obj =
-          node.object.name &&
-          !isReact(node.object) &&
-          !scope.hasBinding(node.object.name)
-            ? t.optionalMemberExpression(ctx, node.object, node.computed, true)
-            : node.object;
-
-        const name =
-          t.isTemplateLiteral(node.property) &&
-          node.property.quasis.length === 1
-            ? node.property.quasis[0].value.raw
-            : node.property.name || node.property.value;
-
-        if (blockedProps.has(name)) {
-          throw path.buildCodeFrameError(
-            `Access to '${name}' is not allowed.`
-          );
-        }
-
-        if (node.computed) {
-          node.property = t.callExpression(validateProperty(state.file), [
-            node.property,
-          ]);
-        }
-
-        const isCreateElement = () =>
-          node.loc &&
-          ["createElement", "createFactory", "cloneElement"].includes(name);
-        const isConstructor = () => name === "constructor";
-
-        // don't allow access to 'constructor' and `React.createElement` methods
-        if (
-          !t.isAssignmentExpression(path.container) &&
-          (isConstructor() ||
-            isCreateElement() ||
-            (t.isTemplateLiteral(node.property) &&
-              node.property.expressions.length) ||
-            (node.computed &&
-              (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
-        ) {
-          path.replaceWith(
-            t.callExpression(validateFunction(state.file), [
-              obj,
-              t.isIdentifier(node.property) && !node.computed
-                ? t.stringLiteral(node.property.name)
-                : node.property,
-            ])
-          );
-        } else if (
-          (node.loc || node.object[jsxMemberObject]) &&
-          obj !== node.object
-        ) {
-          path.replaceWith(
-            t.optionalMemberExpression(obj, node.property, node.computed, true)
-          );
-        }
+        handleMemberExpression(path, state, true);
       },
       MemberExpression(path, state) {
-        const { node, scope } = path;
-        const obj =
-          node.object.name &&
-          !isReact(node.object) &&
-          !scope.hasBinding(node.object.name)
-            ? t.memberExpression(ctx, node.object)
-            : node.object;
-
-        const name =
-          t.isTemplateLiteral(node.property) &&
-          node.property.quasis.length === 1
-            ? node.property.quasis[0].value.raw
-            : node.property.name || node.property.value;
-
-        if (blockedProps.has(name)) {
-          throw path.buildCodeFrameError(
-            `Access to '${name}' is not allowed.`
-          );
-        }
-
-        if (node.computed) {
-          node.property = t.callExpression(validateProperty(state.file), [
-            node.property,
-          ]);
-        }
-
-        const isCreateElement = () =>
-          node.loc &&
-          ["createElement", "createFactory", "cloneElement"].includes(name);
-        const isConstructor = () => name === "constructor";
-
-        // don't allow access to 'constructor' and `React.createElement` methods
-        if (
-          !t.isAssignmentExpression(path.container) &&
-          (isConstructor() ||
-            isCreateElement() ||
-            (t.isTemplateLiteral(node.property) &&
-              node.property.expressions.length) ||
-            (node.computed &&
-              (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
-        ) {
-          path.replaceWith(
-            t.callExpression(validateFunction(state.file), [
-              obj,
-              t.isIdentifier(node.property) && !node.computed
-                ? t.stringLiteral(node.property.name)
-                : node.property,
-            ])
-          );
-        } else if (
-          (node.loc || node.object[jsxMemberObject]) &&
-          obj !== node.object
-        ) {
-          path.replaceWith(
-            t.memberExpression(obj, node.property, node.computed)
-          );
-        }
+        handleMemberExpression(path, state, false);
       },
     },
   };
