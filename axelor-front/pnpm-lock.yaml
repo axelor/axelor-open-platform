@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: 0.6.2
-        version: 0.6.2(@popperjs/core@2.11.8)(@types/node@24.10.13)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
+        specifier: 0.6.3
+        version: 0.6.3(@popperjs/core@2.11.8)(@types/node@24.10.13)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@babel/standalone':
         specifier: ^7.29.1
         version: 7.29.1
@@ -227,8 +227,8 @@ packages:
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
-  '@axelor/ui@0.6.2':
-    resolution: {integrity: sha512-npWI80GCxLRlt8B6v63VPi3ZClNSpWctvhLZAh5dsi0ScLMNWwwXvE/nyK0+unvGZhRGJgofedlNQouDoF2w4Q==}
+  '@axelor/ui@0.6.3':
+    resolution: {integrity: sha512-t0N0L7uv9FqTJu0gjt3udxRtdFdtxgfLy7oTjknNvJR5Uo0mWU7b0GKD7gc+MestW1UP9INmSS7YY3iU537Fug==}
     engines: {node: '>=24.13.0'}
     peerDependencies:
       react: ^19.2.4
@@ -3329,7 +3329,7 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@axelor/ui@0.6.2(@popperjs/core@2.11.8)(@types/node@24.10.13)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
+  '@axelor/ui@0.6.3(@popperjs/core@2.11.8)(@types/node@24.10.13)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@floating-ui/react': 0.27.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
