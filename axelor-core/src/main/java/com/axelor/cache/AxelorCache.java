@@ -6,6 +6,7 @@ package com.axelor.cache;
 
 import jakarta.annotation.Nullable;
 import java.io.Closeable;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +64,10 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
    * @return an unmodifiable mapping of keys to values for the specified keys in this cache
    */
   default Map<K, V> getAll(Set<K> keys) {
-    return keys.stream().collect(Collectors.toUnmodifiableMap(Function.identity(), this::get));
+    return keys.stream()
+        .map(key -> new SimpleImmutableEntry<>(key, get(key)))
+        .filter(e -> e.getValue() != null)
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**

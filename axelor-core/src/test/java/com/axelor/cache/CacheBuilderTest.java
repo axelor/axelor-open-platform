@@ -358,8 +358,30 @@ class CacheBuilderTest {
   private void doGetAllOperations(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
     useCache(
+        cacheBuilderFactory.apply("test-get-all").build(),
+        cache -> {
+          // Existing
+          var initial =
+              Map.of(
+                  "key1", "value1",
+                  "key2", "value2",
+                  "key3", "value3");
+          cache.putAll(initial);
+
+          assertEquals(
+              initial, cache.getAll(initial.keySet()), "Should return all existing values");
+
+          // Mixed existing/missing
+          var mixedKeys = Set.of("key1", "key3", "key4");
+          var expectedMixed = Map.of("key1", "value1", "key3", "value3");
+
+          assertEquals(
+              expectedMixed, cache.getAll(mixedKeys), "Should return only existing values");
+        });
+
+    useCache(
         cacheBuilderFactory
-            .apply("test-get-all")
+            .apply("test-get-all-loading")
             .build(key -> key.startsWith("load-") ? "loaded-" + key : null),
         cache -> {
           // Existing
