@@ -35,7 +35,8 @@ public class DistributedFactory {
    * @return distributed reentrant lock or no-op lock if cache is not distributed
    */
   public static Lock getLockIfDistributed(String name) {
-    return distributedService.getLockIfDistributed(name);
+    return distributedService.getLockIfDistributed(
+        stackWalker.getCallerClass().getName() + ":" + name);
   }
 
   /**
