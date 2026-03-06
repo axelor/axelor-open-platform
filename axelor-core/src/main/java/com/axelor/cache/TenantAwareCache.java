@@ -43,7 +43,7 @@ class TenantAwareCache<K, V> implements AxelorCache<K, V> {
                     try {
                       innerCache.close();
                     } catch (Exception e) {
-                      log.error("Failed to close cache for tenant %s".formatted(innerCache), e);
+                      log.error("Failed to close cache for tenant %s".formatted(tenantId), e);
                     }
                   }
                 })
