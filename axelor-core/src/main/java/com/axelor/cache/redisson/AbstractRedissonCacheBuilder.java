@@ -7,7 +7,10 @@ package com.axelor.cache.redisson;
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheLoader;
+import com.axelor.cache.TenantAwareCache;
+import com.axelor.cache.TenantAwareDistributedCache;
 import java.time.Duration;
+import java.util.function.Function;
 import org.redisson.api.RMap;
 import org.redisson.api.map.MapLoader;
 import org.redisson.api.options.ExMapOptions;
@@ -56,6 +59,12 @@ public abstract class AbstractRedissonCacheBuilder<
     var redissonCache = (AxelorCache<K1, V1>) newConfiguredCache(cache);
 
     return redissonCache;
+  }
+
+  @Override
+  protected <K1 extends K, V1 extends V> TenantAwareCache<K1, V1> createTenantAwareCache(
+      Function<String, AxelorCache<K1, V1>> cacheFactory) {
+    return new TenantAwareDistributedCache<>(cacheFactory);
   }
 
   private O newPrefixedOptions(String name) {

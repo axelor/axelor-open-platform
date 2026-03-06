@@ -8,6 +8,7 @@ import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.event.RemovalListener;
 import com.axelor.db.tenants.TenantModule;
 import java.time.Duration;
+import java.util.function.Function;
 
 /**
  * A builder of {@link AxelorCache} instances
@@ -255,7 +256,7 @@ public abstract class CacheBuilder<K, V> {
    */
   public final <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
     if (isTenantAware() && TenantModule.isEnabled()) {
-      return new TenantAwareCache<>(
+      return createTenantAwareCache(
           tenant -> buildCache("%s:%s".formatted(tenant, getCacheName())));
     } else {
       return buildCache(getCacheName());
@@ -277,11 +278,16 @@ public abstract class CacheBuilder<K, V> {
   public final <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
       CacheLoader<? super K1, V1> loader) {
     if (isTenantAware() && TenantModule.isEnabled()) {
-      return new TenantAwareCache<>(
+      return createTenantAwareCache(
           tenant -> buildCache("%s:%s".formatted(tenant, getCacheName()), loader));
     } else {
       return buildCache(getCacheName(), loader);
     }
+  }
+
+  protected <K1 extends K, V1 extends V> TenantAwareCache<K1, V1> createTenantAwareCache(
+      Function<String, AxelorCache<K1, V1>> cacheFactory) {
+    return new TenantAwareCache<>(cacheFactory);
   }
 
   protected abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(

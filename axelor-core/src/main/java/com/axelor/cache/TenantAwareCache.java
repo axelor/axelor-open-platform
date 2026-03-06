@@ -5,9 +5,11 @@
 package com.axelor.cache;
 
 import com.axelor.db.tenants.TenantResolver;
+import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,29 +27,36 @@ import org.slf4j.LoggerFactory;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-class TenantAwareCache<K, V> implements AxelorCache<K, V> {
+public class TenantAwareCache<K, V> implements AxelorCache<K, V> {
 
   private final LoadingCache<String, AxelorCache<K, V>> caches;
 
-  private static final long MIN_EVICTION_MINUTES = 24 * 60L; // 1 day
+  static final long MIN_EVICTION_MINUTES = 24 * 60L; // 1 day
 
   private static final Logger log = LoggerFactory.getLogger(TenantAwareCache.class);
 
   public TenantAwareCache(Function<String, AxelorCache<K, V>> cacheFactory) {
+    this(
+        cacheFactory::apply,
+        (String tenantId, AxelorCache<K, V> innerCache, RemovalCause cause) -> {
+          if (innerCache != null) {
+            try {
+              innerCache.close();
+            } catch (Exception e) {
+              log.error("Failed to close cache for tenant %s".formatted(tenantId), e);
+            }
+          }
+        });
+  }
+
+  protected TenantAwareCache(
+      CacheLoader<String, AxelorCache<K, V>> cacheLoader,
+      RemovalListener<String, AxelorCache<K, V>> removalListener) {
     this.caches =
         Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(MIN_EVICTION_MINUTES))
-            .evictionListener(
-                (String tenantId, AxelorCache<K, V> innerCache, RemovalCause cause) -> {
-                  if (innerCache != null) {
-                    try {
-                      innerCache.close();
-                    } catch (Exception e) {
-                      log.error("Failed to close cache for tenant %s".formatted(tenantId), e);
-                    }
-                  }
-                })
-            .build(cacheFactory::apply);
+            .evictionListener(removalListener)
+            .build(cacheLoader);
   }
 
   private AxelorCache<K, V> getCache() {
