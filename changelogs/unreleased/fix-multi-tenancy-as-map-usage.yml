@@ -1,0 +1,13 @@
+---
+title: Fix multi-tenancy AxelorCache.asMap() usage
+type: fix
+description: |
+  With multi-tenancy, AxelorCache.asMap() returns a map view for current tenant.
+  Using it on static field either cause null tenant if called before multi-tenancy module,
+  or resolution to tenant of first usage. AxelorCache.asMap() should be called on demand only.
+
+  Moreover, on app shutdown, we need to iterate over the cache for each tenant.
+
+  Affected usage:
+    - Pending exports
+    - Mail channel

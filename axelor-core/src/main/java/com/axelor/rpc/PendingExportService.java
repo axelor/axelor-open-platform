@@ -4,6 +4,7 @@
  */
 package com.axelor.rpc;
 
+import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.event.RemovalCause;
 import com.axelor.common.StringUtils;
@@ -17,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -29,7 +29,7 @@ import java.util.UUID;
 @Singleton
 public class PendingExportService {
 
-  private static final Map<String, String> pendingExports =
+  private static final AxelorCache<String, String> pendingExports =
       CacheBuilder.newBuilder("pendingExports")
           .expireAfterWrite(Duration.ofMinutes(5))
           .removalListener(
@@ -43,8 +43,7 @@ public class PendingExportService {
                   }
                 }
               })
-          .build()
-          .asMap();
+          .build();
 
   /**
    * Adds a pending export file.
@@ -67,7 +66,7 @@ public class PendingExportService {
     var token = UUID.randomUUID().toString();
     var tempFilePath = tempFile.normalize().toAbsolutePath().toString();
 
-    if (pendingExports.putIfAbsent(token, tempFilePath) != null) {
+    if (pendingExports.asMap().putIfAbsent(token, tempFilePath) != null) {
       // Should never happen.
       throw new IllegalStateException("Duplicate token: " + token);
     }
@@ -94,7 +93,7 @@ public class PendingExportService {
    * @return the pending export file or null
    */
   public @Nullable Path remove(String token) {
-    return filterRegularFile(pendingExports.remove(token));
+    return filterRegularFile(pendingExports.asMap().remove(token));
   }
 
   private @Nullable Path filterRegularFile(@Nullable String filePath) {

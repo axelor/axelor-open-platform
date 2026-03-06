@@ -38,6 +38,23 @@ public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
     CURRENT_HOST.set(findTenantHost(tenantId));
   }
 
+  public static void forEachTenant(Runnable runnable) {
+    if (!enabled) {
+      runnable.run();
+      return;
+    }
+
+    var current = currentTenantIdentifier();
+    try {
+      for (var tenant : getTenants(false).keySet()) {
+        setCurrentTenant(tenant);
+        runnable.run();
+      }
+    } finally {
+      setCurrentTenant(current);
+    }
+  }
+
   @Nullable
   private static String findTenantHost(String tenantId) {
     var tenantConfigProvider = Beans.get(TenantConfigProvider.class);
