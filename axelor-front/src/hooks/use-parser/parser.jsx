@@ -19,12 +19,23 @@ const blockedList = [
   "constructor",
 ];
 const blockedProps = new Set(blockedList);
-const allowedObjectMethods = new Set([
-  "entries",
-  "keys",
-  "values",
-  "fromEntries",
+
+// Globals allowed as X.method() — only needed for names in blockedList
+const allowedGlobals = new Map([
+  ["Object", new Set(["entries", "keys", "values", "fromEntries"])],
 ]);
+
+// Globals allowed as direct function calls (e.g. parseFloat("123"))
+const allowedGlobalFunctions = new Set([
+  "parseFloat",
+  "parseInt",
+  "isNaN",
+  "isFinite",
+  "Number",
+  "String",
+  "Boolean",
+]);
+
 const sanitizeURL = ["xlinkHref", "src", "href", "action", "formAction"];
 
 function ScopeTransformer({ types: t, template }) {
@@ -233,17 +244,18 @@ function ScopeTransformer({ types: t, template }) {
           t.optionalMemberExpression(obj, prop, computed, true)
       : (obj, prop, computed) => t.memberExpression(obj, prop, computed);
 
-    const isAllowedObjectAccess =
-      t.isIdentifier(node.object) &&
-      node.object.name === "Object" &&
-      !node.computed &&
-      t.isIdentifier(node.property) &&
-      allowedObjectMethods.has(node.property.name);
+    const isAllowedGlobalAccess = (() => {
+      if (!t.isIdentifier(node.object) || node.computed) return false;
+      if (!t.isIdentifier(node.property)) return false;
+      const methods = allowedGlobals.get(node.object.name);
+      if (methods === undefined) return false;
+      return methods === null || methods.has(node.property.name);
+    })();
 
     const obj =
       node.object.name &&
       !isReact(node.object) &&
-      !isAllowedObjectAccess &&
+      !isAllowedGlobalAccess &&
       !scope.hasBinding(node.object.name)
         ? makeMember(ctx, node.object, false)
         : node.object;
@@ -361,16 +373,17 @@ function ScopeTransformer({ types: t, template }) {
           blockedList.includes(node.name) &&
           (parent.computed || parent.property !== node)
         ) {
-          // Allow Object.entries/keys/values/fromEntries
-          const isAllowedObjectAccess =
-            node.name === "Object" &&
+          // Allow access to allowed global methods (e.g. Object.entries)
+          const methods = allowedGlobals.get(node.name);
+          const isAllowedAccess =
+            methods !== undefined &&
             (t.isMemberExpression(parent) ||
               t.isOptionalMemberExpression(parent)) &&
             !parent.computed &&
             parent.object === node &&
             t.isIdentifier(parent.property) &&
-            allowedObjectMethods.has(parent.property.name);
-          if (!isAllowedObjectAccess) {
+            (methods === null || methods.has(parent.property.name));
+          if (!isAllowedAccess) {
             throw path.buildCodeFrameError(
               `Access to '${node.name}' is not allowed.`
             );
@@ -400,6 +413,9 @@ function ScopeTransformer({ types: t, template }) {
         ) {
           return;
         }
+
+        // Don't rewrite allowed global functions (parseFloat, parseInt, etc.)
+        if (allowedGlobalFunctions.has(node.name)) return;
 
         path.replaceWith(t.memberExpression(ctx, node));
       },

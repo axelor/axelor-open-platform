@@ -113,14 +113,18 @@ describe("parser", () => {
     }
   });
 
-  it("should allow Object.entries/keys/values/fromEntries", () => {
+  it("should allow safe global methods", () => {
     const ctx = {
       obj: { a: 1, b: 2, c: 3 },
       pairs: [
         ["x", 10],
         ["y", 20],
       ],
+      arr: [1, 2, 3],
+      val: "3.14",
+      jsonStr: '{"k":"v"}',
     };
+    // Object
     expect(parser.parse("Object.entries(obj)")(ctx)).toEqual([
       ["a", 1],
       ["b", 2],
@@ -132,6 +136,32 @@ describe("parser", () => {
       x: 10,
       y: 20,
     });
+    // Array
+    expect(parser.parse("Array.isArray(arr)")(ctx)).toBe(true);
+    expect(parser.parse("Array.isArray(obj)")(ctx)).toBe(false);
+    expect(parser.parse("Array.from(arr)")(ctx)).toEqual([1, 2, 3]);
+    // JSON
+    expect(parser.parse("JSON.parse(jsonStr)")(ctx)).toEqual({ k: "v" });
+    expect(parser.parse("JSON.stringify(obj)")(ctx)).toBe('{"a":1,"b":2,"c":3}');
+    // Math
+    expect(parser.parse("Math.abs(-5)")(ctx)).toBe(5);
+    expect(parser.parse("Math.max(1, 2, 3)")(ctx)).toBe(3);
+    expect(parser.parse("Math.PI")(ctx)).toBe(Math.PI);
+    // Number
+    expect(parser.parse("Number.isNaN(0)")(ctx)).toBe(false);
+    expect(parser.parse("Number.isFinite(1)")(ctx)).toBe(true);
+  });
+
+  it("should allow safe global functions", () => {
+    const ctx = { val: "3.14", n: 42 };
+    expect(parser.parse("parseFloat(val)")(ctx)).toBe(3.14);
+    expect(parser.parse("parseInt(val)")(ctx)).toBe(3);
+    expect(parser.parse("isNaN(val)")(ctx)).toBe(false);
+    expect(parser.parse("isFinite(n)")(ctx)).toBe(true);
+    expect(parser.parse('Number("123")')(ctx)).toBe(123);
+    expect(parser.parse("String(n)")(ctx)).toBe("42");
+    expect(parser.parse("Boolean(n)")(ctx)).toBe(true);
+    expect(parser.parse("Boolean(0)")(ctx)).toBe(false);
   });
 
   it("should still block disallowed Object methods", () => {
