@@ -118,8 +118,6 @@ public class TomcatServer {
               }
             });
 
-    Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
-
     return tomcat;
   }
 
@@ -132,9 +130,8 @@ public class TomcatServer {
     } catch (Exception e) {
       throw new RuntimeException("Cannot start Tomcat " + e.getMessage(), e);
     }
-    if (tomcat != null) {
-      tomcat.getServer().await();
-    }
+    Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
+    tomcat.getServer().await();
   }
 
   public void stop() {

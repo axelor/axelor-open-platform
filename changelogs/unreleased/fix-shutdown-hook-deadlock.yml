@@ -1,0 +1,7 @@
+---
+title: Avoid shutdown hook deadlock during Tomcat startup
+type: fix
+description: |
+  The shutdown hook is now registered after Tomcat has fully started instead of
+  during initialization, preventing a potential deadlock if shutdown is triggered
+  while startup is still in progress.
