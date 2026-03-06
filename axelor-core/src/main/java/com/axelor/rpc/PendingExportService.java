@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages pending export files.
@@ -28,6 +30,8 @@ import java.util.UUID;
  */
 @Singleton
 public class PendingExportService {
+
+  private static final Logger log = LoggerFactory.getLogger(PendingExportService.class);
 
   private static final AxelorCache<String, String> pendingExports =
       CacheBuilder.newBuilder("pendingExports")
@@ -39,7 +43,8 @@ public class PendingExportService {
                   try {
                     Files.deleteIfExists(Path.of(filePath));
                   } catch (IOException e) {
-                    throw new UncheckedIOException(e);
+                    log.error(
+                        "Failed to delete expired pending export file: %s".formatted(filePath), e);
                   }
                 }
               })
