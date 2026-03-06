@@ -234,7 +234,7 @@ export function PanelTabs(props: WidgetProps) {
     <div className={styles.tabs}>
       <NavTabs
         items={navTabs}
-        active={activeTab ?? undefined}
+        active={activeTab}
         onItemClick={handleChange}
         data-testid={testId}
       />
