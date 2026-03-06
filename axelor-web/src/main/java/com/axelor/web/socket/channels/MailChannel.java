@@ -5,6 +5,7 @@
 package com.axelor.web.socket.channels;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JpaSecurity;
@@ -35,11 +36,12 @@ public class MailChannel extends Channel {
 
   private static final String NAME = "mail";
 
-  protected final ConcurrentMap<String, Set<Session>> instanceSessions =
-      CacheBuilder.newInMemoryBuilder()
-          .expireAfterAccess(Duration.ofHours(6))
-          .<String, Set<Session>>build()
-          .asMap();
+  private final AxelorCache<String, Set<Session>> instanceSessionsCache =
+      CacheBuilder.newInMemoryBuilder().expireAfterAccess(Duration.ofHours(6)).build();
+
+  protected ConcurrentMap<String, Set<Session>> getInstanceSessions() {
+    return instanceSessionsCache.asMap();
+  }
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -87,31 +89,33 @@ public class MailChannel extends Channel {
 
     switch (command) {
       case JOIN -> {
-        instanceSessions.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(session);
+        getInstanceSessions().computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(session);
         onJoin(session, key);
       }
       case LEFT ->
-          instanceSessions.computeIfPresent(
-              key,
-              (k, sessions) -> {
-                if (sessions.remove(session)) {
-                  onLeft(session, key);
-                }
-                return sessions.isEmpty() ? null : sessions;
-              });
+          getInstanceSessions()
+              .computeIfPresent(
+                  key,
+                  (k, sessions) -> {
+                    if (sessions.remove(session)) {
+                      onLeft(session, key);
+                    }
+                    return sessions.isEmpty() ? null : sessions;
+                  });
       default -> log.warn("Unexpected command {} from session: {}", command, session.getId());
     }
   }
 
   @Override
   public void onUnsubscribe(Session session) {
-    instanceSessions.forEach(
-        (key, sessions) -> {
-          if (sessions.remove(session)) {
-            onLeft(session, key);
-          }
-        });
-    instanceSessions.values().removeIf(Collection::isEmpty);
+    getInstanceSessions()
+        .forEach(
+            (key, sessions) -> {
+              if (sessions.remove(session)) {
+                onLeft(session, key);
+              }
+            });
+    getInstanceSessions().values().removeIf(Collection::isEmpty);
   }
 
   protected void onJoin(Session session, String key) {
@@ -150,7 +154,8 @@ public class MailChannel extends Channel {
 
   protected boolean shouldProcess(MailMessage message) {
     // Process if there are sessions for this message.
-    return instanceSessions.containsKey(getKey(message.getRelatedModel(), message.getRelatedId()));
+    return getInstanceSessions()
+        .containsKey(getKey(message.getRelatedModel(), message.getRelatedId()));
   }
 
   private void processCreated(MailMessage message) {
@@ -199,10 +204,10 @@ public class MailChannel extends Channel {
 
   protected void broadcast(MailData data) {
     var key = getKey(data.model(), data.recordId());
-    var sessions = instanceSessions.get(key);
+    var sessions = getInstanceSessions().get(key);
     if (sessions != null) {
       broadcast(sessions, data);
-      instanceSessions.computeIfPresent(key, (k, s) -> s.isEmpty() ? null : s);
+      getInstanceSessions().computeIfPresent(key, (k, s) -> s.isEmpty() ? null : s);
     }
   }
 

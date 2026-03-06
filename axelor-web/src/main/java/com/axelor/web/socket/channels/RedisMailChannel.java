@@ -9,6 +9,7 @@ import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JpaSecurity;
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,7 +121,7 @@ public class RedisMailChannel extends MailChannel {
   public void shutdown() {
     try {
       topic.removeListener(listenerId);
-      instanceSessions.keySet().forEach(this::leaveGlobal);
+      TenantResolver.forEachTenant(() -> getInstanceSessions().keySet().forEach(this::leaveGlobal));
     } catch (RedissonShutdownException e) {
       log.info("Redisson is already shut down.");
     } finally {

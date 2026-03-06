@@ -111,6 +111,9 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
    * <p>Note that if the cache has a cache loader, it will be used. This differs from Caffeine's
    * Cache#asMap() and is designed to match Redisson RMap behavior.
    *
+   * <p>In case of tenant-aware cache, the returned map view is for current tenant: you must use
+   * this on demand for correct tenant resolution, not on static initialization.
+   *
    * @return a thread-safe view of this cache supporting {@link ConcurrentMap} operations
    */
   ConcurrentMap<K, V> asMap();
