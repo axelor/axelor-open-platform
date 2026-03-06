@@ -64,7 +64,6 @@ function ScopeTransformer({ types: t, template }) {
           || value === (async function*(){}).constructor
         ) throw new Error("Access to 'Function' is not allowed.");
         if (value === React.createElement) throw new Error("Access to 'React.createElement' is not allowed.");
-        if (value === React.createFactory) throw new Error("Access to 'React.createFactory' is not allowed.");
         if (value === React.cloneElement) throw new Error("Access to 'React.cloneElement' is not allowed.");
         return typeof value === "function" ? value.bind(obj) : value;
       }`
@@ -280,7 +279,7 @@ function ScopeTransformer({ types: t, template }) {
 
     const isCreateElement = () =>
       node.loc &&
-      ["createElement", "createFactory", "cloneElement"].includes(name);
+      ["createElement", "cloneElement"].includes(name);
     const isConstructor = () => name === "constructor";
     const isStaticComputedProperty =
       t.isStringLiteral(originalProperty) ||

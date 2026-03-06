@@ -1,0 +1,8 @@
+---
+title: Fix false `React.createFactory` error on undefined property access
+type: fix
+description: |
+  The expression parser sandbox checked property access values against
+  `React.createFactory`, which was removed in React 19 and is `undefined`.
+  This caused any computed property lookup returning `undefined` (e.g. an
+  object key miss with nullish coalescing) to falsely throw an error.

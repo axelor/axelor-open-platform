@@ -126,6 +126,32 @@ describe("react template with safe globals", () => {
     expect(el).toHaveTextContent("42.7 | -43 | finite");
   });
 
+  it("should handle undefined from object lookup with nullish coalescing", async () => {
+    const data = { status: "DRAFT" };
+
+    render(
+      <div>
+        {renderTemplate(
+          `
+          <Box data-testid="badge">
+            {
+              {
+                "OPEN": "warning",
+                "CLOSED": "success",
+              }[status] ?? "primary"
+            }
+          </Box>
+          `,
+          data
+        )}
+      </div>
+    );
+
+    const el = await waitFor(() => screen.getByTestId("badge"));
+    // "DRAFT" is not in the map, so it should fall back to "primary"
+    expect(el).toHaveTextContent("primary");
+  });
+
   it("should render JSON.parse in templates", async () => {
     render(
       <div>
