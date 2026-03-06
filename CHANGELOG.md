@@ -1,3 +1,43 @@
+## 7.4.9 (2026-03-06)
+
+#### Fix
+
+* Fix press enter on date widget should not clear value
+
+  <details>
+  
+  Fixed by upgrading react-datepicker from 7.5.0 to 7.6.0.
+  
+  </details>
+
+* Fix search on grid multi-select widget field
+* Fix required validation in duration widget
+* Fix theme builder typography properties path
+* Fix EML file upload failures
+* Fix dms grid auto scroll issue on cell selection
+* Fix `x-popup-maximized` attribute on relational fields
+
+  <details>
+  
+  This fixes `x-popup-maximized` attribute to control the maximized 
+  (i.e., fullscreen) state of popup windows for relational fields.
+  
+  </details>
+
+#### Security
+
+* Fix sandbox bypass via async/generator function constructors
+
+  <details>
+  
+  The expression parser sandbox only blocked the regular `Function` constructor,
+  allowing code execution through `AsyncFunction`, `GeneratorFunction`, and
+  `AsyncGeneratorFunction` constructors obtained via `.constructor` on async,
+  generator, and async generator function instances.
+  
+  </details>
+
+
 ## 7.4.8 (2026-01-05)
 
 #### Feature

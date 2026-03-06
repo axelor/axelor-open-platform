@@ -1,6 +1,0 @@
----
-title: Fix `x-popup-maximized` attribute on relational fields
-type: fix
-description: |
-  This fixes `x-popup-maximized` attribute to control the maximized 
-  (i.e., fullscreen) state of popup windows for relational fields.
