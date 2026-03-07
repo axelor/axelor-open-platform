@@ -19,6 +19,7 @@ import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.FileResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.AbstractProtocol;
+import org.apache.tomcat.util.scan.StandardJarScanFilter;
 
 public class TomcatServer {
 
@@ -81,6 +82,10 @@ public class TomcatServer {
     context.setResources(resources);
     context.setUnpackWAR(false);
 
+    // Skip scanning jars that cannot contain web fragments, TLDs, or annotations.
+    // Axelor modules and JSP-related jars are NOT skipped.
+    configureJarScanFilter(context);
+
     // additional webapp resources
     options.getExtraResources().stream()
         .map(Path::toFile)
@@ -132,6 +137,17 @@ public class TomcatServer {
     }
     Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     tomcat.getServer().await();
+  }
+
+  private void configureJarScanFilter(StandardContext context) {
+    var filter = new StandardJarScanFilter();
+    // Skip all jars by default, then allow only those that may contain
+    // web fragments, TLDs, or servlet annotations (axelor modules, JSP libs, taglibs).
+    filter.setDefaultTldScan(false);
+    filter.setDefaultPluggabilityScan(false);
+    filter.setTldScan("axelor-*.jar,javax.servlet.jsp.jstl-*.jar,jakarta.servlet.jsp.jstl-*.jar,taglibs-*.jar");
+    filter.setPluggabilityScan("axelor-*.jar");
+    context.getJarScanner().setJarScanFilter(filter);
   }
 
   public void stop() {

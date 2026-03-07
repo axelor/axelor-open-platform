@@ -1,0 +1,7 @@
+---
+title: Speed up embedded Tomcat startup with jar scan filtering
+type: change
+description: |
+  Embedded Tomcat was scanning every jar on the classpath for annotations,
+  TLDs, and web fragments. Configure StandardJarScanFilter to skip all
+  jars by default and only scan axelor modules and JSP-related jars.
