@@ -5,7 +5,8 @@ import {
   useAtom,
   useAtomValue,
 } from "jotai";
-import { atomFamily, useAtomCallback } from "jotai/utils";
+import { useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
 import { useCallback, useId, useMemo } from "react";
 
 import { Button, Input } from "@axelor/ui";

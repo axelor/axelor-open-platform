@@ -1,7 +1,8 @@
 import { Box, clsx } from "@axelor/ui";
 import { ScopeProvider } from "bunshi/react";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
 import filter from "lodash/filter";
 import cloneDeep from "lodash/cloneDeep";
 import getObjValue from "lodash/get";

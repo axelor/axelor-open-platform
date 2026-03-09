@@ -6,7 +6,8 @@ import {
   molecule,
   useMolecule,
 } from "bunshi/react";
-import { atomFamily, useAtomCallback } from "jotai/utils";
+import { useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
 import {
   Dispatch,
   createContext,
