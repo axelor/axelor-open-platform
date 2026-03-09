@@ -5,7 +5,7 @@ import isEqual from "lodash/isEqual";
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { SelectRefHandler } from "@axelor/ui";
 
-import { RelationalTag } from "@/components/tag";
+import { RelationalTag, TagList } from "@/components/tag";
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -347,6 +347,19 @@ export function Tags(props: FieldProps<any>) {
   );
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
+
+  if (readonly) {
+    const items = ready ? (value ?? []) : [];
+    return (
+      <FieldControl {...props} inputId={id}>
+        <TagList
+          items={items}
+          schema={schema}
+          onClick={canView ? handleEdit : undefined}
+        />
+      </FieldControl>
+    );
+  }
 
   return (
     <FieldControl {...props} inputId={id}>
