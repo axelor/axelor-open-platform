@@ -1,12 +1,47 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTheme } from "@axelor/ui";
-import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import {
+  BarChart,
+  FunnelChart,
+  GaugeChart,
+  LineChart,
+  PieChart,
+  RadarChart,
+  ScatterChart,
+} from "echarts/charts";
+import {
+  DatasetComponent,
+  GridComponent,
+  LegendScrollComponent,
+  RadarComponent,
+  TooltipComponent,
+  TransformComponent,
+} from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
 
 import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { DataRecord } from "@/services/client/data.types";
 import classes from "./echarts.module.scss";
+
+echarts.use([
+  BarChart,
+  FunnelChart,
+  GaugeChart,
+  LineChart,
+  PieChart,
+  RadarChart,
+  ScatterChart,
+  DatasetComponent,
+  GridComponent,
+  LegendScrollComponent,
+  RadarComponent,
+  TooltipComponent,
+  TransformComponent,
+  CanvasRenderer,
+]);
 
 export function ECharts({
   data,
@@ -22,7 +57,7 @@ export function ECharts({
   type: ChartType;
   height: number;
   width: number;
-  options: Partial<echarts.EChartsOption>;
+  options: Partial<echarts.EChartsCoreOption>;
   isMerge: boolean;
   lazyUpdate: boolean;
 }) {
@@ -35,7 +70,7 @@ export function ECharts({
     const { series, xAxis } = data;
     const { groupBy } = series?.[0] ?? {};
     return groupBy || xAxis || "";
-  }, [data]);
+  }, [data.series, data.xAxis]);
 
   useEffect(() => {
     echarts.registerTheme(theme, prepareTheme(type));
@@ -51,13 +86,17 @@ export function ECharts({
   useEffect(() => {
     const instance = chart.current;
     if (onClick && instance) {
-      instance.on("click", function (event: any) {
+      const handler = function (event: any) {
         const { seriesName, data: eData } = event || {};
         const context =
           eData?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
           eData?.raw?.[0];
         onClick(context?._original ?? context);
-      });
+      };
+      instance.on("click", handler);
+      return () => {
+        instance.off("click", handler);
+      };
     }
   }, [seriesBy, onClick]);
 
@@ -72,7 +111,7 @@ export function ECharts({
 
   useEffect(() => {
     if (chart.current) {
-      const $options = { ...options } as echarts.EChartsOption;
+      const $options = { ...options } as echarts.EChartsCoreOption;
       if (isRTL) {
         if ($options.yAxis) {
           $options.yAxis = {
