@@ -37,7 +37,7 @@
     "color": "^5.0.3",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.3.2",
     "echarts": "^6.0.0",
     "immer": "^11.1.4",
     "jotai": "^2.17.1",
