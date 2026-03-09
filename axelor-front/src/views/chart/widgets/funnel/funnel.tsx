@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTheme } from "@axelor/ui";
 
 import { Field } from "@/services/client/meta.types";
@@ -45,33 +45,30 @@ const defaultOption = {
 
 export function Funnel(props: ChartProps) {
   const { data } = props;
-  const [options, setOptions] = useState(defaultOption);
   const isRTL = useTheme().dir === "rtl";
 
-  useEffect(() => {
+  const options = useMemo(() => {
     const { xAxis, dataset, scale, series: [{ key }] = [] } = data;
 
-    setOptions(
-      produce((draft: any) => {
-        if (key && xAxis) {
-          const values = dataset.map((x) => parseFloat(x[key]));
-          draft.series[0].min = Math.min(...values);
-          draft.series[0].max = Math.max(...values);
-          draft.series[0].data = dataset.map((x: any) => ({
-            name: x[xAxis],
-            value: x[key],
-          }));
-        }
-        draft.series[0][isRTL ? "right" : "left"] = "10%";
-        draft.tooltip.valueFormatter = (v: any) =>
-          Formatters.decimal(v, {
-            props: {
-              serverType: "DECIMAL",
-              scale,
-            } as unknown as Field,
-          });
-      }),
-    );
+    return produce(defaultOption, (draft: any) => {
+      if (key && xAxis) {
+        const values = dataset.map((x) => parseFloat(x[key]));
+        draft.series[0].min = Math.min(...values);
+        draft.series[0].max = Math.max(...values);
+        draft.series[0].data = dataset.map((x: any) => ({
+          name: x[xAxis],
+          value: x[key],
+        }));
+      }
+      draft.series[0][isRTL ? "right" : "left"] = "10%";
+      draft.tooltip.valueFormatter = (v: any) =>
+        Formatters.decimal(v, {
+          props: {
+            serverType: "DECIMAL",
+            scale,
+          } as unknown as Field,
+        });
+    });
   }, [isRTL, data]);
 
   return <ECharts options={options} {...(props as any)} />;

@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
 import { PlusData, applyTitles, useIsDiscrete } from "../../builder/utils";
@@ -26,42 +26,39 @@ export function Hbar(props: ChartProps) {
   const [type, setType] = useState<ChartGroupType>(
     data.stacked ? "stack" : "group",
   );
-  const [options, setOptions] = useState(defaultOption);
 
-  useEffect(() => {
+  const options = useMemo(() => {
     const { types: dimensions, data: source, formatter } = PlusData(data);
-    setOptions(
-      produce((draft: any) => {
-        applyTitles(draft, data, {
-          yAxis: { nameGap: 85 },
-        });
-        draft.series = dimensions.map((key) => ({
-          type: "bar",
-          stack: isDiscrete || type === "stack" ? "all" : `${key}`,
-          ...(isDiscrete && {
-            label: {
-              show: true,
-              position: "right",
-              formatter: (params: any) =>
-                formatter(
-                  params.value[params.dimensionNames[params.encode.x[0]]],
-                ),
-            },
-            labelLayout: {
-              hideOverlap: true,
-            },
-          }),
-        }));
-        draft.yAxis.axisLabel = {
-          ...draft.yAxis.axisLabel,
-          overflow: "truncate",
-          width: 75,
-        };
-        draft.dataset.dimensions = ["x", ...dimensions];
-        draft.dataset.source = source;
-        draft.tooltip.valueFormatter = formatter;
-      }),
-    );
+    return produce(defaultOption, (draft: any) => {
+      applyTitles(draft, data, {
+        yAxis: { nameGap: 85 },
+      });
+      draft.series = dimensions.map((key) => ({
+        type: "bar",
+        stack: isDiscrete || type === "stack" ? "all" : `${key}`,
+        ...(isDiscrete && {
+          label: {
+            show: true,
+            position: "right",
+            formatter: (params: any) =>
+              formatter(
+                params.value[params.dimensionNames[params.encode.x[0]]],
+              ),
+          },
+          labelLayout: {
+            hideOverlap: true,
+          },
+        }),
+      }));
+      draft.yAxis.axisLabel = {
+        ...draft.yAxis.axisLabel,
+        overflow: "truncate",
+        width: 75,
+      };
+      draft.dataset.dimensions = ["x", ...dimensions];
+      draft.dataset.source = source;
+      draft.tooltip.valueFormatter = formatter;
+    });
   }, [type, data, isDiscrete]);
 
   return (

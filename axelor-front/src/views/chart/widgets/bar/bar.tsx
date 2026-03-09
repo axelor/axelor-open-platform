@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { produce } from "immer";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
@@ -26,57 +26,54 @@ export function Bar(props: ChartProps) {
   const [type, setType] = useState<ChartGroupType>(
     data.stacked ? "stack" : "group",
   );
-  const [options, setOptions] = useState(defaultOption);
 
-  useEffect(() => {
+  const options = useMemo(() => {
     const { types: dimensions, data: source, formatter } = PlusData(data);
-    setOptions(
-      produce((draft: any) => {
-        const rotateLabels = source.length > 6;
-        applyTitles(draft, data, {
-          xAxis: { nameGap: rotateLabels ? 75 : 25 },
-        });
-        draft.series = dimensions.map((key) => ({
-          type: "bar",
-          stack: isDiscrete || type === "stack" ? "all" : `${key}`,
-          ...(isDiscrete && {
-            label: {
-              show: true,
-              position: "top",
-              formatter: (params: any) =>
-                formatter(
-                  params.value[params.dimensionNames[params.encode.y[0]]],
-                ),
-            },
-            labelLayout: {
-              hideOverlap: true,
-            },
-          }),
-        }));
-        draft.tooltip.valueFormatter = formatter;
-        draft.dataset.dimensions = ["x", ...dimensions];
-        draft.dataset.source = source;
+    return produce(defaultOption, (draft: any) => {
+      const rotateLabels = source.length > 6;
+      applyTitles(draft, data, {
+        xAxis: { nameGap: rotateLabels ? 75 : 25 },
+      });
+      draft.series = dimensions.map((key) => ({
+        type: "bar",
+        stack: isDiscrete || type === "stack" ? "all" : `${key}`,
+        ...(isDiscrete && {
+          label: {
+            show: true,
+            position: "top",
+            formatter: (params: any) =>
+              formatter(
+                params.value[params.dimensionNames[params.encode.y[0]]],
+              ),
+          },
+          labelLayout: {
+            hideOverlap: true,
+          },
+        }),
+      }));
+      draft.tooltip.valueFormatter = formatter;
+      draft.dataset.dimensions = ["x", ...dimensions];
+      draft.dataset.source = source;
 
-        if (rotateLabels) {
-          draft.xAxis.axisLabel = {
-            ...draft.xAxis.axisLabel,
-            rotate: 30,
-            interval: 0,
-            overflow: "truncate",
-            width: 110,
-          };
-          draft.grid = {
-            ...draft.grid,
-            bottom: 120,
-          };
-        } else {
-          draft.xAxis.axisLabel = {
-            interval: 0,
-          };
-          draft.grid = {};
-        }
-      }),
-    );
+      if (rotateLabels) {
+        draft.xAxis.axisLabel = {
+          ...draft.xAxis.axisLabel,
+          rotate: 30,
+          interval: 0,
+          overflow: "truncate",
+          width: 110,
+        };
+        draft.grid = {
+          ...draft.grid,
+          bottom: 120,
+        };
+      } else {
+        draft.xAxis.axisLabel = {
+          interval: 0,
+        };
+        draft.grid = {};
+      }
+    });
   }, [type, data, isDiscrete]);
 
   return (
