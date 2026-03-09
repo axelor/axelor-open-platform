@@ -9,6 +9,8 @@ export type ChartProps = {
     scale?: number;
     dataset: ChartDataRecord[];
   };
+  height?: number;
+  width?: number;
   type?: string;
   legend?: boolean;
   onClick?: (record?: ChartDataRecord) => Promise<any>;

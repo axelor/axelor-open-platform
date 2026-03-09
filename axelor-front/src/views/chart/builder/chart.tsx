@@ -1,14 +1,15 @@
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box } from "@axelor/ui";
 
-import { useWidgetComp } from "./hooks";
+import * as CHARTS from "../widgets";
 import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { ChartProps } from "./types";
+import { toCamelCase } from "@/utils/names";
 import classes from "./chart.module.scss";
 
-export const Chart = memo(function Chart(props: ChartProps) {
+export function Chart(props: ChartProps) {
   const { type } = props;
-  const { data: ChartComponent } = useWidgetComp(type!);
+  const ChartComponent = CHARTS[toCamelCase(type!) as keyof typeof CHARTS];
   const { ref, height: _height, width: _width } = useResizeDetector();
   const [height, setHeight] = useState(_height);
   const [width, setWidth] = useState(_width);
@@ -31,9 +32,9 @@ export const Chart = memo(function Chart(props: ChartProps) {
       flex={1}
       className={classes.chart}
     >
-      {ChartComponent && height && width ? (
+      {height && width ? (
         <ChartComponent width={width} height={height} {...props} />
       ) : null}
     </Box>
   );
-});
+}
