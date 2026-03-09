@@ -79,7 +79,10 @@ export function ECharts({
   useEffect(() => {
     if (divRef.current !== null) {
       const $chart = (chart.current = echarts.init(divRef.current, theme));
-      return () => $chart.dispose();
+      return () => {
+        $chart.dispose();
+        chart.current = null;
+      };
     }
   }, [theme]);
 
@@ -95,7 +98,9 @@ export function ECharts({
       };
       instance.on("click", handler);
       return () => {
-        instance.off("click", handler);
+        if (!instance.isDisposed()) {
+          instance.off("click", handler);
+        }
       };
     }
   }, [seriesBy, onClick]);
