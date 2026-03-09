@@ -1,7 +1,0 @@
----
-title: Block expression sandbox escapes via this and prototype access
-type: security
-description: |
-  The expression parser now blocks `this` and dangerous properties such as
-  `__proto__`, `prototype`, and `constructor`, including computed access, to
-  prevent sandbox escapes and prototype pollution vectors.

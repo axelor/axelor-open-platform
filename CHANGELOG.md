@@ -1,3 +1,92 @@
+## 8.1.1 (2026-03-09)
+
+#### Change
+
+* Replace react-text-mask with internal <MaskedInput> component
+
+  <details>
+  
+  Replace the unmaintained react-text-mask dependency with a fully
+  internal <MaskedInput> implementation covering the same feature set.
+  
+  </details>
+
+#### Fix
+
+* Fix required validation in duration widget
+* Fix false `React.createFactory` error on undefined property access
+
+  <details>
+  
+  The expression parser sandbox checked property access values against
+  `React.createFactory`, which was removed in React 19 and is `undefined`.
+  This caused any computed property lookup returning `undefined` (e.g. an
+  object key miss with nullish coalescing) to falsely throw an error.
+  
+  </details>
+
+* Fix SingleSelect dropdown not closing on Tab key
+* Fix EML file upload failures
+* Fix multi-tenancy AxelorCache.asMap() usage
+
+  <details>
+  
+  With multi-tenancy, AxelorCache.asMap() returns a map view for current tenant.
+  Using it on static field either cause null tenant if called before multi-tenancy module,
+  or resolution to tenant of first usage. AxelorCache.asMap() should be called on demand only.
+  
+  Moreover, on app shutdown, we need to iterate over the cache for each tenant.
+  
+  Affected usage:
+    - Pending exports
+    - Mail channel
+  
+  </details>
+
+* Fix lost action-view context in calendar views
+
+  <details>
+  
+  Calendar views with context-based domains (e.g. `self.user.id = :_userId`) displayed
+  no events because the calendar widget's `_domainContext` overwrote the action-view's
+  context variables during filter merge. The DataStore's original context is now preserved
+  by spreading it first when building the calendar's domain context.
+  
+  </details>
+
+* Fix `x-popup-maximized` attribute on relational fields
+
+  <details>
+  
+  This fixes `x-popup-maximized` attribute to control the maximized 
+  (i.e., fullscreen) state of popup windows for relational fields.
+  
+  </details>
+
+#### Security
+
+* Fix sandbox bypass via async/generator function constructors
+
+  <details>
+  
+  The expression parser sandbox only blocked the regular `Function` constructor,
+  allowing code execution through `AsyncFunction`, `GeneratorFunction`, and
+  `AsyncGeneratorFunction` constructors obtained via `.constructor` on async,
+  generator, and async generator function instances.
+  
+  </details>
+
+* Block expression sandbox escapes via this and prototype access
+
+  <details>
+  
+  The expression parser now blocks `this` and dangerous properties such as
+  `__proto__`, `prototype`, and `constructor`, including computed access, to
+  prevent sandbox escapes and prototype pollution vectors.
+  
+  </details>
+
+
 ## 8.1.0 (2026-02-20)
 
 #### Feature

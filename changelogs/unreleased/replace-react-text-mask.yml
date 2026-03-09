@@ -1,6 +1,0 @@
----
-title: Replace react-text-mask with internal <MaskedInput> component
-type: change
-description: |
-  Replace the unmaintained react-text-mask dependency with a fully                                                                                                                                                                                                            
-  internal <MaskedInput> implementation covering the same feature set.
