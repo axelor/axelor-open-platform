@@ -486,13 +486,22 @@ function getDataset({
   series: [{ groupBy } = { groupBy: "" }],
 }: any) {
   return dataset.map((data: any) => {
-    if (xAxis && data[xAxis] === null) {
-      data[xAxis] = "N/A";
+    const needsXAxisFallback = xAxis && data[xAxis] === null;
+    const needsGroupByFallback = groupBy && data[groupBy] === null;
+
+    if (!needsXAxisFallback && !needsGroupByFallback) {
+      return data;
     }
-    if (groupBy && data[groupBy] === null) {
-      data[groupBy] = "N/A";
-    }
-    return data;
+
+    return {
+      ...data,
+      ...(needsXAxisFallback && {
+        [xAxis]: "N/A",
+      }),
+      ...(needsGroupByFallback && {
+        [groupBy]: "N/A",
+      }),
+    };
   });
 }
 
@@ -534,7 +543,8 @@ export function PlusData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = uniq(map(dataset, series.groupBy || xAxis));
+  const groupField = series.groupBy || xAxis;
+  const types = uniq(map(dataset, groupField));
 
   const result = map(
     groupCollectionBy(dataset, xAxis),
@@ -548,14 +558,13 @@ export function PlusData(data: any) {
           value += val;
         }
       });
-      if (!series.groupBy && xAxis) series.groupBy = xAxis;
-      const groupBars = series.groupBy
+      const groupBars = groupField
         ? group.reduce(
             (attrs, rec) => ({
               ...attrs,
-              [rec[series.groupBy]]: Number.isNaN(Number(rec[series.key]))
+              [rec[groupField]]: Number.isNaN(Number(rec[series.key]))
                 ? rec[series.key]
-                : Number(attrs[rec[series.groupBy]] ?? 0) +
+                : Number(attrs[rec[groupField]] ?? 0) +
                   Number(rec[series.key]),
             }),
             {},
