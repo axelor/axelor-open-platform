@@ -50,7 +50,7 @@ export function ECharts({
   width,
   options,
   legend = true,
-  isMerge = false,
+  isMerge = true,
   lazyUpdate = false,
   onClick,
 }: Pick<ChartProps, "data" | "legend" | "onClick"> & {
@@ -131,16 +131,34 @@ export function ECharts({
           padding: [8, 32, 8, 32],
         };
       }
+
+      const legendOption =
+        $options.legend === undefined
+          ? !legend
+            ? { show: false }
+            : undefined
+          : Array.isArray($options.legend)
+            ? $options.legend.map((item) => ({
+                ...item,
+                show: legend,
+              }))
+            : {
+                ...$options.legend,
+                show: legend,
+              };
+
       chart.current.setOption(
         {
           ...$options,
-          ...(!legend && {
-            legend: undefined,
-          }),
+          ...(legendOption !== undefined && { legend: legendOption }),
           color: getColor(type, data.config?.colors, data.config?.shades),
         },
-        !isMerge,
-        lazyUpdate,
+        {
+          // Merge by default and replace high-churn branches to avoid stale data.
+          notMerge: !isMerge,
+          replaceMerge: isMerge ? ["series", "dataset"] : undefined,
+          lazyUpdate,
+        },
       );
     }
   }, [isRTL, type, legend, options, isMerge, data.config, lazyUpdate]);
