@@ -1,0 +1,7 @@
+---
+title: Fix cache busting of JSP and HTML files
+type: fix
+description: |
+  Exclude .jsp, .html, and .htm files from static resource cache busting
+  in NoCacheFilter. These files should not receive immutable cache headers
+  as they are server-rendered or serve as application entry points.

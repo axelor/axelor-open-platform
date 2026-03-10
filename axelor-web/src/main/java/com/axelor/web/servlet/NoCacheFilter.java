@@ -7,6 +7,7 @@ package com.axelor.web.servlet;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
+import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
@@ -24,6 +25,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Singleton
 public class NoCacheFilter implements Filter {
@@ -44,6 +46,8 @@ public class NoCacheFilter implements Filter {
           "/*.css",
           "/*.png",
           "/*.jpg");
+
+  private static final Set<String> EXCLUDED_EXTS = Set.of("jsp", "html", "htm");
 
   private static final String CACHE_BUSTER_PARAM =
       URLEncoder.encode(
@@ -71,8 +75,8 @@ public class NoCacheFilter implements Filter {
     final boolean busted = req.getParameterMap().containsKey(CACHE_BUSTER_PARAM);
 
     // TODO: Move messages.js to another appropriate endpoint
-    if (uri.equals(req.getContextPath() + "/js/messages.js")) {
-      // Cache managed I18nServlet
+    if (uri.equals(req.getContextPath() + "/js/messages.js")
+        || EXCLUDED_EXTS.contains(FileUtils.getExtension(uri))) {
       chain.doFilter(request, response);
       return;
     }
