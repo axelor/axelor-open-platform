@@ -93,7 +93,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const { view } = meta;
   const { items = [] } = view;
   const [layouts, setLayouts] = useState<ResponsiveLayouts | null>(null);
-  const { ref, width } = useResizeDetector();
+  const { ref, width } = useResizeDetector({ keepLastSize: true });
   const { isMobile } = useDevice();
   const saved = useRef(false);
   const getContext = useViewContext();

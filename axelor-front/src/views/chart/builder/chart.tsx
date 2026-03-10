@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo } from "react";
 import { Box } from "@axelor/ui";
 
 import * as CHARTS from "../widgets";
@@ -7,21 +7,12 @@ import { ChartProps } from "./types";
 import { toCamelCase } from "@/utils/names";
 import classes from "./chart.module.scss";
 
-export function Chart(props: ChartProps) {
+export const Chart = memo(function Chart(props: ChartProps) {
   const { type } = props;
   const ChartComponent = CHARTS[toCamelCase(type!) as keyof typeof CHARTS];
-  const { ref, height: _height, width: _width } = useResizeDetector();
-  const [height, setHeight] = useState(_height);
-  const [width, setWidth] = useState(_width);
-
-  useEffect(() => {
-    if (_height) {
-      setHeight(_height);
-    }
-    if (_width) {
-      setWidth(_width);
-    }
-  }, [_height, _width]);
+  const { ref, height, width } = useResizeDetector({
+    keepLastSize: true,
+  });
 
   return (
     <Box
@@ -37,4 +28,4 @@ export function Chart(props: ChartProps) {
       ) : null}
     </Box>
   );
-}
+});
