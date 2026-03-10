@@ -305,30 +305,35 @@ function CollectionRoot({
           item.model === model &&
           (item.record?.cid === id || item.record?.id === id),
       );
-    return atomFamily(({ id, model }: { id: number; model: string }) =>
-      atom(
-        (get) => {
-          const items = get(itemsAtom);
-          return findItem(items, id, model);
-        },
-        (get, set, update: SetStateAction<ItemState>) => {
-          const items = get(itemsAtom);
-          const item = findItem(items, id, model);
-          const state =
-            typeof update === "function"
-              ? update(item ?? { record: { id }, model })
-              : update;
+    return atomFamily(
+      ({ id, model }: { id: number; model: string }) =>
+        atom(
+          (get) => {
+            const items = get(itemsAtom);
+            return findItem(items, id, model);
+          },
+          (get, set, update: SetStateAction<ItemState>) => {
+            const items = get(itemsAtom);
+            const item = findItem(items, id, model);
+            const state =
+              typeof update === "function"
+                ? update(item ?? { record: { id }, model })
+                : update;
 
-          if (item) {
-            set(
-              itemsAtom,
-              items.map((_item) => (_item === item ? state : _item)),
-            );
-          } else {
-            set(itemsAtom, [...items, state]);
-          }
-        },
-      ),
+            if (item) {
+              set(
+                itemsAtom,
+                items.map((_item) => (_item === item ? state : _item)),
+              );
+            } else {
+              set(itemsAtom, [...items, state]);
+            }
+          },
+        ),
+      (
+        a: { id: number; model: string },
+        b: { id: number; model: string },
+      ) => a.id === b.id && a.model === b.model,
     );
   }, [itemsAtom]);
 

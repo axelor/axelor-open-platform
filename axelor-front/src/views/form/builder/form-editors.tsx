@@ -648,7 +648,7 @@ function useItemsFamily({
             set(itemsAtom, next, fireOnChange, markDirty);
           },
         ),
-      (a, b) => a.id === b.id,
+      (a: DataRecord, b: DataRecord) => a.id === b.id,
     );
   }, [itemsAtom, isInitial, isClean, exclusive, multiple]);
 
