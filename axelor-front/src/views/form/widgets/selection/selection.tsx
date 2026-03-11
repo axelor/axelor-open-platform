@@ -95,7 +95,7 @@ export function Selection<Multiple extends boolean>(
     [schema, setValue],
   );
 
-  if (readonly) {
+  if (readonly && schema.inGridEditor) {
     if (multiple) {
       const items = ((selectionValue as SelectionType[]) ?? []).filter(Boolean);
       return (
@@ -131,6 +131,7 @@ export function Selection<Multiple extends boolean>(
         autoComplete={autoComplete}
         multiple={multiple}
         readOnly={readonly}
+        disabled={readonly}
         required={required}
         invalid={invalid}
         options={selectionList}

@@ -347,8 +347,8 @@ export function Tags(props: FieldProps<any>) {
   );
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
-
-  if (readonly) {
+  
+  if (readonly && schema.inGridEditor) {
     const items = ready ? (value ?? []) : [];
     return (
       <FieldControl {...props} inputId={id}>
@@ -369,6 +369,7 @@ export function Tags(props: FieldProps<any>) {
         autoFocus={focus}
         multiple={true}
         readOnly={readonly}
+        disabled={readonly}
         required={required}
         invalid={invalid}
         canSelect={canSelect}

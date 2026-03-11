@@ -31,8 +31,10 @@ export type {
   SelectValue,
 } from "@axelor/ui";
 
-export interface SelectProps<Type, Multiple extends boolean>
-  extends AxSelectProps<Type, Multiple> {
+export interface SelectProps<
+  Type,
+  Multiple extends boolean,
+> extends AxSelectProps<Type, Multiple> {
   canSelect?: boolean;
   fetchOptions?: (inputValue: string, signal: AbortSignal) => Promise<Type[]>;
   canCreateOnTheFly?: boolean;
@@ -281,7 +283,10 @@ function SelectInner<Type, Multiple extends boolean>(
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       onChange={handleChange}
-      className={clsx(className, { [styles.readonly]: readOnly })}
+      className={clsx(className, {
+        [styles.readonly]: readOnly,
+        [styles.disabled]: selectProps.disabled,
+      })}
       menuOptions={{
         maxWidth: 600,
         ...menuOptions,
