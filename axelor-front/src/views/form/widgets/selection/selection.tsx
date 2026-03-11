@@ -1,8 +1,9 @@
-import { clsx } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useId, useMemo } from "react";
 
 import { Select, SelectProps, SelectValue } from "@/components/select";
+import { SelectionList } from "@/components/tag";
 import { Selection as SelectionType } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
 
@@ -93,6 +94,30 @@ export function Selection<Multiple extends boolean>(
     },
     [schema, setValue],
   );
+
+  if (readonly) {
+    if (multiple) {
+      const items = ((selectionValue as SelectionType[]) ?? []).filter(Boolean);
+      return (
+        <FieldControl {...props} inputId={id}>
+          <SelectionList items={items} renderValue={renderValue} />
+        </FieldControl>
+      );
+    }
+
+    const selected = selectionValue as SelectionType | null | undefined;
+    return (
+      <FieldControl {...props} inputId={id}>
+        <Box d="flex">
+          {selected
+            ? renderValue
+              ? renderValue({ option: selected })
+              : selected.title
+            : null}
+        </Box>
+      </FieldControl>
+    );
+  }
 
   return (
     <FieldControl {...props} inputId={id}>
