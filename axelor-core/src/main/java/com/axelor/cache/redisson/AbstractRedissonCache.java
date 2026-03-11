@@ -4,7 +4,7 @@
  */
 package com.axelor.cache.redisson;
 
-import com.axelor.cache.ExpirableAxelorCache;
+import com.axelor.cache.AxelorCache;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,7 @@ import org.redisson.api.RMap;
  * @param <M> the type of Redisson map
  */
 public abstract class AbstractRedissonCache<K, V, M extends RMap<K, V>>
-    implements ExpirableAxelorCache<K, V> {
+    implements AxelorCache<K, V> {
 
   protected final M cache;
 

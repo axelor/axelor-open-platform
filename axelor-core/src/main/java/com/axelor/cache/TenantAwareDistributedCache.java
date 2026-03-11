@@ -24,14 +24,13 @@ public class TenantAwareDistributedCache<K, V> extends TenantAwareCache<K, V> {
     super(
         tenantId -> {
           var cache = cacheFactory.apply(tenantId);
-          ((ExpirableAxelorCache<K, V>) cache).clearExpire();
+          cache.clearExpire();
           return cache;
         },
         (tenantId, innerCache, cause) -> {
           if (innerCache != null) {
             try {
-              ((ExpirableAxelorCache<K, V>) innerCache)
-                  .expire(Duration.ofMinutes(MIN_EVICTION_MINUTES));
+              innerCache.expire(Duration.ofMinutes(MIN_EVICTION_MINUTES));
             } catch (Exception e) {
               log.error("Failed to expire cache for tenant %s".formatted(tenantId), e);
             }

@@ -6,6 +6,7 @@ package com.axelor.cache;
 
 import jakarta.annotation.Nullable;
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Iterator;
 import java.util.Map;
@@ -151,4 +152,32 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
    * @return reentrant lock
    */
   Lock getLock(K key);
+
+  /**
+   * Sets a time to live.
+   *
+   * @param ttl time to live
+   * @return <code>true</code> if the time to live was set
+   */
+  default boolean expire(Duration ttl) {
+    return false;
+  }
+
+  /**
+   * Clears the time to live.
+   *
+   * @return <code>true</code> if the time to live was removed
+   */
+  default boolean clearExpire() {
+    return false;
+  }
+
+  /**
+   * Returns the remaining time to live in milliseconds.
+   *
+   * @return remaining time to live in milliseconds, or a negative value if there is no time to live
+   */
+  default long remainTimeToLive() {
+    return -1;
+  }
 }

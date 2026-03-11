@@ -131,4 +131,19 @@ public class TenantAwareCache<K, V> implements AxelorCache<K, V> {
   public Lock getLock(K key) {
     return getCache().getLock(key);
   }
+
+  @Override
+  public boolean expire(Duration ttl) {
+    return getCache().expire(ttl);
+  }
+
+  @Override
+  public boolean clearExpire() {
+    return getCache().clearExpire();
+  }
+
+  @Override
+  public long remainTimeToLive() {
+    return getCache().remainTimeToLive();
+  }
 }
