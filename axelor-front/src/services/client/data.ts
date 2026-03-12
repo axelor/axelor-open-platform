@@ -197,7 +197,7 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data[0] : Promise.reject(500);
+      return status === 0 ? data[0] : reject(data);
     }
 
     return Promise.reject(resp.status);
@@ -217,7 +217,7 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data : Promise.reject(500);
+      return status === 0 ? data : reject(data);
     }
 
     return Promise.reject(resp.status);
@@ -255,7 +255,7 @@ export class DataSource {
         type: "application/octet-stream",
       });
     }
-    
+
     formData.append("file", fileToUpload);
     formData.append("field", field);
     formData.append("request", JSON.stringify({ data }));
