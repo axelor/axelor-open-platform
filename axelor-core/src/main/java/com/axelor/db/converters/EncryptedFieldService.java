@@ -85,7 +85,7 @@ public class EncryptedFieldService {
                 names.stream().map(n -> "self." + n + " as " + n).collect(Collectors.joining(", ")))
             .append(") FROM ")
             .append(model.getSimpleName())
-            .append(" self");
+            .append(" self ORDER BY self.id");
 
     TypedQuery<Map> selectQuery = JPA.em().createQuery(sb.toString(), Map.class);
     TypedQuery<Long> countQuery =
