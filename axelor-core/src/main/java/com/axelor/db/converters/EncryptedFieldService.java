@@ -4,6 +4,12 @@
  */
 package com.axelor.db.converters;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
+import com.axelor.common.ObjectUtils;
+import com.axelor.common.crypto.BytesEncryptor;
+import com.axelor.common.crypto.Encryptor;
+import com.axelor.common.crypto.StringEncryptor;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -11,11 +17,15 @@ import com.axelor.db.mapper.PropertyType;
 import com.google.inject.persist.Transactional;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.persister.entity.AbstractEntityPersister;
+import org.hibernate.persister.entity.EntityPersister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,14 +54,45 @@ public class EncryptedFieldService {
 
   private static final Logger LOG = LoggerFactory.getLogger(EncryptedFieldService.class);
 
+  /**
+   * Migrates all encrypted field values across all models.
+   *
+   * <p>Iterates over every registered model and re-encrypts each encrypted field using the new
+   * algorithm and password configured in <code>axelor-config.properties</code>.
+   *
+   * @throws IllegalStateException if the new encryption password is not configured
+   */
   @Transactional
   public void migrate() {
+    if (ObjectUtils.isEmpty(ENCRYPTION_PASSWORD)) {
+      throw new IllegalStateException("Encryption password is required for migration");
+    }
+
+    long startTime = System.currentTimeMillis();
     JPA.models().forEach(this::migrate);
+    LOG.info(
+        "Encrypted fields migration completed in {}",
+        formatDuration(System.currentTimeMillis() - startTime));
   }
 
-  @SuppressWarnings("all")
+  /**
+   * Migrates encrypted field values for the given model.
+   *
+   * <p>If no field names are provided, all encrypted fields of the model are migrated. Each value
+   * is decrypted using the old encryptor (via the JPA converter) and re-encrypted using the new
+   * algorithm and password. Updates are executed in batches via JDBC for efficiency.
+   *
+   * @param model the model class whose encrypted fields should be migrated
+   * @param fields optional list of specific field names to migrate; if empty, all encrypted fields
+   *     are migrated
+   * @throws IllegalStateException if the new encryption password is not configured
+   */
   @Transactional
   public void migrate(Class<?> model, String... fields) {
+    if (ObjectUtils.isEmpty(ENCRYPTION_PASSWORD)) {
+      throw new IllegalStateException("Encryption password is required for migration");
+    }
+
     final Mapper mapper = Mapper.of(model);
     final List<Property> encrypted = new ArrayList<>();
 
@@ -73,36 +114,34 @@ public class EncryptedFieldService {
             .map(Property::getType)
             .anyMatch(t -> t == PropertyType.BINARY || t == PropertyType.TEXT);
 
-    List<String> names = encrypted.stream().map(Property::getName).collect(Collectors.toList());
-
     final String selectSql =
-        new StringBuilder("SELECT ")
-            .append("new Map(self.id as id,")
-            .append(
-                names.stream().map(n -> "self." + n + " as " + n).collect(Collectors.joining(", ")))
-            .append(") FROM ")
-            .append(model.getSimpleName())
-            .append(" self ORDER BY self.id")
-            .toString();
+        "SELECT new Map(self.id as id, %s) FROM %s self ORDER BY self.id"
+            .formatted(
+                encrypted.stream()
+                    .map(n -> "self." + n.getName() + " as " + n.getName())
+                    .collect(Collectors.joining(", ")),
+                model.getSimpleName());
 
     final String updateSql =
-        "UPDATE "
-            + model.getSimpleName()
-            + " self SET "
-            + names.stream().map(n -> "self." + n + " = :" + n).collect(Collectors.joining(", "))
-            + " WHERE self.id = :id";
+        "UPDATE %s SET %s WHERE id = ?"
+            .formatted(
+                getTableName(model),
+                encrypted.stream()
+                    .map(n -> getColumnName(model, n.getName()) + " = ?")
+                    .collect(Collectors.joining(", ")));
 
     TypedQuery<Map> selectQuery = JPA.em().createQuery(selectSql, Map.class);
     selectQuery.setFlushMode(FlushModeType.COMMIT);
 
     long count = countRecords(model);
     int offset = 0;
-    int limit = hasLarge ? 40 : 1000;
-    int updatedRecords = 0;
+    int limit = hasLarge ? 100 : 1000;
+    int[] updatedRecords = {0};
+    long startTime = System.currentTimeMillis();
 
     LOG.info(
         "Migrating {} encrypted field(s) across {} record(s) in {}",
-        names.size(),
+        encrypted.stream().map(Property::getName).collect(Collectors.joining(", ")),
         count,
         model.getSimpleName());
 
@@ -112,28 +151,166 @@ public class EncryptedFieldService {
       List<Map> values = selectQuery.getResultList();
       LOG.debug("Processing records {} to {}", offset, Math.min(count, (offset + limit)));
       offset += limit;
-      updatedRecords += values.stream().mapToInt(map -> migrateRecord(updateSql, names, map)).sum();
+
+      JPA.jdbcWork(
+          connection -> {
+            try (PreparedStatement ps = connection.prepareStatement(updateSql)) {
+              for (Map map : values) {
+                for (int i = 0; i < encrypted.size(); i++) {
+                  Property property = encrypted.get(i);
+                  if (property.getJavaType() == String.class) {
+                    ps.setString(
+                        i + 1, getStringEncryptor().encrypt((String) map.get(property.getName())));
+                  } else if (property.getJavaType() == byte[].class) {
+                    ps.setBytes(
+                        i + 1, getBytesEncryptor().encrypt((byte[]) map.get(property.getName())));
+                  } else {
+                    throw new IllegalArgumentException(
+                        "Unsupported encryption type for field: " + property.getName());
+                  }
+                }
+
+                ps.setLong(encrypted.size() + 1, (Long) map.get("id"));
+                ps.addBatch();
+              }
+              int[] counts = ps.executeBatch();
+              for (int c : counts) {
+                if (c > 0) updatedRecords[0] += c;
+              }
+            }
+          });
     }
 
-    LOG.info("{} record(s) migrated in {}", updatedRecords, model.getSimpleName());
+    LOG.info(
+        "{} record(s) migrated in {} in {}",
+        updatedRecords[0],
+        model.getSimpleName(),
+        formatDuration(System.currentTimeMillis() - startTime));
   }
 
-  @SuppressWarnings("all")
-  private int migrateRecord(String updateSql, List<String> names, Map map) {
-    if (names.stream().allMatch(name -> map.get(name) == null)) {
-      return 0;
-    }
-    final jakarta.persistence.Query uq = JPA.em().createQuery(updateSql);
-    uq.setFlushMode(FlushModeType.COMMIT);
-    uq.setParameter("id", (Long) map.get("id"));
-    names.forEach(name -> uq.setParameter(name, map.get(name)));
-    return uq.executeUpdate();
+  /**
+   * Formats a duration in milliseconds into a human-readable string (e.g. {@code 1m 23s 456ms}).
+   *
+   * @param millis the duration in milliseconds
+   * @return a human-readable duration string
+   */
+  private static String formatDuration(long millis) {
+    long minutes = millis / 60_000;
+    long seconds = (millis % 60_000) / 1000;
+    long ms = millis % 1000;
+    if (minutes > 0) return "%dm %ds %dms".formatted(minutes, seconds, ms);
+    if (seconds > 0) return "%ds %dms".formatted(seconds, ms);
+    return "%dms".formatted(ms);
   }
 
+  /**
+   * Returns the total number of records for the given model.
+   *
+   * @param model the model class to count
+   * @return the record count
+   */
   private long countRecords(Class<?> model) {
     TypedQuery<Long> countQuery =
         JPA.em().createQuery("SELECT COUNT(m.id) FROM " + model.getName() + " m", Long.class);
     countQuery.setFlushMode(FlushModeType.COMMIT);
     return countQuery.getSingleResult();
+  }
+
+  /**
+   * Resolves the database column name for the given field of an entity class.
+   *
+   * @param entityClass the entity class
+   * @param fieldName the JPA field name
+   * @return the mapped column name
+   * @throws IllegalStateException if the persister type is not supported or the field maps to
+   *     multiple columns
+   * @throws IllegalArgumentException if no column is mapped for the given field
+   */
+  private String getColumnName(Class<?> entityClass, String fieldName) {
+    SessionFactoryImplementor sfi =
+        JPA.em().getEntityManagerFactory().unwrap(SessionFactoryImplementor.class);
+    EntityPersister persister = sfi.getMappingMetamodel().getEntityDescriptor(entityClass);
+
+    if (!(persister instanceof AbstractEntityPersister aep)) {
+      throw new IllegalStateException(
+          "Unsupported persister type for entity %s: %s"
+              .formatted(entityClass.getName(), persister.getClass().getName()));
+    }
+
+    String[] columnNames = aep.getPropertyColumnNames(fieldName);
+
+    if (columnNames == null || columnNames.length == 0) {
+      throw new IllegalArgumentException(
+          "No column mapped for property '%s' of entity '%s'"
+              .formatted(fieldName, entityClass.getName()));
+    }
+
+    if (columnNames.length != 1) {
+      throw new IllegalStateException(
+          "Expected exactly one column for property '%s' of entity '%s', but got %d"
+              .formatted(fieldName, entityClass.getName(), columnNames.length));
+    }
+
+    return columnNames[0];
+  }
+
+  /**
+   * Resolves the database table name for the given entity class.
+   *
+   * @param entityClass the entity class
+   * @return the mapped table name
+   * @throws IllegalStateException if the persister type is not supported
+   */
+  private static String getTableName(Class<?> entityClass) {
+    SessionFactoryImplementor sfi =
+        JPA.em().getEntityManagerFactory().unwrap(SessionFactoryImplementor.class);
+
+    EntityPersister persister = sfi.getMappingMetamodel().getEntityDescriptor(entityClass);
+
+    if (!(persister instanceof AbstractEntityPersister aep)) {
+      throw new IllegalStateException(
+          "Unsupported persister type for entity %s: %s"
+              .formatted(entityClass.getName(), persister.getClass().getName()));
+    }
+
+    return aep.getMappedTableDetails().getTableName();
+  }
+
+  private static final String ENCRYPTION_ALGORITHM =
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
+  private static final String ENCRYPTION_PASSWORD =
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
+
+  private Encryptor<String, String> stringEncryptor;
+  private Encryptor<byte[], byte[]> bytesEncryptor;
+
+  /**
+   * Returns the {@link StringEncryptor} for the new encryption settings, lazily initialized.
+   *
+   * @return the string encryptor
+   */
+  private Encryptor<String, String> getStringEncryptor() {
+    if (stringEncryptor == null) {
+      stringEncryptor =
+          "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+              ? StringEncryptor.gcm(ENCRYPTION_PASSWORD)
+              : StringEncryptor.cbc(ENCRYPTION_PASSWORD);
+    }
+    return stringEncryptor;
+  }
+
+  /**
+   * Returns the {@link BytesEncryptor} for the new encryption settings, lazily initialized.
+   *
+   * @return the bytes encryptor
+   */
+  private Encryptor<byte[], byte[]> getBytesEncryptor() {
+    if (bytesEncryptor == null) {
+      bytesEncryptor =
+          "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+              ? BytesEncryptor.gcm(ENCRYPTION_PASSWORD)
+              : BytesEncryptor.cbc(ENCRYPTION_PASSWORD);
+    }
+    return bytesEncryptor;
   }
 }
