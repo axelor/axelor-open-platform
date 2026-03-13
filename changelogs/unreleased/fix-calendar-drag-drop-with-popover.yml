@@ -1,0 +1,7 @@
+---
+title: Fix calendar drag-and-drop not saving when popover is open
+type: fix
+description: |
+  Close the event popover when a drag operation starts on the calendar view.
+  Previously, if the template popover was open, dragging an event to another
+  date would not trigger a save.

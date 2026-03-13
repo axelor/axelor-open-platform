@@ -639,6 +639,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           onEventClick={onEventClick}
           onEventCreate={onEventCreate}
           onEventChange={onEventChange}
+          onEventDragStart={hidePopover}
         />
         <div className={styles.sidebar}>
           <DatePicker selected={date} onChange={onDateChange} inline={true} />

@@ -61,6 +61,7 @@ export interface SchedulerProps<T> {
   onEventClick?: (event: SchedulerEvent<T>, element: HTMLElement) => void;
   onEventCreate?: (event: SchedulerEvent<T>) => void;
   onEventChange?: (event: SchedulerEvent<T>) => void;
+  onEventDragStart?: () => void;
 }
 
 const timeViewMap = {
@@ -91,6 +92,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
     onEventCreate,
     onEventChange,
     onEventClick,
+    onEventDragStart,
     onDayClick,
   } = props;
   const calendarRef = useRef<FullCalendar>(null);
@@ -119,6 +121,11 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
       onEventChange?.(toSchedulerEvent<T>(arg.event));
     },
     [onEventChange],
+  );
+
+  const handleDragStart = useCallback(
+    () => onEventDragStart?.(),
+    [onEventDragStart],
   );
 
   const handleClick = useCallback(
@@ -154,6 +161,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         select={handleSet}
         eventChange={handleChange}
         eventClick={handleClick}
+        eventDragStart={handleDragStart}
         eventDurationEditable={editableDuration}
         navLinks={true}
         navLinkDayClick={handleDayClick}
