@@ -6,5 +6,5 @@ package com.axelor.app.cli;
 
 import picocli.CommandLine.Command;
 
-@Command(mixinStandardHelpOptions = true)
+@Command
 public interface CliCommand extends Runnable {}

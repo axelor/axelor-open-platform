@@ -83,7 +83,15 @@ public class CliRunner {
   int execute(String... args) {
     CommandLine cli = new CommandLine(spec);
     Optional.ofNullable(commands).ifPresent(commands -> commands.forEach(cli::addSubcommand));
+    cli.getSubcommands().values().forEach(CliRunner::applyHelpOptions);
     return cli.execute(args);
+  }
+
+  private static void applyHelpOptions(CommandLine cmd) {
+    if (!cmd.getCommandSpec().mixinStandardHelpOptions()) {
+      cmd.getCommandSpec().mixinStandardHelpOptions(true);
+    }
+    cmd.getSubcommands().values().forEach(CliRunner::applyHelpOptions);
   }
 
   private static CliRunner build() {
