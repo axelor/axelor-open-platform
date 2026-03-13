@@ -300,7 +300,7 @@ public class AuditTracker {
 
   private void processDelete() {
     final MetaFiles files = Beans.get(MetaFiles.class);
-    for (Model entity : deleted) {
+    for (Model entity : List.copyOf(deleted)) {
       log.trace(
           "Delete attachments for the entity {}#{}",
           entity.getClass().getSimpleName(),

@@ -1,0 +1,7 @@
+---
+title: Fix ConcurrentModificationException in AuditTracker on entity delete
+type: fix
+description: |
+  AuditTracker.processDelete() now iterates over a snapshot of the deleted
+  entities set, preventing ConcurrentModificationException when cascaded
+  deletes add new entries during iteration.
