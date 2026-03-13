@@ -5,9 +5,6 @@
 package com.axelor.db.converters;
 
 import com.axelor.db.JPA;
-import com.axelor.db.Model;
-import com.axelor.db.Query;
-import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -49,7 +46,7 @@ public class EncryptedFieldService {
 
   @Transactional
   public void migrate() {
-    JPA.models().stream().forEach(this::migrate);
+    JPA.models().forEach(this::migrate);
   }
 
   @SuppressWarnings("all")
@@ -78,39 +75,65 @@ public class EncryptedFieldService {
 
     List<String> names = encrypted.stream().map(Property::getName).collect(Collectors.toList());
 
-    StringBuilder sb =
+    final String selectSql =
         new StringBuilder("SELECT ")
             .append("new Map(self.id as id,")
             .append(
                 names.stream().map(n -> "self." + n + " as " + n).collect(Collectors.joining(", ")))
             .append(") FROM ")
             .append(model.getSimpleName())
-            .append(" self ORDER BY self.id");
+            .append(" self ORDER BY self.id")
+            .toString();
 
-    TypedQuery<Map> selectQuery = JPA.em().createQuery(sb.toString(), Map.class);
-    TypedQuery<Long> countQuery =
-        JPA.em().createQuery("SELECT COUNT(m.id) FROM " + model.getName() + " m", Long.class);
+    final String updateSql =
+        "UPDATE "
+            + model.getSimpleName()
+            + " self SET "
+            + names.stream().map(n -> "self." + n + " = :" + n).collect(Collectors.joining(", "))
+            + " WHERE self.id = :id";
 
-    QueryBinder.of(selectQuery).setFlushMode(FlushModeType.COMMIT);
-    QueryBinder.of(countQuery).setFlushMode(FlushModeType.COMMIT);
+    TypedQuery<Map> selectQuery = JPA.em().createQuery(selectSql, Map.class);
+    selectQuery.setFlushMode(FlushModeType.COMMIT);
 
-    Query<?> updater =
-        Query.of(model.asSubclass(Model.class)).filter("self.id = :id").autoFlush(false);
-
-    long count = (Long) countQuery.getSingleResult();
-    long offset = 0;
+    long count = countRecords(model);
+    int offset = 0;
     int limit = hasLarge ? 40 : 1000;
+    int updatedRecords = 0;
 
-    LOG.info("Updating: {}", model.getName());
-    LOG.info("Records: {}", count);
+    LOG.info(
+        "Migrating {} encrypted field(s) across {} record(s) in {}",
+        names.size(),
+        count,
+        model.getSimpleName());
 
     selectQuery.setMaxResults(limit);
     while (offset < count) {
-      selectQuery.setFirstResult((int) offset);
+      selectQuery.setFirstResult(offset);
       List<Map> values = selectQuery.getResultList();
-      LOG.info("Records from: {} to {}", offset, Math.min(count, (offset + limit)));
+      LOG.debug("Processing records {} to {}", offset, Math.min(count, (offset + limit)));
       offset += limit;
-      values.forEach(map -> updater.bind("id", map.remove("id")).update(map));
+      updatedRecords += values.stream().mapToInt(map -> migrateRecord(updateSql, names, map)).sum();
     }
+
+    LOG.info("{} record(s) migrated in {}", updatedRecords, model.getSimpleName());
+  }
+
+  @SuppressWarnings("all")
+  private int migrateRecord(String updateSql, List<String> names, Map map) {
+    if (names.stream().allMatch(name -> map.get(name) == null)) {
+      return 0;
+    }
+    final jakarta.persistence.Query uq = JPA.em().createQuery(updateSql);
+    uq.setFlushMode(FlushModeType.COMMIT);
+    uq.setParameter("id", (Long) map.get("id"));
+    names.forEach(name -> uq.setParameter(name, map.get(name)));
+    return uq.executeUpdate();
+  }
+
+  private long countRecords(Class<?> model) {
+    TypedQuery<Long> countQuery =
+        JPA.em().createQuery("SELECT COUNT(m.id) FROM " + model.getName() + " m", Long.class);
+    countQuery.setFlushMode(FlushModeType.COMMIT);
+    return countQuery.getSingleResult();
   }
 }
