@@ -6,7 +6,7 @@ package com.axelor.db.converters;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.common.crypto.BytesEncryptor;
 import com.axelor.common.crypto.Encryptor;
 import com.axelor.common.crypto.StringEncryptor;
@@ -54,6 +54,8 @@ public class EncryptedFieldService {
 
   private static final Logger LOG = LoggerFactory.getLogger(EncryptedFieldService.class);
 
+  private boolean settingsValidated = false;
+
   /**
    * Migrates all encrypted field values across all models.
    *
@@ -64,15 +66,63 @@ public class EncryptedFieldService {
    */
   @Transactional
   public void migrate() {
-    if (ObjectUtils.isEmpty(ENCRYPTION_PASSWORD)) {
-      throw new IllegalStateException("Encryption password is required for migration");
-    }
+    validateAndLogMigrationSettings();
 
     long startTime = System.currentTimeMillis();
     JPA.models().forEach(this::migrate);
     LOG.info(
         "Encrypted fields migration completed in {}",
         formatDuration(System.currentTimeMillis() - startTime));
+  }
+
+  private static final List<String> KNOWN_ALGORITHMS = List.of("GCM", "CBC");
+
+  private void validateAndLogMigrationSettings() {
+    if (settingsValidated) {
+      return;
+    }
+
+    if (StringUtils.isBlank(ENCRYPTION_PASSWORD)) {
+      throw new IllegalStateException("Encryption password is required for migration");
+    }
+
+    String newAlgorithm = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
+    String oldAlgorithm = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
+    String oldPassword = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
+
+    if (StringUtils.notBlank(newAlgorithm)
+        && KNOWN_ALGORITHMS.stream().noneMatch(newAlgorithm::equalsIgnoreCase)) {
+      throw new IllegalStateException(
+          "Unknown encryption algorithm '%s'. Supported values: %s"
+              .formatted(newAlgorithm, KNOWN_ALGORITHMS));
+    }
+
+    if (StringUtils.notBlank(oldAlgorithm)
+        && KNOWN_ALGORITHMS.stream().noneMatch(oldAlgorithm::equalsIgnoreCase)) {
+      throw new IllegalStateException(
+          "Unknown old encryption algorithm '%s'. Supported values: %s"
+              .formatted(oldAlgorithm, KNOWN_ALGORITHMS));
+    }
+
+    if (StringUtils.notBlank(oldPassword) && oldPassword.equals(ENCRYPTION_PASSWORD)) {
+      LOG.warn(
+          "encryption.old-password is the same as encryption.password — password rotation will have no effect");
+    } else if (StringUtils.notBlank(oldPassword)) {
+      LOG.info("Encryption migration: rotating password");
+    }
+
+    if (StringUtils.notBlank(oldAlgorithm) && oldAlgorithm.equalsIgnoreCase(newAlgorithm)) {
+      LOG.warn(
+          "encryption.old-algorithm is the same as encryption.algorithm — algorithm change will have no effect");
+    } else if (StringUtils.notBlank(oldAlgorithm)) {
+      LOG.info("Encryption migration: changing algorithm");
+    }
+
+    if (!StringUtils.notBlank(oldPassword) && !StringUtils.notBlank(oldAlgorithm)) {
+      LOG.info("Encryption migration: encrypting plain-text field values");
+    }
+
+    settingsValidated = true;
   }
 
   /**
@@ -89,9 +139,7 @@ public class EncryptedFieldService {
    */
   @Transactional
   public void migrate(Class<?> model, String... fields) {
-    if (ObjectUtils.isEmpty(ENCRYPTION_PASSWORD)) {
-      throw new IllegalStateException("Encryption password is required for migration");
-    }
+    validateAndLogMigrationSettings();
 
     final Mapper mapper = Mapper.of(model);
     final List<Property> encrypted = new ArrayList<>();
