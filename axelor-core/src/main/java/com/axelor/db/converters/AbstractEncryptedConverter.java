@@ -17,10 +17,30 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   private static final String ENCRYPTION_PASSWORD =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
-  private static final String OLD_ENCRYPTION_ALGORITHM =
+  private static final String EXPLICIT_OLD_ENCRYPTION_ALGORITHM =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
-  private static final String OLD_ENCRYPTION_PASSWORD =
+  private static final String EXPLICIT_OLD_ENCRYPTION_PASSWORD =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
+
+  // Only apply defaults when at least one old-* setting is explicitly configured.
+  // If neither is set, the old encryptor stays null so plain-text values pass through as-is
+  // (initial encryption use case).
+  private static final boolean HAS_OLD_ENCRYPTION_SETTINGS =
+      StringUtils.notBlank(EXPLICIT_OLD_ENCRYPTION_ALGORITHM)
+          || StringUtils.notBlank(EXPLICIT_OLD_ENCRYPTION_PASSWORD);
+
+  private static final String OLD_ENCRYPTION_ALGORITHM =
+      HAS_OLD_ENCRYPTION_SETTINGS
+          ? (StringUtils.notBlank(EXPLICIT_OLD_ENCRYPTION_ALGORITHM)
+              ? EXPLICIT_OLD_ENCRYPTION_ALGORITHM
+              : ENCRYPTION_ALGORITHM)
+          : null;
+  private static final String OLD_ENCRYPTION_PASSWORD =
+      HAS_OLD_ENCRYPTION_SETTINGS
+          ? (StringUtils.notBlank(EXPLICIT_OLD_ENCRYPTION_PASSWORD)
+              ? EXPLICIT_OLD_ENCRYPTION_PASSWORD
+              : ENCRYPTION_PASSWORD)
+          : null;
 
   private Encryptor<T, R> encryptor;
   private Encryptor<T, R> oldEncryptor;
