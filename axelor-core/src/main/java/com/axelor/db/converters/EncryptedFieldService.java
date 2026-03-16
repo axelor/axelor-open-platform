@@ -86,7 +86,7 @@ public class EncryptedFieldService {
       throw new IllegalStateException("Encryption password is required for migration");
     }
 
-    String newAlgorithm = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
+    String newAlgorithm = ENCRYPTION_ALGORITHM;
     String oldAlgorithm = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
     String oldPassword = AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
 
@@ -324,9 +324,9 @@ public class EncryptedFieldService {
     return aep.getMappedTableDetails().getTableName();
   }
 
-  private static final String ENCRYPTION_ALGORITHM =
+  private final String ENCRYPTION_ALGORITHM =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
-  private static final String ENCRYPTION_PASSWORD =
+  private final String ENCRYPTION_PASSWORD =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
   private Encryptor<String, String> stringEncryptor;
