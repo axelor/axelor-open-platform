@@ -67,6 +67,112 @@ The `-c` option can be used to provide axelor config file.
   $ axelor -c /path/to/axelor-config.properties run
 ----
 
+== Built-in commands
+
+=== run
+
+Start the embedded Tomcat server.
+
+[source,sh]
+----
+  $ axelor run [OPTIONS]
+----
+
+[cols="1,3",options="header"]
+|===
+| Option | Description
+
+| `--port=<port>`
+| The Tomcat port number. Defaults to `8080`.
+
+| `--base-dir=<path>`
+| The Tomcat base directory.
+
+| `--context-path=<path>`
+| The webapp context path.
+
+| `--proxy-url=<url>`
+| Set proxy URL if running behind a reverse proxy.
+
+| `--max-threads=<n>`
+| Set the maximum number of worker threads.
+
+| `--cache-max-size=<n>`
+| Set the maximum cache size for resources.
+|===
+
+=== database
+
+Perform database maintenance operations. Requires a subcommand.
+
+[source,sh]
+----
+  $ axelor database [SUBCOMMAND]
+----
+
+==== database init
+
+Initialize the database (schema creation and demo data import).
+
+[source,sh]
+----
+  $ axelor database init
+----
+
+==== database update
+
+Update the database schema. Optionally restrict the update to specific modules.
+
+[source,sh]
+----
+  $ axelor database update [OPTIONS]
+----
+
+[cols="1,3",options="header"]
+|===
+| Option | Description
+
+| `-m, --module=<module>`
+| Specify the module to update. Can be repeated to update multiple modules.
+|===
+
+Example:
+
+[source,sh]
+----
+  $ axelor database update --module axelor-sale --module axelor-purchase
+----
+
+==== database migrate
+
+Run the Liquibase migration scripts.
+
+[source,sh]
+----
+  $ axelor database migrate
+----
+
+==== database encrypt
+
+Encrypt or re-encrypt all encrypted field values. This command should be run in the following situations:
+
+* **Initial encryption** — encryption settings were not configured initially, and you now want to encrypt existing
+plain-text field values. No extra configuration is needed.
+* **Password rotation** — set `encryption.old-password` to the previous password. `encryption.old-algorithm` is not
+required and defaults to the current `encryption.algorithm`.
+* **Algorithm change** — set `encryption.old-algorithm` to the previous algorithm. `encryption.old-password` is not
+required and defaults to the current `encryption.password`.
+* **Password and algorithm change** — set both `encryption.old-password` and `encryption.old-algorithm` to their
+respective previous values.
+
+[source,sh]
+----
+  $ axelor database encrypt
+----
+
+IMPORTANT: After the command completes successfully, remove any `encryption.old-password` or `encryption.old-algorithm`
+entries from `axelor-config.properties`.
+
 == Custom commands
 
 The app modules can provide additional commands by implementing
