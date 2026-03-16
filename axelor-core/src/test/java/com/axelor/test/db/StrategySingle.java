@@ -19,9 +19,14 @@
 package com.axelor.test.db;
 
 import com.axelor.auth.db.AuditableModel;
+import com.axelor.db.annotations.Widget;
+import com.axelor.db.converters.EncryptedStringConverter;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
+import javax.persistence.Basic;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,21 +34,30 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "TEST_STRATEGY_SINGLE")
+@Table(name = "STRATEGY_SINGLE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class StrategySingle extends AuditableModel {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TEST_STRATEGY_SINGLE_SEQ")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STRATEGY_SINGLE_SEQ")
   @SequenceGenerator(
-      name = "TEST_STRATEGY_SINGLE_SEQ",
-      sequenceName = "TEST_STRATEGY_SINGLE_SEQ",
+      name = "STRATEGY_SINGLE_SEQ",
+      sequenceName = "STRATEGY_SINGLE_SEQ",
       allocationSize = 1)
   private Long id;
 
-  private Integer myField = 0;
+  private String myString;
+
+  @Convert(converter = EncryptedStringConverter.class)
+  private String mySecureString;
+
+  @Widget(title = "Attributes")
+  @Basic(fetch = FetchType.LAZY)
+  @Type(type = "json")
+  private String attrs;
 
   public StrategySingle() {}
 
@@ -57,12 +71,28 @@ public class StrategySingle extends AuditableModel {
     this.id = id;
   }
 
-  public Integer getMyField() {
-    return myField == null ? 0 : myField;
+  public String getMyString() {
+    return myString;
   }
 
-  public void setMyField(Integer myField) {
-    this.myField = myField;
+  public void setMyString(String myString) {
+    this.myString = myString;
+  }
+
+  public String getMySecureString() {
+    return mySecureString;
+  }
+
+  public void setMySecureString(String mySecureString) {
+    this.mySecureString = mySecureString;
+  }
+
+  public String getAttrs() {
+    return attrs;
+  }
+
+  public void setAttrs(String attrs) {
+    this.attrs = attrs;
   }
 
   @Override
@@ -88,7 +118,8 @@ public class StrategySingle extends AuditableModel {
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("id", getId())
-        .add("myField", getMyField())
+        .add("myString", getMyString())
+        .add("mySecureString", getMySecureString())
         .omitNullValues()
         .toString();
   }

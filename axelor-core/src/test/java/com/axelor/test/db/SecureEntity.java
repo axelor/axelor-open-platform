@@ -20,6 +20,7 @@ package com.axelor.test.db;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.annotations.Widget;
+import com.axelor.db.converters.EncryptedBytesConverter;
 import com.axelor.db.converters.EncryptedStringConverter;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
@@ -30,36 +31,43 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "STRATEGY_JOINED")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class StrategyJoined extends AuditableModel {
+@Table(name = "SECURE_ENTITY")
+public class SecureEntity extends AuditableModel {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STRATEGY_JOINED_SEQ")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SECURE_ENTITY_SEQ")
   @SequenceGenerator(
-      name = "STRATEGY_JOINED_SEQ",
-      sequenceName = "STRATEGY_JOINED_SEQ",
+      name = "SECURE_ENTITY_SEQ",
+      sequenceName = "SECURE_ENTITY_SEQ",
       allocationSize = 1)
   private Long id;
 
-  private String myString;
-
   @Convert(converter = EncryptedStringConverter.class)
   private String mySecureString;
+
+  private String myString;
+
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Convert(converter = EncryptedBytesConverter.class)
+  private byte[] mySecureBinary;
+
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  private byte[] myBinary;
 
   @Widget(title = "Attributes")
   @Basic(fetch = FetchType.LAZY)
   @Type(type = "json")
   private String attrs;
 
-  public StrategyJoined() {}
+  public SecureEntity() {}
 
   @Override
   public Long getId() {
@@ -71,6 +79,14 @@ public class StrategyJoined extends AuditableModel {
     this.id = id;
   }
 
+  public String getMySecureString() {
+    return mySecureString;
+  }
+
+  public void setMySecureString(String mySecureString) {
+    this.mySecureString = mySecureString;
+  }
+
   public String getMyString() {
     return myString;
   }
@@ -79,12 +95,20 @@ public class StrategyJoined extends AuditableModel {
     this.myString = myString;
   }
 
-  public String getMySecureString() {
-    return mySecureString;
+  public byte[] getMySecureBinary() {
+    return mySecureBinary;
   }
 
-  public void setMySecureString(String mySecureString) {
-    this.mySecureString = mySecureString;
+  public void setMySecureBinary(byte[] mySecureBinary) {
+    this.mySecureBinary = mySecureBinary;
+  }
+
+  public byte[] getMyBinary() {
+    return myBinary;
+  }
+
+  public void setMyBinary(byte[] myBinary) {
+    this.myBinary = myBinary;
   }
 
   public String getAttrs() {
@@ -99,9 +123,9 @@ public class StrategyJoined extends AuditableModel {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (this == obj) return true;
-    if (!(obj instanceof StrategyJoined)) return false;
+    if (!(obj instanceof SecureEntity)) return false;
 
-    final StrategyJoined other = (StrategyJoined) obj;
+    final SecureEntity other = (SecureEntity) obj;
     if (this.getId() != null || other.getId() != null) {
       return Objects.equals(this.getId(), other.getId());
     }
@@ -118,8 +142,8 @@ public class StrategyJoined extends AuditableModel {
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("id", getId())
-        .add("myString", getMyString())
         .add("mySecureString", getMySecureString())
+        .add("myString", getMyString())
         .omitNullValues()
         .toString();
   }

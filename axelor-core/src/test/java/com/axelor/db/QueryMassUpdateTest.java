@@ -76,12 +76,12 @@ class QueryMassUpdateTest<M extends Model, C extends M> extends JpaTest {
           childRepository.all().delete();
 
           for (var i = 0; i < numParentEntities; ++i) {
-            var entity = parentRepository.create(Map.of("myField", i));
+            var entity = parentRepository.create(Map.of("myString", i));
             parentRepository.save(entity);
           }
 
           for (var i = 0; i < numChildEntities; ++i) {
-            var childEntity = childRepository.create(Map.of("myFieldChild", i));
+            var childEntity = childRepository.create(Map.of("myStringChild", i));
             childRepository.save(childEntity);
           }
         });
@@ -93,18 +93,19 @@ class QueryMassUpdateTest<M extends Model, C extends M> extends JpaTest {
       inTransaction(
           () ->
               assertEquals(
-                  numTotalEntities, parentRepository.all().update(Map.of("myField", 100), user)));
+                  numTotalEntities,
+                  parentRepository.all().update(Map.of("myString", "100"), user)));
 
-      var results = parentRepository.all().select("myField").fetch(-1, -1);
+      var results = parentRepository.all().select("myString").fetch(-1, -1);
       assertEquals(numTotalEntities, results.size());
-      assertTrue(results.stream().allMatch(m -> Objects.equals(m.get("myField"), 100)));
+      assertTrue(results.stream().allMatch(m -> Objects.equals(m.get("myString"), "100")));
 
-      var childResults = childRepository.all().select("myField", "myFieldChild").fetch(-1, -1);
+      var childResults = childRepository.all().select("myString", "myStringChild").fetch(-1, -1);
       assertEquals(numChildEntities, childResults.size());
-      assertTrue(childResults.stream().allMatch(m -> Objects.equals(m.get("myField"), 100)));
+      assertTrue(childResults.stream().allMatch(m -> Objects.equals(m.get("myString"), "100")));
     } else {
       var query = parentRepository.all();
-      Map<String, Object> values = Map.of("myField", 100);
+      Map<String, Object> values = Map.of("myString", "100");
       inTransaction(
           () -> assertThrows(PersistenceException.class, () -> query.update(values, user)));
     }
@@ -114,15 +115,18 @@ class QueryMassUpdateTest<M extends Model, C extends M> extends JpaTest {
           () ->
               assertEquals(
                   numChildEntities,
-                  childRepository.all().update(Map.of("myField", 200, "myFieldChild", 300), user)));
+                  childRepository
+                      .all()
+                      .update(Map.of("myString", "200", "myStringChild", "300"), user)));
 
-      var childResults = childRepository.all().select("myField", "myFieldChild").fetch(-1, -1);
+      var childResults = childRepository.all().select("myString", "myStringChild").fetch(-1, -1);
       assertEquals(numChildEntities, childResults.size());
-      assertTrue(childResults.stream().allMatch(m -> Objects.equals(m.get("myField"), 200)));
-      assertTrue(childResults.stream().allMatch(m -> Objects.equals(m.get("myFieldChild"), 300)));
+      assertTrue(childResults.stream().allMatch(m -> Objects.equals(m.get("myString"), "200")));
+      assertTrue(
+          childResults.stream().allMatch(m -> Objects.equals(m.get("myStringChild"), "300")));
     } else {
       var query = childRepository.all();
-      Map<String, Object> values = Map.of("myField", 200, "myFieldChild", 300);
+      Map<String, Object> values = Map.of("myString", "200", "myStringChild", "300");
       inTransaction(
           () -> assertThrows(PersistenceException.class, () -> query.update(values, user)));
     }

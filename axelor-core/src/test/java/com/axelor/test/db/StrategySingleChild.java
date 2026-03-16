@@ -19,21 +19,53 @@
 package com.axelor.test.db;
 
 import com.axelor.db.EntityHelper;
+import com.axelor.db.annotations.Widget;
+import com.axelor.db.converters.EncryptedStringConverter;
+import javax.persistence.Basic;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Table;
+import org.hibernate.annotations.Type;
 
 @Entity
+@Table(name = "STRATEGY_SINGLE_CHILD")
 public class StrategySingleChild extends StrategySingle {
 
-  private Integer myFieldChild = 0;
+  private String myStringChild;
+
+  @Convert(converter = EncryptedStringConverter.class)
+  private String mySecureStringChild;
+
+  @Widget(title = "Attributes")
+  @Basic(fetch = FetchType.LAZY)
+  @Type(type = "json")
+  private String attrs;
 
   public StrategySingleChild() {}
 
-  public Integer getMyFieldChild() {
-    return myFieldChild == null ? 0 : myFieldChild;
+  public String getMyStringChild() {
+    return myStringChild;
   }
 
-  public void setMyFieldChild(Integer myFieldChild) {
-    this.myFieldChild = myFieldChild;
+  public void setMyStringChild(String myStringChild) {
+    this.myStringChild = myStringChild;
+  }
+
+  public String getMySecureStringChild() {
+    return mySecureStringChild;
+  }
+
+  public void setMySecureStringChild(String mySecureStringChild) {
+    this.mySecureStringChild = mySecureStringChild;
+  }
+
+  public String getAttrs() {
+    return attrs;
+  }
+
+  public void setAttrs(String attrs) {
+    this.attrs = attrs;
   }
 
   @Override
