@@ -26,14 +26,14 @@ import javax.persistence.AttributeConverter;
 
 public abstract class AbstractEncryptedConverter<T, R> implements AttributeConverter<T, R> {
 
-  private static final String ENCRYPTION_ALGORITHM =
+  private final String encryptionAlgorithm =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
-  private static final String ENCRYPTION_PASSWORD =
+  private final String encryptionPassword =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
-  private static final String OLD_ENCRYPTION_ALGORITHM =
+  private final String oldEncryptionAlgorithm =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
-  private static final String OLD_ENCRYPTION_PASSWORD =
+  private final String oldEncryptionPassword =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
 
   private Encryptor<T, R> encryptor;
@@ -42,15 +42,15 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   protected abstract Encryptor<T, R> getEncryptor(String algorithm, String password);
 
   protected final Encryptor<T, R> encryptor() {
-    if (encryptor == null && StringUtils.notBlank(ENCRYPTION_PASSWORD)) {
-      encryptor = getEncryptor(ENCRYPTION_ALGORITHM, ENCRYPTION_PASSWORD);
+    if (encryptor == null && StringUtils.notBlank(encryptionPassword)) {
+      encryptor = getEncryptor(encryptionAlgorithm, encryptionPassword);
     }
     return encryptor;
   }
 
   protected final Encryptor<T, R> oldEncryptor() {
-    if (oldEncryptor == null && StringUtils.notBlank(OLD_ENCRYPTION_PASSWORD)) {
-      oldEncryptor = getEncryptor(OLD_ENCRYPTION_ALGORITHM, OLD_ENCRYPTION_PASSWORD);
+    if (oldEncryptor == null && StringUtils.notBlank(oldEncryptionPassword)) {
+      oldEncryptor = getEncryptor(oldEncryptionAlgorithm, oldEncryptionPassword);
     }
     return oldEncryptor;
   }
