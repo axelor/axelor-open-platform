@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.1.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="StrategySingle" strategy="SINGLE" table="STRATEGY_SINGLE">
+
+    <string name="myString"/>
+    <string name="mySecureString" encrypted="true"/>
+
+  </entity>
+
+  <entity name="StrategySingleChild" extends="StrategySingle" table="STRATEGY_SINGLE_CHILD">
+
+    <string name="myStringChild"/>
+    <string name="mySecureStringChild" encrypted="true"/>
+
+  </entity>
+
+</domain-models>

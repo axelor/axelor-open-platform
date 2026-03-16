@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.1.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="SecureEntity" table="SECURE_ENTITY">
+
+    <string name="mySecureString" encrypted="true"/>
+    <string name="myString"/>
+
+    <binary name="mySecureBinary" encrypted="true"/>
+    <binary name="myBinary"/>
+
+  </entity>
+
+</domain-models>
