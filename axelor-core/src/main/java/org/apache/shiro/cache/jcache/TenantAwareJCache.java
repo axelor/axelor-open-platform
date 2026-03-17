@@ -43,15 +43,11 @@ class TenantAwareJCache<K, V> implements Cache<K, V> {
     this.caches =
         Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(evictionMinutes))
-            .evictionListener(
-                (String tenantId, Cache<K, V> innerCache, RemovalCause cause) -> {
-                  if (innerCache != null && !innerCache.isClosed()) {
-                    try {
-                      innerCache.clear();
-                      innerCache.close();
-                    } catch (Exception e) {
-                      log.error("Failed to close Shiro cache for tenant %s".formatted(tenantId), e);
-                    }
+            .evictionListener(this::onRemoval)
+            .removalListener(
+                (key, value, cause) -> {
+                  if (!cause.wasEvicted()) {
+                    onRemoval(key, value, cause);
                   }
                 })
             .build(cacheFactory::apply);
@@ -61,10 +57,20 @@ class TenantAwareJCache<K, V> implements Cache<K, V> {
     return caches.get(TenantResolver.currentTenantIdentifier());
   }
 
+  private void onRemoval(String tenantId, Cache<K, V> innerCache, RemovalCause cause) {
+    if (innerCache != null && !innerCache.isClosed()) {
+      try {
+        innerCache.clear();
+        innerCache.close();
+      } catch (Exception e) {
+        log.error("Failed to close Shiro cache for tenant %s".formatted(tenantId), e);
+      }
+    }
+  }
+
   /** Closes all underlying tenant-specific caches. */
   @Override
   public void close() {
-    // Triggers the removal listener to close all entries.
     caches.invalidateAll();
   }
 

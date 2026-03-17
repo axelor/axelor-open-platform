@@ -56,6 +56,12 @@ public class TenantAwareCache<K, V> implements AxelorCache<K, V> {
         Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(MIN_EVICTION_MINUTES))
             .evictionListener(removalListener)
+            .removalListener(
+                (key, value, cause) -> {
+                  if (!cause.wasEvicted()) {
+                    removalListener.onRemoval(key, value, cause);
+                  }
+                })
             .build(cacheLoader);
   }
 
@@ -66,7 +72,6 @@ public class TenantAwareCache<K, V> implements AxelorCache<K, V> {
   /** Closes all underlying tenant-specific caches. */
   @Override
   public void close() {
-    // Triggers the removal listener to close all entries.
     caches.invalidateAll();
   }
 
