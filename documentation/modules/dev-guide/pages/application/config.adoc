@@ -257,8 +257,8 @@ Choose the right option by environment :
 | `application.swagger-ui.allow-try-it-out` | allow "Try it out" in Swagger UI | false
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
-| `encryption.password` | encryption password |
-| `encryption.algorithm` | encryption algorithm (CBC or GCM) |
+| `encryption.password` | encryption password : use unique, long, and complex string |
+| `encryption.algorithm` | encryption algorithm (CBC or GCM) | CBC
 | `encryption.old-password` | old encryption password |
 | `encryption.old-algorithm` | old encryption algorithm (CBC or GCM) |
 | `reports.design-dir` | external directory for birt report designs | \{user.home}/.axelor/reports
