@@ -62,7 +62,7 @@ public final class MetaStore {
   private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
   private static final AxelorCache<String, Action> ACTIONS =
-      CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
+      CacheBuilder.newBuilder("actions").maximumSize(1000).build(XMLViews::findAction);
 
   private MetaStore() {}
 

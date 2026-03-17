@@ -7,11 +7,14 @@ package com.axelor.cache;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.axelor.cache.caffeine.CaffeineCache;
+import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.event.RemovalCause;
 import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.cache.redisson.RedissonUtils;
@@ -25,6 +28,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.slf4j.Logger;
@@ -545,6 +549,25 @@ class CacheBuilderTest {
 
     public void setName(String name) {
       this.name = name;
+    }
+  }
+
+  @Test
+  void testInMemoryBuilder() {
+    // Check fluent chaining
+    var builder =
+        CacheBuilder.newInMemoryBuilder()
+            .maximumSize(100)
+            .weakKeys()
+            .expireAfterWrite(Duration.ofMinutes(5))
+            .weakValues()
+            .expireAfterAccess(Duration.ofMinutes(5))
+            .nonTenantAware();
+
+    assertInstanceOf(CaffeineCacheBuilder.class, builder);
+
+    try (var cache = builder.build()) {
+      assertInstanceOf(CaffeineCache.class, cache);
     }
   }
 

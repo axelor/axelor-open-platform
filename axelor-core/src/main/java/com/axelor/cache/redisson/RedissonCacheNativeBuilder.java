@@ -15,9 +15,6 @@ import org.redisson.api.options.MapOptions;
  *
  * <p>This builds an {@link AxelorCache} wrapping a {@link org.redisson.api.RMapCacheNative}.
  *
- * <p>Weak references are not supported in Redisson collections. When either {@code weakKeys} or
- * {@code weakValues} are used, TTL is set in order to approximate the behavior.
- *
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */

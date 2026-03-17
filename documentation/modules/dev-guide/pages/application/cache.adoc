@@ -44,18 +44,22 @@ The `CacheBuilder` class is used to configure and construct `AxelorCache` instan
 === Builder Creation
 
 - `newBuilder(name)`: Creates a cache builder supporting either in-memory or distributed caching, depending on application configuration. The name, combined with the caller class, forms a globally unique cache identifier that is used in case of distributed caching.
-- `newInMemoryBuilder()`: Creates a builder for an in-memory cache. This is useful when you need in-memory caching while using `AxelorCache` API.
+- `newInMemoryBuilder()`: Creates a `CaffeineCacheBuilder` for an in-memory cache. This is useful when you need in-memory caching while using `AxelorCache` API.
 
 === Builder Options
 
 - `maximumSize(size)`: Sets the maximum number of entries the cache can hold.
 - `expireAfterWrite(duration)`: Configures entries to expire after a specified duration following their last write operation.
 - `expireAfterAccess(duration)`: Configures entries to expire after a specified duration following their last access.
-- `weakKeys()` and `weakValues()`: Specifies the use of weak references for keys or values, allowing garbage collection if no strong references exist.
 - `removalListener(listener)`: Attaches a listener to be notified when entries are removed from the cache (async).
 - `nonTenantAware()`: By default, when multi-tenancy is active, the cache automatically segregates entries based on the current tenant context. This option disables this behavior and allows the cache to be shared globally across all tenants.
 
 NOTE: Support of these various options depends on the underlying cache implementation and may be approximated or ignored if not supported at all.
+
+==== `CaffeineCacheBuilder`-Specific Options
+
+- `weakKeys()`: Wraps each key in a `WeakReference`, allowing garbage collection if no strong references exist.
+- `weakValues()`: Wraps each value in a `WeakReference`, allowing garbage collection if no strong references exist.
 
 === Building the Cache
 

@@ -9,7 +9,6 @@ import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheLoader;
 import com.axelor.cache.TenantAwareCache;
 import com.axelor.cache.TenantAwareDistributedCache;
-import java.time.Duration;
 import java.util.function.Function;
 import org.redisson.api.RMap;
 import org.redisson.api.map.MapLoader;
@@ -17,9 +16,6 @@ import org.redisson.api.options.ExMapOptions;
 
 /*
  * Abstract Redisson cache builder
- *
- * <p>Weak references are not supported in Redisson collections. When either {@code weakKeys} or
- * {@code weakValues} are used, TTL is set in order to approximate the behavior.
  *
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
@@ -112,12 +108,6 @@ public abstract class AbstractRedissonCacheBuilder<
 
   protected void configureCache(AbstractRedissonCache<K, V, M> cache) {
     var expireAfterWrite = getExpireAfterWrite();
-
-    // No weak references in Redisson collections
-    // Setting TTL most closely approximates the behavior
-    if ((isWeakKeys() || isWeakValues()) && expireAfterWrite == null) {
-      expireAfterWrite = Duration.ofHours(1);
-    }
 
     if (expireAfterWrite != null) {
       cache.setExpireAfterWrite(expireAfterWrite);

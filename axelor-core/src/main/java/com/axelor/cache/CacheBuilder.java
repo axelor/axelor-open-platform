@@ -26,10 +26,6 @@ public abstract class CacheBuilder<K, V> {
 
   private Duration expireAfterAccess;
 
-  private boolean weakKeys;
-
-  private boolean weakValues;
-
   private boolean tenantAware = true;
 
   private RemovalListener<? super K, ? super V> removalListener;
@@ -61,8 +57,6 @@ public abstract class CacheBuilder<K, V> {
     this.maximumSize = builder.maximumSize;
     this.expireAfterWrite = builder.expireAfterWrite;
     this.expireAfterAccess = builder.expireAfterAccess;
-    this.weakKeys = builder.weakKeys;
-    this.weakValues = builder.weakValues;
     this.removalListener = builder.removalListener;
   }
 
@@ -84,15 +78,13 @@ public abstract class CacheBuilder<K, V> {
   }
 
   /**
-   * Constructs a new {@code CacheBuilder} instance for an in-memory cache.
-   *
-   * <p>This currently uses Caffeine as the in-memory cache provider.
+   * Constructs a new {@code CaffeineCacheBuilder} instance for an in-memory cache.
    *
    * @param <K> the key type of the cache
    * @param <V> the value type of the cache
-   * @return a new {@code CacheBuilder} instance
+   * @return a new {@code CaffeineCacheBuilder} instance
    */
-  public static <K, V> CacheBuilder<K, V> newInMemoryBuilder() {
+  public static <K, V> CaffeineCacheBuilder<K, V> newInMemoryBuilder() {
     return new CaffeineCacheBuilder<>();
   }
 
@@ -170,40 +162,6 @@ public abstract class CacheBuilder<K, V> {
    */
   public CacheBuilder<K, V> expireAfterAccess(Duration expireAfterAccess) {
     this.expireAfterAccess = expireAfterAccess;
-    return this;
-  }
-
-  protected boolean isWeakKeys() {
-    return weakKeys;
-  }
-
-  /**
-   * Specifies that the cache should use weak references for keys.
-   *
-   * <p>Depending on the cache provider, this may not be supported and approximation techniques may
-   * be used.
-   *
-   * @return this {@code CacheBuilder} instance (for chaining)
-   */
-  public CacheBuilder<K, V> weakKeys() {
-    this.weakKeys = true;
-    return this;
-  }
-
-  protected boolean isWeakValues() {
-    return weakValues;
-  }
-
-  /**
-   * Specifies that the cache should use weak references for values.
-   *
-   * <p>Depending on the cache provider, this may not be supported and approximation techniques may
-   * be used.
-   *
-   * @return this {@code CacheBuilder} instance (for chaining)
-   */
-  public CacheBuilder<K, V> weakValues() {
-    this.weakValues = true;
     return this;
   }
 
