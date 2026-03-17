@@ -104,6 +104,10 @@ Most important config values are:
 - `fixed` : use a fixed scale for all axis. Value should be provided by `max` config.
 - `distinct` : use a distinct scale by axis, based on the series values. This is the default.
 - `unique` : use a unique scale for all axis, based on the series values.
+* `maxSeries` - maximum number of series (dimensions) to display. When the dataset produces more
+  series than this limit, only the top N series by value are shown and the remaining ones are
+  aggregated into an "Others" bucket. Defaults to `50`. Set to `0` to disable the limit.
+  This is useful for charts with large datasets to prevent excessive memory consumption.
 * `min/max` -  used with gauge and radar chart(max support), define the minimum and maximum values.
 * `onClick` - call specified action with clicked data in context
 
@@ -134,6 +138,28 @@ each color by adjusting the brightness.
   <config name="shades" value="10" />
 
 </chart>
+----
+
+== Series limit
+
+When a chart dataset produces a large number of series (e.g. thousands of distinct products),
+the browser may consume excessive memory. The `maxSeries` config limits the number of displayed
+series by keeping the top N by value and aggregating the rest into a single "Others" series.
+
+[source,xml]
+----
+<chart name="chart.sale.turnover.by.product" title="Turnover by product">
+  ...
+  <!-- Show only the top 20 products, aggregate the rest into "Others" -->
+  <config name="maxSeries" value="20" />
+</chart>
+----
+
+The default value is `50`. To disable the limit entirely, set it to `0`:
+
+[source,xml]
+----
+<config name="maxSeries" value="0" />
 ----
 
 == Actions

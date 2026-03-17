@@ -649,6 +649,7 @@ export interface ChartConfig {
   scale?: number;
   min?: number;
   max?: number;
+  maxSeries?: number;
   axisScale?: "fixed" | "distinct" | "unique"; // radar chart config
   onClick?: string;
   hideLegend?: boolean;

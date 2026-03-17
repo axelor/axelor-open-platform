@@ -11,9 +11,12 @@ import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 
 import { moment } from "@/services/client/l10n";
+import { i18n } from "@/services/client/i18n";
 import { ChartView, Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
 import { ChartDataRecord, ChartType } from "./types";
+
+const DEFAULT_MAX_SERIES = 50;
 
 const ChartColors = [
   [
@@ -544,7 +547,7 @@ export function PlusData(data: any) {
   } = data;
   const dataset = getDataset(data);
   const groupField = series.groupBy || xAxis;
-  const types = uniq(map(dataset, groupField));
+  const types = uniq(map(dataset, groupField)) as string[];
 
   const result = map(
     groupCollectionBy(dataset, xAxis),
@@ -579,14 +582,107 @@ export function PlusData(data: any) {
     },
   );
 
-  return {
+  const configMax = Number(data.config?.maxSeries);
+  const maxSeries = Number.isFinite(configMax) ? configMax : DEFAULT_MAX_SERIES;
+  const { types: cappedTypes, data: cappedResult } = capPlusDataSeries(
     types,
-    data: result,
+    result,
+    groupField,
+    xAxis,
+    maxSeries,
+  );
+
+  return {
+    types: cappedTypes,
+    data: cappedResult,
     formatter: (value: any) =>
       Formatters.decimal(value, {
         props: { serverType: "DECIMAL", scale } as Field,
       }),
   };
+}
+
+function capPlusDataSeries(
+  types: string[],
+  result: any[],
+  groupField: string,
+  xAxis: string,
+  maxSeries: number,
+): { types: string[]; data: any[] } {
+  if (maxSeries <= 0 || types.length <= maxSeries) {
+    return { types, data: result };
+  }
+
+  const othersLabel = i18n.get("Others");
+
+  // Compute total absolute value per type across all result rows
+  const totals = new Map<string, number>();
+  for (const row of result) {
+    for (const type of types) {
+      const val = Number(row[type]);
+      if (!Number.isNaN(val)) {
+        totals.set(type, (totals.get(type) ?? 0) + Math.abs(val));
+      }
+    }
+  }
+
+  const sorted = [...totals.entries()].sort((a, b) => b[1] - a[1]);
+  const topTypes = sorted.slice(0, maxSeries).map(([k]) => k);
+  const tailTypes = new Set(sorted.slice(maxSeries).map(([k]) => k));
+
+  if (groupField !== xAxis) {
+    // Bar/hbar case: each result row has dimension keys — collapse tail keys
+    const cappedData = result.map((row) => {
+      const newRow: any = { raw: row.raw, x: row.x, y: row.y };
+      for (const t of topTypes) {
+        if (row[t] !== undefined) newRow[t] = row[t];
+      }
+      let othersTotal = 0;
+      for (const t of tailTypes) {
+        const val = Number(row[t]);
+        if (!Number.isNaN(val)) othersTotal += val;
+      }
+      if (othersTotal !== 0) newRow[othersLabel] = othersTotal;
+      return newRow;
+    });
+
+    const cappedTypes = [...topTypes];
+    if (cappedData.some((r) => r[othersLabel] !== undefined)) {
+      cappedTypes.push(othersLabel);
+    }
+    return { types: cappedTypes, data: cappedData };
+  }
+
+  // Pie/donut/radar case: each result row corresponds to one type — merge tail rows
+  // groupBy returns object keys as strings; normalize for membership checks
+  const topSet = new Set(topTypes.map((t) => String(t)));
+  const topRows: any[] = [];
+  let othersValue = 0;
+  const othersRaw: any[] = [];
+
+  for (const row of result) {
+    if (topSet.has(String(row.x))) {
+      topRows.push(row);
+    } else {
+      othersValue += Number(row.y) || 0;
+      if (row.raw) othersRaw.push(...row.raw);
+    }
+  }
+
+  const cappedData = [...topRows];
+  if (othersValue !== 0) {
+    cappedData.push({
+      [othersLabel]: othersValue,
+      raw: othersRaw,
+      x: othersLabel,
+      y: othersValue.toString(),
+    });
+  }
+
+  const cappedTypes = topRows.map((r) => r.x);
+  if (othersValue !== 0) cappedTypes.push(othersLabel);
+
+  return { types: cappedTypes, data: cappedData };
 }
 
 export function PlotData(data: any) {
@@ -639,14 +735,67 @@ export function PlotData(data: any) {
     (x) => x,
   );
 
+  const plotConfigMax = Number(data.config?.maxSeries);
+  const maxSeries = Number.isFinite(plotConfigMax) ? plotConfigMax : DEFAULT_MAX_SERIES;
+  const cappedResult = capPlotDataSeries(result, maxSeries);
+
   return {
     types,
-    data: result,
+    data: cappedResult,
     formatter: (value: any) =>
       Formatters.decimal(value, {
         props: { serverType: "DECIMAL", scale } as Field,
       }),
   };
+}
+
+function capPlotDataSeries(result: any[], maxSeries: number): any[] {
+  if (maxSeries <= 0 || result.length <= maxSeries) return result;
+
+  const othersLabel = i18n.get("Others");
+
+  // Sort series by total absolute value descending
+  const withTotals = result.map((s) => ({
+    series: s,
+    total: (s.values as { y: number }[]).reduce(
+      (sum, v) => sum + Math.abs(Number(v.y) || 0),
+      0,
+    ),
+  }));
+  withTotals.sort((a, b) => b.total - a.total);
+
+  const topSeries = withTotals.slice(0, maxSeries).map((s) => s.series);
+  const tailSeries = withTotals.slice(maxSeries).map((s) => s.series);
+
+  if (tailSeries.length === 0) return topSeries;
+
+  // Aggregate tail series values by index using the longest series as base
+  const longestTail = tailSeries.reduce(
+    (longest, s) =>
+      s.values.length > longest.values.length ? s : longest,
+    tailSeries[0],
+  );
+  const baseValues = longestTail.values as { x: any; y: any; sort: any }[];
+  const othersValues = baseValues.map((_: any, i: number) => {
+    let ySum = 0;
+    for (const s of tailSeries) {
+      ySum += Number(s.values[i]?.y) || 0;
+    }
+    return {
+      x: baseValues[i].x,
+      y: ySum,
+      sort: baseValues[i].sort,
+    };
+  });
+
+  return [
+    ...topSeries,
+    {
+      key: othersLabel,
+      type: tailSeries[0].type,
+      values: othersValues,
+    },
+  ];
 }
 
 export function getChartData(
