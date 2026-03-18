@@ -23,8 +23,12 @@ import org.redisson.api.options.ExMapOptions;
  * @param <O> the type of Redisson map options
  */
 public abstract class AbstractRedissonCacheBuilder<
-        K, V, M extends RMap<K, V>, O extends ExMapOptions<?, K, V>>
-    extends CacheBuilder<K, V> {
+        K,
+        V,
+        B extends AbstractRedissonCacheBuilder<K, V, B, M, O>,
+        M extends RMap<K, V>,
+        O extends ExMapOptions<?, K, V>>
+    extends CacheBuilder<K, V, B> {
 
   protected static final String PREFIX = "axelor-cache:";
 
@@ -32,7 +36,7 @@ public abstract class AbstractRedissonCacheBuilder<
     super(cacheName);
   }
 
-  protected AbstractRedissonCacheBuilder(CacheBuilder<K, V> builder) {
+  protected AbstractRedissonCacheBuilder(CacheBuilder<K, V, ?> builder) {
     super(builder);
   }
 

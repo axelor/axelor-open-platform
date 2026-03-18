@@ -38,9 +38,7 @@ public class RedisMailChannel extends MailChannel {
   // key => model:recordId
   // value => instanceId => session count
   private final AxelorCache<String, Map<String, Integer>> globalSessions =
-      CacheBuilder.<String, Map<String, Integer>>newBuilder("mail-sessions")
-          .expireAfterAccess(Duration.ofHours(6))
-          .build();
+      CacheBuilder.newBuilder("mail-sessions").expireAfterAccess(Duration.ofHours(6)).build();
 
   private final RTopic topic;
   private final int listenerId;

@@ -110,7 +110,7 @@ class CacheBuilderTest {
   }
 
   private void doBasicCacheOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-cache").build(),
         cache -> {
@@ -146,7 +146,7 @@ class CacheBuilderTest {
   }
 
   private void doCacheLoaderOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory
             .apply("test-cache-loader")
@@ -205,7 +205,7 @@ class CacheBuilderTest {
   }
 
   private void doExpireAfterWrite(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-write-expiry").expireAfterWrite(TTL).build(),
         cache -> {
@@ -232,7 +232,7 @@ class CacheBuilderTest {
   }
 
   private void doExpireAfterAccess(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-access-expiry").expireAfterAccess(TTL).build(),
         cache -> {
@@ -267,7 +267,8 @@ class CacheBuilderTest {
         });
   }
 
-  private void doMapOperations(Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+  private void doMapOperations(
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-map").build(),
         cache -> {
@@ -297,7 +298,7 @@ class CacheBuilderTest {
   }
 
   private void doRemovalListenerOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     var removalResults = new ConcurrentHashMap<RemovalCause, Map<String, Object>>();
 
     useCache(
@@ -360,7 +361,7 @@ class CacheBuilderTest {
   }
 
   private void doGetAllOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-get-all").build(),
         cache -> {
@@ -418,7 +419,7 @@ class CacheBuilderTest {
   }
 
   private void doPutAllOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-put-all").expireAfterWrite(TTL).build(),
         cache -> {
@@ -468,7 +469,7 @@ class CacheBuilderTest {
   }
 
   private void doSerializationOperations(
-      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-serialization").build(),
         cache -> {

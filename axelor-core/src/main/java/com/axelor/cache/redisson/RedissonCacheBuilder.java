@@ -23,13 +23,14 @@ import org.redisson.api.options.MapCacheOptions;
  * @param <V> the type of mapped values
  */
 public class RedissonCacheBuilder<K, V>
-    extends AbstractRedissonCacheBuilder<K, V, RMapCache<K, V>, MapCacheOptions<K, V>> {
+    extends AbstractRedissonCacheBuilder<
+        K, V, RedissonCacheBuilder<K, V>, RMapCache<K, V>, MapCacheOptions<K, V>> {
 
   public RedissonCacheBuilder(String cacheName) {
     super(cacheName);
   }
 
-  public RedissonCacheBuilder(CacheBuilder<K, V> builder) {
+  public RedissonCacheBuilder(CacheBuilder<K, V, ?> builder) {
     super(builder);
   }
 

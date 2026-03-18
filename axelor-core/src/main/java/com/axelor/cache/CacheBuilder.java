@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public abstract class CacheBuilder<K, V> {
+public abstract class CacheBuilder<K, V, B extends CacheBuilder<K, V, B>> {
 
   private final String cacheName;
 
@@ -52,11 +52,12 @@ public abstract class CacheBuilder<K, V> {
     this.cacheName = cacheName;
   }
 
-  protected CacheBuilder(CacheBuilder<K, V> builder) {
+  protected CacheBuilder(CacheBuilder<K, V, ?> builder) {
     this(builder.cacheName);
     this.maximumSize = builder.maximumSize;
     this.expireAfterWrite = builder.expireAfterWrite;
     this.expireAfterAccess = builder.expireAfterAccess;
+    this.tenantAware = builder.tenantAware;
     this.removalListener = builder.removalListener;
   }
 
@@ -73,7 +74,7 @@ public abstract class CacheBuilder<K, V> {
    * @param <V> the value type of the cache
    * @return a new {@code CacheBuilder} instance
    */
-  public static <K, V> CacheBuilder<K, V> newBuilder(String name) {
+  public static <K, V, B extends CacheBuilder<K, V, B>> B newBuilder(String name) {
     return fromCacheName(stackWalker.getCallerClass().getName() + ":" + name);
   }
 
@@ -100,8 +101,8 @@ public abstract class CacheBuilder<K, V> {
    * @return a new {@code CacheBuilder} instance
    */
   @SuppressWarnings("unchecked")
-  protected static <K, V> CacheBuilder<K, V> fromCacheName(String name) {
-    return cacheType.getCacheBuilder(name);
+  protected static <K, V, B extends CacheBuilder<K, V, B>> B fromCacheName(String name) {
+    return (B) cacheType.getCacheBuilder(name);
   }
 
   /**
@@ -117,6 +118,11 @@ public abstract class CacheBuilder<K, V> {
     return cacheName;
   }
 
+  @SuppressWarnings("unchecked")
+  protected B self() {
+    return (B) this;
+  }
+
   protected int getMaximumSize() {
     return maximumSize;
   }
@@ -130,9 +136,9 @@ public abstract class CacheBuilder<K, V> {
    * @param maximumSize the maximum size of the cache
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> maximumSize(int maximumSize) {
+  public B maximumSize(int maximumSize) {
     this.maximumSize = maximumSize;
-    return this;
+    return self();
   }
 
   protected Duration getExpireAfterWrite() {
@@ -145,9 +151,9 @@ public abstract class CacheBuilder<K, V> {
    * @param expireAfterWrite the duration after which entries will expire following the last write
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> expireAfterWrite(Duration expireAfterWrite) {
+  public B expireAfterWrite(Duration expireAfterWrite) {
     this.expireAfterWrite = expireAfterWrite;
-    return this;
+    return self();
   }
 
   protected Duration getExpireAfterAccess() {
@@ -160,9 +166,9 @@ public abstract class CacheBuilder<K, V> {
    * @param expireAfterAccess the duration after which entries will expire following the last access
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> expireAfterAccess(Duration expireAfterAccess) {
+  public B expireAfterAccess(Duration expireAfterAccess) {
     this.expireAfterAccess = expireAfterAccess;
-    return this;
+    return self();
   }
 
   protected boolean isTenantAware() {
@@ -178,9 +184,9 @@ public abstract class CacheBuilder<K, V> {
    *
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public CacheBuilder<K, V> nonTenantAware() {
+  public B nonTenantAware() {
     this.tenantAware = false;
-    return this;
+    return self();
   }
 
   @SuppressWarnings("unchecked")
@@ -195,11 +201,12 @@ public abstract class CacheBuilder<K, V> {
    * @param removalListener the listener instance
    * @return this {@code CacheBuilder} instance (for chaining)
    */
-  public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> removalListener(
-      RemovalListener<? super K1, ? super V1> removalListener) {
+  public <K1 extends K, V1 extends V, B1 extends CacheBuilder<K1, V1, B1>>
+      CacheBuilder<K1, V1, B1> removalListener(
+          RemovalListener<? super K1, ? super V1> removalListener) {
 
     @SuppressWarnings("unchecked")
-    var self = (CacheBuilder<K1, V1>) this;
+    var self = (CacheBuilder<K1, V1, B1>) this;
     self.removalListener = removalListener;
 
     return self;

@@ -36,14 +36,14 @@ public enum CacheType {
       new RedissonDistributedService(),
       true);
 
-  private final Function<String, CacheBuilder<?, ?>> cacheBuilderFactory;
+  private final Function<String, CacheBuilder<?, ?, ?>> cacheBuilderFactory;
   private final Class<? extends CachingProvider> cachingProviderClass;
   private final String cacheRegionFactory;
   private final DistributedService distributedService;
   private final boolean distributed;
 
   CacheType(
-      Function<String, CacheBuilder<?, ?>> cacheBuilderFactory,
+      Function<String, CacheBuilder<?, ?, ?>> cacheBuilderFactory,
       Class<? extends CachingProvider> cachingProviderClass,
       String cacheRegionFactory,
       DistributedService distributedService,

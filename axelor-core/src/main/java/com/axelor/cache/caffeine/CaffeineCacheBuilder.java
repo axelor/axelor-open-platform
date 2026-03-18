@@ -8,11 +8,9 @@ import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheLoader;
 import com.axelor.cache.event.RemovalCause;
-import com.axelor.cache.event.RemovalListener;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import java.time.Duration;
 
 /**
  * Caffeine cache builder
@@ -25,7 +23,7 @@ import java.time.Duration;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
+public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V, CaffeineCacheBuilder<K, V>> {
 
   private boolean weakKeys;
 
@@ -85,41 +83,6 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
    */
   public CaffeineCacheBuilder<K, V> weakValues() {
     this.weakValues = true;
-    return this;
-  }
-
-  @Override
-  public CaffeineCacheBuilder<K, V> maximumSize(int maximumSize) {
-    super.maximumSize(maximumSize);
-    return this;
-  }
-
-  @Override
-  public CaffeineCacheBuilder<K, V> expireAfterWrite(Duration expireAfterWrite) {
-    super.expireAfterWrite(expireAfterWrite);
-    return this;
-  }
-
-  @Override
-  public CaffeineCacheBuilder<K, V> expireAfterAccess(Duration expireAfterAccess) {
-    super.expireAfterAccess(expireAfterAccess);
-    return this;
-  }
-
-  @Override
-  public <K1 extends K, V1 extends V> CaffeineCacheBuilder<K1, V1> removalListener(
-      RemovalListener<? super K1, ? super V1> removalListener) {
-    super.removalListener(removalListener);
-
-    @SuppressWarnings("unchecked")
-    var self = (CaffeineCacheBuilder<K1, V1>) this;
-
-    return self;
-  }
-
-  @Override
-  public CaffeineCacheBuilder<K, V> nonTenantAware() {
-    super.nonTenantAware();
     return this;
   }
 
