@@ -1,0 +1,5 @@
+---
+title: Fix NPE in MetaFiles.upload() recovery block
+type: fix
+description: |
+  Add null check for temporary file copy to prevent masking of root persistence exceptions with NPEs during new file uploads.

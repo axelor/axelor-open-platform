@@ -353,7 +353,9 @@ public class MetaFiles {
           // ignore, file may not completely uploaded
         }
         // restore original file
-        store.addFile(tmpCopy, originalFilePath);
+        if (tmpCopy != null) {
+          store.addFile(tmpCopy, originalFilePath);
+        }
         throw new PersistenceException(e);
       }
     } finally {
