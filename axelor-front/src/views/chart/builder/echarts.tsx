@@ -50,16 +50,12 @@ export function ECharts({
   width,
   options,
   legend = true,
-  isMerge = true,
-  lazyUpdate = false,
   onClick,
 }: Pick<ChartProps, "data" | "legend" | "onClick"> & {
   type: ChartType;
   height: number;
   width: number;
   options: Partial<echarts.EChartsCoreOption>;
-  isMerge: boolean;
-  lazyUpdate: boolean;
 }) {
   const divRef = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts>(null);
@@ -154,14 +150,12 @@ export function ECharts({
           color: getColor(type, data.config?.colors, data.config?.shades),
         },
         {
-          // Merge by default and replace high-churn branches to avoid stale data.
-          notMerge: !isMerge,
-          replaceMerge: isMerge ? ["series", "dataset"] : undefined,
-          lazyUpdate,
+          // Full replacement avoids stale branches when options shrink.
+          notMerge: true,
         },
       );
     }
-  }, [isRTL, type, legend, options, isMerge, data.config, lazyUpdate]);
+  }, [isRTL, type, legend, options, data.config]);
 
   return <div className={classes.echarts} ref={divRef} />;
 }
