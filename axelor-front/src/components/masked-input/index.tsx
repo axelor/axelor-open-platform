@@ -105,6 +105,7 @@ type NativeInputProps = Omit<
 type MaskedInputProps = MaskedFieldProps & InputProps & NativeInputProps;
 
 function moveCaretToStart(el: HTMLInputElement, placeholderChar: string) {
+  if (document.activeElement !== el) return;
   const { value } = el;
   if (typeof el.selectionStart === "number") {
     const ind = value.indexOf(placeholderChar);
@@ -147,6 +148,7 @@ export function MaskedInput(props: MaskedInputProps) {
   const { value, onBlur, onChange, onFocus, onKeyDown, ...rest } = inputProps;
 
   const frameRef = useRef<number>(0);
+  const mountedRef = useRef(true);
   const [showMaskState, setShowMaskState] = useState(false);
   const isShowMaskControlled = showMaskProp !== undefined;
   const showMask = isShowMaskControlled ? !!showMaskProp : showMaskState;
@@ -164,7 +166,10 @@ export function MaskedInput(props: MaskedInputProps) {
   });
 
   useEffect(() => {
-    return () => cancelAnimationFrame(frameRef.current);
+    return () => {
+      mountedRef.current = false;
+      cancelAnimationFrame(frameRef.current);
+    };
   }, []);
 
   const composedRef = useCallback(
@@ -206,7 +211,9 @@ export function MaskedInput(props: MaskedInputProps) {
 
   function handleFocus(event: FocusEvent<HTMLInputElement>) {
     if (!isShowMaskControlled) {
-      setShowMaskState(true);
+      queueMicrotask(() => {
+        if (mountedRef.current) setShowMaskState(true);
+      });
     }
     const inputEl = event.currentTarget;
     frameRef.current = requestAnimationFrame(() =>
@@ -216,8 +223,11 @@ export function MaskedInput(props: MaskedInputProps) {
   }
 
   function handleBlur(event: FocusEvent<HTMLInputElement>) {
+    cancelAnimationFrame(frameRef.current);
     if (!isShowMaskControlled) {
-      setShowMaskState(false);
+      queueMicrotask(() => {
+        if (mountedRef.current) setShowMaskState(false);
+      });
     }
     onBlur?.(event);
   }
