@@ -31,7 +31,7 @@ import { i18n } from "@/services/client/i18n";
 import { Views } from "../views";
 import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
-import { showErrors } from "@/views/form";
+import { showErrors } from "@/views/form/builder/form-errors";
 import { handlePopper } from "./view-popper";
 
 import styles from "./view-popup.module.scss";

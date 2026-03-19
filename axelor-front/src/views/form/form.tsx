@@ -1,7 +1,6 @@
 import { ScopeProvider } from "bunshi/react";
-import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import uniq from "lodash/uniq";
 import {
   RefObject,
   SyntheticEvent,
@@ -65,11 +64,10 @@ import {
   FormState,
   FormWidget,
   RecordHandler,
-  WidgetErrors,
-  WidgetState,
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
+import { showErrors, useGetErrors } from "./builder/form-errors";
 import {
   FormWidgetProviders,
   FormWidgetsHandler,
@@ -105,63 +103,6 @@ export const fetchRecord = async (
   }
 
   return defaults;
-};
-
-export const showErrors = (errors: WidgetErrors[]) => {
-  const titles = uniq(
-    Object.values(errors).flatMap((e) =>
-      Object.values(e)
-        .filter(Boolean)
-        .flatMap((v) => (typeof v === "object" ? Object.values(v) : v)),
-    ),
-  );
-  titles.length &&
-    alerts.error({
-      message: (
-        <ul>
-          {titles.map((title, i) => (
-            <li key={i}>{title}</li>
-          ))}
-        </ul>
-      ),
-    });
-};
-
-export const useGetErrors = () => {
-  const store = useStore();
-  return useCallback(
-    (formState: FormState, fieldName?: string) => {
-      const { states, statesByName = {} } = formState;
-      const isHidden = function isHidden(s: WidgetState): boolean {
-        return Boolean(
-          s.attrs.hidden ||
-            (s.name && statesByName[s.name]?.attrs?.hidden) ||
-            (s.parent && isHidden(store.get(s.parent))),
-        );
-      };
-
-      const serverErrors = Object.keys(statesByName)
-        .filter((k) => statesByName[k].errors?.error)
-        .filter((v) => Object.values(states).some((w) => w.name === v))
-        .map((o) => Object.values(states).find((w) => w.name === o))
-        .filter((s) => !isHidden(s!))
-        .map((w) => {
-          const error = i18n.get(`{0} is invalid`, w?.attrs?.title || w?.name);
-          return { error } as WidgetErrors;
-        });
-
-      const errors = Object.values(states)
-        .filter((s) => fieldName === undefined || s.name === fieldName)
-        .filter((s) => !isHidden(s))
-        .filter(
-          (s) => Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
-        )
-        .map((s) => s.errors ?? {})
-        .concat(serverErrors);
-      return errors.length ? errors : null;
-    },
-    [store],
-  );
 };
 
 export const usePrepareSaveRecord = (

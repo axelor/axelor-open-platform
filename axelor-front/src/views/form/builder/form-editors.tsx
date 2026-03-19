@@ -30,7 +30,8 @@ import {
 import { toKebabCase } from "@/utils/names.ts";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
-import { Layout as FormViewLayout, useGetErrors } from "../form";
+import { Layout as FormViewLayout } from "../form";
+import { getTopError, useGetErrors } from "./form-errors";
 import { createFormAtom, formDirtyUpdater } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
@@ -1194,8 +1195,11 @@ const RecordEditor = memo(function RecordEditor({
         if (invalid && editor.json) {
           const state = get(editorAtom);
           errors = getErrors(state)?.reduce(
-            (errorList, error) =>
-              errorList.concat(Object.values(error) as string[]),
+            (errorList, fieldErrors) => {
+              const top = getTopError(fieldErrors);
+              if (!top) return errorList;
+              return errorList.concat(Array.isArray(top) ? top : [top]);
+            },
             [] as string[],
           );
         }

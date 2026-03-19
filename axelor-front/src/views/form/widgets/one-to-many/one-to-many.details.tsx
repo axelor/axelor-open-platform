@@ -13,7 +13,8 @@ import { focusAtom } from "@/utils/atoms";
 
 import { Form, FormAtom, useFormHandlers } from "../../builder";
 import { useFormScope } from "../../builder/scope";
-import { Layout, showErrors, useGetErrors } from "../../form";
+import { Layout } from "../../form";
+import { showErrors, useGetErrors } from "../../builder/form-errors";
 
 import styles from "./one-to-many.details.module.scss";
 

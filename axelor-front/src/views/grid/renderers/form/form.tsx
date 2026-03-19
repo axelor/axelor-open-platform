@@ -35,7 +35,8 @@ import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { executeWithoutQueue } from "@/view-containers/action";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
-import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
+import { useHandleFocus } from "@/views/form";
+import { showErrors, useGetErrors } from "@/views/form/builder/form-errors";
 import {
   FormAtom,
   Form as FormComponent,
@@ -440,7 +441,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const checkInvalid = useAtomCallback(
       useCallback(
-        (get, set, name?: string) => getErrors(get(formAtom), name),
+        (get) => getErrors(get(formAtom)),
         [formAtom, getErrors],
       ),
     );

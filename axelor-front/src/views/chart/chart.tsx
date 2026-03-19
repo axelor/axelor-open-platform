@@ -25,7 +25,7 @@ import { Form, FormAtom, useFormHandlers } from "../form/builder";
 import { ChartDataRecord, Chart as ChartComponent } from "./builder";
 import { getChartData, getScale } from "./builder/utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useGetErrors } from "../form";
+import { useGetErrors } from "../form/builder/form-errors";
 import { FormActionHandler } from "../form/builder/scope";
 import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import { DataContext } from "@/services/client/data.types";

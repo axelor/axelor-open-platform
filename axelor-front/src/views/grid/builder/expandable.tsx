@@ -32,10 +32,9 @@ import {
 import {
   Layout,
   fetchRecord,
-  showErrors,
   useFormPerms,
-  useGetErrors,
 } from "@/views/form";
+import { showErrors, useGetErrors } from "@/views/form/builder/form-errors";
 import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";

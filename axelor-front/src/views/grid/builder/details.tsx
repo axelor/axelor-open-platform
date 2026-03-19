@@ -24,13 +24,12 @@ import {
 import {
   Layout,
   restoreSelectedStateWithSavedRecord,
-  showErrors,
   useFormAttachment,
   useFormPerms,
-  useGetErrors,
   useHandleFocus,
   usePrepareSaveRecord,
 } from "../../form";
+import { showErrors, useGetErrors } from "../../form/builder/form-errors";
 import { Form, FormState, useFormHandlers } from "../../form/builder";
 
 import styles from "./details.module.scss";

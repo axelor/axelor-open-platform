@@ -53,8 +53,8 @@ const validateRange: Validate = (value, { props }) => {
 const validateString: Validate = (value, { props, context }) => {
   return (
     validateRequired(value, { props, context }) ||
-    validatePattern(value, { props, context }) ||
-    validateRange(value?.length, { props, context })
+    validateRange(value?.length, { props, context }) ||
+    validatePattern(value, { props, context })
   );
 };
 

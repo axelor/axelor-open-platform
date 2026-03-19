@@ -16,7 +16,7 @@ import { ActionView, FormView, Schema } from "@/services/client/meta.types";
 import { PopupProps, showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
-import { showErrors } from "@/views/form";
+import { showErrors } from "@/views/form/builder/form-errors";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
 import { initTab } from "../use-tabs";
