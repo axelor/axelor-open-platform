@@ -1,7 +1,7 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:2.0.0")
+    classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:2.1.1")
   }
 }
 
