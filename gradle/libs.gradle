@@ -54,7 +54,7 @@ libs.slf4j_logback = libs.slf4j_base + [
 libs.guava = "com.google.guava:guava:${versions.guava}"
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:2.5"
+libs.snakeyaml = "org.yaml:snakeyaml:2.6"
 
 // Exclude guava and use explicit version : to fix CVE in transitive dependencies
 def excludeGuava = { name ->
