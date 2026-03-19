@@ -13,6 +13,7 @@ import com.axelor.db.Model;
 import com.axelor.db.audit.state.AuditState;
 import com.axelor.db.audit.state.EntityState;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
@@ -342,7 +343,6 @@ public class AuditProcessor {
 
   private Map<String, Object> parseValues(Class<?> entityClass, Map<String, Object> values) {
     var mapper = Mapper.of(entityClass);
-    var entity = Mapper.toBean(entityClass, null);
     var parsedValues = new HashMap<String, Object>();
     for (var entry : values.entrySet()) {
       var name = entry.getKey();
@@ -350,10 +350,10 @@ public class AuditProcessor {
       var prop = mapper.getProperty(name);
       if (prop == null || prop.isReference()) {
         parsedValues.put(name, value);
-        continue;
+      } else {
+        parsedValues.put(
+            name, Adapter.adapt(value, prop.getJavaType(), prop.getGenericType(), null));
       }
-      prop.set(entity, value);
-      parsedValues.put(name, prop.get(entity));
     }
     return parsedValues;
   }

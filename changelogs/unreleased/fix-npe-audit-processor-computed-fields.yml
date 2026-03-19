@@ -1,0 +1,3 @@
+---
+title: Fix NPE in AuditProcessor when processing computed fields
+type: fix
