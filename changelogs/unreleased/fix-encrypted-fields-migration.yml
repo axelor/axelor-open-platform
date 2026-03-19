@@ -1,0 +1,9 @@
+---
+title: Fix encrypted fields migration
+type: fix
+description: |
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINED` so they are 
+  migrated by the parent class.

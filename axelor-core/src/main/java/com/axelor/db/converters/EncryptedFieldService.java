@@ -19,6 +19,7 @@
 package com.axelor.db.converters;
 
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.persistence.FlushModeType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +79,21 @@ public class EncryptedFieldService {
           .map(mapper::getProperty)
           .filter(Property::isEncrypted)
           .forEach(encrypted::add);
+    }
+
+    Class<?> superclass = model.getSuperclass();
+    while (superclass != null && superclass != Model.class) {
+      if (JPA.models().contains(superclass)) {
+        // With TABLE_PER_CLASS, each concrete table has its own physical copy of inherited
+        // columns, so inherited fields must be migrated independently per class.
+        Inheritance inheritance = superclass.getAnnotation(Inheritance.class);
+        if (inheritance == null || inheritance.strategy() != InheritanceType.TABLE_PER_CLASS) {
+          final Mapper superMapper = Mapper.of(superclass);
+          encrypted.removeIf(p -> superMapper.getProperty(p.getName()) != null);
+        }
+        break;
+      }
+      superclass = superclass.getSuperclass();
     }
 
     if (encrypted.isEmpty()) {
