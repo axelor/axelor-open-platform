@@ -4,7 +4,6 @@
  */
 package com.axelor.text;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
@@ -226,9 +225,6 @@ public class AxelorStreamingTemplateEngine extends StreamingTemplateEngine {
       }
     }
 
-    @SuppressFBWarnings(
-        value = "SR_NOT_CHECKED",
-        justification = "safe to ignore return value of skip from reader backed by StringReader")
     private int getLinesInSource() throws IOException {
       int result;
 
