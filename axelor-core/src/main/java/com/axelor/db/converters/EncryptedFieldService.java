@@ -11,11 +11,14 @@ import com.axelor.common.crypto.BytesEncryptor;
 import com.axelor.common.crypto.Encryptor;
 import com.axelor.common.crypto.StringEncryptor;
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.inject.persist.Transactional;
 import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.TypedQuery;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -151,6 +154,21 @@ public class EncryptedFieldService {
           .map(mapper::getProperty)
           .filter(Property::isEncrypted)
           .forEach(encrypted::add);
+    }
+
+    Class<?> superclass = model.getSuperclass();
+    while (superclass != null && superclass != Model.class) {
+      if (JPA.models().contains(superclass)) {
+        // With TABLE_PER_CLASS, each concrete table has its own physical copy of inherited
+        // columns, so inherited fields must be migrated independently per class.
+        Inheritance inheritance = superclass.getAnnotation(Inheritance.class);
+        if (inheritance == null || inheritance.strategy() != InheritanceType.TABLE_PER_CLASS) {
+          final Mapper superMapper = Mapper.of(superclass);
+          encrypted.removeIf(p -> superMapper.getProperty(p.getName()) != null);
+        }
+        break;
+      }
+      superclass = superclass.getSuperclass();
     }
 
     if (encrypted.isEmpty()) {

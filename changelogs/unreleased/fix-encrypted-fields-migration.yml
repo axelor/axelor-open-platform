@@ -1,0 +1,17 @@
+---
+title: Fix encrypted fields migration
+type: fix
+description: |
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINE`D so they are 
+  migrated by the parent class.
+  
+  Also few improvements has been done :
+  - Use JDBC batch statements instead of individual JPQL UPDATE queries : select decrypted values via JPA (so the old 
+  encryptor is applied automatically), then re-encrypt and persist via `PreparedStatement.addBatch()` / `executeBatch()`
+  for better performance and reduced DB load
+  - Add validation of migration settings (required password, known algorithms, warn on no-op rotations) before starting
+  - Infer missing old encryption settings from current values when rotating : only need to configure what actually 
+  changed. Ex : no need to set `old-password` is we rotate only the algorithm.
