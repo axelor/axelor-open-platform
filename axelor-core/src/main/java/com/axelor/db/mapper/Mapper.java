@@ -397,7 +397,7 @@ public class Mapper {
   }
 
   /**
-   * Create an object of the given class mapping the given value map to it's properties.
+   * Create an object of the given class mapping the given value map to its properties.
    *
    * @param <T> type of the bean
    * @param klass class of the bean
@@ -415,8 +415,20 @@ public class Mapper {
       return bean;
     }
     final Mapper mapper = Mapper.of(klass);
-    values.entrySet().stream()
-        .filter(e -> mapper.setters.containsKey(e.getKey()))
+    Map<Boolean, List<Map.Entry<String, Object>>> partitioned =
+        values.entrySet().stream()
+            .filter(e -> mapper.setters.containsKey(e.getKey()))
+            .collect(
+                Collectors.partitioningBy(
+                    e -> {
+                      Property prop = mapper.getProperty(e.getKey());
+                      return prop != null && prop.isVirtual();
+                    }));
+    partitioned
+        .getOrDefault(false, List.of())
+        .forEach(e -> mapper.set(bean, e.getKey(), e.getValue()));
+    partitioned
+        .getOrDefault(true, List.of())
         .forEach(e -> mapper.set(bean, e.getKey(), e.getValue()));
     return bean;
   }

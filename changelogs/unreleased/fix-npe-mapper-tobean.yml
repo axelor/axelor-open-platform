@@ -1,0 +1,7 @@
+---
+title: Fix NPE from Mapper.toBean() with computed fields
+type: fix
+description: |
+  When mapping values to a bean, computed fields often depend on other
+  field values. By populating non-virtual fields first, we ensure that
+  dependencies are available when virtual fields are processed.
