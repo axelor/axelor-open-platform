@@ -12,3 +12,4 @@ description: |
   - Upgrade Ldaptive from 2.4.2 to 2.5.0
   - Upgrade Hibernate from 6.6.42 to 6.6.44
   - Upgrade Redisson from 3.52.0 to 4.3.1
+  - Upgrade Junit from 5.14.3 to 6.0.3

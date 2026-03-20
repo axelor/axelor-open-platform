@@ -20,7 +20,7 @@ versions.jakartaee_pac4j = "8.0.1"
 versions.pac4j = "6.4.1"
 versions.ldaptive = "2.5.0"
 
-versions.junit5 = "5.14.3"
+versions.junit = "6.0.3"
 
 versions.slf4j = "2.0.17"
 
@@ -31,8 +31,8 @@ versions.asm = "9.9.1"
 versions.flyway = "11.20.3"
 
 // unit testing
-libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
-libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.14.3" // for IDE
+libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit}"
+libs.junit_launcher = "org.junit.platform:junit-platform-launcher:${versions.junit}" // for IDE
 
 // logging
 libs.slf4j_api = "org.slf4j:slf4j-api:${versions.slf4j}"
