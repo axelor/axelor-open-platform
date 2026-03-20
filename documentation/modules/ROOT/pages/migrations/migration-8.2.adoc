@@ -9,6 +9,26 @@ In this document, we will see the major steps to migrate from 8.1 to 8.2.
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.2/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.2.
 
+== MySQL and Oracle databases support removed
+
+MySQL and Oracle as database backends are no longer supported. PostgreSQL remains the only supported database for
+production use. The support was always partial and never fully validated in production environments. Over time,
+maintaining this compatibility became an ongoing source of complexity with no real benefit:
+
+* *Development overhead*: A lot of features involving database-specific behavior had to be implemented separately for
+each database engine. This made the codebase harder to maintain and slowed down development.
+
+* *Missing features*: MySQL and Oracle lack or differ on several PostgreSQL capabilities that the platform relies on,
+such as advisory locks (used for leader election), `SKIP LOCKED`, advanced JSON operators, and unaccent support.
+Keeping workarounds alive for features that could not be fully supported was not sustainable.
+
+* *No known production users*: To our knowledge, no production deployment ran on MySQL or Oracle. The support existed
+on paper but was never exercised in real conditions.
+
+If you are running PostgreSQL, no action is required. If you are running MySQL or Oracle, you will need to migrate your
+data to PostgreSQL before upgrading to 8.2. Standard database migration tools such as https://pgloader.io/[pgloader]
+can help automate the data transfer.
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :
@@ -17,3 +37,4 @@ Here is the full SQL migration script for all built-in AOP entities :
 ----
 ALTER TABLE meta_json_model ADD is_delegated boolean;
 ----
+

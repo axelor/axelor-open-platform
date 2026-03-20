@@ -109,7 +109,6 @@ libs.jakarta_annotation = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
 libs.jdbc_postgres = "org.postgresql:postgresql:42.7.10"
-libs.jdbc_mysql = "com.mysql:mysql-connector-j:9.4.0"
 
 // Hibernate
 libs.hibernate = [
@@ -153,9 +152,7 @@ libs.flywaydb = [
     exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-toml'
   },
   "org.flywaydb:flyway-database-hsqldb:${versions.flyway}",
-  "org.flywaydb:flyway-database-oracle:${versions.flyway}",
   "org.flywaydb:flyway-database-postgresql:${versions.flyway}",
-  "org.flywaydb:flyway-mysql:${versions.flyway}",
   // overrides jackson version used
   "com.fasterxml.jackson.dataformat:jackson-dataformat-toml:${versions.jackson}"
 ]

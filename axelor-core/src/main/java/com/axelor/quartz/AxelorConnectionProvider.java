@@ -97,11 +97,6 @@ public class AxelorConnectionProvider extends HikariCpPoolingConnectionProvider 
   private String determineScriptName() throws SQLException {
     if (DBHelper.isPostgreSQL()) {
       return "tables_postgres.sql";
-    } else if (DBHelper.isMySQL()) {
-      return "tables_mysql.sql";
-    } else if (DBHelper.isOracle()) {
-      // Assuming Oracle 23+ for now
-      return "tables_oracle23.sql";
     } else if (DBHelper.isHSQL()) {
       return "tables_hsqldb.sql";
     }

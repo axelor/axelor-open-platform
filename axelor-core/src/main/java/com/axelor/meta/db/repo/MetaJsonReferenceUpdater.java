@@ -7,7 +7,6 @@ package com.axelor.meta.db.repo;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -33,11 +32,6 @@ import java.util.stream.Collectors;
 public class MetaJsonReferenceUpdater {
 
   void handleOnSave(@Observes @Named(RequestEvent.SAVE) PostRequest event) {
-
-    // Not supported on Oracle
-    if (DBHelper.isOracle()) {
-      return;
-    }
 
     final Request request = event.getRequest();
     if (request.getBeanClass() == null) {

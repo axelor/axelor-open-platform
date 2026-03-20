@@ -2,9 +2,6 @@
 :toc:
 :toc-title:
 
-:url-mysql: https://www.mysql.com/
-:url-oracle: http://www.oracle.com/technetwork/indexes/downloads/index.html#database
-
 :url-caffeine: https://github.com/ben-manes/caffeine
 :url-hazelcast: https://hazelcast.com/
 :url-redis: https://redis.io/
@@ -178,8 +175,6 @@ db.default.password = secret <4>
 <2> the jdbc url to connect to
 <3> user name to be used to connect to the database server
 <4> user password to authenticate the user
-
-If you want to use {url-mysql}[MySQL], update the JDBC URL : `db.default.url = jdbc:mysql://localhost:3306/my_database`.
 
 The `db.default.ddl` configuration property is used to customize the Hibernate database schema generation process, and
 it can take the following values:

@@ -8,19 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.axelor.JpaTest;
-import com.axelor.db.internal.DBHelper;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.extension.ExecutionCondition;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.condition.EnabledIf;
 
-@ExtendWith(JsonFunctionsTest.SupportCondition.class)
+@EnabledIf("com.axelor.db.internal.DBHelper#isPostgreSQL")
 @TestMethodOrder(OrderAnnotation.class)
 class JsonFunctionsTest extends JpaTest {
 
@@ -116,17 +112,5 @@ class JsonFunctionsTest extends JpaTest {
     var result = query.getSingleResult();
 
     assertEquals(EXPECTED_INTEGER, result);
-  }
-
-  static class SupportCondition implements ExecutionCondition {
-    @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-      if (DBHelper.isPostgreSQL() || DBHelper.isMySQL()) {
-        return ConditionEvaluationResult.enabled("JSON functions are supported.");
-      } else {
-        return ConditionEvaluationResult.disabled(
-            "JSON functions are not fully supported with current dialect.");
-      }
-    }
   }
 }

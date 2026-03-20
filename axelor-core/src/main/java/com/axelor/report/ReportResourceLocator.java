@@ -8,7 +8,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
-import com.axelor.db.internal.DBHelper;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -45,13 +44,6 @@ public class ReportResourceLocator implements IResourceLocator {
 
   @Override
   public URL findResource(ModuleHandle moduleHandle, String fileName, int type) {
-    if (DBHelper.isOracle() && fileName.endsWith(".rptlibrary")) {
-      final URL found =
-          find(moduleHandle, fileName.replace(".rptlibrary", ".oracle.rptlibrary"), type);
-      if (found != null) {
-        return found;
-      }
-    }
     return find(moduleHandle, fileName, type);
   }
 

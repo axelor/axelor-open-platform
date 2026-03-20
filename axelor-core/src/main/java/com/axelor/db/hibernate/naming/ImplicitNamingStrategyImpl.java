@@ -4,7 +4,6 @@
  */
 package com.axelor.db.hibernate.naming;
 
-import com.axelor.db.internal.DBHelper;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.boot.model.naming.Identifier;
@@ -34,10 +33,6 @@ public class ImplicitNamingStrategyImpl extends ImplicitNamingStrategyLegacyHbmI
 
   @Override
   public Identifier determineIndexName(ImplicitIndexNameSource source) {
-    // if oracle, generate short index names
-    if (DBHelper.isOracle()) {
-      return super.determineIndexName(source);
-    }
     // in v4, we used _IDX suffix in index names
     return determineContraintName(source, "_IDX");
   }

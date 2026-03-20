@@ -37,7 +37,6 @@ import org.quartz.impl.jdbcjobstore.JobStoreSupport;
 import org.quartz.impl.jdbcjobstore.JobStoreTX;
 import org.quartz.impl.jdbcjobstore.PostgreSQLDelegate;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
-import org.quartz.impl.jdbcjobstore.oracle.OracleDelegate;
 import org.quartz.spi.JobStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,13 +195,11 @@ class SchedulerProvider implements Provider<Scheduler> {
   private String getDriverDelegateClass() {
     if (DBHelper.isPostgreSQL()) {
       return PostgreSQLDelegate.class.getName();
-    } else if (DBHelper.isOracle()) {
-      return OracleDelegate.class.getName();
     } else if (DBHelper.isHSQL()) {
       return HSQLDBDelegate.class.getName();
     }
 
-    // Fallback to standard JDBC driver (suitable for MySQL, H2)
+    // Fallback to standard JDBC driver, suitable for H2
     return StdJDBCDelegate.class.getName();
   }
 

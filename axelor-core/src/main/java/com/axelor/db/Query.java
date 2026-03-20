@@ -492,7 +492,6 @@ public class Query<T extends Model> {
     namedParams.putAll(params);
 
     boolean versioned = updatedBy != null;
-    boolean notMySQL = !DBHelper.isMySQL();
 
     String whereClause = String.join(" OR ", where);
     String selectQuery = updateQuery().replaceFirst("SELECT self", "SELECT self.id");
@@ -505,39 +504,11 @@ public class Query<T extends Model> {
 
     selectQuery = selectQuery.replaceAll("\\bself", "that");
 
-    if (notMySQL) {
-      return QueryBinder.of(
-              em().createQuery(updateQuery(params, versioned, "self.id IN (" + selectQuery + ")")))
-          .bind(namedParams, this.params)
-          .getQuery()
-          .executeUpdate();
-    }
-
-    // MySQL doesn't allow sub select on same table with UPDATE also, JPQL doesn't
-    // support JOIN with UPDATE query so we have to update in batch.
-
-    String updateQuery = updateQuery(params, versioned, "self.id IN (:ids)");
-
-    int count = 0;
-    int limit = 1000;
-
-    TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
-    jakarta.persistence.Query uq = em().createQuery(updateQuery);
-
-    QueryBinder.of(sq).bind(namedParams, this.params);
-    QueryBinder.of(uq).bind(namedParams, this.params);
-
-    sq.setFirstResult(0);
-    sq.setMaxResults(limit);
-
-    List<Long> ids = sq.getResultList();
-    while (!ids.isEmpty()) {
-      uq.setParameter("ids", ids);
-      count += uq.executeUpdate();
-      ids = sq.getResultList();
-    }
-
-    return count;
+    return QueryBinder.of(
+            em().createQuery(updateQuery(params, versioned, "self.id IN (" + selectQuery + ")")))
+        .bind(namedParams, this.params)
+        .getQuery()
+        .executeUpdate();
   }
 
   /**
@@ -562,40 +533,12 @@ public class Query<T extends Model> {
    * @return total number of records affected.
    */
   public int delete() {
-    boolean notMySQL = !DBHelper.isMySQL();
     String selectQuery =
         updateQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that");
 
-    if (notMySQL) {
-      jakarta.persistence.Query q =
-          em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
-      this.bind(q);
-      return q.executeUpdate();
-    }
-
-    // MySQL doesn't allow sub select on same table with DELETE also, JPQL doesn't
-    // support JOIN with DELETE query so we have to update in batch.
-
-    TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
-    jakarta.persistence.Query dq = em().createQuery(deleteQuery("self.id IN (:ids)"));
-
-    this.bind(sq);
-    this.bind(dq);
-
-    int count = 0;
-    int limit = 1000;
-
-    sq.setFirstResult(0);
-    sq.setMaxResults(limit);
-
-    List<Long> ids = sq.getResultList();
-    while (!ids.isEmpty()) {
-      dq.setParameter("ids", ids);
-      count += dq.executeUpdate();
-      ids = sq.getResultList();
-    }
-
-    return count;
+    jakarta.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
+    this.bind(q);
+    return q.executeUpdate();
   }
 
   /**

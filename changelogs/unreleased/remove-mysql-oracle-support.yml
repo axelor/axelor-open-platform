@@ -1,0 +1,6 @@
+---
+title: Remove MySQL and Oracle database support
+type: change
+description: |
+  Both databases had only partial support that was never actively used or maintained. 
+  Removing them to reduce complexity and focus on PostgreSQL as the primary supported database.

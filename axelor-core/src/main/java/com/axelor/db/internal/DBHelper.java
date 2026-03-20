@@ -231,16 +231,6 @@ public class DBHelper {
     return StringUtils.isBlank(mode) ? SharedCacheMode.NONE : SharedCacheMode.valueOf(mode);
   }
 
-  /** Whether using oracle database. */
-  public static boolean isOracle() {
-    return isEngine(TargetDatabase.ORACLE);
-  }
-
-  /** Whether using MySQL database. */
-  public static boolean isMySQL() {
-    return isEngine(TargetDatabase.MYSQL);
-  }
-
   /** Whether using PostgreSQL database. */
   public static boolean isPostgreSQL() {
     return isEngine(TargetDatabase.POSTGRESQL);

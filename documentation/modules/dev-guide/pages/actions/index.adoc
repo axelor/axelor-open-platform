@@ -2,8 +2,8 @@
 :toc:
 :toc-title:
 
-:url-java-el: https://docs.oracle.com/javaee/7/tutorial/jsf-el.htm
-:url-groovy: http://www.groovy-lang.org/
+:url-java-el: https://jakarta.ee/specifications/expression-language/5.0/jakarta-expression-language-spec-5.0
+:url-groovy: https://docs.groovy-lang.org/docs/groovy-4.0.30/html/documentation/
 
 In previous chapter we have checked about the object views. The views however
 requires actions to do something useful other than just CRUD operations.

@@ -21,8 +21,8 @@ Each file should have proper declaration:
 </domain-models>
 ----
 
-IMPORTANT: Java reserved keywords can't be used as field names. SQL reserved
-keywords (PostgreSQL, MySQL & Oracle) can't be used as column names.
+IMPORTANT: Java reserved keywords can't be used as field names. PostgreSQL reserved keywords can't be used as column
+names.
 
 Let's see with an example:
 
@@ -336,9 +336,6 @@ example:
 
 The `<long>` field is used to define non-decimal numeric field where value can't
 be represented by `integer` type.
-
-IMPORTANT: Avoid using this field type as some dbms (oracle) only allows one
-long column per table (we already have one for `id` column)
 
 [cols="2,8"]
 |===

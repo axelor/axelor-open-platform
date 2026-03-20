@@ -17,7 +17,6 @@ import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Arrays;
 import java.util.Optional;
 import javax.crypto.BadPaddingException;
@@ -93,9 +92,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
       }
       if (ex instanceof ConstraintViolationException exception) {
         return onConstraintViolationException(exception, response);
-      }
-      if (ex instanceof SQLIntegrityConstraintViolationException exception) {
-        return onSQLIntegrityConstraintViolationException(exception, response);
       }
       if (ex instanceof SQLException exception) {
         return onSQLException(exception, response);
@@ -205,51 +201,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
   static final String DEFAULT_ERROR_TITLE = /*$$(*/ "SQL error" /*)*/;
   static final String DEFAULT_ERROR_MESSAGE = /*$$(*/
       "Unexpected database error occurred on the server." /*)*/;
-
-  private Response onSQLIntegrityConstraintViolationException(
-      SQLIntegrityConstraintViolationException e, Response response) {
-    int errorNumber = e.getErrorCode();
-
-    String title = null;
-    String message = null;
-
-    // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
-    switch (errorNumber) {
-      case 1217:
-      // fall through
-      case 1451: // foreign key violation
-        title = I18n.get(REFERENCE_ERROR_TITLE);
-        message = I18n.get(REFERENCE_ERROR_MESSAGE);
-        break;
-      case 1062: // unique constraint violation
-        title = I18n.get(UNIQUE_VIOLATION_ERROR_TITLE);
-        message = I18n.get(UNIQUE_VIOLATION_ERROR_MESSAGE);
-        break;
-      case 1406: // exceeds the maximum length
-        title = I18n.get(TOO_LONG_ERROR_TITLE);
-        message = I18n.get(TOO_LONG_ERROR_MESSAGE);
-        break;
-      case 3819: // check violation
-        title = I18n.get(CHECK_VIOLATION_ERROR_TITLE);
-        message = I18n.get(CHECK_VIOLATION_ERROR_MESSAGE);
-        break;
-      case 1048: // not null violation
-        title = I18n.get(NOT_NULL_ERROR_TITLE);
-        message = I18n.get(NOT_NULL_ERROR_MESSAGE);
-        break;
-      default:
-        title = I18n.get(DEFAULT_ERROR_TITLE);
-        message = I18n.get(DEFAULT_ERROR_MESSAGE);
-        break;
-    }
-
-    log.error("MySQL Error: {}", e.getMessage());
-
-    ResponseException error = new ResponseException(message, title, e);
-    response.setException(error);
-
-    return response;
-  }
 
   private Response onSQLException(SQLException e, Response response) {
 

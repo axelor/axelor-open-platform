@@ -10,6 +10,4 @@ public class TargetDatabase {
 
   public static final String HSQLDB = "HSQL Database Engine";
   public static final String POSTGRESQL = "PostgreSQL";
-  public static final String ORACLE = "Oracle";
-  public static final String MYSQL = "MySQL";
 }

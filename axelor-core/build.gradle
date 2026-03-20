@@ -27,7 +27,6 @@ dependencies {
 
   testImplementation libs.jdbc_hsqldb
   implementation libs.jdbc_postgres
-  implementation libs.jdbc_mysql
 
   api libs.hibernate
 

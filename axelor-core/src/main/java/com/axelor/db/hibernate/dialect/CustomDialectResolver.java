@@ -46,23 +46,6 @@ public class CustomDialectResolver implements DialectResolver {
       return null;
     }
 
-    if (TargetDatabase.MYSQL.equals(databaseName)) {
-      if (info.isSameOrAfter(8)) {
-        return new AxelorMySQLDialect(info);
-      }
-
-      log.error("MySQL 8.0 or later is required.");
-      return null;
-    }
-
-    if (TargetDatabase.ORACLE.equals(databaseName)) {
-      if (info.isSameOrAfter(19)) {
-        return new AxelorOracleDialect(info);
-      }
-      log.error("Oracle 19 or later is required.");
-      return null;
-    }
-
     if (TargetDatabase.HSQLDB.equals(databaseName)) {
       return new AxelorHSQLDialect(info);
     }
