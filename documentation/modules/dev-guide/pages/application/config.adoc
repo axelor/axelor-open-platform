@@ -395,7 +395,7 @@ There are also popular caching libraries such as {url-ehcache}[Ehcache],
 *Infinispan :*
 [source,gradle]
 ----
-implementation "org.infinispan:infinispan-hibernate-cache-v62:${infinispan_version}"
+implementation "org.infinispan:infinispan-hibernate-cache-v66:${infinispan_version}"
 implementation "org.infinispan:infinispan-core:${infinispan_version}"
 implementation "org.infinispan:infinispan-jcache:${infinispan_version}"
 ----
