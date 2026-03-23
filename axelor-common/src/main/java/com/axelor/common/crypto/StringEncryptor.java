@@ -8,7 +8,19 @@ import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 import java.nio.charset.StandardCharsets;
 
-/** The {@link StringEncryptor} can be used to encrypt/decrypt {@link String} values. */
+/**
+ * AES encryptor operating on {@link String} values.
+ *
+ * <p>Encrypts and decrypts strings by delegating to a {@link BytesEncryptor} and encoding the
+ * resulting bytes as Base64.
+ *
+ * @deprecated Backed by {@link BytesEncryptor}, which uses weak key derivation (PBKDF2WithHmacSHA1,
+ *     1024 iterations) and an instance-scoped salt. Use {@link StringEncryptorPbkdf2Sha512} (or
+ *     {@link StringEncryptorPbkdf2Sha256}) for new encryptions, or {@link
+ *     StringEncryptorCoordinator} to handle legacy {@code $AES$}, {@code $AESv1$}, and {@code
+ *     $AESv2$} ciphertext transparently.
+ */
+@Deprecated
 public class StringEncryptor implements Encryptor<String, String> {
 
   private final BaseEncoding encoder;

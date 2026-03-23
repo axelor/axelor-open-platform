@@ -18,6 +18,26 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES encryptor operating on raw byte arrays.
+ *
+ * <p>Uses PBKDF2WithHmacSHA1 for key derivation with a fixed iteration count of 1024 and an 8-byte
+ * salt that is generated once at construction time and reused for every {@link #encrypt(byte[])}
+ * call.
+ *
+ * <p>Binary payload format:
+ *
+ * <pre>
+ * CBC: | $AES$ (5 bytes) | salt (8 bytes) | encrypted_data |
+ * GCM: | $AES$ (5 bytes) | salt (8 bytes) | iv (16 bytes) | encrypted_data |
+ * </pre>
+ *
+ * @deprecated Weak key derivation (PBKDF2WithHmacSHA1, 1024 iterations) and instance-scoped salt.
+ *     Use {@link BytesEncryptorPbkdf2Sha512} (or {@link BytesEncryptorPbkdf2Sha256}) for new
+ *     encryptions, or {@link BytesEncryptorCoordinator} to handle legacy {@code $AES$}, {@code
+ *     $AESv1$}, and {@code $AESv2$} ciphertext transparently.
+ */
+@Deprecated
 public class BytesEncryptor implements Encryptor<byte[], byte[]> {
 
   private static final String AES_ALGORITHM = "AES";
