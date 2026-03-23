@@ -17,31 +17,6 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   private final String encryptionPassword =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
-  private final String explicitOldEncryptionAlgorithm =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
-  private final String explicitOldEncryptionPassword =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
-
-  // Only apply defaults when at least one old-* setting is explicitly configured.
-  // If neither is set, the old encryptor stays null so plain-text values pass through as-is
-  // (initial encryption use case).
-  private final boolean hasOldEncryptionSettings =
-      StringUtils.notBlank(explicitOldEncryptionAlgorithm)
-          || StringUtils.notBlank(explicitOldEncryptionPassword);
-
-  private final String oldEncryptionAlgorithm =
-      hasOldEncryptionSettings
-          ? (StringUtils.notBlank(explicitOldEncryptionAlgorithm)
-              ? explicitOldEncryptionAlgorithm
-              : encryptionAlgorithm)
-          : null;
-  private final String oldEncryptionPassword =
-      hasOldEncryptionSettings
-          ? (StringUtils.notBlank(explicitOldEncryptionPassword)
-              ? explicitOldEncryptionPassword
-              : encryptionPassword)
-          : null;
-
   private Encryptor<T, R> encryptor;
   private Encryptor<T, R> oldEncryptor;
 
@@ -55,8 +30,18 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   }
 
   protected final Encryptor<T, R> oldEncryptor() {
-    if (oldEncryptor == null && StringUtils.notBlank(oldEncryptionPassword)) {
-      oldEncryptor = getEncryptor(oldEncryptionAlgorithm, oldEncryptionPassword);
+    if (oldEncryptor == null && isMigrating()) {
+      String oldAlgorithm =
+          StringUtils.notBlank(AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM))
+              ? AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM)
+              : encryptionAlgorithm;
+      String oldPassword =
+          StringUtils.notBlank(AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD))
+              ? AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD)
+              : encryptionPassword;
+      if (StringUtils.notBlank(oldPassword)) {
+        oldEncryptor = getEncryptor(oldAlgorithm, oldPassword);
+      }
     }
     return oldEncryptor;
   }

@@ -109,7 +109,7 @@ public class TestBytesEncryptorPbkdf2SelfDescribing {
 
   private void assertSaltSizeStoredInHeader(OperationMode mode) {
     final int oldSaltSize = 8;
-    final int newSaltSize = 16;
+    final int newSaltSize = 127;
 
     final ConfigurableEncryptor oldEncryptor = new ConfigurableEncryptor(mode, 1_000, oldSaltSize);
     final byte[] ciphertext = oldEncryptor.encrypt(PLAINTEXT);

@@ -89,6 +89,8 @@ public class FieldsEncryptionFromPlainTextMigrationTest extends BaseEncryptionMi
   /// Load data for inheritance entities
   /// /////////////
 
+  protected static final int INHERITANCE_TEST_COUNT = 50;
+
   private static void insertDataForInheritanceEntities() {
     insertForSingle();
     insertForClass();
@@ -108,7 +110,7 @@ public class FieldsEncryptionFromPlainTextMigrationTest extends BaseEncryptionMi
             JPA.jdbcWork(
                 connection -> {
                   try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                    for (int i = 1; i <= 100; i++) {
+                    for (int i = 1; i <= INHERITANCE_TEST_COUNT; i++) {
                       ps.setLong(1, currentId.getAndSet(currentId.get() + 1) + 1);
                       for (int j = 1; j <= values.size(); j++) {
                         if (values.get(j - 1) instanceof Integer intVal) {
@@ -152,7 +154,7 @@ public class FieldsEncryptionFromPlainTextMigrationTest extends BaseEncryptionMi
                 connection -> {
                   try (PreparedStatement ps =
                       connection.prepareStatement(insertJoinedChildInJoinedTable)) {
-                    for (int i = 101; i <= 200; i++) {
+                    for (int i = INHERITANCE_TEST_COUNT + 1; i <= INHERITANCE_TEST_COUNT * 2; i++) {
                       ps.setLong(1, (long) i);
                       ps.setString(2, "MigrationTestDataChild");
                       ps.setString(3, "EncodedMigrationTestDataChild");

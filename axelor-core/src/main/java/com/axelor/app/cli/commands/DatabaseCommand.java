@@ -61,6 +61,11 @@ public class DatabaseCommand extends AbstractCliCommand {
   @Command(name = "encrypt", description = "Update the encrypted field values.")
   static class EncryptCommand extends AbstractCliCommand {
 
+    @Option(
+        names = {"-i", "--iteration"},
+        description = "Number of hash iterations used during re-encryption (default: 100000).")
+    private int iteration;
+
     @ParentCommand DatabaseCommand parent;
 
     @Override
@@ -68,11 +73,13 @@ public class DatabaseCommand extends AbstractCliCommand {
       parent.run(
           () -> {
             EncryptedFieldService service = Beans.get(EncryptedFieldService.class);
+            if (iteration > 0) {
+              service.setIteration(iteration);
+            }
             log.info("Start field value encryption...");
             System.setProperty("axelor.task.database", "encrypt");
             service.migrate();
             log.info("Field value encryption complete.");
-            log.info("Remove 'encryption.old-password' from 'axelor-config.properties'");
           });
     }
   }

@@ -4,16 +4,16 @@
  */
 package com.axelor.db.converters;
 
-import com.axelor.common.crypto.StringEncryptor;
+import com.axelor.common.crypto.StringEncryptorCoordinator;
 import jakarta.persistence.Converter;
 
 @Converter
 public class EncryptedStringConverter extends AbstractEncryptedConverter<String, String> {
 
   @Override
-  protected StringEncryptor getEncryptor(String algorithm, String password) {
+  protected StringEncryptorCoordinator getEncryptor(String algorithm, String password) {
     return "GCM".equalsIgnoreCase(algorithm)
-        ? StringEncryptor.gcm(password)
-        : StringEncryptor.cbc(password);
+        ? StringEncryptorCoordinator.gcm(password)
+        : StringEncryptorCoordinator.cbc(password);
   }
 }

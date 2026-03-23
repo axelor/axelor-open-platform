@@ -7,9 +7,10 @@ package com.axelor.db.converters;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
-import com.axelor.common.crypto.BytesEncryptor;
+import com.axelor.common.crypto.BytesEncryptorPbkdf2Sha256;
 import com.axelor.common.crypto.Encryptor;
-import com.axelor.common.crypto.StringEncryptor;
+import com.axelor.common.crypto.OperationMode;
+import com.axelor.common.crypto.StringEncryptorPbkdf2Sha256;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -58,6 +59,24 @@ public class EncryptedFieldService {
   private static final Logger LOG = LoggerFactory.getLogger(EncryptedFieldService.class);
 
   private boolean settingsValidated = false;
+
+  /**
+   * Iteration count used when re-encrypting during migration.
+   *
+   * <p><strong>Conscious security trade-off:</strong> 100K iterations is intentionally below the
+   * OWASP 2023 recommendation of 600,000 for PBKDF2-SHA256, chosen to keep migration throughput
+   * acceptable on large datasets.
+   */
+  private int defaultIteration = 100_000;
+
+  /**
+   * Overrides the default iteration count used when re-encrypting during migration.
+   *
+   * @param iteration the number of hash iterations to use
+   */
+  public void setIteration(int iteration) {
+    this.defaultIteration = iteration;
+  }
 
   /**
    * Migrates all encrypted field values across all models.
@@ -121,8 +140,9 @@ public class EncryptedFieldService {
       LOG.info("Encryption migration: changing algorithm");
     }
 
-    if (!StringUtils.notBlank(oldPassword) && !StringUtils.notBlank(oldAlgorithm)) {
-      LOG.info("Encryption migration: encrypting plain-text field values");
+    if (StringUtils.isBlank(oldPassword) && StringUtils.isBlank(oldAlgorithm)) {
+      LOG.info(
+          "Encryption migration: encrypting plain-text field values or change of algorithm version");
     }
 
     settingsValidated = true;
@@ -213,9 +233,9 @@ public class EncryptedFieldService {
 
     selectQuery.setMaxResults(limit);
     while (offset < count) {
+      LOG.debug("Processing records {} to {}", offset, Math.min(count, (offset + limit)));
       selectQuery.setFirstResult(offset);
       List<Map> values = selectQuery.getResultList();
-      LOG.debug("Processing records {} to {}", offset, Math.min(count, (offset + limit)));
       offset += limit;
 
       JPA.jdbcWork(
@@ -351,7 +371,8 @@ public class EncryptedFieldService {
   private Encryptor<byte[], byte[]> bytesEncryptor;
 
   /**
-   * Returns the {@link StringEncryptor} for the new encryption settings, lazily initialized.
+   * Returns the default {@code Encryptor<String, String>} for the new encryption settings, lazily
+   * initialized.
    *
    * @return the string encryptor
    */
@@ -359,14 +380,17 @@ public class EncryptedFieldService {
     if (stringEncryptor == null) {
       stringEncryptor =
           "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-              ? StringEncryptor.gcm(ENCRYPTION_PASSWORD)
-              : StringEncryptor.cbc(ENCRYPTION_PASSWORD);
+              ? new StringEncryptorPbkdf2Sha256(
+                  OperationMode.GCM, ENCRYPTION_PASSWORD, defaultIteration)
+              : new StringEncryptorPbkdf2Sha256(
+                  OperationMode.CBC, ENCRYPTION_PASSWORD, defaultIteration);
     }
     return stringEncryptor;
   }
 
   /**
-   * Returns the {@link BytesEncryptor} for the new encryption settings, lazily initialized.
+   * Returns the default {@code Encryptor<byte[], byte[]>} for the new encryption settings, lazily
+   * initialized.
    *
    * @return the bytes encryptor
    */
@@ -374,8 +398,10 @@ public class EncryptedFieldService {
     if (bytesEncryptor == null) {
       bytesEncryptor =
           "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-              ? BytesEncryptor.gcm(ENCRYPTION_PASSWORD)
-              : BytesEncryptor.cbc(ENCRYPTION_PASSWORD);
+              ? new BytesEncryptorPbkdf2Sha256(
+                  OperationMode.GCM, ENCRYPTION_PASSWORD, defaultIteration)
+              : new BytesEncryptorPbkdf2Sha256(
+                  OperationMode.CBC, ENCRYPTION_PASSWORD, defaultIteration);
     }
     return bytesEncryptor;
   }

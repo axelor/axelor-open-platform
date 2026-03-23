@@ -164,11 +164,22 @@ required and defaults to the current `encryption.algorithm`.
 required and defaults to the current `encryption.password`.
 * **Password and algorithm change** — set both `encryption.old-password` and `encryption.old-algorithm` to their
 respective previous values.
+* **Hashing algorithm upgrade** — migrating from the legacy `$AES$` format (PBKDF2WithHmacSHA1) to the new
+`$AESv1$` format (PBKDF2WithHmacSHA256). No extra configuration is needed: the password and AES algorithm remain
+the same, only the hashing algorithm changes.
 
 [source,sh]
 ----
-  $ axelor database encrypt
+  $ axelor database encrypt [OPTIONS]
 ----
+
+[cols="1,3",options="header"]
+|===
+| Option | Description
+
+| `-i, --iteration=<iteration>`
+| Specify the number of hash iterations used.
+|===
 
 IMPORTANT: After the command completes successfully, remove any `encryption.old-password` or `encryption.old-algorithm`
 entries from `axelor-config.properties`.

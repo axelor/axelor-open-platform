@@ -8,8 +8,10 @@ import com.axelor.JpaTest;
 import com.axelor.JpaTestModule;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.common.crypto.BytesEncryptor;
-import com.axelor.common.crypto.StringEncryptor;
+import com.axelor.common.crypto.BytesEncryptorPbkdf2Sha256;
+import com.axelor.common.crypto.Encryptor;
+import com.axelor.common.crypto.OperationMode;
+import com.axelor.common.crypto.StringEncryptorPbkdf2Sha256;
 import com.axelor.test.GuiceModules;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -19,8 +21,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 abstract class BaseEncryptionTest extends JpaTest {
 
-  protected static String ENCRYPTION_ALGORITHM = "GCM";
-  protected static String ENCRYPTION_PASSWORD = "123456789";
+  protected static final String ENCRYPTION_ALGORITHM = "GCM";
+  protected static final String ENCRYPTION_PASSWORD = "123456789";
 
   public static class AuditTestModule extends JpaTestModule {
     @Override
@@ -44,15 +46,15 @@ abstract class BaseEncryptionTest extends JpaTest {
     AppSettings.get().getInternalProperties().remove(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
   }
 
-  protected StringEncryptor getStringEncryptor() {
-    return "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-        ? StringEncryptor.gcm(ENCRYPTION_PASSWORD)
-        : StringEncryptor.cbc(ENCRYPTION_PASSWORD);
+  protected Encryptor<String, String> getStringEncryptor() {
+    return OperationMode.CBC.name().equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+        ? StringEncryptorPbkdf2Sha256.cbc(ENCRYPTION_PASSWORD)
+        : StringEncryptorPbkdf2Sha256.gcm(ENCRYPTION_PASSWORD);
   }
 
-  protected BytesEncryptor getBytesEncryptor() {
-    return "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-        ? BytesEncryptor.gcm(ENCRYPTION_PASSWORD)
-        : BytesEncryptor.cbc(ENCRYPTION_PASSWORD);
+  protected Encryptor<byte[], byte[]> getBytesEncryptor() {
+    return OperationMode.CBC.name().equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+        ? BytesEncryptorPbkdf2Sha256.cbc(ENCRYPTION_PASSWORD)
+        : BytesEncryptorPbkdf2Sha256.gcm(ENCRYPTION_PASSWORD);
   }
 }

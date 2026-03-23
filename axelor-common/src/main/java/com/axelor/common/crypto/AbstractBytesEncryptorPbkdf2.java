@@ -124,8 +124,8 @@ abstract class AbstractBytesEncryptorPbkdf2 implements Encryptor<byte[], byte[]>
     this.saltSize = saltSize;
     this.ivSize = ivSize;
     this.prefixBytes = prefixBytes;
-    // prefix(n) + iterations(4) + salt_size(1) + iv_size(1) + salt(n) + iv(n)
-    this.minPayloadSize = prefixBytes.length + 4 + 1 + 1 + saltSize + ivSize;
+    // prefix(n) + iterations(4) + salt_size(1) + iv_size(1)
+    this.minPayloadSize = prefixBytes.length + 4 + 1 + 1;
   }
 
   /**

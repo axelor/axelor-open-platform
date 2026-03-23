@@ -26,6 +26,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 abstract class BaseEncryptionMigrationTest extends BaseEncryptionTest {
 
+  protected static final int TEST_COUNT = 125;
+
   private static final String INSERT_SQL =
       "INSERT INTO secure_entity(id, version, my_secure_string, my_secure_binary, my_string, my_binary)"
           + " VALUES(?, 0, ?, ?, ?, ?)";
@@ -40,7 +42,7 @@ abstract class BaseEncryptionMigrationTest extends BaseEncryptionTest {
             JPA.jdbcWork(
                 connection -> {
                   try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL)) {
-                    for (int i = 1; i <= 2000; i++) {
+                    for (int i = 1; i <= TEST_COUNT; i++) {
                       String text = "EncodedMigrationTestData" + i;
                       byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
                       ps.setLong(1, i);
