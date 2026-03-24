@@ -298,8 +298,8 @@ For example:
 
 Translated values are stored in same general translation table (no context saved).
 
-The `encrypted` field values are stored in database using AES-256 encrypted values.
-The password should be provided from application config file using `encryption.password` key.
+The `encrypted` field values are stored in the database using AES-256 with `PBKDF2WithHmacSHA256`
+key derivation. See <<Field Encryption>> for configuration and column size constraints.
 
 ==== Boolean
 
@@ -715,8 +715,16 @@ It is defined by specifying :
 
 == Field Encryption
 
-Starting from 5.0, we can now encrypt sensitive fields. In order to use this
-feature, following application settings are required:
+Field encryption stores sensitive values in the database using AES-256. The encryption key is derived from a password
+using `PBKDF2WithHmacSHA256` with 600,000 iterations.
+
+The default operation mode is *AES/GCM* (authenticated encryption), which provides both confidentiality and integrity
+— any tampering with the stored value is detected on decryption. The mode can be changed to `CBC` via
+`encryption.algorithm`, but GCM is strongly recommended.
+
+The ciphertext is self-describing: the iteration count, salt size, and IV size are embedded in the payload. This means
+that changing the `encryption.password` or `encryption.algorithm` settings in the future does not break existing stored
+values, as long as the old password is provided via `encryption.old-password` during migration.
 
 [source,properties]
 ----
@@ -726,11 +734,11 @@ feature, following application settings are required:
 # change this password to a unique, long, and complex string
 encryption.password = MySuperSecretKey
 
-# Set encryption algorithm (CBC or GCM)
+# Set encryption algorithm: CBC or GCM (default)
 #encryption.algorithm = GCM
 ----
 
-We can mark `<string>` and `<binary>` fields as encrypted like this:
+Mark `<string>` and `<binary>` fields as encrypted in the model definition:
 
 [source,xml]
 ----
@@ -738,8 +746,23 @@ We can mark `<string>` and `<binary>` fields as encrypted like this:
 <binary name="myPicture" encrypted="true" />
 ----
 
-Encrypted values will be longer than actual values, so you should make sure that
-the field size is reasonably good enough to hold the encrypted value in database.
+Encrypted values are Base64-encoded in the database and are longer than the original plaintext. The table below gives
+the maximum plaintext size that fits in a standard `VARCHAR(255)` column:
+
+[cols="1,1,1", options="header"]
+|===
+| Mode | Max plaintext bytes | Notes
+
+| GCM (default) | 132 B | Recommended — authenticated encryption
+| CBC | 143 B | Legacy mode, no integrity check
+|===
+
+NOTE: For single-byte encodings (ASCII, digits, symbols), bytes equal characters. Multi-byte UTF-8 characters reduce
+the limit proportionally: 2-byte characters (e.g. `é`) halve it to ~66 chars, 3-byte characters (e.g. `中`) reduce it
+to ~44 chars.
+
+If 132 bytes is insufficient for a given field, increase the column size in the database schema (e.g. `VARCHAR(512)`)
+rather than switching to CBC mode.
 
 == Entity Listeners
 

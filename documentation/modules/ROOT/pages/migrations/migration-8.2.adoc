@@ -9,6 +9,87 @@ In this document, we will see the major steps to migrate from 8.1 to 8.2.
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.2/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.2.
 
+== Encrypted fields
+
+=== Stronger key derivation and self-describing ciphertext
+
+Encrypted fields now use `PBKDF2WithHmacSHA256`  with 600,000 iterations (`$AESv1$`) instead of the legacy
+`PBKDF2WithHmacSHA1` with 1,024 iterations (`$AES$`).
+
+Beyond the key derivation function change, the ciphertext format is now self-describing: the iteration count, salt
+size, and IV size are embedded directly in the payload header. This means decryption is always independent of the
+current application defaults — future changes to iteration counts or salt sizes never break existing stored values.
+
+The default operation mode is now *GCM* (authenticated encryption), replacing the previous *CBC* default. GCM provides
+integrity verification in addition to confidentiality, detecting any tampering with the stored value. The mode can
+still be set explicitly via `encryption.algorithm` in `axelor-config.properties` if needed.
+
+CAUTION: If `encryption.algorithm` is not explicitly set in the properties file, the default operation mode has
+changed from *CBC* to *GCM*. After upgrading, the application will attempt to decrypt existing CBC-encrypted values
+using GCM, which will *fail with errors*. Be sure to explicitly set it to *CBC* to be able to decrypt current values.
+
+**No immediate action is required.** The application transparently decrypts legacy `$AES$` ciphertext alongside the
+new `$AESv1$` format. Existing encrypted values continue to be readable as-is, and are re-encrypted with the new
+algorithm on the next writing.
+
+=== Encrypted output size and column limits
+
+The new format embeds additional metadata in the payload (prefix, iteration count, salt size, IV size), and GCM appends
+a 16-byte authentication tag. The encrypted value stored in the database is Base64-encoded, so the total column space
+required is slightly larger than with the legacy encryptor.
+
+The table below gives the maximum plaintext byte count that produces an encrypted value still fitting in a standard
+`VARCHAR(255)` column:
+
+[cols="1,1,1", options="header"]
+|===
+| Encryptor | Mode | Max plaintext bytes
+
+| Legacy `$AES$` (SHA1) | CBC | 175 B
+| Legacy `$AES$` (SHA1) | GCM | 144 B
+| `$AESv1$` (SHA256) | *GCM (default)* | *132 B*
+| `$AESv1$` (SHA256) | CBC | 143 B
+|===
+
+NOTE: "Max plaintext bytes" equals "max characters" only for single-byte encodings (ASCII, Latin digits, symbols).
+Multi-byte UTF-8 characters reduce the effective character limit proportionally: 2-byte characters (e.g. `é`) halve it
+to ~66, and 3-byte characters (e.g. `中`) reduce it to ~44 for the default GCM mode.
+
+If your application stores long values in encrypted fields and the 132-byte limit is too restrictive, consider
+increasing the column size in the database schema rather than switching to CBC mode.
+
+=== Migrating existing encrypted values
+
+To explicitly re-encrypt all `$AES$` values to the new `$AESv1$` format, run the database encryption CLI tool:
+
+[source,sh]
+----
+axelor database encrypt
+----
+
+No `encryption.old-password` or `encryption.old-algorithm` settings are required when coming from the legacy encryptor.
+
+Because `PBKDF2WithHmacSHA256` is significantly more CPU-intensive than the legacy `PBKDF2WithHmacSHA1`, a separate AES
+key must be derived for each encrypted field value, and that derivation dominates the processing time. To keep
+migration throughput acceptable on large datasets, the CLI tool uses **100,000 iterations** instead of the runtime
+default of 600,000. This can be overridden with the `--iteration` flag:
+
+[source,sh]
+----
+axelor database encrypt --iteration 200000
+----
+
+Values written during migration can be re-migrated to a higher count at any time, thanks to the self-describing format.
+
+Approximate cost at 100,000 iterations on typical hardware:
+
+* ~10 ms per encrypted field value
+* ~15 ms fixed overhead per record (batch read/write)
+
+Example: a table with 10,000 records and 6 encrypted fields takes roughly *10,000 × (15 ms + 6 × 10 ms) = ~12 minutes*.
+
+Plan migration windows accordingly for large datasets.
+
 == MySQL and Oracle databases support removed
 
 MySQL and Oracle as database backends are no longer supported. PostgreSQL remains the only supported database for
@@ -37,4 +118,3 @@ Here is the full SQL migration script for all built-in AOP entities :
 ----
 ALTER TABLE meta_json_model ADD is_delegated boolean;
 ----
-
