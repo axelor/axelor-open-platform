@@ -727,7 +727,7 @@ feature, following application settings are required:
 encryption.password = MySuperSecretKey
 
 # Set encryption algorithm (CBC or GCM)
-#encryption.algorithm = CBC
+#encryption.algorithm = GCM
 ----
 
 We can mark `<string>` and `<binary>` fields as encrypted like this:

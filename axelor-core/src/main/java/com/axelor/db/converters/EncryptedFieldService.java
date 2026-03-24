@@ -378,12 +378,12 @@ public class EncryptedFieldService {
    */
   private Encryptor<String, String> getStringEncryptor() {
     if (stringEncryptor == null) {
+      OperationMode mode =
+          OperationMode.CBC.name().equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+              ? OperationMode.CBC
+              : OperationMode.GCM;
       stringEncryptor =
-          "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-              ? new StringEncryptorPbkdf2Sha256(
-                  OperationMode.GCM, ENCRYPTION_PASSWORD, defaultIteration)
-              : new StringEncryptorPbkdf2Sha256(
-                  OperationMode.CBC, ENCRYPTION_PASSWORD, defaultIteration);
+          new StringEncryptorPbkdf2Sha256(mode, ENCRYPTION_PASSWORD, defaultIteration);
     }
     return stringEncryptor;
   }
@@ -396,12 +396,11 @@ public class EncryptedFieldService {
    */
   private Encryptor<byte[], byte[]> getBytesEncryptor() {
     if (bytesEncryptor == null) {
-      bytesEncryptor =
-          "GCM".equalsIgnoreCase(ENCRYPTION_ALGORITHM)
-              ? new BytesEncryptorPbkdf2Sha256(
-                  OperationMode.GCM, ENCRYPTION_PASSWORD, defaultIteration)
-              : new BytesEncryptorPbkdf2Sha256(
-                  OperationMode.CBC, ENCRYPTION_PASSWORD, defaultIteration);
+      OperationMode mode =
+          OperationMode.CBC.name().equalsIgnoreCase(ENCRYPTION_ALGORITHM)
+              ? OperationMode.CBC
+              : OperationMode.GCM;
+      bytesEncryptor = new BytesEncryptorPbkdf2Sha256(mode, ENCRYPTION_PASSWORD, defaultIteration);
     }
     return bytesEncryptor;
   }

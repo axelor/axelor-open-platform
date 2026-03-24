@@ -5,6 +5,7 @@
 package com.axelor.db.converters;
 
 import com.axelor.common.crypto.BytesEncryptorCoordinator;
+import com.axelor.common.crypto.OperationMode;
 import jakarta.persistence.Converter;
 
 @Converter
@@ -12,8 +13,10 @@ public class EncryptedBytesConverter extends AbstractEncryptedConverter<byte[], 
 
   @Override
   protected BytesEncryptorCoordinator getEncryptor(String algorithm, String password) {
-    return "GCM".equalsIgnoreCase(algorithm)
-        ? BytesEncryptorCoordinator.gcm(password)
-        : BytesEncryptorCoordinator.cbc(password);
+    OperationMode mode =
+        OperationMode.CBC.name().equalsIgnoreCase(algorithm)
+            ? OperationMode.CBC
+            : OperationMode.GCM;
+    return new BytesEncryptorCoordinator(mode, password);
   }
 }

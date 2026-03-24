@@ -253,7 +253,7 @@ Choose the right option by environment :
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
 | `encryption.password` | encryption password : use unique, long, and complex string |
-| `encryption.algorithm` | encryption algorithm (CBC or GCM) | CBC
+| `encryption.algorithm` | encryption algorithm (CBC or GCM) | GCM
 | `encryption.old-password` | old encryption password |
 | `encryption.old-algorithm` | old encryption algorithm (CBC or GCM) |
 | `reports.design-dir` | external directory for birt report designs | \{user.home}/.axelor/reports
