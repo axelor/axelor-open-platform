@@ -23,6 +23,7 @@ import {
   getTimeFormat,
 } from "@/utils/format";
 import { toCamelCase } from "@/utils/names";
+import { useFormOverlay } from "@/views/form/builder/overlay-scope";
 
 import { FieldControl, FieldProps, WidgetState } from "../../builder";
 import { ViewerInput } from "../string/viewer";
@@ -73,6 +74,8 @@ export function DateComponent({
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
+  const openRef = useRef(false);
+  const { onOpenOverlay, onCloseOverlay } = useFormOverlay();
 
   const type =
     toCamelCase(
@@ -96,12 +99,27 @@ export function DateComponent({
   );
   const [valueFormat, format] = dateFormats[type] || dateFormats.date;
 
+  const notifyOpen = useCallback(() => {
+    if (!openRef.current) {
+      openRef.current = true;
+      onOpenOverlay?.();
+    }
+  }, [onOpenOverlay]);
+
+  const notifyClose = useCallback(() => {
+    if (openRef.current) {
+      openRef.current = false;
+      onCloseOverlay?.();
+    }
+  }, [onCloseOverlay]);
+
   const getInput = useCallback(() => {
     const calendar = pickerRef.current;
     return calendar?.input?.inputElement as HTMLElement;
   }, []);
 
   const handleOpen = useCallback((isFocus?: boolean) => {
+    notifyOpen();
     setOpen(true);
     if (isFocus) {
       setTimeout(() => {
@@ -115,7 +133,7 @@ export function DateComponent({
         }
       }, 100);
     }
-  }, []);
+  }, [notifyOpen]);
 
   const handleBlur = useCallback(
     (e?: FocusEvent<HTMLElement>) => {
@@ -140,6 +158,7 @@ export function DateComponent({
 
   const handleClose = useCallback(
     (focus?: boolean) => {
+      notifyClose();
       setOpen(false);
       if (focus) {
         focusInput(getInput());
@@ -157,7 +176,7 @@ export function DateComponent({
         );
       }
     },
-    [getInput, handleBlur],
+    [getInput, handleBlur, notifyClose],
   );
 
   const handleClickOutSide = useCallback(
@@ -254,6 +273,10 @@ export function DateComponent({
   );
 
   useEffect(() => {
+    return () => notifyClose();
+  }, [notifyClose]);
+
+  useEffect(() => {
     // if value exist and it's invalid moment date value
     // then it should reset to null
     if (value && !$date) {
@@ -315,7 +338,6 @@ export function DateComponent({
           }
           onSelect={handleSelect}
           onChange={handleChange}
-          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           onClickOutside={handleClickOutSide}
         />

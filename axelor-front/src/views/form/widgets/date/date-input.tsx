@@ -3,6 +3,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { forwardRef, useCallback, useRef } from "react";
 import { MaskedInput } from "@/components/masked-input";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { isDatePickerTarget } from "./utils";
 
 const CHAR_MASK: Record<string, (RegExp | ((ch: string) => RegExp))[]> = {
   M: [/[0-1]/, (prev) => (prev === "1" ? /[0-2]/ : /\d/)],
@@ -64,14 +65,22 @@ export const DateInput = forwardRef<any, any>(
   ) => {
     const { name, eventOnBlur: onBlur, onChange, onFocus } = props;
     const mountRef = useRef(false);
-    function handleBlur({ target: { name, value } }: any) {
+    function handleBlur({ target: { name, value }, relatedTarget }: any) {
       const changed = value !== inputValue;
-      if (open || !changed) return;
-      const event = {
-        target: { name, value: value?.includes?.("_") ? "" : value },
-      };
-      onChange?.(event);
-      onBlur?.(event);
+      queueMicrotask(() => {
+        const nextTarget =
+          (relatedTarget as Element | null) ||
+          (document.activeElement as Element | null);
+        if (isDatePickerTarget(nextTarget)) {
+          return;
+        }
+        if (open || !changed) return;
+        const event = {
+          target: { name, value: value?.includes?.("_") ? "" : value },
+        };
+        onChange?.(event);
+        onBlur?.(event);
+      });
     }
 
     function handleKeyDown(e: any) {
