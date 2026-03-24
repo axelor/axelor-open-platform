@@ -162,8 +162,10 @@
 .react-datepicker__year-text--in-selecting-range,
 .react-datepicker__year-text--in-range {
   background-color: var(--bs-primary);
+  color: var(--bs-white);
   &:hover {
     background-color: var(--bs-primary) !important;
+    color: var(--bs-white) !important;
   }
 }
 
@@ -172,6 +174,7 @@
 .react-datepicker__quarter-text--keyboard-selected,
 .react-datepicker__year-text--keyboard-selected {
   background-color: var(--bs-secondary-bg);
+  color: var(--bs-body-color);
 
   &:focus-visible {
     outline: 2px solid var(--bs-primary);
