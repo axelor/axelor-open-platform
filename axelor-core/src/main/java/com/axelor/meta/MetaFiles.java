@@ -244,12 +244,32 @@ public class MetaFiles {
    * <p>The file is valid if it matches file upload whitelist types and doesn't match upload
    * blacklist types.
    *
+   * <p>Detection is based solely on the file content (magic bytes), without any filename hint, to
+   * prevent spoofing via file extension.
+   *
    * @param file the file to check
-   * @throws IllegalArgumentException
+   * @throws IllegalArgumentException if the content type is not valid
    */
   public static void checkType(File file) {
     Preconditions.checkNotNull(file, "file can't be null");
-    checkType(MimeTypesUtils.getContentType(file));
+    checkType(MimeTypesUtils.getContentType(file, null));
+  }
+
+  /**
+   * Check whether the given input stream content is valid.
+   *
+   * <p>The content is valid if it matches file upload whitelist types and doesn't match upload
+   * blacklist types.
+   *
+   * <p>Detection is based solely on the stream content (magic bytes), without any filename hint, to
+   * prevent spoofing via file extension.
+   *
+   * @param stream the input stream to check
+   * @throws IllegalArgumentException if the content type is not valid
+   */
+  public static void checkType(InputStream stream) {
+    Preconditions.checkNotNull(stream, "stream can't be null");
+    checkType(MimeTypesUtils.getContentType(stream, null));
   }
 
   /**

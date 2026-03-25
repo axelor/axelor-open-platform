@@ -1,0 +1,7 @@
+---
+title: Fix file upload content type validation to prevent extension spoofing
+type: security
+description: |
+  MetaFiles.checkType(File) now pass null as the filename hint to Tika, ensuring detection relies solely on magic
+  bytes. Previously, the filename was used as a hint and could influence the result, allowing a malicious file 
+  disguised with an allowed extension to bypass validation.
