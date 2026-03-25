@@ -8,6 +8,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.audit.db.AuditEventType;
 import com.axelor.audit.db.AuditLog;
+import com.axelor.common.UuidUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -29,15 +30,12 @@ import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.security.SecureRandom;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -54,7 +52,6 @@ public class AuditTracker {
   private final Set<Model> updated = new HashSet<>();
   private final Set<Model> deleted = new HashSet<>();
 
-  private static final SecureRandom random = new SecureRandom();
   private static final int FLUSH_THRESHOLD =
       AppSettings.get()
           .getInt(AvailableAppSettings.AUDIT_LOGS_FLUSH_THRESHOLD, DBHelper.getJdbcBatchSize());
@@ -64,35 +61,8 @@ public class AuditTracker {
   private boolean logCreated = false;
 
   public AuditTracker() {
-    this.txId = generateTxId();
+    this.txId = UuidUtils.v7().toString();
     this.mapper = Beans.get(ObjectMapper.class);
-  }
-
-  /**
-   * Generate transaction id
-   *
-   * @return UUIDv7
-   */
-  private static String generateTxId() {
-    var unixMillis = Instant.now().toEpochMilli();
-
-    // --- 48 bits timestamp ---
-    var ms = unixMillis & 0xFFFFFFFFFFFFL;
-
-    // --- random bits ---
-    var randA = random.nextInt(1 << 12); // 12 bits
-    var randB = random.nextLong() & 0x3FFFFFFFFFFFFFFFL; // 62 bits
-
-    // Construct MSB (timestamp + version 7)
-    var msb =
-        (ms << 16)
-            | 0x7000 // version = 7 (bits 12–15)
-            | randA;
-
-    // Construct LSB (variant + 62 random bits)
-    var lsb = (0x8000000000000000L) | randB; // variant 2 (RFC-4122)
-
-    return new UUID(msb, lsb).toString();
   }
 
   private String toJSON(Object value) {
