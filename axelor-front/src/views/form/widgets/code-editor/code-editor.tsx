@@ -1,34 +1,26 @@
-import Editor, { loader } from "@monaco-editor/react";
 import { clsx } from "@axelor/ui";
 import { useAtom } from "jotai";
 import { useCallback, useId } from "react";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { useAppSettings } from "@/hooks/use-app-settings";
+import { BaseCodeEditor } from "./base-code-editor";
 
 import styles from "./code-editor.module.scss";
 
-const monacoPath = import.meta.env.MONACO_PATH;
-
-if (monacoPath) {
-  const baseUrl = location.origin + location.pathname.replace(/\/$/, "");
-  loader.config({ paths: { vs: `${baseUrl}/${monacoPath}` } });
-}
-
 export function CodeEditorComponent(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;
-  const { codeSyntax, width = "100%" } = schema;
-  const height = schema.height ?? schema.widgetAttrs?.height ?? 400;
+  const { codeSyntax, width = "100%", placeholder, widgetAttrs } = schema;
 
-  const { themeMode } = useAppSettings();
+  const lite = schema?.lite === true || widgetAttrs?.lite === true;
+  const autoSize = schema?.autoSize === true || widgetAttrs?.autoSize === true;
 
-  const theme = themeMode === "dark" ? "vs-dark" : "light";
+  const height = schema.height ?? widgetAttrs?.height ?? 360;
 
   const [value, setValue] = useAtom(valueAtom);
 
   const handleChange = useCallback(
-    (value = "") => {
-      setValue(value, true);
+    (nextValue = "") => {
+      setValue(nextValue, true);
     },
     [setValue],
   );
@@ -37,27 +29,26 @@ export function CodeEditorComponent(props: FieldProps<string>) {
   const w = width && /^(\d+)$/.test(width) ? `${width}px` : width;
 
   return (
-    <Editor
+    <BaseCodeEditor
       className={clsx(styles.container, {
         [styles.invalid]: invalid,
         [styles.readonly]: readonly,
       })}
-      theme={theme}
       language={codeSyntax}
       value={value ?? ""}
+      placeholder={placeholder}
       width={w}
       height={h}
+      lite={lite}
+      autoSize={autoSize}
       onChange={handleChange}
-      options={{
-        readOnly: readonly,
-      }}
+      options={{ readOnly: readonly }}
     />
   );
 }
 
 export function CodeEditor(props: FieldProps<string>) {
   const id = useId();
-  
   return (
     <FieldControl {...props} inputId={id}>
       <CodeEditorComponent {...props} id={id} data-testid="input" />

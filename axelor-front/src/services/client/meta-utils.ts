@@ -130,6 +130,7 @@ function processWidgetAttrs(field: Schema) {
         "colorPickerShowAlpha",
         "barcodeDisplayValue",
         "resetState",
+        "autoSize",
       ].indexOf(name) !== -1
     ) {
       val = String(value)?.toLowerCase?.() === "true";

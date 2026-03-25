@@ -1047,6 +1047,11 @@
         <xsd:documentation>Color scheme for the code editor.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-auto-size" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether the code editor should auto-size to fit content up to the given height.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-lite" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to use compact version of the widget.</xsd:documentation>

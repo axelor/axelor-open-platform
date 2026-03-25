@@ -1244,6 +1244,8 @@ The following attributes are supported:
 
 * `x-code-syntax`: syntax highlighting
 * `x-code-theme`: theme to style the editor. If not defined, use the default theme.
+* `x-auto-size`: if `true`, the editor auto-sizes to fit content, growing up to the specified `height` (defaults to 360px).
+* `x-lite`: if `true`, use a minimal editor with no line numbers, folding, hover, suggestions, or context menu.
 
 WARNING: As part of the new v7 front-end built on top of React, `x-code-theme` is no more supported. It will be
 re-added in a future version.
