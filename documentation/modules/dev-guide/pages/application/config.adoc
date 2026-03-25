@@ -406,10 +406,9 @@ hibernate.cache.infinispan.cfg = org/infinispan/hibernate/cache/commons/builder/
 ----
 
 *Redis :*
-[source,gradle]
-----
-implementation "org.redisson:redisson-hibernate-6:${redisson_version}"
-----
+
+Redis is built-in and doesn't need external dependencies.
+
 [source,properties]
 ----
 # Use RedissonRegionFactory/RedissonRegionNativeFactory or any subclass
