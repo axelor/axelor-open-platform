@@ -1,0 +1,7 @@
+---
+title: Fix RestService upload missing file content type validation
+type: security
+description: |
+  Only the declared file type from the request data was validated against the whitelist/blacklist, allowing a malicious 
+  user to bypass validation by sending a file with an allowed extension but different content. Now the actual file 
+  content is inspected via Apache Tika for both attachment and non-attachment uploads.
