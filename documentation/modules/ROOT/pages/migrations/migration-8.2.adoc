@@ -8,3 +8,12 @@ In this document, we will see the major steps to migrate from 8.1 to 8.2.
 
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.2/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.2.
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+ALTER TABLE meta_json_model ADD is_delegated boolean;
+----
