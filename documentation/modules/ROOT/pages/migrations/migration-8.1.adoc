@@ -74,3 +74,41 @@ More information xref:dev-guide:modules/messaging.adoc[here].
 == Dependencies upgrade
 
 Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+-- AuditLog
+CREATE SEQUENCE audit_log_seq START WITH 1 INCREMENT BY 100;
+CREATE TABLE audit_log
+(
+    id             bigint       not null    primary key,
+    archived       boolean,
+    version        integer,
+    created_on     timestamp(6),
+    updated_on     timestamp(6),
+    current_state  text,
+    error_message  text,
+    event_type     varchar(255) not null,
+    previous_state text,
+    processed      boolean,
+    related_id     bigint       not null,
+    related_model  varchar(255) not null,
+    retry_count    integer,
+    tx_id          varchar(255) not null,
+    created_by     bigint   constraint fk_ru17orlmi6rjhpojmeqrxbiok references auth_user,
+    updated_by     bigint   constraint fk_tbhw331n3l89dk629vmpxg4de references auth_user,
+    user_id        bigint   constraint fk_pyjqqm7hglp6pnwp3h8whian8 references auth_user
+);
+
+CREATE INDEX audit_log_idx_processing
+    ON audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
+
+-- MailMessage
+ALTER TABLE mail_message ADD COLUMN received_on timestamp(6);
+CREATE INDEX mail_message_received_on_idx ON mail_message (received_on);
+UPDATE mail_message set received_on = created_on;
+----
