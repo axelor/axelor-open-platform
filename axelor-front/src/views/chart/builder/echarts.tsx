@@ -17,6 +17,7 @@ import {
   GridComponent,
   LegendScrollComponent,
   RadarComponent,
+  ToolboxComponent,
   TooltipComponent,
   TransformComponent,
 } from "echarts/components";
@@ -42,6 +43,7 @@ echarts.use([
   GridComponent,
   LegendScrollComponent,
   RadarComponent,
+  ToolboxComponent,
   TooltipComponent,
   TransformComponent,
   CanvasRenderer,
@@ -152,6 +154,14 @@ export function ECharts({
           ...$options,
           ...(legendOption !== undefined && { legend: legendOption }),
           color: getColor(type, data.config?.colors, data.config?.shades),
+          toolbox: {
+            feature: {
+              saveAsImage: {
+                title: " ",
+                pixelRatio: 2,
+              },
+            },
+          },
         },
         {
           // Full replacement avoids stale branches when options shrink.
