@@ -151,6 +151,7 @@ public class FileService extends AbstractService {
     try {
       files.clean(fileId);
     } catch (IOException e) {
+      // ignore
     }
     return javax.ws.rs.core.Response.ok().build();
   }
@@ -183,6 +184,7 @@ public class FileService extends AbstractService {
     }
 
     final Map<String, Object> data = new HashMap<>();
+    File file = null;
     try {
       fileName = URLDecoder.decode(fileName, "UTF-8");
       final String safeFileName = FileUtils.safeFileName(fileName);
@@ -190,7 +192,7 @@ public class FileService extends AbstractService {
       // check if file name is valid
       MetaFiles.checkPath(safeFileName);
       MetaFiles.checkType(fileType);
-      final File file = files.upload(stream, fileOffset, fileSize, fileId);
+      file = files.upload(stream, fileOffset, fileSize, fileId);
       // check if file content is valid
       MetaFiles.checkType(file);
       if (Files.size(file.toPath()) == fileSize) {
@@ -203,11 +205,13 @@ public class FileService extends AbstractService {
         return javax.ws.rs.core.Response.ok(meta).build();
       }
     } catch (IllegalArgumentException e) {
+      deleteTempUploadedFile(file);
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
       data.putAll(validateBuilder.build());
       return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
     } catch (Exception e) {
+      deleteTempUploadedFile(file);
       LOG.error("Error when uploading file:", e);
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
@@ -220,5 +224,15 @@ public class FileService extends AbstractService {
     }
 
     return javax.ws.rs.core.Response.ok(data).build();
+  }
+
+  private void deleteTempUploadedFile(File file) {
+    if (file != null) {
+      try {
+        Files.deleteIfExists(file.toPath());
+      } catch (IOException e) {
+        LOG.error("Error when deleting file: {}", file, e);
+      }
+    }
   }
 }
