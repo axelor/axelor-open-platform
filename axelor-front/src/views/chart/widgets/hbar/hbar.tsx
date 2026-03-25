@@ -2,7 +2,12 @@ import { produce } from "immer";
 import { useMemo, useState } from "react";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
-import { PlusData, applyTitles, useIsDiscrete } from "../../builder/utils";
+import {
+  PlusData,
+  applyTitles,
+  getDataZoom,
+  useIsDiscrete,
+} from "../../builder/utils";
 import { BarGroup } from "../bar/bar-group";
 
 const defaultOption = {
@@ -58,6 +63,13 @@ export function Hbar(props: ChartProps) {
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
       draft.tooltip.valueFormatter = formatter;
+
+      const dataZoom = getDataZoom(source.length, "yAxis");
+      if (dataZoom) {
+        draft.dataZoom = dataZoom;
+        // Slider on the right side — no legend overlap
+        draft.grid = { ...draft.grid, right: 80 };
+      }
     });
   }, [type, data, isDiscrete]);
 

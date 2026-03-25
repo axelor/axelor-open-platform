@@ -17,6 +17,35 @@ import { Formatters } from "@/utils/format";
 import { ChartDataRecord, ChartType } from "./types";
 
 const DEFAULT_MAX_SERIES = 50;
+const DATA_ZOOM_THRESHOLD = 20;
+
+/**
+ * Build dataZoom config for charts with many xAxis categories.
+ * Shows a slider + inside (scroll/pinch) zoom, initially displaying
+ * the first `maxVisible` items.
+ */
+export function getDataZoom(
+  dataLength: number,
+  axis: "xAxis" | "yAxis" = "xAxis",
+  maxVisible = DATA_ZOOM_THRESHOLD,
+) {
+  if (dataLength <= maxVisible) return undefined;
+
+  const endPercent = Math.min((maxVisible / dataLength) * 100, 100);
+  const axisIndex = axis === "xAxis" ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
+
+  return [
+    {
+      type: "slider",
+      ...axisIndex,
+      start: 0,
+      end: endPercent,
+      bottom: 5,
+      height: 20,
+    },
+    { type: "inside", ...axisIndex, start: 0, end: endPercent },
+  ];
+}
 
 const ChartColors = [
   [
@@ -609,78 +638,78 @@ function capPlusDataSeries(
   xAxis: string,
   maxSeries: number,
 ): { types: string[]; data: any[] } {
-  if (maxSeries <= 0 || types.length <= maxSeries) {
+  if (maxSeries <= 0) {
     return { types, data: result };
   }
 
   const othersLabel = i18n.get("Others");
 
-  // Compute total absolute value per type across all result rows
-  const totals = new Map<string, number>();
-  for (const row of result) {
-    for (const type of types) {
-      const val = Number(row[type]);
-      if (!Number.isNaN(val)) {
-        totals.set(type, (totals.get(type) ?? 0) + Math.abs(val));
+  // Cap types (series/dimensions) when there are too many
+  let cappedTypes = types;
+  let cappedData = result;
+
+  if (types.length > maxSeries) {
+    // Compute total absolute value per type across all result rows
+    const totals = new Map<string, number>();
+    for (const row of result) {
+      for (const type of types) {
+        const val = Number(row[type]);
+        if (!Number.isNaN(val)) {
+          totals.set(type, (totals.get(type) ?? 0) + Math.abs(val));
+        }
       }
     }
-  }
 
-  const sorted = [...totals.entries()].sort((a, b) => b[1] - a[1]);
-  const topTypes = sorted.slice(0, maxSeries).map(([k]) => k);
-  const tailTypes = new Set(sorted.slice(maxSeries).map(([k]) => k));
+    const sorted = [...totals.entries()].sort((a, b) => b[1] - a[1]);
+    const topTypes = sorted.slice(0, maxSeries).map(([k]) => k);
+    const tailTypes = new Set(sorted.slice(maxSeries).map(([k]) => k));
 
-  if (groupField !== xAxis) {
-    // Bar/hbar case: each result row has dimension keys — collapse tail keys
-    const cappedData = result.map((row) => {
-      const newRow: any = { raw: row.raw, x: row.x, y: row.y };
-      for (const t of topTypes) {
-        if (row[t] !== undefined) newRow[t] = row[t];
-      }
-      let othersTotal = 0;
-      for (const t of tailTypes) {
-        const val = Number(row[t]);
-        if (!Number.isNaN(val)) othersTotal += val;
-      }
-      if (othersTotal !== 0) newRow[othersLabel] = othersTotal;
-      return newRow;
-    });
+    if (groupField !== xAxis) {
+      // Bar/hbar case: each result row has dimension keys — drop tail keys
+      // (no "Others" bucket — it would dwarf individual bars and break the scale)
+      cappedData = result.map((row) => {
+        const newRow: any = { raw: row.raw, x: row.x, y: row.y };
+        for (const t of topTypes) {
+          if (row[t] !== undefined) newRow[t] = row[t];
+        }
+        return newRow;
+      });
 
-    const cappedTypes = [...topTypes];
-    if (cappedData.some((r) => r[othersLabel] !== undefined)) {
-      cappedTypes.push(othersLabel);
-    }
-    return { types: cappedTypes, data: cappedData };
-  }
-
-  // Pie/donut/radar case: each result row corresponds to one type — merge tail rows
-  // groupBy returns object keys as strings; normalize for membership checks
-  const topSet = new Set(topTypes.map((t) => String(t)));
-  const topRows: any[] = [];
-  let othersValue = 0;
-  const othersRaw: any[] = [];
-
-  for (const row of result) {
-    if (topSet.has(String(row.x))) {
-      topRows.push(row);
+      cappedTypes = [...topTypes];
     } else {
-      othersValue += Number(row.y) || 0;
-      if (row.raw) othersRaw.push(...row.raw);
+      // Pie/donut/radar case: each result row corresponds to one type — merge tail rows
+      // groupBy returns object keys as strings; normalize for membership checks
+      const topSet = new Set(topTypes.map((t) => String(t)));
+      const topRows: any[] = [];
+      let othersValue = 0;
+      const othersRaw: any[] = [];
+
+      for (const row of result) {
+        if (topSet.has(String(row.x))) {
+          topRows.push(row);
+        } else {
+          othersValue += Number(row.y) || 0;
+          if (row.raw) othersRaw.push(...row.raw);
+        }
+      }
+
+      cappedData = [...topRows];
+      if (othersValue !== 0) {
+        cappedData.push({
+          [othersLabel]: othersValue,
+          raw: othersRaw,
+          x: othersLabel,
+          y: othersValue.toString(),
+        });
+      }
+
+      cappedTypes = topRows.map((r) => r.x);
+      if (othersValue !== 0) cappedTypes.push(othersLabel);
     }
   }
 
-  const cappedData = [...topRows];
-  if (othersValue !== 0) {
-    cappedData.push({
-      [othersLabel]: othersValue,
-      raw: othersRaw,
-      x: othersLabel,
-      y: othersValue.toString(),
-    });
-  }
-
-  const cappedTypes = topRows.map((r) => r.x);
-  if (othersValue !== 0) cappedTypes.push(othersLabel);
+  // Note: xAxis categories are NOT capped here — chart widgets use dataZoom
+  // to let users scroll through many categories instead of dropping data.
 
   return { types: cappedTypes, data: cappedData };
 }

@@ -12,6 +12,8 @@ import {
 } from "echarts/charts";
 import {
   DatasetComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
   GridComponent,
   LegendScrollComponent,
   RadarComponent,
@@ -35,6 +37,8 @@ echarts.use([
   RadarChart,
   ScatterChart,
   DatasetComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
   GridComponent,
   LegendScrollComponent,
   RadarComponent,

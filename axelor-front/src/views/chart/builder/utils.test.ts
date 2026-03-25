@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PlusData, PlotData } from "./utils";
+import { PlusData, PlotData, getDataZoom } from "./utils";
 
 /**
  * Helper to build a bar-style dataset similar to:
@@ -86,23 +86,24 @@ describe("PlusData maxSeries capping", () => {
       expect(result.data).toHaveLength(2); // 2 years
     });
 
-    it("should cap 200 products to default 50 + Others", () => {
+    it("should cap 200 products to default 50 (no Others for bar)", () => {
       const data = makeBarData(200);
       const result = PlusData(data);
 
-      expect(result.types.length).toBeLessThanOrEqual(51);
-      expect(result.types).toContain("Others");
+      // Bar/hbar drops tail dimensions without "Others" to preserve Y-axis scale
+      expect(result.types).toHaveLength(50);
+      expect(result.types).not.toContain("Others");
 
       // Top products should be the highest-value ones
       expect(result.types).toContain("Product_199");
       expect(result.types).toContain("Product_198");
 
-      // Each source row (year) should have top dimensions + Others
+      // Each source row (year) should only have top dimensions
       for (const row of result.data) {
         const keys = Object.keys(row).filter(
           (k) => !["raw", "x", "y"].includes(k),
         );
-        expect(keys.length).toBeLessThanOrEqual(51);
+        expect(keys.length).toBeLessThanOrEqual(50);
       }
     });
 
@@ -110,8 +111,8 @@ describe("PlusData maxSeries capping", () => {
       const data = makeBarData(100, 10);
       const result = PlusData(data);
 
-      expect(result.types.length).toBeLessThanOrEqual(11); // 10 + Others
-      expect(result.types).toContain("Others");
+      expect(result.types).toHaveLength(10);
+      expect(result.types).not.toContain("Others");
     });
 
     it("should disable capping when maxSeries is 0", () => {
@@ -122,23 +123,21 @@ describe("PlusData maxSeries capping", () => {
       expect(result.types).not.toContain("Others");
     });
 
-    it("should aggregate tail values correctly into Others", () => {
+    it("should drop tail dimensions and keep only top types", () => {
       const data = makeBarData(5, 2);
       const result = PlusData(data);
 
       // Top 2 by value: Product_4 (500+250=750), Product_3 (400+200=600)
       expect(result.types).toContain("Product_4");
       expect(result.types).toContain("Product_3");
-      expect(result.types).toContain("Others");
-      expect(result.types).toHaveLength(3);
+      expect(result.types).toHaveLength(2);
+      expect(result.types).not.toContain("Others");
 
-      // Check Others value for 2024 row: (1*100 + 2*100 + 3*100) = 600
+      // Tail dimensions should not be present in rows
       const row2024 = result.data.find((r: any) => r.x === "2024");
-      expect(row2024?.["Others"]).toBe(600);
-
-      // Check Others value for 2025 row: (1*50 + 2*50 + 3*50) = 300
-      const row2025 = result.data.find((r: any) => r.x === "2025");
-      expect(row2025?.["Others"]).toBe(300);
+      expect(row2024?.["Product_0"]).toBeUndefined();
+      expect(row2024?.["Product_1"]).toBeUndefined();
+      expect(row2024?.["Product_2"]).toBeUndefined();
     });
 
     it("should keep top types sorted by total absolute value", () => {
@@ -161,6 +160,47 @@ describe("PlusData maxSeries capping", () => {
 
       // Should fall back to DEFAULT_MAX_SERIES (50)
       expect(result.types.length).toBeLessThanOrEqual(51);
+    });
+  });
+
+  describe("bar/hbar with many xAxis categories (few types, many rows)", () => {
+    /**
+     * Simulates: few groupBy values (2 years) but many xAxis values (products).
+     * xAxis categories are NOT capped — chart widgets use dataZoom instead.
+     */
+    function makeBarManyCategories(count: number) {
+      const dataset = [];
+      for (let i = 0; i < count; i++) {
+        dataset.push({
+          _value: (i + 1) * 100,
+          _product: `Product_${i}`,
+          _year: "2024",
+        });
+        dataset.push({
+          _value: (i + 1) * 50,
+          _product: `Product_${i}`,
+          _year: "2025",
+        });
+      }
+      return {
+        xAxis: "_product",
+        series: [{ key: "_value", groupBy: "_year" }],
+        scale: 2,
+        dataset,
+        config: {},
+      };
+    }
+
+    it("should preserve all xAxis categories (dataZoom handles scrolling)", () => {
+      const data = makeBarManyCategories(200);
+      const result = PlusData(data);
+
+      // types = 2 (years), not capped
+      expect(result.types).toContain("2024");
+      expect(result.types).toContain("2025");
+
+      // All 200 categories preserved — dataZoom will handle display
+      expect(result.data).toHaveLength(200);
     });
   });
 
@@ -254,8 +294,8 @@ describe("maxSeries output size reduction", () => {
     expect(uncapped.types).toHaveLength(200);
     const uncappedKeys = countDimensionKeys(uncapped.data);
 
-    // Capped: ≤51 types → ≤51 keys per row × 2 rows = ≤102
-    expect(capped.types.length).toBeLessThanOrEqual(51);
+    // Capped: 50 types (no Others) → 50 keys per row × 2 rows = 100
+    expect(capped.types).toHaveLength(50);
     const cappedKeys = countDimensionKeys(capped.data);
 
     expect(cappedKeys).toBeLessThan(uncappedKeys / 3);
@@ -346,5 +386,37 @@ describe("PlotData maxSeries capping", () => {
 
     // Falls back to DEFAULT_MAX_SERIES (50)
     expect(result.data.length).toBeLessThanOrEqual(51);
+  });
+});
+
+describe("getDataZoom", () => {
+  it("should return undefined when data fits within threshold", () => {
+    expect(getDataZoom(10)).toBeUndefined();
+    expect(getDataZoom(20)).toBeUndefined();
+  });
+
+  it("should return slider + inside zoom for large data", () => {
+    const zoom = getDataZoom(100);
+    expect(zoom).toHaveLength(2);
+    expect(zoom![0]).toMatchObject({ type: "slider", xAxisIndex: 0 });
+    expect(zoom![1]).toMatchObject({ type: "inside", xAxisIndex: 0 });
+  });
+
+  it("should calculate correct end percentage", () => {
+    const zoom = getDataZoom(200);
+    // 20/200 = 10%
+    expect(zoom![0].end).toBe(10);
+  });
+
+  it("should support yAxis for horizontal bar charts", () => {
+    const zoom = getDataZoom(100, "yAxis");
+    expect(zoom![0]).toMatchObject({ type: "slider", yAxisIndex: 0 });
+    expect(zoom![1]).toMatchObject({ type: "inside", yAxisIndex: 0 });
+  });
+
+  it("should support custom maxVisible", () => {
+    const zoom = getDataZoom(100, "xAxis", 20);
+    // 20/100 = 20%
+    expect(zoom![0].end).toBe(20);
   });
 });

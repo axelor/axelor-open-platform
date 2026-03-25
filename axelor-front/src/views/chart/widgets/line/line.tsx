@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { useMemo } from "react";
 
 import { Formatters } from "@/utils/format";
-import { PlotData, applyTitles } from "../../builder/utils";
+import { PlotData, applyTitles, getDataZoom } from "../../builder/utils";
 import { ChartProps, ECharts } from "../../builder";
 
 const defaultOption = {
@@ -28,6 +28,7 @@ export function Line({ data, type, ...rest }: ChartProps) {
         ? "time"
         : "category";
       applyTitles(draft, data);
+      const useSampling = types.length > 200;
       draft.series = series.map((line: any) => ({
         name: line.key,
         type: "line",
@@ -37,6 +38,7 @@ export function Line({ data, type, ...rest }: ChartProps) {
             : ({ y }: any) => y,
         ),
         ...(type === "area" ? { areaStyle: {} } : {}),
+        ...(useSampling && { sampling: "lttb" }),
       }));
       draft.xAxis.type = xType;
       draft.xAxis.data = types;
@@ -62,6 +64,13 @@ export function Line({ data, type, ...rest }: ChartProps) {
           ...draft.tooltip,
           axisPointer: {},
         };
+      }
+
+      const dataZoom = getDataZoom(types.length);
+      if (dataZoom) {
+        draft.dataZoom = dataZoom;
+        draft.legend.bottom = 30;
+        draft.grid = { ...draft.grid, bottom: 65 };
       }
     });
   }, [type, data]);

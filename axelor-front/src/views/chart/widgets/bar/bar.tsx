@@ -2,7 +2,12 @@ import { useState, useMemo } from "react";
 import { produce } from "immer";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
-import { PlusData, applyTitles, useIsDiscrete } from "../../builder/utils";
+import {
+  PlusData,
+  applyTitles,
+  getDataZoom,
+  useIsDiscrete,
+} from "../../builder/utils";
 import { BarGroup } from "./bar-group";
 
 const defaultOption = {
@@ -55,7 +60,22 @@ export function Bar(props: ChartProps) {
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
 
-      if (rotateLabels) {
+      const dataZoom = getDataZoom(source.length);
+
+      if (dataZoom) {
+        // With dataZoom, use compact labels since users can zoom in
+        draft.xAxis.axisLabel = {
+          rotate: 45,
+          interval: 0,
+          overflow: "truncate",
+          width: 60,
+        };
+        // Show full category name in tooltip on hover
+        draft.tooltip.trigger = "axis";
+        draft.grid = { ...draft.grid, bottom: 110 };
+        draft.dataZoom = dataZoom;
+        draft.legend.bottom = 30;
+      } else if (rotateLabels) {
         draft.xAxis.axisLabel = {
           ...draft.xAxis.axisLabel,
           rotate: 30,
@@ -63,15 +83,10 @@ export function Bar(props: ChartProps) {
           overflow: "truncate",
           width: 110,
         };
-        draft.grid = {
-          ...draft.grid,
-          bottom: 120,
-        };
+        draft.tooltip.trigger = "axis";
+        draft.grid = { ...draft.grid, bottom: 120 };
       } else {
-        draft.xAxis.axisLabel = {
-          interval: 0,
-        };
-        draft.grid = {};
+        draft.xAxis.axisLabel = { interval: 0 };
       }
     });
   }, [type, data, isDiscrete]);
