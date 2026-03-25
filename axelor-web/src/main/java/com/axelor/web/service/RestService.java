@@ -68,6 +68,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.DatatypeConverter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -407,7 +408,14 @@ public class RestService extends ResourceService {
     if (!isAttachment) {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       uploadSave(fileStream, out);
-      data.put(field, out.toByteArray());
+      final byte[] bytes = out.toByteArray();
+      try {
+        // check if file content is valid
+        MetaFiles.checkType(new ByteArrayInputStream(bytes));
+      } catch (IllegalArgumentException e) {
+        return new Response().fail(e.getMessage());
+      }
+      data.put(field, bytes);
       return getResource().save(request);
     }
 
@@ -426,6 +434,13 @@ public class RestService extends ResourceService {
     entity.setFileType(metaFile.getFileType());
 
     File tmp = files.upload(fileStream, 0, -1, UUID.randomUUID().toString());
+    try {
+      // check if file content is valid
+      MetaFiles.checkType(tmp);
+    } catch (IllegalArgumentException e) {
+      Files.deleteIfExists(tmp.toPath());
+      return new Response().fail(e.getMessage());
+    }
     final MetaFile updatedEntity = files.upload(tmp, entity);
     JPA.runInTransaction(() -> updatedEntity.setFileName(originalFileName));
 
