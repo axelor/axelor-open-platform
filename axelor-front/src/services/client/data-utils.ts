@@ -1,4 +1,5 @@
 import isEqual from "lodash/isEqual";
+import getObjValue from "lodash/get";
 import setObjValue from "lodash/set";
 import { produce } from "immer";
 
@@ -191,16 +192,15 @@ export function updateRecord(
       const [jsonField, ...fieldParts] = key.split(".");
       const subField = fieldParts.join(".");
 
-      const _values =
+      const currentValue =
         jsonFieldsValue[jsonField] ??
         (jsonFieldsValue[jsonField] = toJSON(result[jsonField]));
 
-      if (!equals(_values[subField], value)) {
+      if (!equals(getObjValue(currentValue, subField), value)) {
+        const nextValue = toJSON(JSON.stringify(currentValue));
+        setObjValue(nextValue, subField, value);
         changed = true;
-        jsonFieldsValue[jsonField] = {
-          ..._values,
-          [subField]: value,
-        };
+        jsonFieldsValue[jsonField] = nextValue;
       }
       continue;
     }
@@ -220,7 +220,6 @@ export function updateRecord(
     }
 
     if (fields?.[key]?.json) {
-      delete jsonFieldsValue[key];
       newValue =
         newValue && compactJson(toJSON(newValue), { forContext: false });
     }
@@ -284,7 +283,6 @@ export function updateRecord(
           (vals, key) => ({
             ...vals,
             [key]: JSON.stringify({
-              // check json field is explicitly set, then retains the value
               ...(key in source && toJSON(result[key])),
               ...jsonFieldsValue[key],
             }),
