@@ -18,7 +18,24 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** This class defines from static helper methods to deal with Mime Types. */
+/**
+ * This class defines static helper methods to deal with MIME types.
+ *
+ * <p><strong>Security note:</strong> methods in this class fall into two categories:
+ *
+ * <ul>
+ *   <li><strong>Extension-based detection</strong> ({@link #getContentType(String)}, {@link
+ *       #getExtensionContentType(String)}): rely solely on the file name or extension. These must
+ *       <em>not</em> be used for security validation, as a malicious user can rename any file to an
+ *       allowed extension.
+ *   <li><strong>Content-based detection</strong> ({@link #getContentType(File, String)}, {@link
+ *       #getContentType(InputStream, String)}): inspect the file's magic bytes via Apache Tika.
+ *       When a {@code fileName} is provided, it is used as a hint that may influence the result
+ *       when content detection is ambiguous. To guarantee purely content-based detection (e.g. for
+ *       security validation), pass {@code null} as {@code fileName} so that Tika relies exclusively
+ *       on magic bytes.
+ * </ul>
+ */
 public class MimeTypesUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(MimeTypesUtils.class);
@@ -29,7 +46,13 @@ public class MimeTypesUtils {
   public MimeTypesUtils() {}
 
   /**
-   * Returns the content type from the file.
+   * Returns the content type from the file, using both its content (magic bytes) and its name as a
+   * hint.
+   *
+   * <p><strong>Security note:</strong> the file name is passed as a hint to Tika and may influence
+   * the result when content detection is ambiguous. For security validation, use {@link
+   * #getContentType(File, String)} with {@code null} as the file name to rely solely on magic
+   * bytes.
    *
    * @param file the file
    * @return detected content type if it is a supported format or "application/octet-stream" if it
@@ -43,7 +66,13 @@ public class MimeTypesUtils {
   }
 
   /**
-   * Returns the content type from the path.
+   * Returns the content type from the path, using both its content (magic bytes) and its name as a
+   * hint.
+   *
+   * <p><strong>Security note:</strong> the file name is passed as a hint to Tika and may influence
+   * the result when content detection is ambiguous. For security validation, use {@link
+   * #getContentType(File, String)} with {@code null} as the file name to rely solely on magic
+   * bytes.
    *
    * @param path the path
    * @return detected content type if it is a supported format or "application/octet-stream" if it
@@ -57,8 +86,11 @@ public class MimeTypesUtils {
   }
 
   /**
-   * Detects the content type of the given file name. The type detection is based on known file name
-   * extensions.
+   * Detects the content type of the given file name. The type detection is based solely on known
+   * file name extensions, without inspecting file content.
+   *
+   * <p><strong>Security note:</strong> this method must not be used for security validation, as a
+   * malicious user can rename any file to an allowed extension.
    *
    * @param fileName the file name
    * @return detected content type if it is a supported format or "application/octet-stream" if it
@@ -72,7 +104,10 @@ public class MimeTypesUtils {
   }
 
   /**
-   * Returns the content type from the file extension.
+   * Returns the content type from the file extension, without inspecting file content.
+   *
+   * <p><strong>Security note:</strong> this method must not be used for security validation, as a
+   * malicious user can rename any file to an allowed extension.
    *
    * @param extension the extension of the file (e.g., "doc")
    * @return detected content type if it is a supported format or "application/octet-stream" if it
@@ -87,10 +122,16 @@ public class MimeTypesUtils {
   }
 
   /**
-   * Returns the content type from the file and file name.
+   * Returns the content type from the file content (magic bytes), optionally using the file name as
+   * a hint.
+   *
+   * <p><strong>Security note:</strong> if {@code fileName} is non-null and non-blank, it is passed
+   * to Tika as a hint and may influence the result when content detection is ambiguous. To
+   * guarantee purely content-based detection (e.g. for security validation), pass {@code null} as
+   * {@code fileName}.
    *
    * @param file the file, can be <code>null</code>
-   * @param fileName the file name or extension of the file (e.g., "doc")
+   * @param fileName the file name hint (e.g., "doc"), or {@code null} for content-only detection
    * @return detected content type if it is a supported format or "application/octet-stream" if it
    *     is an unsupported format
    */
@@ -105,7 +146,7 @@ public class MimeTypesUtils {
   }
 
   /**
-   * Detects the content type based on the input stream and file name.
+   * Detects the content type based on the input stream and an optional file name hint.
    *
    * <p>This method is designed to be safe for all stream types. It guarantees that the provided
    * {@code InputStream} is never consumed or corrupted.
@@ -115,11 +156,17 @@ public class MimeTypesUtils {
    * type accurately, and then <b>reset</b> the stream to its original position.
    *
    * <p>If the stream is {@code null} or does <b>not</b> support mark/reset (e.g., a raw {@code
-   * FileInputStream}), deep inspection is skipped to avoid consuming data. In this case, detection
-   * relies solely on the provided {@code fileName} extension.
+   * FileInputStream}), content inspection is skipped to avoid consuming data. In this case,
+   * detection relies solely on the provided {@code fileName} extension.
+   *
+   * <p><strong>Security note:</strong> if {@code fileName} is non-null and non-blank, it is passed
+   * to Tika as a hint and may influence the result when content detection is ambiguous. To
+   * guarantee purely content-based detection (e.g. for security validation), pass {@code null} as
+   * {@code fileName} and ensure the stream supports mark/reset (e.g. wrap it in a {@link
+   * java.io.BufferedInputStream} or use a {@link java.io.ByteArrayInputStream}).
    *
    * @param inputStream the input stream to inspect (can be {@code null} or raw)
-   * @param fileName the file name or extension of the file (e.g., "doc")
+   * @param fileName the file name hint (e.g., "doc"), or {@code null} for content-only detection
    * @return the detected content type, or "application/octet-stream" if detection fails
    */
   public static String getContentType(InputStream inputStream, String fileName) {
