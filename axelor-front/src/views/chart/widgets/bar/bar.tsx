@@ -69,9 +69,8 @@ export function Bar(props: ChartProps) {
           interval: 0,
           overflow: "truncate",
           width: 60,
+          tooltip: { show: true },
         };
-        // Show full category name in tooltip on hover
-        draft.tooltip.trigger = "axis";
         draft.grid = { ...draft.grid, bottom: 110 };
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;
@@ -82,8 +81,8 @@ export function Bar(props: ChartProps) {
           interval: 0,
           overflow: "truncate",
           width: 110,
+          tooltip: { show: true },
         };
-        draft.tooltip.trigger = "axis";
         draft.grid = { ...draft.grid, bottom: 120 };
       } else {
         draft.xAxis.axisLabel = { interval: 0 };

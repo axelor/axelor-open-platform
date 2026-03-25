@@ -59,6 +59,7 @@ export function Hbar(props: ChartProps) {
         ...draft.yAxis.axisLabel,
         overflow: "truncate",
         width: 75,
+        tooltip: { show: true },
       };
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
