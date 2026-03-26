@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.bar.MyBase;
+import com.axelor.common.bar.TestAnnotation;
 import com.axelor.common.reflections.Reflections;
 import java.io.Serializable;
 import java.util.Map;
@@ -31,13 +32,14 @@ public class TestReflections implements Serializable {
     assertTrue(all.size() > 2);
 
     // scan by annotation within a package
-    all = Reflections.findTypes().having(Disabled.class).within("com.axelor.common").find();
+    all = Reflections.findTypes().having(TestAnnotation.class).within("com.axelor.common").find();
 
     assertNotNull(all);
     assertEquals(2, all.size());
 
     // scan by annotation within a package
-    all = Reflections.findTypes().having(Disabled.class).within("com.axelor.common.foo").find();
+    all =
+        Reflections.findTypes().having(TestAnnotation.class).within("com.axelor.common.foo").find();
 
     assertNotNull(all);
     assertEquals(1, all.size());

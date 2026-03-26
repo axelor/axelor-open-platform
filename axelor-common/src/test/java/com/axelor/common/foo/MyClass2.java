@@ -5,7 +5,7 @@
 package com.axelor.common.foo;
 
 import com.axelor.common.bar.MyBase;
-import org.junit.jupiter.api.Disabled;
+import com.axelor.common.bar.TestAnnotation;
 
-@Disabled
+@TestAnnotation
 public abstract class MyClass2 extends MyBase {}
