@@ -1,5 +1,6 @@
 import pick from "lodash/pick";
 
+import { alerts } from "@/components/alerts";
 import { readCookie, request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { TreeRecord } from "./types";
@@ -39,6 +40,41 @@ function formatSize(done: number, total: number) {
     return size + " B";
   }
   return format(done || 0) + "/" + format(total);
+}
+
+type UploadErrorPayload = {
+  title?: string;
+  message?: string;
+};
+
+type UploadFailureReason = {
+  error?: UploadErrorPayload | string | null;
+  message?: string;
+} | null;
+
+function getUploadErrorMessage(reason?: UploadFailureReason) {
+  const error = reason?.error ?? reason;
+  const title =
+    typeof error === "object" &&
+    error !== null &&
+    "title" in error &&
+    typeof error.title === "string"
+      ? error.title
+      : undefined;
+  const message =
+    typeof error === "string"
+      ? error
+      : typeof error === "object" &&
+          error !== null &&
+          "message" in error &&
+          typeof error.message === "string"
+        ? error.message
+        : undefined;
+
+  return {
+    title,
+    message: message || i18n.get("Failed"),
+  };
 }
 
 export enum UploadStatus {
@@ -123,10 +159,11 @@ export class Uploader {
     this.notify();
   }
 
-  process() {
+  process(): Promise<void> | void {
     if (this.#running || this.#pending.length === 0) {
       this.#scheduleCleanup();
-      return this.notify();
+      this.notify();
+      return;
     }
 
     this.#clearCleanupTimer();
@@ -147,18 +184,18 @@ export class Uploader {
 
     const promise = this.upload(info);
 
-    const error = (reason: any): any => {
+    const error = (reason: UploadFailureReason): Promise<void> | void => {
       this.#running = false;
       if (info) {
         info.progress = 0;
-        info.transfer = reason.message;
+        info.transfer = reason?.message ?? i18n.get("Failed");
         info.status = UploadStatus.Failed;
         this.notify();
       }
       return this.process();
     };
 
-    const success = (): any => {
+    const success = (): Promise<void> | void => {
       this.#running = false;
       if (info) {
         info.status = UploadStatus.Completed;
@@ -238,7 +275,7 @@ export class Uploader {
     const onSave = this.#saveHandler;
     const notify = () => this.notify();
 
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<DataRecord>((resolve, reject) => {
       function doClean() {
         return request({
           url: "ws/files/upload/" + info.uuid,
@@ -246,16 +283,18 @@ export class Uploader {
         });
       }
 
-      function onError(reason?: any) {
+      function onError(reason?: UploadFailureReason) {
         function done() {
-          const message =
-            reason && reason.error ? reason.error : i18n.get("Failed");
+          const { title, message } = getUploadErrorMessage(reason);
+          if (reason?.error) {
+            alerts.error({ title, message });
+          }
           reject({ message: message, failed: true });
         }
         doClean().then(done, done);
       }
 
-      function onCancel(clean?: any) {
+      function onCancel(clean?: boolean) {
         function done() {
           reject({ message: i18n.get("Cancelled"), cancelled: true });
         }
@@ -347,7 +386,7 @@ export class Uploader {
         notify();
       });
 
-      xhr.onreadystatechange = function (e) {
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           switch (xhr.status) {
             case 0:

@@ -112,16 +112,20 @@ export function Drawing(
           const file = new File([blob], "drawing.png");
 
           const dataStore = new DataStore(META_FILE_MODEL);
-          const metaFile = await dataStore.save({
-            id: record?.id,
-            version: record?.version ?? record?.$version,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            $upload: { file },
-          });
-          if (metaFile.id) {
-            setValue(metaFile, true, record?.id == null);
+          try {
+            const metaFile = await dataStore.save({
+              id: record?.id,
+              version: record?.version ?? record?.$version,
+              fileName: file.name,
+              fileType: file.type,
+              fileSize: file.size,
+              $upload: { file },
+            });
+            if (metaFile.id) {
+              setValue(metaFile, true, record?.id == null);
+            }
+          } catch {
+            // Error is already handled upstream.
           }
         }
       }
@@ -130,9 +134,7 @@ export function Drawing(
     },
     [
       isBinary,
-      record?.$version,
-      record?.id,
-      record?.version,
+      record,
       required,
       setValid,
       setValue,

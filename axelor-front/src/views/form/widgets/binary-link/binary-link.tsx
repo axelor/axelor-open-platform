@@ -75,16 +75,20 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
     async (file?: File) => {
       if (file && validateFileSize(file)) {
         const dataStore = new DataStore(META_FILE_MODEL);
-        const metaFile = await dataStore.save({
-          id: value?.id,
-          version: value?.version ?? value?.$version,
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          $upload: { file },
-        });
-        if (metaFile.id) {
-          setValue(metaFile, true, value?.id == null);
+        try {
+          const metaFile = await dataStore.save({
+            id: value?.id,
+            version: value?.version ?? value?.$version,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            $upload: { file },
+          });
+          if (metaFile.id) {
+            setValue(metaFile, true, value?.id == null);
+          }
+        } catch {
+          // Error is already handled upstream.
         }
       }
     },

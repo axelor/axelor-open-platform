@@ -66,6 +66,34 @@ export type ExportResult = {
 
 export type AccessType = "read" | "write" | "create" | "remove" | "export";
 
+type UploadErrorPayload = {
+  status?: number;
+  data?: ErrorReport | string | null;
+  error?: ErrorReport | string | null;
+};
+
+function getUploadError(data: unknown): number | string | ErrorReport | null {
+  if (data == null) {
+    return null;
+  }
+
+  if (typeof data === "number" || typeof data === "string") {
+    return data;
+  }
+
+  const payload = data as UploadErrorPayload;
+
+  if (payload.error) {
+    return payload.error;
+  }
+
+  if (payload.status !== 0 && payload.data) {
+    return payload.data;
+  }
+
+  return payload.data ?? null;
+}
+
 export class DataSource {
   #model;
 
@@ -260,7 +288,7 @@ export class DataSource {
     formData.append("field", field);
     formData.append("request", JSON.stringify({ data }));
 
-    return new Promise<DataRecord>(function (resolve, reject) {
+    return new Promise<DataRecord>(function (resolve, rejectPromise) {
       if (onProgress) {
         xhr.upload.addEventListener(
           "progress",
@@ -272,30 +300,39 @@ export class DataSource {
         );
       }
 
-      xhr.onerror = reject;
-      xhr.onabort = reject;
+      xhr.onerror = rejectPromise;
+      xhr.onabort = rejectPromise;
 
       xhr.onload = function () {
-        let data: any = {};
+        let responseData: unknown = {};
         try {
-          data = JSON.parse(xhr.response || xhr.responseText);
+          responseData = JSON.parse(xhr.response || xhr.responseText);
         } catch {
           // ignore
         }
 
         const response = {
-          data,
+          data: responseData,
           status: xhr.status,
         };
 
         if (xhr.status === 200) {
-          if (data?.status === 0) {
-            resolve(data?.data[0]);
+          if (
+            typeof responseData === "object" &&
+            responseData !== null &&
+            "status" in responseData &&
+            responseData.status === 0 &&
+            "data" in responseData &&
+            Array.isArray(responseData.data)
+          ) {
+            resolve(responseData.data[0]);
           } else {
-            reject(500);
+            rejectAsAlert(getUploadError(responseData)).catch(rejectPromise);
           }
         } else {
-          reject(response.status);
+          rejectAsAlert(getUploadError(responseData) ?? response.status).catch(
+            rejectPromise,
+          );
         }
       };
 
