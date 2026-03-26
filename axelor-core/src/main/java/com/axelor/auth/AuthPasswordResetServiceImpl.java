@@ -186,7 +186,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
         user.getCode(),
         getBaseUrl(),
         resetUrl,
-        getMaxAgeHours());
+        getMaxAgeMinutes());
   }
 
   protected String getMessage(String key) {
@@ -231,7 +231,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
     }
 
     final var token = UUID.randomUUID().toString();
-    final var expiry = LocalDateTime.now().plusHours(getMaxAgeHours());
+    final var expiry = LocalDateTime.now().plusMinutes(getMaxAgeMinutes());
     final var passwordResetToken = new PasswordResetToken(user, hash(token), expiry);
 
     tokenRepository.get().save(passwordResetToken);
@@ -264,12 +264,15 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
   }
 
   /**
-   * Gets the maximum age of a password reset token in hours.
+   * Gets the maximum age of a password reset token in minutes.
    *
-   * @return the maximum age in hours
+   * <p>Defaults to 30 minutes if not configured or if the configured value is negative.
+   *
+   * @return the maximum age in minutes
    */
-  protected static int getMaxAgeHours() {
-    return settings.getInt(AvailableAppSettings.APPLICATION_RESET_PASSWORD_MAX_AGE, 24);
+  protected static int getMaxAgeMinutes() {
+    final var maxAge = settings.getInt(AvailableAppSettings.APPLICATION_RESET_PASSWORD_MAX_AGE, 30);
+    return maxAge > 0 ? maxAge : 30;
   }
 
   /**

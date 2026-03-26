@@ -110,6 +110,20 @@ If you are running PostgreSQL, no action is required. If you are running MySQL o
 data to PostgreSQL before upgrading to 8.2. Standard database migration tools such as https://pgloader.io/[pgloader]
 can help automate the data transfer.
 
+== Password reset token expiry unit changed to minutes
+
+The `application.reset-password.max-age` configuration property previously accepted a value in **hours**.
+It now accepts a value in **minutes**, and the default has been reduced from 24 hours to **30 minutes**.
+
+If you have customized this setting, update your configuration accordingly.
+
+If you were relying on the default, no action is strictly required, but be aware that the effective
+default validity period has been reduced from 24 hours to 30 minutes.
+
+If you have customized the `PASSWORD_RESET_EMAIL_BODY` translation and your version references the
+token validity as hours (e.g. `valid for \{4} hours`), update it to reflect that `\{4}` now holds a
+value in minutes (e.g. `valid for \{4} minutes`).
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :
