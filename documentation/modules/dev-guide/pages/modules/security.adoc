@@ -930,3 +930,43 @@ When the user is done, they may call the logout endpoint.
 # Basic authentication
 auth.local.basic-auth = indirect, direct
 -----
+
+== Emergency Password Reset
+
+In a disaster or recovery scenario — for example, when an administrator has lost their credentials and cannot log in
+— it is not possible to reset the password through the application UI. Instead, a system administrator can generate a
+new password hash and update the user record directly in the database.
+
+Axelor uses Apache Shiro with Argon2id for password hashing. The `shiro-tools-hasher` command-line tool, provided by
+the Shiro project, can generate a compatible hash for any plain-text password.
+
+=== Generate a password hash
+
+Download the `shiro-tools-hasher` jar and run:
+
+[source,bash]
+----
+(cd /tmp && curl -sSL -O https://repo1.maven.org/maven2/org/apache/shiro/tools/shiro-tools-hasher/2.1.0/shiro-tools-hasher-2.1.0-cli.jar)
+java -jar /tmp/shiro-tools-hasher-2.1.0-cli.jar -a argon2id -p
+----
+
+The tool will prompt for the password interactively (input is not echoed). It outputs a hash string  in the format
+`$shiro2$argon2id$...`, which is the value to store in the database.
+
+=== Update the user record
+
+Once you have the hash, update the user's password directly in the database:
+
+[source,sql]
+----
+UPDATE auth_user SET password = '$shiro2$argon2id$...' WHERE code = 'my_user';
+----
+
+Replace `$shiro2$argon2id$...` with the hash generated in the previous step and `my_user` with the actual login code of
+the user to recover.
+
+[CAUTION]
+====
+This is a low-level operation that bypasses all application-level password policies. It should only be performed by a
+trusted system administrator as part of a controlled recovery procedure.
+====
