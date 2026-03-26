@@ -4,6 +4,7 @@
  */
 package com.axelor.app;
 
+import com.axelor.auth.password.PasswordPolicy;
 import com.axelor.db.audit.HibernateListenerConfigurator;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
@@ -33,5 +34,13 @@ public abstract class AxelorModule extends AbstractModule {
   protected void addHibernateListenerConfigurator(
       Class<? extends HibernateListenerConfigurator> listenerClass) {
     hibernateListenerConfiguratorBinder().addBinding().to(listenerClass);
+  }
+
+  protected Multibinder<PasswordPolicy> passwordPolicyBinder() {
+    return Multibinder.newSetBinder(binder(), PasswordPolicy.class);
+  }
+
+  protected void addPasswordPolicy(Class<? extends PasswordPolicy> policyClass) {
+    passwordPolicyBinder().addBinding().to(policyClass);
   }
 }

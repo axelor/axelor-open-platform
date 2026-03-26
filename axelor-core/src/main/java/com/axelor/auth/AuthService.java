@@ -4,24 +4,23 @@
  */
 package com.axelor.auth;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.User;
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
-import com.axelor.i18n.I18n;
+import com.axelor.auth.pac4j.local.ChangePasswordException;
+import com.axelor.auth.password.AuthPasswordManager;
+import com.axelor.auth.password.policy.InvalidPolicy;
+import com.axelor.auth.password.policy.PolicyDescription;
 import com.axelor.inject.Beans;
-import com.axelor.rpc.ActionRequest;
-import com.axelor.rpc.ActionResponse;
-import com.axelor.rpc.Context;
-import com.google.common.base.Preconditions;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link AuthService} class provides various utility services including password encryption,
@@ -33,25 +32,15 @@ import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
 @Singleton
 public class AuthService {
 
+  protected static final Logger logger =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   private final DefaultPasswordService passwordService = new DefaultPasswordService();
 
   private final ParsableHashFormat hashFormat =
       (ParsableHashFormat) passwordService.getHashFormat();
 
-  private static final String PASSWORD_PATTERN;
-  private static final String PASSWORD_PATTERN_TITLE;
-
-  private static final Pattern passwordPattern;
-
-  static {
-    final AppSettings settings = AppSettings.get();
-    PASSWORD_PATTERN = settings.get(AvailableAppSettings.USER_PASSWORD_PATTERN, ".{4,}");
-    PASSWORD_PATTERN_TITLE =
-        settings.get(
-            AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE,
-            AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE);
-    passwordPattern = Pattern.compile(PASSWORD_PATTERN);
-  }
+  @Inject private AuthPasswordManager passwordManager;
 
   /**
    * Get the instance of the {@link AuthService}.
@@ -82,6 +71,7 @@ public class AuthService {
       hashFormat.parse(password);
       return password;
     } catch (IllegalArgumentException e) {
+      // ignore
     }
     return passwordService.encryptPassword(password);
   }
@@ -126,42 +116,17 @@ public class AuthService {
   }
 
   /**
-   * Helper action to check user password.
-   *
-   * @param request the request with username and password as context or data
-   * @param response the response, with user details if password matched
-   */
-  public void checkPassword(ActionRequest request, ActionResponse response) {
-    final Context context = request.getContext();
-    final Map<String, Object> data = context == null ? request.getData() : context;
-
-    final String username = (String) data.getOrDefault("username", data.get("code"));
-    final String password = (String) data.getOrDefault("password", data.get("newPassword"));
-
-    final User user = AuthUtils.getUser(username);
-    if (user == null || !match(password, user.getPassword())) {
-      response.setStatus(ActionResponse.STATUS_FAILURE);
-      response.setError("No such user or password doesn't match.");
-      return;
-    }
-
-    final Mapper mapper = Mapper.of(User.class);
-    final Property name = mapper.getNameField();
-    response.setValue("id", user.getId());
-    response.setValue("name", name.get(user));
-    response.setValue("nameField", name.getName());
-    response.setValue("login", user.getCode());
-    response.setValue("lang", user.getLanguage());
-  }
-
-  /**
    * Changes user password.
    *
-   * @param user
-   * @param password
+   * @param user the user whose password needs to be changed
+   * @param password the new plain-text password
+   * @throws ChangePasswordException if unable to validate password policies
    */
   public void changePassword(User user, String password) {
-    Preconditions.checkArgument(passwordMatchesPattern(password), getPasswordPatternTitle());
+    InvalidPolicy invalidPolicy = validatePasswordPolicies(user, password);
+    if (invalidPolicy != null) {
+      throw new ChangePasswordException(invalidPolicy);
+    }
 
     user.setPassword(encrypt(password));
     user.setPasswordUpdatedOn(LocalDateTime.now());
@@ -172,33 +137,30 @@ public class AuthService {
     if (authUser != null && authUser.getId().equals(user.getId())) {
       Beans.get(AuthSessionService.class).updateLoginDate();
     }
+
+    logger.debug("Password changed for user \"{}\"", user.getCode());
   }
 
   /**
-   * Checks whether the password matches the configured pattern.
+   * Validates the given password against the configured password policies for the specified user.
    *
-   * @param password
-   * @return
+   * @param user the user for whom the password policies need to be validated
+   * @param password the password to validate against the policies
+   * @return {@link InvalidPolicy} if any policy is violated, null otherwise
    */
-  public boolean passwordMatchesPattern(String password) {
-    return passwordPattern.matcher(Optional.ofNullable(password).orElse("")).matches();
+  public InvalidPolicy validatePasswordPolicies(User user, String password) {
+    return passwordManager.validate(password, user);
   }
 
   /**
-   * Gets configured user password pattern.
+   * Returns the translated descriptions of all currently enabled password policies, in evaluation
+   * order. Intended for display as requirements guidance on the login or change-password page.
    *
-   * @return
+   * @return an ordered list of translated policy requirement strings
    */
-  public String getPasswordPattern() {
-    return PASSWORD_PATTERN;
-  }
-
-  /**
-   * Gets configured user password pattern description.
-   *
-   * @return
-   */
-  public String getPasswordPatternTitle() {
-    return I18n.get(PASSWORD_PATTERN_TITLE);
+  public List<String> getPasswordPolicyDescriptions() {
+    return passwordManager.getDescriptions().stream()
+        .map(PolicyDescription::getTranslatedMessage)
+        .collect(Collectors.toList());
   }
 }

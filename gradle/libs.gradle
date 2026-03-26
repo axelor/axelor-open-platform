@@ -387,3 +387,5 @@ libs.minio = dependencies.create("io.minio:minio:8.6.0") {
 libs.totp = dependencies.create('dev.samstevens.totp:totp:1.7.1') {
   exclude group: 'com.beust', module: 'jcommander'
 }
+
+libs.zxcvbn4j = "com.nulab-inc:zxcvbn:1.9.0"

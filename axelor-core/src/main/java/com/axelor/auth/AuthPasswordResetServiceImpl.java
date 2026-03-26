@@ -102,11 +102,6 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
     final var user = resetPasswordToken.getUser();
     final var authService = AuthService.getInstance();
 
-    // Check whether new password is the same as current one.
-    if (authService.match(password, user.getPassword())) {
-      throw new IllegalArgumentException(I18n.get("New password must be different."));
-    }
-
     authService.changePassword(user, password);
     user.setForcePasswordChange(false);
     resetPasswordToken.setConsumed(true);

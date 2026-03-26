@@ -4,6 +4,13 @@
  */
 package com.axelor.app;
 
+import com.axelor.auth.password.policy.DigitsPasswordPolicy;
+import com.axelor.auth.password.policy.LengthPasswordPolicy;
+import com.axelor.auth.password.policy.LowerCasePasswordPolicy;
+import com.axelor.auth.password.policy.PatternPasswordPolicy;
+import com.axelor.auth.password.policy.ScorePasswordPolicy;
+import com.axelor.auth.password.policy.SpecialCharsPasswordPolicy;
+import com.axelor.auth.password.policy.UpperCasePasswordPolicy;
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.CacheSettings;
 
@@ -167,8 +174,14 @@ public interface AvailableAppSettings {
   String QUARTZ_JOB_STORE_CLASS = QUARTZ_JOB_STORE_PREFIX + "class";
   String QUARTZ_DATA_SOURCE_PREFIX = "quartz.data-source.";
 
-  String USER_PASSWORD_PATTERN = "user.password.pattern";
-  String USER_PASSWORD_PATTERN_TITLE = /*$$(*/ "user.password.pattern-title" /*)*/;
+  String USER_PASSWORD_LENGTH_MIN = "user.password." + LengthPasswordPolicy.ID + ".min";
+  String USER_PASSWORD_DIGITS_MIN = "user.password." + DigitsPasswordPolicy.ID + ".min";
+  String USER_PASSWORD_LOWER_CASE_MIN = "user.password." + LowerCasePasswordPolicy.ID + ".min";
+  String USER_PASSWORD_UPPER_CASE_MIN = "user.password." + UpperCasePasswordPolicy.ID + ".min";
+  String USER_PASSWORD_SPECIAL_CHARS_MIN =
+      "user.password." + SpecialCharsPasswordPolicy.ID + ".min";
+  String USER_PASSWORD_PATTERN_VALUE = "user.password." + PatternPasswordPolicy.ID + ".value";
+  String USER_PASSWORD_SCORE_MIN = "user.password." + ScorePasswordPolicy.ID + ".min";
 
   String ENCRYPTION_ALGORITHM = "encryption.algorithm";
   String ENCRYPTION_PASSWORD = "encryption.password";

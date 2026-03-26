@@ -124,6 +124,22 @@ If you have customized the `PASSWORD_RESET_EMAIL_BODY` translation and your vers
 token validity as hours (e.g. `valid for \{4} hours`), update it to reflect that `\{4}` now holds a
 value in minutes (e.g. `valid for \{4} minutes`).
 
+== User password policies changed
+
+The user password policy system has been reworked to provide more useful, secure, and customizable built-in policies.
+
+Default behavior changes:
+
+* Minimum password length increased from 4 to 8 characters (mandatory, cannot be disabled).
+* New password must differ from the current one (mandatory, cannot be disabled).
+* Passwords must not contain the user login code (case-insensitive substring check).
+
+Several additional policies are available but disabled by default. They are designed to cover common security
+requirements without imposing them on all deployments. See more details xref:dev-guide:application/config.adoc#password-requirements[here]
+
+`user-form` and `user-preferences-form` forms has been updated to reflect the changes. If any override was made, make
+sure to integrate them.
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :

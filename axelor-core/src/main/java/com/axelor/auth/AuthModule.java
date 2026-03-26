@@ -6,10 +6,21 @@ package com.axelor.auth;
 
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
+import com.axelor.auth.password.PasswordPolicy;
+import com.axelor.auth.password.policy.DigitsPasswordPolicy;
+import com.axelor.auth.password.policy.LengthPasswordPolicy;
+import com.axelor.auth.password.policy.LowerCasePasswordPolicy;
+import com.axelor.auth.password.policy.NotCodePasswordPolicy;
+import com.axelor.auth.password.policy.NotSamePasswordPolicy;
+import com.axelor.auth.password.policy.PatternPasswordPolicy;
+import com.axelor.auth.password.policy.ScorePasswordPolicy;
+import com.axelor.auth.password.policy.SpecialCharsPasswordPolicy;
+import com.axelor.auth.password.policy.UpperCasePasswordPolicy;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 import org.apache.shiro.SecurityUtils;
@@ -31,6 +42,18 @@ public class AuthModule extends AbstractModule {
 
     // bind security service
     bind(JpaSecurity.class).toProvider(AuthSecurity.class);
+
+    // bind password policies
+    final var policies = Multibinder.newSetBinder(binder(), PasswordPolicy.class);
+    policies.addBinding().to(NotSamePasswordPolicy.class);
+    policies.addBinding().to(LengthPasswordPolicy.class);
+    policies.addBinding().to(NotCodePasswordPolicy.class);
+    policies.addBinding().to(DigitsPasswordPolicy.class);
+    policies.addBinding().to(LowerCasePasswordPolicy.class);
+    policies.addBinding().to(UpperCasePasswordPolicy.class);
+    policies.addBinding().to(SpecialCharsPasswordPolicy.class);
+    policies.addBinding().to(PatternPasswordPolicy.class);
+    policies.addBinding().to(ScorePasswordPolicy.class);
 
     // non-web environment (cli or unit tests)
     if (context == null) {

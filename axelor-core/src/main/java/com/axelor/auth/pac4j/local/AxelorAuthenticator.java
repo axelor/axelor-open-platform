@@ -9,6 +9,7 @@ import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_USER_NAME;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.auth.password.policy.InvalidPolicy;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import java.util.Objects;
@@ -34,8 +35,6 @@ public class AxelorAuthenticator implements Authenticator {
   public static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
   public static final String NEW_PASSWORD_MUST_BE_DIFFERENT = /*$$(*/
       "New password must be different." /*)*/;
-  public static final String NEW_PASSWORD_DOES_NOT_MATCH_PATTERN = /*$$(*/
-      "New password does not match pattern." /*)*/;
 
   @Override
   public Optional<Credentials> validate(CallContext ctx, Credentials inputCredentials) {
@@ -92,8 +91,9 @@ public class AxelorAuthenticator implements Authenticator {
         throw new ChangePasswordException(NEW_PASSWORD_MUST_BE_DIFFERENT);
       }
 
-      if (!authService.passwordMatchesPattern(newPassword)) {
-        throw new ChangePasswordException(NEW_PASSWORD_DOES_NOT_MATCH_PATTERN);
+      InvalidPolicy invalidPolicy = authService.validatePasswordPolicies(user, newPassword);
+      if (invalidPolicy != null) {
+        throw new ChangePasswordException(invalidPolicy);
       }
 
       JPA.runInTransaction(

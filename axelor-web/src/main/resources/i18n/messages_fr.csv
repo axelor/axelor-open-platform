@@ -414,6 +414,7 @@
 "Yesterday","Hier",,
 "You are not allowed to upload a file bigger than {0} MB.","Vous n’êtes pas autorisé(e) à envoyer un fichier de plus de {0} Mo.",,
 "You are not authorized to access this resource.","Vous n’êtes pas autorisé(e) à acceder à cette ressource.",,
+"Your new password must","Votre nouveau mot de passe doit",,
 "Your password has been successfully changed.","Votre mot de passe a éte changé avec succès.",,
 "Your password reset token is invalid or expired.","Votre jeton de réinitialisation de mot de passe est invalide ou expiré.",,
 "[Last] dddd","dddd [dernier]",,

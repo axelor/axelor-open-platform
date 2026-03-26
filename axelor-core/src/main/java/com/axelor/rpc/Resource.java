@@ -14,6 +14,7 @@ import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.auth.pac4j.local.ChangePasswordException;
 import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -61,7 +62,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.OptimisticLockException;
-import jakarta.validation.ValidationException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1211,18 +1211,19 @@ public class Resource<T extends Model> {
     }
 
     if (StringUtils.isBlank(oldPassword)) {
-      throw new ValidationException("Current user password is not provided.");
+      throw new ChangePasswordException(I18n.get("Current user password is not provided."));
     }
 
     if (!newPassword.equals(chkPassword)) {
-      throw new ValidationException("Confirm password doesn't match with new password.");
+      throw new ChangePasswordException(
+          I18n.get("Confirm password doesn't match with new password."));
     }
 
     final User current = AuthUtils.getUser();
     final AuthService authService = AuthService.getInstance();
 
     if (!authService.match(oldPassword, current.getPassword())) {
-      throw new ValidationException("Current user password is wrong.");
+      throw new ChangePasswordException(I18n.get("Current user password is wrong."));
     }
 
     authService.changePassword(user, newPassword);

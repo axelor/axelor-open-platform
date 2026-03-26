@@ -4,6 +4,7 @@
  */
 package com.axelor.auth.web;
 
+import com.axelor.auth.AuthService;
 import com.axelor.auth.MFAService;
 import com.axelor.auth.db.User;
 import com.axelor.i18n.I18n;
@@ -29,5 +30,10 @@ public class UserController {
               "You have changed your email address. Please reconfigure it for multi-factor"
                   + " authentication."));
     }
+  }
+
+  public void showPasswordRequirements(ActionRequest request, ActionResponse response) {
+    response.setValue(
+        "_passwordRequirements", AuthService.getInstance().getPasswordPolicyDescriptions());
   }
 }

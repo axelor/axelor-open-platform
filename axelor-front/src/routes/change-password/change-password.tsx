@@ -25,13 +25,11 @@ import styles from "./change-password.module.scss";
 export function ChangePassword({
   onSubmit,
   error: propsErrorMessage,
-  passwordPattern: propsPasswordPattern,
-  passwordPatternTitle: propsPasswordPatternTitle,
+  passwordRequirements: propsPasswordRequirements,
 }: {
   onSubmit?: FormEventHandler<HTMLFormElement>;
   error?: string;
-  passwordPattern?: string;
-  passwordPatternTitle?: string;
+  passwordRequirements?: string[];
 }) {
   const session = useSession();
   const { copyright } = useAppSettings();
@@ -44,8 +42,7 @@ export function ChangePassword({
   const {
     username,
     error,
-    passwordPattern = propsPasswordPattern,
-    passwordPatternTitle = propsPasswordPatternTitle,
+    passwordRequirements = propsPasswordRequirements,
   } = route ?? {};
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -137,29 +134,17 @@ export function ChangePassword({
     ],
   );
 
-  const passwordPatternExp = useMemo(
-    () => new RegExp(passwordPattern),
-    [passwordPattern],
-  );
-
   const getNewPasswordValidity = useCallback(
     (value: string) => {
       let validity = "";
       if (value) {
         if (requireCurrentPassword && value === currentPassword) {
           validity = i18n.get("New password must be different.");
-        } else if (!passwordPatternExp.test(value)) {
-          validity = passwordPatternTitle;
         }
       }
       return validity;
     },
-    [
-      currentPassword,
-      passwordPatternExp,
-      passwordPatternTitle,
-      requireCurrentPassword,
-    ],
+    [currentPassword, requireCurrentPassword],
   );
 
   const newPasswordValidity = useMemo(() => {
@@ -410,6 +395,55 @@ export function ChangePassword({
               >
                 {errorMessage}
               </Alert>
+            )}
+
+            {passwordRequirements && passwordRequirements.length > 0 && (
+              <Box
+                mb={2}
+                rounded
+                style={{
+                  backgroundColor: "var(--bs-tertiary-bg)",
+                  color: "rgba(var(--bs-body-color-rgb), 0.65)",
+                  padding: "0.65rem 0.75rem",
+                  fontSize: "0.85rem",
+                }}
+              >
+                <Box
+                  as="p"
+                  mb={1}
+                  style={{
+                    fontWeight: 600,
+                  }}
+                >
+                  {i18n.get("Your new password must")}
+                </Box>
+                <Box
+                  as="ul"
+                  d="flex"
+                  flexDirection="column"
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                    gap: "0.2rem",
+                  }}
+                >
+                  {passwordRequirements.map(
+                    (requirement: string, i: number) => (
+                      <Box
+                        as="li"
+                        key={i}
+                        d="flex"
+                        alignItems="center"
+                        style={{ gap: "0.25rem" }}
+                      >
+                        <BootstrapIcon icon="dot" aria-hidden="true" />
+                        {requirement}
+                      </Box>
+                    ),
+                  )}
+                </Box>
+              </Box>
             )}
 
             <LoadingButton

@@ -239,8 +239,6 @@ Choose the right option by environment :
 | `view.collaboration.amqp.target-address` | AMQP 1.0 target address for view collaboration (🏷️ EE only)  |
 | `view.collaboration.amqp.username`       | AMQP 1.0 broker username for view collaboration (🏷️ EE only) |
 | `view.collaboration.amqp.password`       | AMQP 1.0 broker password for view collaboration (🏷️ EE only) |
-| `user.password.pattern` | pattern to validate user password | .{4,}
-| `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
 | `api.pagination.default-per-page` | define the default number of items per page | 40
 | `application.openapi.enabled` | enable OpenAPI resource endpoint | true
@@ -700,7 +698,195 @@ application.sign-in.buttons.submit.icon = none
 
 Note that the properties file is not a source for extracting translations. So, for your translatable texts, you can add your translations to `custom_<language>.csv` files.
 
-For links, you may use `:username` in the URL to have the username as a parameter (eg. `public/forgot-password.html?username=:username`).
+For links, you may use `:username` in the URL to have the username as a parameter.
+
+[#password-requirements]
+== Password Requirements
+
+Password policies enforce constraints on passwords when a user sets or changes their password.
+
+=== Built-in Policies
+
+Three policies are active by default.
+
+Two of them are *mandatory* and cannot be disabled via configuration:
+
+`length`::
+Passwords must be at least 8 characters long. Leading and trailing spaces are ignored to prevent
+space-padding bypasses. The minimum length is configurable:
++
+[source,properties]
+----
+user.password.length.min = 8
+----
++
+NOTE: The password field in the database has a minimum column length of 4 characters. Configuring
+a value below this threshold has no effect — the policy will silently enforce 4 as the minimum.
+It is recommended to always keep this value at or above the default of 8.
+
+`notSame`::
+A new password must differ from the user's current password. This policy is always enforced and
+has no configuration parameters.
+
+The third default policy is active by default but can be disabled:
+
+`notCode`::
+The password must not contain the user's login code (case-insensitive substring check).
++
+[source,properties]
+----
+# Disable the "must not contain login code" check
+user.password.notCode.enabled = false
+----
+
+=== Opt-in Policies
+
+Several additional policies are available but disabled by default. They are designed to cover
+common security requirements without imposing them on all deployments. Each policy is identified
+by a short ID and can be switched on with a single property:
+
+[source,properties]
+----
+user.password.<policy-id>.enabled = true
+----
+
+The available opt-in policies are:
+
+`digits`::
+Requires the password to contain a minimum number of digit characters.
++
+[source,properties]
+----
+user.password.digits.enabled = true
+user.password.digits.min = 1
+----
+
+`lowerCase`::
+Requires the password to contain a minimum number of lowercase letters.
++
+[source,properties]
+----
+user.password.lowerCase.enabled = true
+user.password.lowerCase.min = 1
+----
+
+`upperCase`::
+Requires the password to contain a minimum number of uppercase letters.
++
+[source,properties]
+----
+user.password.upperCase.enabled = true
+user.password.upperCase.min = 1
+----
+
+`specialChars`::
+Requires the password to contain a minimum number of special (non-alphanumeric) characters.
++
+[source,properties]
+----
+user.password.specialChars.enabled = true
+user.password.specialChars.min = 1
+----
+
+`pattern`::
+Requires the password to match a custom regular expression.
++
+[source,properties]
+----
+user.password.pattern.enabled = true
+user.password.pattern.value = (?=.*[A-Z])(?=.*\d).+
+----
+
+`score`::
+Requires the password to reach a minimum strength score (0 = very weak, 4 = very strong) as
+computed by the https://github.com/nulab/zxcvbn4j[zxcvbn] library.
++
+[source,properties]
+----
+user.password.score.enabled = true
+user.password.score.min = 2
+----
+
+=== Custom Password Policy
+
+You can provide your own password policy by implementing the `PasswordPolicy` interface :
+
+[source,java]
+----
+import com.axelor.auth.db.User;
+import com.axelor.auth.password.PasswordPolicy;
+import com.axelor.auth.password.policy.InvalidPolicy;
+import com.axelor.auth.password.policy.PolicyDescription;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Singleton;
+
+@Singleton
+public class MyCustomPasswordPolicy implements PasswordPolicy {
+
+  private static final String ID = "my-custom";
+  private static final String DESCRIPTION = "My custom password policy";
+  private static final String ERROR_MESSAGE = "must meet custom requirements";
+
+  @Override
+  public String getPolicyId() {
+    return ID;
+  }
+
+  @Override
+  public InvalidPolicy validate(@Nullable User user, String password) {
+
+    if (!meetsMyRequirements(password)) {
+      return new InvalidPolicy(ERROR_MESSAGE);
+    }
+    return null;
+  }
+
+  private boolean meetsMyRequirements(String password) {
+    // your logic here
+    return true;
+  }
+
+  @Override
+  public PolicyDescription getDescription() {
+    return new PolicyDescription(ID, DESCRIPTION);
+  }
+}
+----
+
+The `validate` method should return `null` if the password is valid, or an `InvalidPolicy` instance carrying the error
+message otherwise.
+
+If the policy should be configurable via `user.password.<id>.enabled`, override `getPolicyId()` and optionally
+`isEnabledByDefault()`:
+
+[source,java]
+----
+@Override
+public String getPolicyId() {
+  return "myPolicy"; // maps to user.password.myPolicy.enabled
+}
+
+@Override
+public boolean isEnabledByDefault() {
+  return false; // opt-in policy
+}
+----
+
+Then, in your application's Guice module, add the policy :
+
+[source,java]
+----
+public class MyModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    addPasswordPolicy(MyCustomPasswordPolicy.class);
+    //...
+  }
+}
+----
+
+The policy will be picked up automatically by the password manager alongside the built-in policies.
 
 == Password Reset
 

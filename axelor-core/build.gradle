@@ -73,6 +73,7 @@ dependencies {
   implementation libs.picocli
 
   implementation libs.totp
+  implementation libs.zxcvbn4j
 
   testImplementation libs.greenmail
   testImplementation libs.unboundid_ldapsdk

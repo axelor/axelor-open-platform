@@ -6,6 +6,7 @@ package com.axelor.web.service;
 
 import com.axelor.auth.AuthPasswordResetService;
 import com.axelor.auth.AuthService;
+import com.axelor.auth.pac4j.local.ChangePasswordException;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.google.inject.servlet.RequestScoped;
@@ -89,14 +90,8 @@ public class PasswordResetResource {
       return error(e);
     }
 
-    final var authService = AuthService.getInstance();
-
     return ok(
-        Map.of(
-            "passwordPattern",
-            authService.getPasswordPattern(),
-            "passwordPatternTitle",
-            authService.getPasswordPatternTitle()));
+        Map.of("passwordRequirements", AuthService.getInstance().getPasswordPolicyDescriptions()));
   }
 
   @POST
@@ -120,7 +115,7 @@ public class PasswordResetResource {
 
     try {
       authPasswordResetService.changePassword(token, password);
-    } catch (final IllegalArgumentException e) {
+    } catch (final ChangePasswordException e) {
       return errorMessage(e);
     } catch (final Exception e) {
       return error(e);
@@ -142,7 +137,7 @@ public class PasswordResetResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 
-  private Response errorMessage(IllegalArgumentException e) {
+  private Response errorMessage(Exception e) {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity(errorEntity(e.getMessage()))
         .build();
