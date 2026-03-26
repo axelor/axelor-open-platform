@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
-import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
-import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
+import jotaiDebugLabel from "jotai-babel/plugin-debug-label";
+import jotaiReactRefresh from "jotai-babel/plugin-react-refresh";
 import { ProxyOptions, loadEnv, mergeConfig } from "vite";
 import { ViteUserConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
