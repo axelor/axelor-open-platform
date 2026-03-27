@@ -133,6 +133,10 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   heart_arrow: "favorite",
   // 2025-11-21
   volume_down_alt: "volume_down",
+  // 2026-02-18
+  offline_bolt: "charger",
+  // 2026-03-12
+  bus_map_pin_2: "bus_map_pin",
 };
 
 export type IconProps = {
