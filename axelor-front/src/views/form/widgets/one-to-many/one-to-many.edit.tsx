@@ -125,8 +125,9 @@ export function OneToManyEdit({
 
   const { data: meta } = useAsync(async () => {
     const view = views?.find?.((v: View) => v.type === "grid");
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     if (view && view.items) {
-      const { fields } = await findFields(model);
+      const { fields } = await findFields(model, jsonModel);
       return {
         view,
         fields,
@@ -136,8 +137,9 @@ export function OneToManyEdit({
       type: "grid",
       name: gridView,
       model,
+      jsonModel,
     });
-  }, [views, gridView, model]);
+  }, [views, gridView, model, schema.jsonModel, schema.jsonTarget]);
 
   const columnNames = useGridColumnNames({
     view: meta?.view ?? schema,
@@ -212,13 +214,15 @@ export function OneToManyEdit({
         });
       };
       let form = views?.find?.((v: View) => v.type === "form");
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
       if (form) {
-        const { fields } = await findFields(model);
+        const { fields } = await findFields(model, jsonModel);
         form = { ...form, fields };
       }
       showEditor({
         title: title ?? "",
         model,
+        jsonModel,
         record,
         readonly,
         maximize: isPopupMaximized(schema, "editor"),
@@ -269,8 +273,10 @@ export function OneToManyEdit({
       return onEdit({});
     }
     const onClose = onPopupViewInit();
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     showSelector({
       model,
+      jsonModel,
       multiple: true,
       maximize: isPopupMaximized(schema, "selector"),
       viewName: gridView,

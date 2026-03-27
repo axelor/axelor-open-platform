@@ -117,6 +117,7 @@
     <field name="title"/>
     <field name="type"/>
     <field name="model"/>
+    <field name="jsonModel"/>
     <field name="module"/>
     <field name="extension" hidden="true"/>
     <field name="computed" hidden="true"/>
@@ -147,6 +148,7 @@
       </panel>
       <panel itemSpan="12">
         <field name="model"/>
+        <field name="jsonModel"/>
         <field name="module"/>
         <field name="groups" widget="Tags" x-create="code,name"/>
         <panel showIf="['form', 'grid'].indexOf(type) >= 0">

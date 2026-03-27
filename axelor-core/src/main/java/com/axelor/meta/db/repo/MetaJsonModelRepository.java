@@ -75,6 +75,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       gridView = new MetaView();
       gridView.setType("grid");
       gridView.setModel(MetaJsonRecord.class.getName());
+      gridView.setJsonModel(jsonModel.getName());
     }
 
     gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
@@ -94,6 +95,10 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(" model=")
             .append('"')
             .append(gridView.getModel())
+            .append('"')
+            .append(" x-json-model=")
+            .append('"')
+            .append(jsonModel.getName())
             .append('"');
 
     Function<String, String> fixCommaList =
@@ -132,6 +137,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       formView = new MetaView();
       formView.setType("form");
       formView.setModel(MetaJsonRecord.class.getName());
+      formView.setJsonModel(jsonModel.getName());
     }
     formView.setName("custom-model-" + jsonModel.getName() + "-form");
     formView.setTitle(jsonModel.getTitle());
@@ -149,6 +155,10 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(" model=")
             .append('"')
             .append(formView.getModel())
+            .append('"')
+            .append(" x-json-model=")
+            .append('"')
+            .append(jsonModel.getName())
             .append('"');
 
     if (!StringUtils.isBlank(onNew)) {

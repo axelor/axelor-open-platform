@@ -22,6 +22,7 @@ import { useSingleClickHandler } from "../use-button";
 export type SelectorOptions = {
   id?: string;
   model: string;
+  jsonModel?: string;
   title?: string;
   multiple?: boolean;
   maximize?: boolean;
@@ -43,6 +44,7 @@ export function useSelector() {
       id,
       title,
       model,
+      jsonModel,
       view: gridView,
       viewName,
       viewParams,
@@ -63,6 +65,7 @@ export function useSelector() {
           type: "grid",
           name: viewName,
           model,
+          jsonModel,
         })) || {};
       return view?.title;
     }
@@ -85,7 +88,10 @@ export function useSelector() {
         popup: true,
       },
       domain,
-      context,
+      context: {
+        ...context,
+        jsonModel,
+      },
     });
 
     if (!tab) return;

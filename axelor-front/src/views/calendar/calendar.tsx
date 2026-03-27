@@ -379,8 +379,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
-      const { name, model = action.model ?? "" } = formView;
-      const { view } = (await findView({ type, name, model })) || {};
+      const { name, model = action.model ?? "", jsonModel } = formView;
+      const { view } = (await findView({ type, name, model, jsonModel })) || {};
       const { title = "", name: viewName } = view || {};
 
       hidePopover();

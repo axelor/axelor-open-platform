@@ -41,7 +41,7 @@ async function processActionResult(data: ActionResult) {
       yesNo: false,
     });
   }
-  
+
   if (data.info) {
     await dialogs.box({
       title: data.info.title,
@@ -217,6 +217,7 @@ export async function fields(
 
 export async function viewFields(
   model: string,
+  jsonModel?: string,
   fields?: string[],
 ): Promise<MetaData> {
   const resp = await request({
@@ -225,6 +226,7 @@ export async function viewFields(
     body: {
       fields,
       model,
+      context: { jsonModel },
     },
   });
 
@@ -252,9 +254,10 @@ export async function view<
   type: T;
   name?: string;
   model?: string;
+  jsonModel?: string;
   context?: Record<string, any>;
 }): Promise<ViewData<V>> {
-  const { type, name, model, context } = options;
+  const { type, name, model, jsonModel, context } = options;
   const resp = await request({
     url: "ws/meta/view",
     method: "POST",
@@ -263,7 +266,10 @@ export async function view<
       data: {
         name,
         type,
-        context,
+        context: {
+          ...context,
+          ...(jsonModel && { jsonModel }),
+        },
       },
     },
   });

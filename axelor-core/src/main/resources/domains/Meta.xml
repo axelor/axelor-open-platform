@@ -29,6 +29,7 @@
     <string name="type" required="true" selection="view.type.selection"/>
     <integer name="priority" required="true" default="20"/>
     <string name="model"/>
+    <string name="jsonModel"/>
     <string name="module"/>
     <string name="xml" required="true" large="true"/>
     <boolean name="computed"/>
@@ -62,6 +63,7 @@
     <string name="title" required="true" namecolumn="true" />
     <string name="type" required="true" selection="view.type.selection"/>
     <string name="model" />
+    <string name="jsonModel"/>
     <string name="xml" required="true" large="true"/>
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" required="true" />
     <boolean name="shared" />

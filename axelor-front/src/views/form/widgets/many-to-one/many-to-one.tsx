@@ -69,6 +69,7 @@ export function ManyToOne(
     imageField,
     colorField,
   } = schema;
+  const jsonModel = schema.jsonTarget || schema.jsonModel;
   const [value, setValue] = useAtom(valueAtom);
   const [hasSearchMore, setSearchMore] = useState(false);
   const { hasButton } = usePermission(schema, widgetAtom, perms);
@@ -138,6 +139,7 @@ export function ManyToOne(
         id: editorId,
         title: title ?? "",
         model: target,
+        jsonModel,
         viewName: formView,
         record: $record,
         readonly,
@@ -163,6 +165,7 @@ export function ManyToOne(
       schema,
       getContext,
       handleChange,
+      jsonModel,
     ],
   );
 
@@ -213,6 +216,7 @@ export function ManyToOne(
     await showSelector({
       id: selectorId,
       model: target,
+      jsonModel,
       viewName: gridView,
       orderBy: sortBy,
       multiple: false,

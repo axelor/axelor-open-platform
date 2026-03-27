@@ -83,6 +83,7 @@ export interface Property {
   widget?: string;
   widgetAttrs?: Record<string, any>; // incoming is string, processed to object
   jsonField?: string;
+  jsonTarget?: string;
 }
 
 export interface Widget {
@@ -388,6 +389,8 @@ export interface PanelRelated extends Omit<Panel, "type"> {
   fields?: Property[];
   perms?: Perms;
   showBars?: boolean;
+  jsonModel?: string;
+  jsonTarget?: string;
 }
 
 export interface PanelDashlet extends Omit<Panel, "type"> {

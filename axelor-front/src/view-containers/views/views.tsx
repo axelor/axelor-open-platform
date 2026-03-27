@@ -43,6 +43,7 @@ async function loadView(props: {
   type: string;
   name?: string;
   model?: string;
+  jsonModel?: string;
   resource?: string;
   context?: DataContext;
 }) {
@@ -59,13 +60,19 @@ function ViewContainer({
   dataStore,
 }: {
   tab: Tab;
-  view: { name?: string; type: string };
+  view: { name?: string; type: string; jsonModel?: string };
   searchAtom?: AdvancedSearchAtom;
   dataStore?: DataStore;
 }) {
   const { model, params, context } = tab.action;
   const { state, data, error } = useAsync(
-    async () => loadView({ context, model, ...view }),
+    async () =>
+      loadView({
+        context,
+        model,
+        jsonModel: context?.jsonModel,
+        ...view,
+      }),
     [model, view, context],
   );
 
@@ -298,6 +305,7 @@ const DataViews = memo(function DataViews({
         name: filterName,
         type: "search-filters",
         model,
+        jsonModel: context?.jsonModel,
       });
       fields = res?.fields || {};
       items = (res?.view?.items || []).map((item) => {

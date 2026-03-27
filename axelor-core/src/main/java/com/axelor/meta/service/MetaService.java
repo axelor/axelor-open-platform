@@ -171,9 +171,13 @@ public class MetaService {
   }
 
   public Response findViews(Class<?> model, Map<String, String> views) {
+    return findViews(model, views, null);
+  }
+
+  public Response findViews(Class<?> model, Map<String, String> views, String jsonModel) {
     Response response = new Response();
 
-    Map<String, Object> data = XMLViews.findViews(model.getName(), views);
+    Map<String, Object> data = XMLViews.findViews(model.getName(), views, jsonModel);
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
@@ -181,9 +185,13 @@ public class MetaService {
   }
 
   public Response findView(String model, String name, String type) {
+    return findView(model, name, type, null);
+  }
+
+  public Response findView(String model, String name, String type, String jsonModel) {
     Response response = new Response();
 
-    AbstractView data = XMLViews.findView(name, type, model);
+    AbstractView data = XMLViews.findView(name, type, model, null, jsonModel);
     if (data != null) {
       viewProcessors.forEach(viewProcessor -> viewProcessor.process(data));
     }
@@ -238,6 +246,7 @@ public class MetaService {
       entity.setName(view.getName());
       entity.setType(view.getType());
       entity.setModel(view.getModel());
+      entity.setJsonModel(view.getJsonModel());
       entity.setUser(user);
     }
 
@@ -309,7 +318,7 @@ public class MetaService {
 
     LOG.debug("Search : {}", name);
 
-    Search search = (Search) XMLViews.findView(name, "search");
+    Search search = (Search) XMLViews.findView(name, "search", null, null, null);
     ScriptHelper helper = search.scriptHandler(context);
 
     List<Object> data = new ArrayList<>();
@@ -455,7 +464,7 @@ public class MetaService {
       return response;
     }
 
-    ChartView chart = (ChartView) XMLViews.findView(name, "chart");
+    ChartView chart = (ChartView) XMLViews.findView(name, "chart", null, null, null);
     if (chart == null) {
       return response;
     }
@@ -576,7 +585,7 @@ public class MetaService {
       return response;
     }
 
-    CustomView report = (CustomView) XMLViews.findView(viewName, "custom");
+    CustomView report = (CustomView) XMLViews.findView(viewName, "custom", null, null, null);
     if (report == null) {
       return response;
     }

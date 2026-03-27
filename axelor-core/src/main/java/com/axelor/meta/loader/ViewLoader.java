@@ -345,6 +345,7 @@ public class ViewLoader extends AbstractParallelLoader {
     entity.setType(type);
     entity.setModel(modelName);
     entity.setModule(module.getName());
+    entity.setJsonModel(view.getJsonModel());
     entity.setXml(xml);
     entity.setComputed(null);
     final Set<String> missingGroups = addGroups(entity::addGroup, view.getGroups());

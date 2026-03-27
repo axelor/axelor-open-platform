@@ -326,12 +326,15 @@ export function Form(props: ViewProps<FormView>) {
           ...(popupRecord._dirty ? { ...res, ...popupRecord } : res),
         };
       } else {
-        return popupRecord?.id == null
-          ? {
-              ...getDefaultValues(meta.fields, meta.view.items),
-              ...popupRecord,
-            }
-          : popupRecord;
+        if (popupRecord?.id == null) {
+          const defaults = getDefaultValues(meta.fields, meta.view.items);
+          const { model, jsonModel } = meta.view;
+          if (model === "com.axelor.meta.db.MetaJsonRecord" && jsonModel) {
+            defaults.jsonModel = jsonModel;
+          }
+          return { ...defaults, ...popupRecord };
+        }
+        return popupRecord;
       }
     }
     return await fetchRecord(meta, dataStore, recordId);

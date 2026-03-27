@@ -209,11 +209,13 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { state, data } = useAsync(async () => {
     const { items, serverType } = schema;
     if ((items || []).length > 0) return;
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     const { view, ...res } =
       (await findView<GridView>({
         type: "grid",
         name: gridView,
         model,
+        jsonModel,
       })) || {};
     return {
       ...res,
@@ -1157,15 +1159,19 @@ function OneToManyInner({
   );
 
   const getActionContext = useCallback(
-    () => ({
-      _viewType: "grid",
-      _views: [{ type: "grid", name: gridView }],
-      ...(refs.current.lastSelectedIds?.length > 0 && {
-        _ids: refs.current.lastSelectedIds,
-      }),
-      _parent: getContext(),
-    }),
-    [getContext, gridView],
+    () => {
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
+      return {
+        _viewType: "grid",
+        _views: [{ type: "grid", name: gridView }],
+        ...(jsonModel && { jsonModel }),
+        ...(refs.current.lastSelectedIds?.length > 0 && {
+          _ids: refs.current.lastSelectedIds,
+        }),
+        _parent: getContext(),
+      };
+    },
+    [getContext, gridView, schema.jsonTarget, schema.jsonModel],
   );
 
   const actionView = useMemo(
@@ -1206,6 +1212,7 @@ function OneToManyInner({
     ) => {
       const { record } = options || {};
       const { id } = record ?? {};
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
       if (showEditorInTab && (id ?? 0) > 0) {
         return showEditorInTab(record!, options?.readonly ?? false);
       }
@@ -1214,6 +1221,7 @@ function OneToManyInner({
         id: editorId,
         title: title ?? "",
         model,
+        jsonModel,
         record: { id: null },
         readonly: false,
         maximize: isPopupMaximized(schema, "editor"),
@@ -1251,6 +1259,8 @@ function OneToManyInner({
       getContext,
       isManyToMany,
       isCollectionTree,
+      schema.jsonTarget,
+      schema.jsonModel,
     ],
   );
 
@@ -1494,10 +1504,12 @@ function OneToManyInner({
 
   const { data: detailMeta } = useAsync(async () => {
     if (!hasMasterDetails) return;
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     const meta = await findView<FormView>({
       type: "form",
       name: detailFormName,
       model,
+      jsonModel,
     });
     return (
       meta && {
@@ -1924,12 +1936,14 @@ function OneToManyInner({
 
   const { data: expandableSummaryMeta } = useAsync(async () => {
     if (!isTreeGrid || !summaryView) return null;
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     return await findView<FormView>({
       type: "form",
       name: summaryView,
       model,
+      jsonModel,
     });
-  }, [isTreeGrid, summaryView, model]);
+  }, [isTreeGrid, summaryView, model, schema.jsonModel, schema.jsonTarget]);
 
   const gridStyle: CSSProperties = useMemo(
     () => ({

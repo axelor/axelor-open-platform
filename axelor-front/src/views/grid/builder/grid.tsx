@@ -413,9 +413,10 @@ export const Grid = forwardRef<
             type: "form",
             name: expandableView,
             model,
+            jsonModel: view.jsonModel,
           });
     }
-  }, [expandable, model, fields, expandableView]);
+  }, [expandable, model, fields, expandableView, view.jsonModel]);
 
   useAsyncEffect(async () => {
     await onSearch?.({ ...searchOptions, fields: names });

@@ -453,8 +453,12 @@ public final class MetaStore {
             domain = "(%s) AND (%s)".formatted(domain, record.getDomain());
           }
           attrs.put("domain", domain);
-          attrs.put("gridView", targetModel.getGridView().getName());
-          attrs.put("formView", targetModel.getFormView().getName());
+          if (targetModel.getGridView() != null) {
+            attrs.put("gridView", targetModel.getGridView().getName());
+          }
+          if (targetModel.getFormView() != null) {
+            attrs.put("formView", targetModel.getFormView().getName());
+          }
           attrs.put("targetName", "name");
           attrs.put("jsonTarget", targetModel.getName());
         }

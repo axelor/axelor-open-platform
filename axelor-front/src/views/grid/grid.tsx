@@ -623,8 +623,9 @@ function GridInner(props: ViewProps<GridView>) {
       type: "form",
       name,
       model: view.model,
+      jsonModel: view.jsonModel,
     });
-  }, [view.model, formViewName]);
+  }, [view.model, view.jsonModel, formViewName]);
 
   const fetchAndSetDetailsRecord = useCallback(
     async (
@@ -1184,12 +1185,13 @@ function GridInner(props: ViewProps<GridView>) {
   const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
 
   const { data: expandableSummaryMeta } = useAsync(async () => {
-    const { summaryView, model } = view;
+    const { summaryView, model, jsonModel } = view;
     if (!isTreeGrid || !summaryView) return;
     return await findView<FormView>({
       type: "form",
       name: summaryView,
       model,
+      jsonModel,
     });
   }, [isTreeGrid, view]);
 

@@ -345,8 +345,10 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           return showEditorInTab($record, _readonly);
         }
 
+        const jsonModel = schema.jsonTarget || schema.jsonModel;
         showEditor({
           model,
+          jsonModel,
           title: title ?? "",
           onSelect: (record) => set(valueAtom, record, true),
           record: $record,
@@ -364,6 +366,8 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         showEditorInTab,
         title,
         valueAtom,
+        schema.jsonTarget,
+        schema.jsonModel,
       ],
     ),
   );
@@ -371,8 +375,10 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const handleSelect = useAtomCallback(
     useCallback(
       async (get, set) => {
+        const jsonModel = schema.jsonTarget || schema.jsonModel;
         showSelector({
           model,
+          jsonModel,
           domain,
           orderBy,
           maximize: isPopupMaximized(schema, "selector"),
@@ -400,6 +406,8 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         showSelector,
         handleEdit,
         valueAtom,
+        schema.jsonTarget,
+        schema.jsonModel,
       ],
     ),
   );

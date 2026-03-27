@@ -309,6 +309,7 @@ export async function findViewFields(
         try {
           const { fields } = await fetchViewFields(
             viewFields?.[item.name]?.target || item.target,
+            viewFields?.[item.name]?.jsonTarget || item.jsonTarget,
             item.items
               .filter((item) => item.type === "field" && item.name)
               .map((item) => item.name) as string[],

@@ -19,12 +19,13 @@ import { useViewTab } from "@/view-containers/views/scope";
 import { showErrors } from "@/views/form/builder/form-errors";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
-import { initTab } from "../use-tabs";
 import { useSingleClickHandler } from "../use-button";
+import { initTab } from "../use-tabs";
 
 export type EditorOptions = {
   id?: string;
   model: string;
+  jsonModel?: string;
   title: string;
   record?: DataRecord | null;
   readonly?: boolean;
@@ -56,11 +57,13 @@ export function useEditorInTab(schema: Schema) {
   const handleEdit = useCallback(
     async (record: DataRecord, readonly = false) => {
       const model = target;
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
       const { view } =
         (await findView<FormView>({
           type: "form",
           name: formView,
           model,
+          jsonModel,
         })) || {};
       return openTab({
         title: view?.title || "",
@@ -83,7 +86,14 @@ export function useEditorInTab(schema: Schema) {
         },
       });
     },
-    [formView, gridView, target, tab.action],
+    [
+      formView,
+      gridView,
+      target,
+      schema.jsonModel,
+      schema.jsonTarget,
+      tab.action,
+    ],
   );
 
   if (!tab.popup && (editWindow === "blank" || widget === "ref-link")) {
@@ -99,6 +109,7 @@ export function useEditor() {
       id,
       title,
       model,
+      jsonModel,
       record,
       view,
       viewName,
@@ -131,6 +142,7 @@ export function useEditor() {
       params: tabParams,
       context: {
         _showRecord: record?.id,
+        jsonModel,
         ...context,
       },
     });

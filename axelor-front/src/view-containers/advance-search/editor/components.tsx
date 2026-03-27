@@ -165,6 +165,8 @@ function RelationalSelectWidget({
     target,
     targetName,
     targetSearch,
+    jsonModel,
+    jsonTarget,
     gridView,
     searchLimit,
     domain,
@@ -200,6 +202,7 @@ function RelationalSelectWidget({
   const showSelect = useCallback(() => {
     showSelector({
       model: target,
+      jsonModel: jsonTarget || jsonModel,
       viewName: gridView,
       orderBy: sortBy,
       multiple,
@@ -214,10 +217,12 @@ function RelationalSelectWidget({
     });
   }, [
     showSelector,
-    multiple,
     target,
+    jsonTarget,
+    jsonModel,
     gridView,
     sortBy,
+    multiple,
     searchLimit,
     domain,
     onChange,

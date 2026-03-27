@@ -244,6 +244,11 @@ public class XMLViews {
   }
 
   public static Map<String, Object> findViews(String model, Map<String, String> views) {
+    return findViews(model, views, null);
+  }
+
+  public static Map<String, Object> findViews(
+      String model, Map<String, String> views, String jsonModel) {
     final Map<String, Object> result = new HashMap<>();
     if (views == null || views.isEmpty()) {
       views = Map.of("grid", "", "form", "");
@@ -251,7 +256,7 @@ public class XMLViews {
     for (Entry<String, String> entry : views.entrySet()) {
       final String type = entry.getKey();
       final String name = entry.getValue();
-      final AbstractView view = findView(name, type, model);
+      final AbstractView view = findView(name, type, model, null, jsonModel);
       try {
         result.put(type, view);
       } catch (Exception e) {
@@ -262,13 +267,14 @@ public class XMLViews {
   }
 
   private static MetaViewCustom findCustomView(
-      MetaViewCustomRepository views, String name, String type, String model) {
+      MetaViewCustomRepository views, String name, String type, String model, String jsonModel) {
     User user = AuthUtils.getUser();
     List<String> conditions = new ArrayList<>();
 
     if (StringUtils.notBlank(name)) conditions.add("self.name = :name");
     if (StringUtils.notBlank(type)) conditions.add("self.type = :type");
     if (StringUtils.notBlank(model)) conditions.add("self.model = :model");
+    if (StringUtils.notBlank(jsonModel)) conditions.add("self.jsonModel = :jsonModel");
 
     // find personal
     String filter = String.join(" AND ", conditions) + " AND self.user = :user";
@@ -280,6 +286,7 @@ public class XMLViews {
             .bind("name", name)
             .bind("type", type)
             .bind("model", model)
+            .bind("jsonModel", jsonModel)
             .bind("user", user)
             .fetchOne();
 
@@ -296,11 +303,18 @@ public class XMLViews {
         .bind("name", name)
         .bind("type", type)
         .bind("model", model)
+        .bind("jsonModel", jsonModel)
         .fetchOne();
   }
 
   private static MetaView findMetaView(
-      MetaViewRepository views, String name, String type, String model, String module, Long group) {
+      MetaViewRepository views,
+      String name,
+      String type,
+      String model,
+      String module,
+      String jsonModel,
+      Long group) {
     final List<String> select = new ArrayList<>();
     if (name != null) {
       select.add("self.name = :name");
@@ -313,6 +327,9 @@ public class XMLViews {
     }
     if (module != null) {
       select.add("self.module = :module");
+    }
+    if (jsonModel != null) {
+      select.add("self.jsonModel = :jsonModel");
     }
     if (group == null) {
       select.add("self.groups is empty");
@@ -327,6 +344,7 @@ public class XMLViews {
         .bind("type", type)
         .bind("model", model)
         .bind("module", module)
+        .bind("jsonModel", jsonModel)
         .bind("group", group)
         .cacheable()
         .order("-priority")
@@ -360,11 +378,15 @@ public class XMLViews {
   }
 
   public static AbstractView findView(String name, String type) {
-    return findView(name, type, null, null);
+    return findView(name, type, null, null, null);
   }
 
   public static AbstractView findView(String name, String type, String model) {
-    return findView(name, type, model, null);
+    return findView(name, type, model, null, null);
+  }
+
+  public static AbstractView findView(String name, String type, String model, String module) {
+    return findView(name, type, model, module, null);
   }
 
   public static boolean isCustomizationEnabled() {
@@ -380,15 +402,19 @@ public class XMLViews {
    *   <li>find custom view by name and current user
    *   <li>find view matching given params with user's group
    *   <li>find view matching given params but have no groups
+   *   <li>for jsonModel views, fallback to legacy naming convention
+   *       (custom-model-{jsonModel}-{type})
    * </ol>
    *
    * @param name find by name
    * @param type find by type (name or model should be provided)
    * @param model find by model (name or type should be provided)
    * @param module (any of the other param should be provided)
-   * @return
+   * @param jsonModel find by jsonModel (for custom model views)
+   * @return the view or null if not found
    */
-  public static AbstractView findView(String name, String type, String model, String module) {
+  public static AbstractView findView(
+      String name, String type, String model, String module, String jsonModel) {
 
     final MetaViewRepository views = Beans.get(MetaViewRepository.class);
     final MetaViewCustomRepository customViews = Beans.get(MetaViewCustomRepository.class);
@@ -401,18 +427,26 @@ public class XMLViews {
 
     // find personalized view
     if (Boolean.TRUE.equals(isCustomizationEnabled()) && module == null && user != null) {
-      custom = findCustomView(customViews, name, type, model);
+      custom = findCustomView(customViews, name, type, model, jsonModel);
     }
 
     // first find by name
     if (StringUtils.notBlank(name)) {
       // with group
-      view = findMetaView(views, name, null, model, module, group);
-      view = view == null ? findMetaView(views, name, null, null, module, group) : view;
+      view = findMetaView(views, name, null, model, module, jsonModel, group);
+      view = view == null ? findMetaView(views, name, null, null, module, jsonModel, group) : view;
 
       // without group
-      view = view == null ? findMetaView(views, name, null, model, module, null) : view;
-      view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+      view = view == null ? findMetaView(views, name, null, model, module, jsonModel, null) : view;
+      view = view == null ? findMetaView(views, name, null, null, module, jsonModel, null) : view;
+
+      // fallback: try without jsonModel filter (for views not yet migrated)
+      if (view == null && jsonModel != null) {
+        view = findMetaView(views, name, null, model, module, null, group);
+        view = view == null ? findMetaView(views, name, null, null, module, null, group) : view;
+        view = view == null ? findMetaView(views, name, null, model, module, null, null) : view;
+        view = view == null ? findMetaView(views, name, null, null, module, null, null) : view;
+      }
 
       if (view == null) {
         log.error("No such view found: {}", name);
@@ -420,10 +454,26 @@ public class XMLViews {
       }
     }
 
-    // next find by type
+    // next find by type (and optionally jsonModel)
     if (type != null && model != null) {
-      view = view == null ? findMetaView(views, null, type, model, module, group) : view;
-      view = view == null ? findMetaView(views, null, type, model, module, null) : view;
+      // try with jsonModel first
+      if (jsonModel != null) {
+        view =
+            view == null ? findMetaView(views, null, type, model, module, jsonModel, group) : view;
+        view =
+            view == null ? findMetaView(views, null, type, model, module, jsonModel, null) : view;
+      }
+      // fallback without jsonModel
+      view = view == null ? findMetaView(views, null, type, model, module, null, group) : view;
+      view = view == null ? findMetaView(views, null, type, model, module, null, null) : view;
+
+      // fallback: try legacy naming convention for jsonModel views
+      if (view == null && jsonModel != null) {
+        String legacyName = "custom-model-" + jsonModel + "-" + type;
+        view = findMetaView(views, legacyName, null, model, module, null, group);
+        view =
+            view == null ? findMetaView(views, legacyName, null, model, module, null, null) : view;
+      }
     }
 
     final AbstractView xmlView;
@@ -463,6 +513,9 @@ public class XMLViews {
           xmlView.setModelId(metaModel.getId());
         }
       }
+    }
+    if (jsonModel != null) {
+      xmlView.setJsonModel(jsonModel);
     }
     if (custom != null) {
       xmlView.setCustomViewId(custom.getId());
