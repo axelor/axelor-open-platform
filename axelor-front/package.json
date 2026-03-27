@@ -42,7 +42,7 @@
     "immer": "^11.1.4",
     "jotai": "^2.19.0",
     "jotai-family": "^1.0.1",
-    "jotai-immer": "^0.4.1",
+    "jotai-immer": "^0.4.3",
     "libphonenumber-js": "^1.12.40",
     "lodash": "^4.17.23",
     "monaco-editor": "^0.52.2",

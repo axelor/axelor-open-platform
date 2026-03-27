@@ -80,8 +80,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4))
       jotai-immer:
-        specifier: ^0.4.1
-        version: 0.4.2(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4))
+        specifier: ^0.4.3
+        version: 0.4.3(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4))
       libphonenumber-js:
         specifier: ^1.12.40
         version: 1.12.40
@@ -2250,8 +2250,8 @@ packages:
     peerDependencies:
       jotai: '>=2.9.0'
 
-  jotai-immer@0.4.2:
-    resolution: {integrity: sha512-wMMoJl8EHWifkXGPyOPx9NNvuE7VWKMERwbI/FKou3Sl76vIERWXBohTK6ZbEoLETcYyVhiHhspandOrXClpMg==}
+  jotai-immer@0.4.3:
+    resolution: {integrity: sha512-sJWiSweR294aDA/jeH6bKSKYVxRqgfxnLWaZmKw0/Hd6iGKLN4TSB3AHpFWQFDf0W+P3sEIkROr0ALlWQfCSeA==}
     peerDependencies:
       immer: '>=9.0.0'
       jotai: '>=2.0.0'
@@ -5675,7 +5675,7 @@ snapshots:
     dependencies:
       jotai: 2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4)
 
-  jotai-immer@0.4.2(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4)):
+  jotai-immer@0.4.3(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4)):
     dependencies:
       immer: 11.1.4
       jotai: 2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4)
