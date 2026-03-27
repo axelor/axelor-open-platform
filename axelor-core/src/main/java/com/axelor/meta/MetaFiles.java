@@ -49,6 +49,9 @@ public class MetaFiles {
 
   private static final String UPLOAD_NAME_PATTERN_AUTO = "auto";
 
+  static final String MSG_FILE_NAME_NOT_ALLOWED = /*$$(*/ "File name is not allowed: {0}" /*)*/;
+  static final String MSG_FILE_TYPE_NOT_ALLOWED = /*$$(*/ "File type is not allowed: {0}" /*)*/;
+
   private static final Object lock = new Object();
 
   private static final List<Pattern> WHITELIST_PATTERNS =
@@ -113,7 +116,7 @@ public class MetaFiles {
    * blacklist pattern.
    *
    * @param filePath the file path to check
-   * @throws IllegalArgumentException if the file path to check is not valid
+   * @throws IllegalFileException if the file path to check is not valid
    */
   public static void checkPath(String filePath) {
     Objects.requireNonNull(filePath, "file path can't be null");
@@ -122,14 +125,14 @@ public class MetaFiles {
         !BLACKLIST_PATTERNS.isEmpty() && isMatchingFileNamePattern(BLACKLIST_PATTERNS, filePath);
 
     if (blocked) {
-      throw new IllegalArgumentException("File name is not allowed: " + filePath);
+      throw new IllegalFileException(MSG_FILE_NAME_NOT_ALLOWED, filePath);
     }
 
     boolean allowed =
         WHITELIST_PATTERNS.isEmpty() || isMatchingFileNamePattern(WHITELIST_PATTERNS, filePath);
 
     if (!allowed) {
-      throw new IllegalArgumentException("File name is not allowed: " + filePath);
+      throw new IllegalFileException(MSG_FILE_NAME_NOT_ALLOWED, filePath);
     }
   }
 
@@ -144,7 +147,7 @@ public class MetaFiles {
    * blacklist types.
    *
    * @param fileType the file type to check
-   * @throws IllegalArgumentException if the file type to check is not valid
+   * @throws IllegalFileException if the file type to check is not valid
    */
   public static void checkType(String fileType) {
     if (StringUtils.isBlank(fileType)) {
@@ -161,13 +164,13 @@ public class MetaFiles {
     boolean blocked = !BLACKLIST_TYPES.isEmpty() && isMatchingMimeType(BLACKLIST_TYPES, mimeType);
 
     if (blocked) {
-      throw new IllegalArgumentException("File type is not allowed: " + fileType);
+      throw new IllegalFileException(MSG_FILE_TYPE_NOT_ALLOWED, fileType);
     }
 
     boolean allowed = WHITELIST_TYPES.isEmpty() || isMatchingMimeType(WHITELIST_TYPES, mimeType);
 
     if (!allowed) {
-      throw new IllegalArgumentException("File type is not allowed: " + fileType);
+      throw new IllegalFileException(MSG_FILE_TYPE_NOT_ALLOWED, fileType);
     }
   }
 
@@ -185,7 +188,7 @@ public class MetaFiles {
    * prevent spoofing via file extension.
    *
    * @param file the file to check
-   * @throws IllegalArgumentException if the content type is not valid
+   * @throws IllegalFileException if the content type is not valid
    */
   public static void checkType(File file) {
     Objects.requireNonNull(file, "file can't be null");
@@ -202,7 +205,7 @@ public class MetaFiles {
    * prevent spoofing via file extension.
    *
    * @param stream the input stream to check
-   * @throws IllegalArgumentException if the content type is not valid
+   * @throws IllegalFileException if the content type is not valid
    */
   public static void checkType(InputStream stream) {
     Objects.requireNonNull(stream, "stream can't be null");
