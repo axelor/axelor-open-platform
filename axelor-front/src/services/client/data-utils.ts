@@ -154,6 +154,51 @@ function toJSON(value?: string | null) {
   return {};
 }
 
+function parseJsonField(value: unknown): Record<string, unknown> {
+  try {
+    if (typeof value === "string") return JSON.parse(value);
+    if (value && typeof value === "object")
+      return { ...value } as Record<string, unknown>;
+  } catch {
+    // ignore parse errors
+  }
+  return {};
+}
+
+/**
+ * Update a JSON field on a record: parses the existing value from source,
+ * applies updates, and stringifies it back onto the target record.
+ */
+export function updateJsonFieldValue(
+  record: DataRecord,
+  jsonField: string,
+  source: DataRecord,
+  updates: Record<string, unknown>,
+) {
+  const jsonValue = parseJsonField(source[jsonField]);
+  Object.assign(jsonValue, updates);
+  record[jsonField] = JSON.stringify(jsonValue);
+}
+
+/**
+ * Re-expand dotted JSON field values on a record from its JSON string.
+ * e.g. updates record["attrs.status"] from the parsed record["attrs"].
+ */
+export function expandJsonFieldValues(
+  record: DataRecord,
+  fieldNames: (string | undefined)[],
+  fields?: Record<string, Property>,
+) {
+  for (const name of fieldNames) {
+    if (!name) continue;
+    const field = fields?.[name];
+    if (field?.jsonField && field?.jsonPath) {
+      const json = parseJsonField(record[field.jsonField]);
+      record[name] = json[field.jsonPath];
+    }
+  }
+}
+
 export function updateRecord(
   target: DataRecord,
   source: DataRecord,

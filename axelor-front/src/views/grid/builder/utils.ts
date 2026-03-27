@@ -98,11 +98,11 @@ export function getWidget(item: any, field: any): string {
 }
 
 export function isValidSequence(field: Property) {
-  const { type, name } = field;
+  const { type, name, jsonField } = field;
   return (
-    ["INTEGER", "LONG"].includes(type) &&
+    ["INTEGER", "LONG"].includes(type?.toUpperCase()) &&
     !["id", "version"].includes(name) &&
-    !name.includes(".")
+    (!name.includes(".") || !!jsonField)
   );
 }
 

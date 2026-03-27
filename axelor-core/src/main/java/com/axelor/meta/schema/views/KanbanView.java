@@ -16,6 +16,7 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -124,11 +125,39 @@ public class KanbanView extends CardsView {
 
   @XmlTransient
   @JsonProperty
+  @SuppressWarnings("unchecked")
   public List<Selection.Option> getColumns() {
-    Mapper mapper = Mapper.of(getModelClass());
+    Class<?> modelClass = getModelClass();
+    Mapper mapper = Mapper.of(modelClass);
+
+    // Handle JSON custom fields (e.g., attrs.status)
+    int dotIndex = columnBy.indexOf('.');
+    if (dotIndex > 0) {
+      String jsonField = columnBy.substring(0, dotIndex);
+      String fieldName = columnBy.substring(dotIndex + 1);
+      Property jsonProperty = mapper.getProperty(jsonField);
+
+      if (jsonProperty != null && jsonProperty.isJson()) {
+        Map<String, Object> jsonFields =
+            StringUtils.notBlank(getJsonModel())
+                ? MetaStore.findJsonFields(getJsonModel())
+                : MetaStore.findJsonFields(modelClass.getName(), jsonField);
+
+        if (jsonFields != null && jsonFields.containsKey(fieldName)) {
+          Map<String, Object> attrs = (Map<String, Object>) jsonFields.get(fieldName);
+          List<Selection.Option> selectionList =
+              (List<Selection.Option>) attrs.get("selectionList");
+          if (selectionList != null) {
+            return selectionList;
+          }
+        }
+        throw new RuntimeException("Invalid columnBy: " + columnBy);
+      }
+    }
+
     Property columnField = mapper.getProperty(columnBy);
     if (columnField == null) {
-      throw new RuntimeException("Null field found: " + columnBy);
+      throw new RuntimeException("Invalid columnBy: " + columnBy);
     }
 
     if (columnField.isEnum()) {
