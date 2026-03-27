@@ -64,16 +64,15 @@ const formatDuration: Formatter = (value, opts = {}) => {
 };
 
 const formatRelativeTime: Formatter = (value, opts = {}) => {
-  let result = "";
   const { props } = opts;
   const { serverType, type } = props ?? {};
 
   if (!value) return "";
 
-  result = moment(value).fromNow();
+  const result = moment(value).fromNow();
 
   if ((serverType ?? type)?.toUpperCase() === "DATE") {
-    result = moment(value).calendar(null, {
+    return moment(value).calendar(null, {
       sameDay: `[${i18n.get("Today")}]`,
       nextDay: `[${i18n.get("Tomorrow")}]`,
       nextWeek: "dddd",

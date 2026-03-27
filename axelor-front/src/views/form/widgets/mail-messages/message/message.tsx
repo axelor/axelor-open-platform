@@ -129,16 +129,15 @@ export const Message = React.memo(function Message(props: MessageProps) {
   } = data;
 
   const body = useMemo<TYPES.MessageBody | null>(() => {
-    let body: string | null = data.body || "{}";
     try {
-      body = JSON.parse(data.body || "");
-      if (typeof body !== "object") {
-        body = null;
+      const parsedBody = JSON.parse(data.body || "{}");
+      if (typeof parsedBody !== "object") {
+        return null;
       }
+      return parsedBody;
     } catch (e) {
-      body = null;
+      return null;
     }
-    return body;
   }, [data.body]);
 
   const $title = body?.title || subject;

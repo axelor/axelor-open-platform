@@ -345,22 +345,17 @@ export function adjustCaretPosition({
     (previousConformedValue === conformedValue ||
       conformedValue === placeholder);
 
-  let caretPosition = 0;
-
-  if (shouldSetCaretToEnd) {
-    caretPosition = currentCaretPosition - editLength;
-  } else {
-    const result = findTargetCaretPosition(
-      conformedValue,
-      rawValue,
-      placeholder,
-      previousPlaceholder,
-      placeholderChar,
-      currentCaretPosition,
-      isAddition,
-    );
-    caretPosition = result.caretPosition;
-  }
+  const caretPosition = shouldSetCaretToEnd
+    ? currentCaretPosition - editLength
+    : findTargetCaretPosition(
+        conformedValue,
+        rawValue,
+        placeholder,
+        previousPlaceholder,
+        placeholderChar,
+        currentCaretPosition,
+        isAddition,
+      ).caretPosition;
 
   if (isAddition) {
     for (let i = caretPosition; i <= placeholderLength; i++) {

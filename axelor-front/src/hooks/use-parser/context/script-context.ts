@@ -122,12 +122,11 @@ export function createScriptContext(
       if (items && items.length) {
         items.forEach(function (item) {
           let value = 0;
-          let value2 = 0;
           if (field in item) {
             value = +(item[field] || 0);
           }
           if (operation && field2 && field2 in item) {
-            value2 = +(item[field2] || 0);
+            const value2 = +(item[field2] || 0);
             switch (operation) {
               case "*":
                 value = value * value2;
