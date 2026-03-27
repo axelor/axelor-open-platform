@@ -207,7 +207,7 @@ public class FileService extends AbstractService {
     } catch (IllegalArgumentException e) {
       deleteTempUploadedFile(file);
       ActionValidateBuilder validateBuilder =
-          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getLocalizedMessage());
       data.putAll(validateBuilder.build());
       return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
     } catch (Exception e) {

@@ -45,6 +45,7 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
+import com.axelor.meta.IllegalFileException;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
@@ -403,9 +404,13 @@ public class RestService extends ResourceService {
     final String safeFileName = FileUtils.safeFileName(originalFileName);
     final String fileType = String.valueOf(data.get("fileType"));
 
-    // check if file name is valid
-    MetaFiles.checkPath(safeFileName);
-    MetaFiles.checkType(fileType);
+    try {
+      // check if file name is valid
+      MetaFiles.checkPath(safeFileName);
+      MetaFiles.checkType(fileType);
+    } catch (IllegalFileException e) {
+      return new Response().fail(e.getLocalizedMessage());
+    }
 
     final InputPart filePart = formData.get("file").get(0);
     final InputPart fieldPart = formData.get("field").get(0);
@@ -420,8 +425,8 @@ public class RestService extends ResourceService {
       try {
         // check if file content is valid
         MetaFiles.checkType(new ByteArrayInputStream(bytes));
-      } catch (IllegalArgumentException e) {
-        return new Response().fail(e.getMessage());
+      } catch (IllegalFileException e) {
+        return new Response().fail(e.getLocalizedMessage());
       }
       data.put(field, bytes);
       return getResource().save(request);
@@ -445,9 +450,9 @@ public class RestService extends ResourceService {
     try {
       // check if file content is valid
       MetaFiles.checkType(tmp);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalFileException e) {
       Files.deleteIfExists(tmp.toPath());
-      return new Response().fail(e.getMessage());
+      return new Response().fail(e.getLocalizedMessage());
     }
     final MetaFile updatedEntity = files.upload(tmp, entity);
     JPA.runInTransaction(() -> updatedEntity.setFileName(originalFileName));
