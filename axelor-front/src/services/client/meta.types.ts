@@ -83,6 +83,7 @@ export interface Property {
   widget?: string;
   widgetAttrs?: Record<string, any>; // incoming is string, processed to object
   jsonField?: string;
+  jsonPath?: string;
   jsonTarget?: string;
 }
 

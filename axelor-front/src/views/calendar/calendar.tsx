@@ -35,6 +35,10 @@ import { useActionExecutor } from "../form/builder/scope";
 import { Picker as DatePicker } from "../form/widgets/date/picker";
 import { ViewProps } from "../types";
 import { getColor } from "./colors";
+import {
+  getJsonFieldValue,
+  updateJsonFieldValue,
+} from "@/services/client/data-utils";
 import { Filter, Filters } from "./filters";
 import { Popover } from "./popover";
 
@@ -95,7 +99,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const searchNames = useMemo(() => {
     const fieldNames = Object.keys(meta.fields ?? {});
     const itemNames = [eventStart, eventStop!, colorBy!].filter(Boolean);
-    return [...new Set([...fieldNames, ...itemNames])];
+    const jsonFieldNames = itemNames
+      .map((name) => meta.fields?.[name]?.jsonField)
+      .filter((name): name is string => !!name);
+    return [...new Set([...fieldNames, ...itemNames, ...jsonFieldNames])];
   }, [meta.fields, eventStart, eventStop, colorBy]);
 
   const modeRef = useRef(mode);
@@ -213,8 +220,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
           props: titleField,
           context: record,
         });
-        const startValue = record[eventStart];
-        const endValue = eventStop && record[eventStop];
+        const getFieldValue = (record: DataRecord, name: string) => {
+          const field = meta.fields?.[name];
+          return field?.jsonField
+            ? getJsonFieldValue(record, field)
+            : record[name];
+        };
+        const startValue = getFieldValue(record, eventStart);
+        const endValue = eventStop && getFieldValue(record, eventStop);
         const start = startValue
           ? moment(startValue).toDate()
           : moment().toDate();
@@ -280,6 +293,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     eventLength,
     eventStart,
     eventStop,
+    meta.fields,
     titleField,
     allDayOnly,
   ]);
@@ -467,16 +481,47 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const onEventCreate = useCallback(
     ({ start, end }: SchedulerEvent<DataRecord>) => {
       if (canNew) {
-        const record: DataRecord = {
-          [eventStart]: start.toISOString(),
-        };
-        if (eventStop) {
+        const record: DataRecord = {};
+        // Set jsonModel for custom model records
+        const { jsonModel } = meta.view;
+        if (jsonModel) {
+          record.jsonModel = jsonModel;
+        }
+        const startField = meta.fields?.[eventStart];
+        const stopField = eventStop ? meta.fields?.[eventStop] : undefined;
+
+        if (startField?.jsonField && startField?.jsonPath) {
+          const updates: Record<string, unknown> = {
+            [startField.jsonPath]: start.toISOString(),
+          };
+          if (
+            stopField?.jsonField &&
+            stopField?.jsonPath &&
+            stopField.jsonField === startField.jsonField
+          ) {
+            updates[stopField.jsonPath] = end.toISOString();
+          }
+          updateJsonFieldValue(record, startField.jsonField, record, updates);
+        } else {
+          record[eventStart] = start.toISOString();
+        }
+
+        if (
+          stopField?.jsonField &&
+          stopField?.jsonPath &&
+          stopField.jsonField !== startField?.jsonField
+        ) {
+          updateJsonFieldValue(record, stopField.jsonField, record, {
+            [stopField.jsonPath]: end.toISOString(),
+          });
+        } else if (eventStop && !stopField?.jsonField) {
           record[eventStop] = end.toISOString();
         }
+
         showRecord(record);
       }
     },
-    [eventStart, eventStop, canNew, showRecord],
+    [eventStart, eventStop, meta.fields, canNew, showRecord],
   );
 
   const onEventChange = useAtomCallback(
@@ -491,23 +536,75 @@ export function Calendar(props: ViewProps<CalendarView>) {
         if (allDay) {
           endValue = moment(endValue).startOf("day").toDate();
         }
+        let previousStart = start;
+        let previousEnd = endValue;
+        let previousAllDay = Boolean(allDay);
+
+        // Optimistically update event position to avoid flicker
+        setEvents((prev) =>
+          prev.map((e) => {
+            if (e.data?.id !== data?.id) return e;
+
+            previousStart = e.start;
+            previousEnd = e.end;
+            previousAllDay = Boolean(e.allDay);
+
+            return { ...e, start, end: endValue, allDay };
+          }),
+        );
 
         const startStr = start.toISOString();
         const endStr = endValue.toISOString();
+        const startField = meta.fields?.[eventStart];
+        const stopField = eventStop ? meta.fields?.[eventStop] : undefined;
 
-        if (eventStart) record[eventStart] = startStr;
-        if (eventStop) record[eventStop] = endStr;
+        // Collect JSON field updates grouped by parent field
+        const jsonUpdates: Record<string, Record<string, unknown>> = {};
 
-        if (onChange) {
-          set(formAtom, (prev) => ({ ...prev, record }));
-          await actionExecutor.execute(onChange, {
-            context: { ...record },
-          });
-          record = { ...record, ...get(formAtom).record };
+        if (startField?.jsonField && startField?.jsonPath) {
+          (jsonUpdates[startField.jsonField] ??= {})[startField.jsonPath] =
+            startStr;
+        } else if (eventStart) {
+          record[eventStart] = startStr;
         }
 
-        await dataStore.save(record);
-        await onRefresh();
+        if (stopField?.jsonField && stopField?.jsonPath) {
+          (jsonUpdates[stopField.jsonField] ??= {})[stopField.jsonPath] =
+            endStr;
+        } else if (eventStop) {
+          record[eventStop] = endStr;
+        }
+
+        for (const [jsonField, updates] of Object.entries(jsonUpdates)) {
+          updateJsonFieldValue(record, jsonField, data!, updates);
+        }
+
+        try {
+          if (onChange) {
+            set(formAtom, (prev) => ({ ...prev, record }));
+            await actionExecutor.execute(onChange, {
+              context: { ...record },
+            });
+            record = { ...record, ...get(formAtom).record };
+          }
+
+          await dataStore.save(record);
+          await onRefresh();
+        } catch (error) {
+          setEvents((prev) =>
+            prev.map((e) =>
+              e.data?.id === data?.id
+                ? {
+                    ...e,
+                    start: previousStart,
+                    end: previousEnd,
+                    allDay: previousAllDay,
+                  }
+                : e,
+            ),
+          );
+          throw error;
+        }
       },
       [
         actionExecutor,
@@ -516,8 +613,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
         eventStart,
         eventStop,
         formAtom,
+        meta.fields,
         onChange,
         onRefresh,
+        setEvents,
       ],
     ),
   );

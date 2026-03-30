@@ -165,6 +165,15 @@ function parseJsonField(value: unknown): Record<string, unknown> {
   return {};
 }
 
+export function getJsonFieldValue(
+  record: DataRecord,
+  field?: Pick<Property, "jsonField" | "jsonPath">,
+) {
+  if (!field?.jsonField || !field?.jsonPath) return undefined;
+  const json = parseJsonField(record[field.jsonField]);
+  return getObjValue(json, field.jsonPath);
+}
+
 /**
  * Update a JSON field on a record: parses the existing value from source,
  * applies updates, and stringifies it back onto the target record.
@@ -176,7 +185,9 @@ export function updateJsonFieldValue(
   updates: Record<string, unknown>,
 ) {
   const jsonValue = parseJsonField(source[jsonField]);
-  Object.assign(jsonValue, updates);
+  for (const [path, value] of Object.entries(updates)) {
+    setObjValue(jsonValue, path, value);
+  }
   record[jsonField] = JSON.stringify(jsonValue);
 }
 
@@ -193,8 +204,7 @@ export function expandJsonFieldValues(
     if (!name) continue;
     const field = fields?.[name];
     if (field?.jsonField && field?.jsonPath) {
-      const json = parseJsonField(record[field.jsonField]);
-      record[name] = json[field.jsonPath];
+      record[name] = getJsonFieldValue(record, field);
     }
   }
 }
