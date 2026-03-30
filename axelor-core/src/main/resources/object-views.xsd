@@ -2320,6 +2320,14 @@
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="x-json-model" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Specify the custom model name for this node. Used when the node model
+                    is MetaJsonRecord to filter records by their custom model.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
@@ -2616,6 +2624,13 @@
         <xsd:attribute name="model" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify the model object name.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-json-model" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the custom model name of this view.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="orderBy" type="xsd:string">

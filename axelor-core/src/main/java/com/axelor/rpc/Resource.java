@@ -585,23 +585,66 @@ public class Resource<T extends Model> {
               throw new IllegalArgumentException("Invalid name: %s".formatted(name));
             });
 
-    builder
-        .append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
-        .append(modelName)
-        .append(" self ")
-        .append("LEFT JOIN self.")
-        .append(parentName)
-        .append(" AS _parent ")
-        .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
+    // Check if parent field is a JSON custom field (e.g., attrs.parent)
+    var isJsonParent = false;
+    var dotIndex = parentName.indexOf('.');
+    if (dotIndex > 0) {
+      try {
+        var modelClass = Class.forName(modelName);
+        var mapper = Mapper.of(modelClass);
+        var baseProp = mapper.getProperty(parentName.substring(0, dotIndex));
+        isJsonParent = baseProp != null && baseProp.isJson();
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException("Invalid model: " + modelName, e);
+      }
+    }
 
-    jakarta.persistence.Query q = JPA.em().createQuery(builder.toString());
-    q.setParameter("ids", ids);
+    if (isJsonParent) {
+      var jsonField = parentName.substring(0, dotIndex);
+      var jsonPath = parentName.substring(dotIndex + 1);
+      // JSON many-to-one references store values as {"id": N, ...},
+      // so extract the nested "id" to match against parent IDs
+      var jsonExtract = "json_extract_text(self." + jsonField + ", '" + jsonPath + "', 'id')";
+      builder
+          .append("SELECT new map(")
+          .append(jsonExtract)
+          .append(" as id, count(self.id) as count) FROM ")
+          .append(modelName)
+          .append(" self ")
+          .append("WHERE ")
+          .append(jsonExtract)
+          .append(" IN (:ids) GROUP BY ")
+          .append(jsonExtract);
+    } else {
+      builder
+          .append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
+          .append(modelName)
+          .append(" self ")
+          .append("LEFT JOIN self.")
+          .append(parentName)
+          .append(" AS _parent ")
+          .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
+    }
+
+    var q = JPA.em().createQuery(builder.toString());
+    var paramIds =
+        isJsonParent ? ids.stream().map(id -> id == null ? null : id.toString()).toList() : ids;
+
+    q.setParameter("ids", paramIds);
 
     QueryBinder.of(q).setReadOnly();
 
     Map counts = new HashMap<>();
     for (Object item : q.getResultList()) {
-      counts.put(((Map) item).get("id"), ((Map) item).get("count"));
+      Object id = ((Map) item).get("id");
+      if (isJsonParent && id instanceof String sid) {
+        try {
+          id = Long.valueOf(sid);
+        } catch (NumberFormatException e) {
+          // keep as string
+        }
+      }
+      counts.put(id, ((Map) item).get("count"));
     }
 
     for (Object item : result) {

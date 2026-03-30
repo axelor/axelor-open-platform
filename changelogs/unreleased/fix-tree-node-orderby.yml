@@ -1,0 +1,5 @@
+---
+title: Fix tree node orderBy attribute not being applied
+type: fix
+description: |
+  `orderBy` attribute defined on tree node was not being applied during the search request of the node.

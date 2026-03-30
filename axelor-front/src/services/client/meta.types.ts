@@ -601,6 +601,7 @@ export interface TreeNode {
   draggable?: boolean;
   domain?: string;
   orderBy?: string;
+  jsonModel?: string;
   items?: (TreeField | Button)[];
 }
 

@@ -1,6 +1,14 @@
 import { useSetAtom } from "jotai";
 import uniq from "lodash/uniq";
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type JSX } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 
 import {
   Box,
@@ -18,8 +26,13 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE, getDefaultPageSize } from "@/utils/app-settings.ts";
+import {
+  Property,
+  TreeField,
+  TreeNode,
+  TreeView,
+} from "@/services/client/meta.types";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
@@ -30,6 +43,10 @@ import {
   useViewTab,
 } from "@/view-containers/views/scope";
 
+import {
+  expandJsonFieldValues,
+  updateJsonFieldValue,
+} from "@/services/client/data-utils";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Node as NodeComponent, NodeProps } from "./renderers/node";
@@ -39,11 +56,14 @@ import {
 } from "./renderers/node-text";
 import { LoadMoreTreeRow } from "./types";
 import { createContextParams } from "../form/builder/utils";
+import { findJsonFieldItem } from "@/utils/schema";
 import { getNodeOfTreeRecord } from "./utils";
 
 import styles from "./tree.module.scss";
 
-function isTreeFieldItem(item: TreeField | { type?: string }): item is TreeField {
+function isTreeFieldItem(
+  item: TreeField | { type?: string },
+): item is TreeField {
   return item.type === "field";
 }
 
@@ -65,6 +85,85 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const loadingMoreRef = useRef<Set<string>>(new Set());
   const getViewContext = useViewContext();
 
+  const getJsonField = useCallback(
+    (fieldName?: string) =>
+      fieldName ? findJsonFieldItem(meta, fieldName) : undefined,
+    [meta],
+  );
+
+  const getJsonParentField = useCallback(
+    (fieldName?: string, node?: TreeNode) => {
+      const field = getJsonField(fieldName);
+      if (!fieldName) {
+        return {
+          field,
+          countOn: fieldName,
+          jsonField: undefined,
+          jsonPath: undefined,
+        };
+      }
+      if (field?.jsonField && field?.jsonPath) {
+        return {
+          field,
+          countOn: `${field.jsonField}.${field.jsonPath}`,
+          jsonField: field.jsonField,
+          jsonPath: field.jsonPath,
+        };
+      }
+      // For JSON model nodes (MetaJsonRecord), fields not found in meta.jsonFields
+      // (e.g. child node with a different jsonModel) are stored in attrs
+      if (node?.jsonModel) {
+        return {
+          field,
+          countOn: `attrs.${fieldName}`,
+          jsonField: "attrs",
+          jsonPath: fieldName,
+        };
+      }
+      return {
+        field,
+        countOn: fieldName,
+      };
+    },
+    [getJsonField],
+  );
+
+  const expandNodeJsonFields = useCallback(
+    (record: DataRecord, node?: TreeNode) => {
+      const next = { ...record };
+      const fieldNames = [
+        node?.parent,
+        ...(node?.items ?? []).map((item) => item.name),
+      ];
+      const fields = fieldNames.reduce<Record<string, Property>>(
+        (acc, name) => {
+          if (!name) return acc;
+          const field = getJsonField(name);
+          if (field) {
+            acc[name] = field as unknown as Property;
+          } else if (node?.jsonModel) {
+            // For JSON model nodes whose fields aren't in meta.jsonFields
+            // (e.g. child nodes with a different jsonModel), infer jsonField
+            // and jsonPath from the dotted name so the value can be expanded
+            const dotIndex = name.indexOf(".");
+            if (dotIndex > 0) {
+              acc[name] = {
+                jsonField: name.slice(0, dotIndex),
+                jsonPath: name.slice(dotIndex + 1),
+              } as Property;
+            }
+          }
+          return acc;
+        },
+        {},
+      );
+
+      expandJsonFieldValues(next, fieldNames, fields);
+      return next;
+    },
+    [getJsonField],
+  );
+
   const getContext = useCallback(
     (actions?: boolean) => {
       const ctx = getViewContext(actions);
@@ -78,23 +177,26 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     [getViewContext, action, view],
   );
 
-  // check parent/child is of same model
+  // check parent/child is of same model (including jsonModel)
   const isSameModelTree = useMemo(() => {
     const model = view?.nodes?.[0]?.model;
-    return view?.nodes?.every?.((n) => n.model === model);
+    const jsonModel = view?.nodes?.[0]?.jsonModel;
+    return view?.nodes?.every?.(
+      (n) => n.model === model && n.jsonModel === jsonModel,
+    );
   }, [view]);
 
   const getSearchOptions = useCallback(
     (node: TreeNode): Partial<SearchOptions> => {
-      const { items = [] } = node;
+      const { items = [], orderBy } = node;
       const treeFields = items.filter(isTreeFieldItem);
-      if (sortColumns.length === 0) return {};
+      if (sortColumns.length === 0) {
+        return orderBy ? { sortBy: orderBy.split(/\s*,\s*/) } : {};
+      }
       return {
         sortBy: sortColumns
           .map((col) => {
-            const $item = treeFields.find(
-              (item) => item.as === col.name,
-            );
+            const $item = treeFields.find((item) => item.as === col.name);
             return $item
               ? `${col.order === "desc" ? "-" : ""}${$item.name}`
               : null;
@@ -108,36 +210,58 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const toTreeData = useCallback(
     (node: TreeNode, treeRecords: DataRecord[]) => {
       const { model, draggable, items = [] } = node;
-      const treeFields = items.filter(isTreeFieldItem);
-      return treeRecords.map(
-        (treeRecord) =>
-          ({
-            ...treeFields.reduce(
-              (nextRecord, item) =>
+      return treeRecords.map((record) => {
+        const expanded = expandNodeJsonFields(record, node);
+        return {
+          ...(items as TreeField[])
+            .filter(isTreeFieldItem)
+            .reduce(
+              (treeNode, item) =>
                 item.as
-                  ? { ...nextRecord, [item.as]: nextRecord[item.name] }
-                  : nextRecord,
-              treeRecord,
+                  ? { ...treeNode, [item.as]: treeNode[item.name] }
+                  : treeNode,
+              expanded,
             ),
-            _draggable: draggable && isSameModelTree,
-            _droppable: node === view.nodes?.[0] || isSameModelTree,
-            $key: `${model}:${treeRecord.id}`,
-          }) as unknown as TreeRecord,
-      );
+          _draggable: draggable && isSameModelTree,
+          _droppable: node === view.nodes?.[0] || isSameModelTree,
+          $key: `${model}:${record.id}`,
+        } as unknown as TreeRecord;
+      });
     },
-    [view, isSameModelTree],
+    [view, isSameModelTree, expandNodeJsonFields],
+  );
+
+  const getNodeFieldNames = useCallback(
+    (node?: TreeNode) => {
+      if (!node) return [] as string[];
+
+      const names = new Set<string>();
+      [node.parent, ...(node.items ?? []).map((item) => item.name)].forEach(
+        (name) => {
+          const jsonField = getJsonParentField(name, node).jsonField;
+          if (jsonField) {
+            names.add(jsonField);
+          }
+        },
+      );
+      return [...names];
+    },
+    [getJsonParentField],
   );
 
   const dataStore = useMemo<DataStore | null>(() => {
     const { nodes } = view;
     const { model, items = [] } = nodes?.[0] || {};
-    const fields = uniq(items.map((item) => item.name)) as string[];
+    const fields = uniq([
+      ...items.map((item) => item.name),
+      ...getNodeFieldNames(nodes?.[0]),
+    ]) as string[];
     return model
       ? new DataStore(model, {
           fields,
         })
       : null;
-  }, [view]);
+  }, [view, getNodeFieldNames]);
 
   const columns = useMemo(() => {
     return (view.columns || []).map((column) => {
@@ -164,11 +288,20 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
         let _domain = rootNode?.domain;
 
+        if (rootNode?.jsonModel) {
+          const jsonModelFilter = "self.jsonModel = :jsonModel";
+          _domain = _domain
+            ? `${jsonModelFilter} AND (${_domain})`
+            : jsonModelFilter;
+        }
+
         if (action.domain) {
           _domain = `${action.domain.trim()}${
             _domain ? ` AND (${_domain})` : ""
           }`;
         }
+
+        const childParent = getJsonParentField(nodes?.[1]?.parent, nodes?.[1]);
 
         return dataStore.search({
           ...(rootNode && getSearchOptions(rootNode)),
@@ -180,12 +313,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
             _domainContext: {
               ...options?.filter?._domainContext,
               ..._domainContext,
+              ...(rootNode?.jsonModel && { jsonModel: rootNode.jsonModel }),
               ...(isSameModelTree
-                ? { _countOn: nodes?.[1]?.parent }
+                ? { _countOn: childParent.countOn }
                 : {
                     _childOn: {
                       model: nodes?.[1]?.model,
-                      parent: nodes?.[1]?.parent,
+                      parent: childParent.countOn,
                     },
                   }),
             },
@@ -200,6 +334,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       isSameModelTree,
       getSearchOptions,
       getContext,
+      getJsonParentField,
     ],
   );
 
@@ -226,21 +361,54 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       options: Partial<SearchOptions> = {},
     ) => {
       const { _domainAction, ..._domainContext } = getContext() ?? {};
-      const { model, domain, parent, items = [] } = node;
-      const countOn = isSameModelTree ? parent : "";
-      const fields = uniq(items.map((item) => item.name)) as string[];
+      const { model, domain, parent, jsonModel, items = [] } = node;
+      const parentField = getJsonParentField(parent, node);
+      const countOn = isSameModelTree ? parentField.countOn : "";
+      const fields = uniq([
+        ...items.map((item) => item.name),
+        ...getNodeFieldNames(node),
+      ]) as string[];
+
+      const domainParts: string[] = [];
+      if (jsonModel) {
+        domainParts.push("self.jsonModel = :jsonModel");
+      }
+      if (parent) {
+        if (parentField.jsonField && parentField.jsonPath) {
+          domainParts.push(
+            `json_extract_text(self.${parentField.jsonField}, '${parentField.jsonPath}', 'id') = :_parentId`,
+          );
+        } else {
+          domainParts.push(`self.${parent}.id = :_parentId`);
+        }
+      }
+      if (domain) {
+        domainParts.push(`(${domain})`);
+      }
+      const _domain = domainParts.join(" AND ");
+
+      const nodeIndex = view.nodes?.indexOf(node) ?? -1;
+      const nextNode = nodeIndex >= 0 ? view.nodes?.[nodeIndex + 1] : undefined;
+      const nextParent = getJsonParentField(nextNode?.parent, nextNode);
+
       const ds = new DataStore(model!, {
         fields,
         filter: {
-          ...(parent && {
-            _domain: `self.${parent}.id = :_parentId ${
-              domain ? `AND (${domain})` : ""
-            }`,
-          }),
+          ...(_domain && { _domain }),
           _domainAction,
           _domainContext: {
             ..._domainContext,
+            ...(jsonModel && { jsonModel }),
             ...(countOn && { _countOn: countOn }),
+            ...(nextNode &&
+              (isSameModelTree
+                ? { _countOn: nextParent.countOn }
+                : {
+                    _childOn: {
+                      model: nextNode.model,
+                      parent: nextParent.countOn,
+                    },
+                  })),
             _parentId: treeNode.id,
           },
         },
@@ -252,7 +420,14 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         ...options,
       });
     },
-    [isSameModelTree, getContext, getSearchOptions],
+    [
+      view,
+      isSameModelTree,
+      getContext,
+      getSearchOptions,
+      getNodeFieldNames,
+      getJsonParentField,
+    ],
   );
 
   const makeLoadMoreNode = useCallback(
@@ -339,7 +514,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         childrenCacheRef.current.set(parentKey, {
           ...cached,
           records: [...cached.records, ...newTreeData],
-          totalCount: Math.max(totalCount, cached.records.length + newTreeData.length),
+          totalCount: Math.max(
+            totalCount,
+            cached.records.length + newTreeData.length,
+          ),
         });
 
         await treeRef.current?.reloadChildren(parentKey);
@@ -387,18 +565,28 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         items = [],
       } = node;
 
-      let saveData = {
+      const parentValue = parentRecord.data
+        ? {
+            id: parentRecord.data?.id,
+            version: parentRecord.data?.version,
+          }
+        : null;
+
+      let saveData: DataRecord = {
         id: data.id,
         version: data.version,
-        ...(parent && {
-          [parent]: parentRecord.data
-            ? {
-                id: parentRecord.data?.id,
-                version: parentRecord.data?.version,
-              }
-            : null,
-        }),
       };
+
+      if (parent) {
+        const parentField = getJsonParentField(parent, node);
+        if (parentField.jsonField && parentField.jsonPath) {
+          updateJsonFieldValue(saveData, parentField.jsonField, data, {
+            [parentField.jsonPath]: parentValue,
+          });
+        } else {
+          saveData[parent] = parentValue;
+        }
+      }
 
       if (node?.onMove) {
         const res = await actionExecutor.execute(node?.onMove, {
@@ -421,6 +609,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       const result = await ds.save(saveData);
 
       if (result) {
+        const merged = expandNodeJsonFields({ ...data, ...result }, node);
         return {
           ...record,
           data: (items as TreeField[]).reduce(
@@ -428,13 +617,19 @@ export function Tree({ meta }: ViewProps<TreeView>) {
               item.as
                 ? { ...itemData, [item.as]: itemData[item.name] }
                 : itemData,
-            { ...data, ...result },
+            merged,
           ),
         };
       }
       return record;
     },
-    [view, isSameModelTree, actionExecutor],
+    [
+      view,
+      isSameModelTree,
+      actionExecutor,
+      getJsonParentField,
+      expandNodeJsonFields,
+    ],
   );
 
   const handleSort = useCallback((cols?: TreeSortColumn[]) => {
