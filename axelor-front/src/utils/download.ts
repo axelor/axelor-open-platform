@@ -39,7 +39,7 @@ export async function download(url: string, fileName?: string) {
     const disposition = res.headers.get("Content-Disposition");
     const name = getFilename(disposition) || fileName || "";
 
-    link.innerHTML = name || "File";
+    link.textContent = name || "File";
     link.download = name || "download";
     link.href = url;
 
