@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { atom, useAtom, useSetAtom } from "jotai";
 import React, {
   useCallback,
   useEffect,
@@ -9,7 +9,7 @@ import React, {
 
 import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
-import { ValueAtom } from "./types";
+import { FormAtom, ValueAtom } from "./types";
 
 import * as WIDGETS from "../widgets";
 
@@ -160,4 +160,19 @@ export function useInput<T>(
     onBlur,
     onKeyDown,
   } as const;
+}
+
+export function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
+  return useSetAtom(
+    useMemo(
+      () =>
+        atom(null, (get, set, value: any) => {
+          set(formAtom, ({ record, ...rest }) => ({
+            ...rest,
+            record: { ...record, [fieldName]: value },
+          }));
+        }),
+      [formAtom, fieldName],
+    ),
+  );
 }

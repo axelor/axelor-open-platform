@@ -1,4 +1,4 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { ChangeEvent, useCallback, useId, useMemo, useRef } from "react";
 
@@ -11,24 +11,10 @@ import { download } from "@/utils/download";
 import { validateFileSize } from "@/utils/files";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
-import { FieldControl, FieldProps, FormAtom } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { formDirtyUpdater } from "../../builder/atoms";
+import { useFormFieldSetter } from "../../builder/hooks";
 import { META_FILE_MODEL, makeImageURL } from "../image/utils";
-
-function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
-  return useSetAtom(
-    useMemo(
-      () =>
-        atom(null, (get, set, value: any) => {
-          set(formAtom, ({ record, ...rest }) => ({
-            ...rest,
-            record: { ...record, [fieldName]: value },
-          }));
-        }),
-      [formAtom, fieldName],
-    ),
-  );
-}
 
 export function Binary(
   props: FieldProps<string | DataRecord | undefined | null>,

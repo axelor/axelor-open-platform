@@ -1,6 +1,14 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useCallback, useEffect, useId, useMemo, useRef } from "react";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -9,8 +17,11 @@ import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { focusAtom } from "@/utils/atoms";
 import { validateFileSize } from "@/utils/files";
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
+import { formDirtyUpdater } from "../../builder/atoms";
+import { useFormFieldSetter } from "../../builder/hooks";
 import { META_FILE_MODEL, makeImageURL } from "./utils";
 
 import styles from "./image.module.scss";
@@ -28,6 +39,19 @@ export function Image(
   const {
     attrs: { title, required },
   } = useAtomValue(widgetAtom);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const setUpload = useFormFieldSetter(formAtom, "$upload");
+  const dirtyAtom = useViewDirtyAtom();
+
+  const setDirty = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        set(formAtom, formDirtyUpdater);
+        set(dirtyAtom, true);
+      },
+      [formAtom, dirtyAtom],
+    ),
+  );
 
   const setValid = useSetAtom(
     useMemo(
@@ -72,26 +96,36 @@ export function Image(
 
   function handleUpload() {
     const file = inputRef.current;
-    file && file.click();
+    file?.click();
   }
 
   function handleRemove() {
-    inputRef.current && (inputRef.current.value = "");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
     setValue(null, true);
-    isBinary && required && setValid(false);
+    if (isBinary) {
+      setUpload(undefined);
+      setPreviewUrl(null);
+      if (required) {
+        setValid(false);
+      }
+    }
   }
 
   const handleFileUpload = useCallback(
     async (file?: File) => {
       if (file && validateFileSize(file)) {
         if (isBinary) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const value = e.target?.result ?? null;
-            setValue(value, true);
-            required && setValid(true);
-          };
-          reader.readAsDataURL(file);
+          setUpload({
+            field: schema.name,
+            file,
+          });
+          setPreviewUrl(URL.createObjectURL(file));
+          setDirty();
+          if (required) {
+            setValid(true);
+          }
         } else {
           const dataStore = new DataStore(META_FILE_MODEL);
           try {
@@ -112,13 +146,24 @@ export function Image(
         }
       }
     },
-    [isBinary, record, required, setValid, setValue],
+    [
+      isBinary,
+      record,
+      required,
+      schema.name,
+      setDirty,
+      setUpload,
+      setValid,
+      setValue,
+    ],
   );
 
   async function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e?.target?.files?.[0];
 
-    inputRef.current && (inputRef.current.value = "");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
 
     await handleFileUpload(file);
   }
@@ -128,12 +173,27 @@ export function Image(
     : schema;
 
   const isBinaryImage = isBinary && value !== null && !value;
-  const url =
-    isBinary && value === null
+  const url = previewUrl
+    ? previewUrl
+    : isBinary && value === null
       ? makeImageURL(null)
-      : isBinary && value
-        ? (value as string)
+      : isBinary
+        ? makeImageURL(record, target, name, parent, true)
         : makeImageURL(record, target, name, parent);
+
+  // Clean up object URL on unmount or when preview changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Reset preview on record change (save, prev/next navigation)
+  useEffect(() => {
+    setPreviewUrl(null);
+  }, [parentId, parentVersion]);
 
   useEffect(() => {
     let ok = true;
@@ -141,7 +201,9 @@ export function Image(
       const img = new window.Image();
       img.onload = function () {
         const exist = img.height > 1 && img.width > 1;
-        ok && setValid(exist);
+        if (ok) {
+          setValid(exist);
+        }
       };
       img.src = url;
     }
@@ -169,7 +231,7 @@ export function Image(
         onDropFile={handleFileUpload}
         renderDragOverlay={({ children }) => (
           <Box className={styles.overlay} data-testid="input">
-            <MaterialIcon icon="upload" aria-hidden="true"/>
+            <MaterialIcon icon="upload" aria-hidden="true" />
             <span>{children}</span>
           </Box>
         )}
@@ -200,8 +262,16 @@ export function Image(
           alignItems={"center"}
           justifyContent={"center"}
         >
-          <MaterialIcon icon="upload" onClick={handleUpload} data-testid="upload-button" />
-          <MaterialIcon icon="close" onClick={handleRemove} data-testid="remove-button" />
+          <MaterialIcon
+            icon="upload"
+            onClick={handleUpload}
+            data-testid="upload-button"
+          />
+          <MaterialIcon
+            icon="close"
+            onClick={handleRemove}
+            data-testid="remove-button"
+          />
         </Box>
       </FileDroppable>
     </FieldControl>
