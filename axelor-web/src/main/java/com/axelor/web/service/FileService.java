@@ -202,8 +202,12 @@ public class FileService extends AbstractService {
       final String safeFileName = FileUtils.safeFileName(fileName);
 
       // check if file name is valid
-      MetaFiles.checkPath(safeFileName);
-      MetaFiles.checkType(fileType);
+      if (StringUtils.notEmpty(safeFileName)) {
+        MetaFiles.checkPath(safeFileName);
+      }
+      if (StringUtils.notEmpty(fileType)) {
+        MetaFiles.checkType(fileType);
+      }
       file = files.upload(stream, fileOffset, fileSize, fileId);
       // check if file content is valid
       MetaFiles.checkType(file);

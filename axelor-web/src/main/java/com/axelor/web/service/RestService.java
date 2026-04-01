@@ -389,14 +389,20 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     final Map<String, Object> data = request.getData();
 
-    final String originalFileName = String.valueOf(data.get("fileName"));
+    final String originalFileName =
+        data.get("fileName") != null ? String.valueOf(data.get("fileName")) : null;
     final String safeFileName = FileUtils.safeFileName(originalFileName);
-    final String fileType = String.valueOf(data.get("fileType"));
+    final String fileType =
+        data.get("fileType") != null ? String.valueOf(data.get("fileType")) : null;
 
     try {
       // check if file name is valid
-      MetaFiles.checkPath(safeFileName);
-      MetaFiles.checkType(fileType);
+      if (StringUtils.notEmpty(safeFileName)) {
+        MetaFiles.checkPath(safeFileName);
+      }
+      if (StringUtils.notEmpty(fileType)) {
+        MetaFiles.checkType(fileType);
+      }
     } catch (IllegalFileException e) {
       return new Response().fail(e.getLocalizedMessage());
     }
