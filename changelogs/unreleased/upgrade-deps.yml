@@ -7,3 +7,4 @@ description: |
   - Upgrade PostgreSQL JDBC from 42.7.4 to 42.7.10
   - Upgrade Logback JDBC from 1.3.15 to 1.3.16
   - Upgrade Jackson from 2.18.3 to 2.18.6
+  - Upgrade Tomcat from 9.0.102 to 9.0.116
