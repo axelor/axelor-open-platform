@@ -15,6 +15,7 @@ import org.pac4j.core.matching.matcher.csrf.CsrfTokenGenerator;
 import org.pac4j.core.matching.matcher.csrf.CsrfTokenGeneratorMatcher;
 import org.pac4j.jee.context.JEEContext;
 
+/** CSRF matcher with custom cookie name and header name. */
 @Singleton
 public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   public static final String CSRF_MATCHER_NAME = "axelorCsrfToken";
@@ -43,6 +44,14 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
     return true;
   }
 
+  /**
+   * Adds the CSRF cookie and header to the response.
+   *
+   * <p>Dynamic secure/samePolicy based on request.isSecure() and uses path from request context
+   * path. Those are not supported by default CSRF matcher that uses static config.
+   *
+   * @param ctx the call context
+   */
   protected void addResponseCookieAndHeader(CallContext ctx) {
     final WebContext context = ctx.webContext();
     final SessionStore sessionStore = ctx.sessionStore();
@@ -62,6 +71,5 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
 
     context.addResponseCookie(cookie);
     context.setResponseHeader(headerName, token);
-    //    context.setRequestAttribute(Pac4jConstants.CSRF_TOKEN, token); // XXX
   }
 }
