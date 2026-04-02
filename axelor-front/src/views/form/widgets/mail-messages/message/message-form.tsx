@@ -15,6 +15,7 @@ import { SelectionTag } from "@/views/form/widgets";
 import HtmlEditor from "../../html/editor";
 import { Message, MessageFile, MessageRecipient } from "../message/types";
 import { MessageFiles } from "./message-files";
+import { DEFAULT_COMPLETION_PAGE_SIZE } from "@/utils/app-settings";
 
 export function useMessagePopup() {
   return useCallback(
@@ -109,6 +110,7 @@ function Form({
         url: "ws/search/emails",
         method: "POST",
         body: {
+          limit: DEFAULT_COMPLETION_PAGE_SIZE,
           data: {
             search: term,
             selected: (recipients || []).map(function (x) {
@@ -192,6 +194,7 @@ function Form({
             placeholder={i18n.get("Recipients")}
             fetchOptions={searchEmails}
             renderValue={renderValue}
+            canShowNoResultOption={true}
           />
         </Box>
       )}
