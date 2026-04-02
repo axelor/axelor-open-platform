@@ -4,7 +4,7 @@ type: change
 description: |
   Here is the list of backend dependencies upgraded :
   
-  - Upgrade Jackson from 2.21.0 to 2.21.1
+  - Upgrade Jackson from 2.21.0 to 2.21.2
   - Upgrade Swagger from 2.2.43 to 2.2.45
   - Upgrade ByteBuddy from 1.18.5 to 1.18.7
   - Upgrade Birt from 4.22.0 to 4.23.0
