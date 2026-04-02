@@ -80,7 +80,8 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
       final Optional<String> sessionToken =
           (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
       return !sessionToken.isPresent()
-          || (sessionToken.get().equals(parameterToken) || sessionToken.get().equals(headerToken));
+          || (strEquals(sessionToken.get(), parameterToken)
+              || strEquals(sessionToken.get(), headerToken));
     }
     return true;
   }

@@ -1,0 +1,5 @@
+---
+title: Upgrade Pac4j dependency
+type: security
+description: |
+  Upgrade Pac4j from 5.7.7 to 5.7.10 for security reasons
