@@ -1,0 +1,7 @@
+---
+title: Upgrade backend dependencies
+type: change
+description: |
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade PostgreSQL JDBC from 42.7.4 to 42.7.10
