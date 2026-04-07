@@ -13,6 +13,7 @@ export type ChartProps = {
   width?: number;
   type?: string;
   legend?: boolean;
+  loading?: boolean;
   onClick?: (record?: ChartDataRecord) => Promise<any>;
 };
 

@@ -71,6 +71,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const chartName = meta.view.name!;
   const { dashlet } = useViewTab();
   const [records, setRecords] = useState<ChartDataRecord[] | null>(null);
+  const [loading, setLoading] = useState(false);
   const [legend, showLegend] = useState(
     () => String(view.config?.hideLegend) !== "true",
   );
@@ -220,12 +221,17 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           }
         });
 
-        const fetchRecords = await fetchChart<ChartDataRecord[]>(
-          chartName,
-          context,
-          true,
-        );
-        setRecords(fetchRecords);
+        setLoading(true);
+        try {
+          const fetchRecords = await fetchChart<ChartDataRecord[]>(
+            chartName,
+            context,
+            true,
+          );
+          setRecords(fetchRecords);
+        } finally {
+          setLoading(false);
+        }
       },
       [chartName, view, formMeta, formAtom, getErrors, getContext],
     ),
@@ -293,10 +299,11 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     if (view) {
       const { config, series: [{ type }] = [] } = view;
       const $records = records ?? [];
-      if (type && ($records?.length || ["gauge"].includes(type))) {
+      if (type && (loading || $records?.length || ["gauge"].includes(type))) {
         const scale = getScale(view, $records);
         return {
           type,
+          loading,
           data: {
             ...view,
             scale,
@@ -313,7 +320,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       }
     }
     return null;
-  }, [isRTL, view, records]);
+  }, [isRTL, view, records, loading]);
 
   useEffect(() => {
     if (view && dashlet) {
@@ -358,6 +365,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           {...(hasAction && { onClick: onClickAction })}
         />
       ) : (
+        !loading &&
         hasRecordsFetched && (
           <Box
             d="flex"
