@@ -27,7 +27,16 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   protected Class<T> modelClass;
 
+  private final JsonReferenceCascader jsonManager;
+  private final JsonReferenceUpdater jsonUpdater;
+
+  protected JpaRepository() {
+    this.jsonManager = Beans.get(JsonReferenceCascader.class);
+    this.jsonUpdater = Beans.get(JsonReferenceUpdater.class);
+  }
+
   protected JpaRepository(Class<T> modelClass) {
+    this();
     this.modelClass = modelClass;
   }
 
@@ -88,9 +97,6 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   @Override
   public T save(T entity) {
-    var jsonManager = Beans.get(JsonReferenceCascader.class);
-    var jsonUpdater = Beans.get(JsonReferenceUpdater.class);
-    jsonManager.beforeSave(entity);
     try {
       T saved = JPA.save(entity);
       jsonManager.afterSave(saved);
@@ -124,7 +130,7 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   @Override
   public void remove(T entity) {
-    Beans.get(JsonReferenceCascader.class).beforeRemove(entity);
+    jsonManager.beforeRemove(entity);
     // detach orphan o2m records
     detachChildren(entity);
     JPA.remove(entity);

@@ -4,19 +4,23 @@
  */
 package com.axelor.db.json;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.axelor.db.json.JsonReferenceResolver.SourceContext;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.axelor.db.Query;
 import com.axelor.rpc.JsonContext;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,29 +40,26 @@ public class JsonReferenceCascader {
   // Cascade-visit tracking: prevents infinite loops with circular references (like JPA cascade).
   private static final ThreadLocal<Set<String>> IN_PROGRESS = ThreadLocal.withInitial(HashSet::new);
 
+  private static final LoadingCache<Class<?>, Boolean> hasJsonFieldCache =
+      Caffeine.newBuilder()
+          .expireAfterAccess(Duration.ofHours(1))
+          .build(
+              entityClass -> {
+                var mapper = Mapper.of(entityClass);
+                for (var property : mapper.getProperties()) {
+                  if (property.isJson()) return true;
+                }
+                return false;
+              });
+
   @Inject private JsonReferenceResolver resolver;
 
-  public void beforeSave(Model entity) {
-    if (!hasJsonField(entity)) return;
+  public void captureOldState(Model entity, String jsonField, String oldJsonStr) {
+    if (StringUtils.isBlank(oldJsonStr) || entity.getId() == null || entity.getId() <= 0) return;
+
     var ctx = SourceContext.of(entity);
-    if (ctx.id() == null || ctx.id() <= 0) return;
-
-    var fields = resolver.findReferenceFields(ctx);
-    if (fields.isEmpty()) return;
-
-    var grouped = groupByModelField(fields);
-    for (var entry : grouped.entrySet()) {
-      var jsonField = entry.getKey();
-      var snapshotKey = snapshotKey(ctx, jsonField);
-
-      // Skip if snapshot already captured (e.g. from Resource.save before flush)
-      if (OLD_JSON.get().containsKey(snapshotKey)) continue;
-
-      var jsonData = resolver.loadJsonFromDb(entity, jsonField);
-      if (jsonData == null) continue;
-
-      OLD_JSON.get().put(snapshotKey, jsonData);
-    }
+    var snapshotKey = snapshotKey(ctx, jsonField);
+    OLD_JSON.get().computeIfAbsent(snapshotKey, k -> JsonReferenceResolver.parseJson(oldJsonStr));
   }
 
   public void afterSave(Model entity) {
@@ -450,13 +451,9 @@ public class JsonReferenceCascader {
     return idValue <= 0;
   }
 
-  private boolean hasJsonField(Model entity) {
+  public static boolean hasJsonField(Model entity) {
     var entityClass = EntityHelper.getEntityClass(entity);
-    var mapper = Mapper.of(entityClass);
-    for (var property : mapper.getProperties()) {
-      if (property.isJson()) return true;
-    }
-    return false;
+    return hasJsonFieldCache.get(entityClass);
   }
 
   private Map<String, List<MetaJsonField>> groupByModelField(List<MetaJsonField> fields) {

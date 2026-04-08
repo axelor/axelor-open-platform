@@ -7,7 +7,6 @@ package com.axelor.db.json;
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.db.EntityHelper;
-import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
@@ -17,7 +16,6 @@ import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Singleton;
-import jakarta.persistence.FlushModeType;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -105,23 +103,6 @@ class JsonReferenceResolver {
     var beanClass = EntityHelper.getEntityClass(entity);
     var mapper = Mapper.of(beanClass);
     mapper.set(entity, jsonField, toJson(data));
-  }
-
-  public Map<String, Object> loadJsonFromDb(Model entity, String jsonField) {
-    if (entity.getId() == null || entity.getId() <= 0) return null;
-
-    var entityClass = EntityHelper.getEntityClass(entity);
-    var em = JPA.em();
-    var entityName = em.getMetamodel().entity(entityClass).getName();
-    var value =
-        em.createQuery(
-                "SELECT e." + jsonField + " FROM " + entityName + " e WHERE e.id = :id",
-                String.class)
-            .setParameter("id", entity.getId())
-            .setFlushMode(FlushModeType.COMMIT)
-            .getSingleResult();
-    if (value == null) return null;
-    return parseJson(value);
   }
 
   public static Map<String, Object> parseJson(String value) {
