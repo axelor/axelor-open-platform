@@ -4,6 +4,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
 import com.axelor.auth.db.MFA;
@@ -57,7 +58,7 @@ public class AxelorProfileManager extends ShiroProfileManager {
 
   private void removeSession() {
     try {
-      SecurityUtils.getSubject().logout();
+      Beans.get(AuthSessionService.class).revokeSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }

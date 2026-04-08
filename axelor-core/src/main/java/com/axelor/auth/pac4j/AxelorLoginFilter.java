@@ -4,7 +4,9 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
+import com.axelor.inject.Beans;
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -41,11 +43,11 @@ public class AxelorLoginFilter implements Filter {
     if (authenticated) {
       if (AuthUtils.getUser() == null) {
         logger.warn("Authenticated, but no user: {}", subject.getPrincipal());
-        subject.logout();
+        Beans.get(AuthSessionService.class).revokeSession(subject);
         authenticated = false;
       } else if (info.getUserProfile(request, response).isEmpty()) {
         logger.warn("Authenticated, but no user profile: {}", subject.getPrincipal());
-        subject.logout();
+        Beans.get(AuthSessionService.class).revokeSession(subject);
         authenticated = false;
       }
     }

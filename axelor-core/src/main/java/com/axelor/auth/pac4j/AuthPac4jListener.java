@@ -54,7 +54,7 @@ public class AuthPac4jListener implements AuthenticationListener {
     final UnknownAccountException exception = new UnknownAccountException(msg);
 
     firePostLoginFailure(token, exception);
-    SecurityUtils.getSubject().logout();
+    sessionService.revokeSession(SecurityUtils.getSubject());
 
     throw exception;
   }
