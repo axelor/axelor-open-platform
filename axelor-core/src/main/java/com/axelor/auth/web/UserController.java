@@ -140,7 +140,7 @@ public class UserController {
    * <p>The caller must either own the session or be an admin. The current session cannot be
    * revoked.
    */
-  public void revokeSession(ActionRequest request, ActionResponse response) {
+  public void terminateSession(ActionRequest request, ActionResponse response) {
     String sessionId = (String) request.getContext().get("_sessionId");
 
     if (sessionId == null) {
@@ -156,7 +156,7 @@ public class UserController {
     }
 
     try {
-      Beans.get(AuthSessionService.class).revokeSession(target);
+      Beans.get(AuthSessionService.class).terminateSession(target);
       response.setNotify(I18n.get("Session has been revoked"));
       response.setReload(true);
     } catch (Exception e) {

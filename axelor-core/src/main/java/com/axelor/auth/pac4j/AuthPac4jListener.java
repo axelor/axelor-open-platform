@@ -38,7 +38,6 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = authenticationInfo.getUser();
 
       if (user != null) {
-        sessionService.updateLoginDate();
         firePostLoginSuccess(token, user);
         return;
       }
@@ -54,7 +53,7 @@ public class AuthPac4jListener implements AuthenticationListener {
     final UnknownAccountException exception = new UnknownAccountException(msg);
 
     firePostLoginFailure(token, exception);
-    sessionService.revokeSession(SecurityUtils.getSubject());
+    sessionService.terminateSession(SecurityUtils.getSubject());
 
     throw exception;
   }

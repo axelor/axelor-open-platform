@@ -58,7 +58,7 @@ public class AxelorProfileManager extends ShiroProfileManager {
 
   private void removeSession() {
     try {
-      Beans.get(AuthSessionService.class).revokeSession(SecurityUtils.getSubject());
+      Beans.get(AuthSessionService.class).terminateSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }

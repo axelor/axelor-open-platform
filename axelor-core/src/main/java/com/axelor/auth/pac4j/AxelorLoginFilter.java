@@ -43,11 +43,11 @@ public class AxelorLoginFilter implements Filter {
     if (authenticated) {
       if (AuthUtils.getUser() == null) {
         logger.warn("Authenticated, but no user: {}", subject.getPrincipal());
-        Beans.get(AuthSessionService.class).revokeSession(subject);
+        Beans.get(AuthSessionService.class).terminateSession(subject);
         authenticated = false;
       } else if (info.getUserProfile(request, response).isEmpty()) {
         logger.warn("Authenticated, but no user profile: {}", subject.getPrincipal());
-        Beans.get(AuthSessionService.class).revokeSession(subject);
+        Beans.get(AuthSessionService.class).terminateSession(subject);
         authenticated = false;
       }
     }

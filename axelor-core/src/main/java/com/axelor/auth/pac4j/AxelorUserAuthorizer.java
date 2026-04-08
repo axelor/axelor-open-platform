@@ -9,7 +9,6 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.shiro.SecurityUtils;
 import org.pac4j.core.authorization.authorizer.Authorizer;
@@ -36,7 +35,7 @@ public class AxelorUserAuthorizer implements Authorizer {
     if (user == null) {
       return false;
     }
-    if (!isAllowed(user)) {
+    if (!AuthUtils.isActive(user)) {
       removeSession();
       return false;
     }
@@ -44,17 +43,9 @@ public class AxelorUserAuthorizer implements Authorizer {
     return true;
   }
 
-  private boolean isAllowed(User user) {
-    final LocalDateTime loginDate = authSessionService.getLoginDate();
-    return AuthUtils.isActive(user)
-        && (user.getPasswordUpdatedOn() == null
-            || loginDate == null
-            || !loginDate.isBefore(user.getPasswordUpdatedOn()));
-  }
-
   private void removeSession() {
     try {
-      authSessionService.revokeSession(SecurityUtils.getSubject());
+      authSessionService.terminateSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }

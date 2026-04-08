@@ -131,12 +131,8 @@ public class AuthService {
     user.setPassword(encrypt(password));
     user.setPasswordUpdatedOn(LocalDateTime.now());
 
-    final User authUser = AuthUtils.getUser();
-
-    // Update login date in session so that user changing own password doesn't get logged out.
-    if (authUser != null && authUser.getId().equals(user.getId())) {
-      Beans.get(AuthSessionService.class).updateLoginDate();
-    }
+    // Revoke all others sessions.
+    Beans.get(AuthSessionService.class).terminateSessions(user, false);
 
     logger.debug("Password changed for user \"{}\"", user.getCode());
   }

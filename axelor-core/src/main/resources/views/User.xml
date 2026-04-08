@@ -258,7 +258,7 @@
   </action-validate>
 
   <action-method name="action-user-revoke-session">
-    <call class="com.axelor.auth.web.UserController" method="revokeSession" />
+    <call class="com.axelor.auth.web.UserController" method="terminateSession" />
   </action-method>
 
 </object-views>
