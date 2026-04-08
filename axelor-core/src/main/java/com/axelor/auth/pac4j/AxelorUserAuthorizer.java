@@ -54,7 +54,7 @@ public class AxelorUserAuthorizer implements Authorizer {
 
   private void removeSession() {
     try {
-      SecurityUtils.getSubject().logout();
+      authSessionService.revokeSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }

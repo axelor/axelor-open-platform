@@ -389,3 +389,5 @@ libs.totp = dependencies.create('dev.samstevens.totp:totp:1.7.1') {
 }
 
 libs.zxcvbn4j = "com.nulab-inc:zxcvbn:1.9.0"
+
+libs.ua_parser = "com.github.ua-parser:uap-java:1.6.1"

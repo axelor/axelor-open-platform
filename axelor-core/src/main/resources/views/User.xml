@@ -17,6 +17,9 @@
   </grid>
 
   <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="action-method-user-save">
+    <toolbar>
+      <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices"/>
+    </toolbar>
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
       <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
@@ -63,6 +66,10 @@
       <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
         <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
         <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
+      </panel>
+      <panel title="Devices">
+        <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." colSpan="7"/>
+        <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices" colSpan="5" title="Devices"/>
       </panel>
     </panel>
   </form>
@@ -159,6 +166,99 @@
 
   <action-method name="action-method-user-change-password">
     <call class="com.axelor.auth.web.UserController" method="changePassword"/>
+  </action-method>
+
+  <action-view name="action-user-show-active-sessions" title="Active sessions" model="com.axelor.auth.db.User">
+    <view type="form" name="user-session-form" />
+    <view-param name="popup" value="true" />
+    <view-param name="popup-save" value="false" />
+    <view-param name="show-toolbar" value="false" />
+    <context name="_showRecord" expr="eval: id" />
+  </action-view>
+
+  <form title="Active sessions" name="user-session-form" model="com.axelor.auth.db.User" onLoad="com.axelor.auth.web.UserController:loadSessions">
+    <panel showFrame="false" itemSpan="12">
+      <field name="code" hidden="true" />
+      <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." />
+      <field name="_xActiveSessions" readonly="true" showTitle="false" colSpan="12" x-dirty="false">
+        <viewer>
+          <![CDATA[
+            <>
+              {_xActiveSessions && _xActiveSessions.length > 0 ? (
+                <Box d="flex" flexDirection="column" g={4}>
+                  {_xActiveSessions.map((session, i) => (
+                    <Box
+                      key={i}
+                      d="flex"
+                      flexDirection="column"
+                      g={2}
+                      p={3}
+                      border
+                      rounded
+                    >
+                      <Box d="flex" alignItems="center" justifyContent="space-between">
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="devices" />
+                          <strong>
+                            {session.device?.browser && session.device?.os
+                              ? `${session.device.browser} - ${session.device.os}`
+                              : _t('Unknown device')}
+                          </strong>
+                        </Box>
+                        {!session.current && (
+                          <Button variant="danger" size="sm" onClick={() => $execute("action-validate-user-revoke-session,action-user-revoke-session", { _sessionId: session.id })}>
+                            {_t('Revoke')}
+                          </Button>
+                        )}
+                      </Box>
+                      <Box
+                        d="flex"
+                        flexDirection="column"
+                        g={1}
+                        style={{ fontSize: '0.85em' }}
+                      >
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="location_on" />
+                          <span>{session.device?.remoteIp || _t('Unknown IP')}</span>
+                        </Box>
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="login" />
+                          <span>{_t('Signed in at:')} {session.loginDate ? Formatters.datetime(new Date(session.loginDate), { props: { seconds: true } }) : _t('Unknown')}</span>
+                        </Box>
+                        {session.current ? (
+                          <Box d="flex" alignItems="center" g={2}>
+                            <Icon icon="check_circle" />
+                            <span>{_t('This is your current session')}</span>
+                          </Box>
+                        ) : (
+                          <Box d="flex" alignItems="center" g={2}>
+                            <Icon icon="schedule" />
+                            <span>{_t('Last activity:')} {Formatters.datetime(new Date(session.lastAccess), { props: { seconds: true } })}</span>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Box d="flex" alignItems="center" justifyContent="center" p={4}>
+                  <Icon icon="devices" />
+                  <span style={{ marginLeft: '0.5em' }}>{_t('No active sessions')}</span>
+                </Box>
+              )}
+            </>
+          ]]>
+        </viewer>
+      </field>
+    </panel>
+  </form>
+
+  <action-validate name="action-validate-user-revoke-session">
+    <alert message="Are you sure? The device will be signed out." confirm-btn-title="Revoke" />
+  </action-validate>
+
+  <action-method name="action-user-revoke-session">
+    <call class="com.axelor.auth.web.UserController" method="revokeSession" />
   </action-method>
 
 </object-views>

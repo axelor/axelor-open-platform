@@ -74,6 +74,7 @@ dependencies {
 
   implementation libs.totp
   implementation libs.zxcvbn4j
+  implementation libs.ua_parser
 
   testImplementation libs.greenmail
   testImplementation libs.unboundid_ldapsdk
