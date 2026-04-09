@@ -5,6 +5,7 @@
 package com.axelor.meta.db.repo;
 
 import com.axelor.db.json.JsonReferenceCascader;
+import com.axelor.db.json.JsonReferenceUpdater;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import java.util.Optional;
@@ -24,12 +25,18 @@ public class MetaJsonFieldRepository extends AbstractMetaJsonFieldRepository {
   }
 
   private void invalidateCache(MetaJsonField entity) {
-    var modelKey =
-        Optional.ofNullable(entity)
-            .map(MetaJsonField::getJsonModel)
-            .map(MetaJsonModel::getName)
-            .orElse(entity != null ? entity.getModel() : null);
+    if (entity == null) return;
 
+    var modelKey =
+        Optional.ofNullable(entity.getJsonModel())
+            .map(MetaJsonModel::getName)
+            .orElse(entity.getModel());
     JsonReferenceCascader.clearCache(modelKey);
+
+    var targetKey =
+        Optional.ofNullable(entity.getTargetJsonModel())
+            .map(MetaJsonModel::getName)
+            .orElse(entity.getTargetModel());
+    JsonReferenceUpdater.clearCache(targetKey);
   }
 }
