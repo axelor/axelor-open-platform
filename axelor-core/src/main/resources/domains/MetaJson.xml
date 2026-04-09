@@ -5,7 +5,7 @@
 
   <module name="meta" package="com.axelor.meta.db" />
 
-  <entity name="MetaJsonField" table="META_JSON_FIELD">
+  <entity name="MetaJsonField" table="META_JSON_FIELD" repository="abstract">
     <string name="name" required="true" />
     <string name="title" />
     <string name="type" column="type_name" required="true"

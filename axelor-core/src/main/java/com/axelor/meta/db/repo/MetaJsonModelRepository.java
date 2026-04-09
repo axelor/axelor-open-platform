@@ -8,6 +8,7 @@ import com.axelor.common.HtmlUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.json.JsonReferenceCascader;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -259,12 +260,14 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
   @Override
   public MetaJsonModel save(MetaJsonModel entity) {
+    JsonReferenceCascader.clearCache(entity.getName());
     this.onSave(entity);
     return super.save(entity);
   }
 
   @Override
   public void remove(MetaJsonModel entity) {
+    JsonReferenceCascader.clearCache(entity.getName());
     final EntityManager em = JPA.em();
     final Model[] related = {
       entity.getGridView(), entity.getFormView(), entity.getMenu(), entity.getAction(),

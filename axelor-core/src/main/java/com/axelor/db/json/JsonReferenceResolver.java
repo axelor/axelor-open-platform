@@ -4,6 +4,8 @@
  */
 package com.axelor.db.json;
 
+import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Singleton;
 import jakarta.persistence.FlushModeType;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,20 +50,47 @@ class JsonReferenceResolver {
     }
   }
 
+  private static final AxelorCache<String, List<MetaJsonField>> referenceFieldCache =
+      CacheBuilder.newBuilder("referenceFieldCache")
+          .expireAfterWrite(Duration.ofHours(1))
+          .build(
+              modelKey -> {
+                var fieldRepository = Beans.get(MetaJsonFieldRepository.class);
+                var filter =
+                    modelKey.contains(".")
+                        ? "self.type IN :types AND self.model = :model"
+                        : "self.type IN :types AND self.jsonModel.name = :model";
+                var fields =
+                    fieldRepository
+                        .all()
+                        .filter(filter)
+                        .bind("types", ALL_REF_TYPES)
+                        .bind("model", modelKey)
+                        .cacheable()
+                        .fetch();
+
+                // Initialize lazy proxy to avoid LazyInitializationException outside session
+                for (var field : fields) {
+                  if (field.getJsonModel() != null) {
+                    field.getJsonModel().getName();
+                  }
+                  if (field.getTargetJsonModel() != null) {
+                    field.getTargetJsonModel().getName();
+                  }
+                }
+
+                return fields;
+              });
+
   public List<MetaJsonField> findReferenceFields(SourceContext ctx) {
     var modelKey = ctx.jsonModel() != null ? ctx.jsonModel() : ctx.model();
-    var fieldRepository = Beans.get(MetaJsonFieldRepository.class);
-    var filter =
-        modelKey.contains(".")
-            ? "self.type IN :types AND self.model = :model"
-            : "self.type IN :types AND self.jsonModel.name = :model";
-    return fieldRepository
-        .all()
-        .filter(filter)
-        .bind("types", ALL_REF_TYPES)
-        .bind("model", modelKey)
-        .cacheable()
-        .fetch();
+    return referenceFieldCache.get(modelKey);
+  }
+
+  static void clearCache(String modelKey) {
+    if (modelKey != null) {
+      referenceFieldCache.invalidate(modelKey);
+    }
   }
 
   public Map<String, Object> getJsonValue(Model entity, String jsonField) {
