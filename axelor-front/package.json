@@ -97,6 +97,9 @@
         "@babel/*",
         "@eslint/*"
       ]
+    },
+    "overrides": {
+      "dompurify": "^3.3.3"
     }
   }
 }
