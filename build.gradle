@@ -18,13 +18,16 @@ apply plugin: com.axelor.gradle.support.ChangelogSupport
 apply from: "version.gradle"
 
 def gitGitRevision(p) {
-  def gitFolder = "$p.projectDir/.git/"
-  if( !new File(gitFolder).exists() ) {
-    gitFolder = "$rootProject.projectDir/.git/"
+  def gitEntry = new File("$p.projectDir/.git")
+  if( !gitEntry.exists() ) {
+    gitEntry = new File("$rootProject.projectDir/.git")
   }
-  if( !new File(gitFolder).exists() ) {
+  if( !gitEntry.exists() ) {
     return null
   }
+  def gitFolder = gitEntry.isFile()
+      ? new File(gitEntry.text.trim().replace("gitdir: ", "")).canonicalPath + "/"
+      : gitEntry.path + "/"
 
   def head = new File(gitFolder + "HEAD").text.split(":")
   def isCommit = head.length == 1
