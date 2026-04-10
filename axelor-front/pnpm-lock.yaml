@@ -86,8 +86,8 @@ importers:
         specifier: ^1.12.40
         version: 1.12.40
       lodash:
-        specifier: ^4.17.23
-        version: 4.17.23
+        specifier: ^4.18.1
+        version: 4.18.1
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
@@ -2363,8 +2363,8 @@ packages:
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -5805,7 +5805,7 @@ snapshots:
 
   lodash.debounce@4.0.8: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.1: {}
 
   loose-envify@1.4.0:
     dependencies:
@@ -5857,7 +5857,7 @@ snapshots:
 
   minim@0.23.8:
     dependencies:
-      lodash: 4.17.23
+      lodash: 4.18.1
 
   minimatch@10.2.4:
     dependencies:
@@ -6464,7 +6464,7 @@ snapshots:
       immutable: 3.8.3
       js-file-download: 0.4.12
       js-yaml: 4.1.1
-      lodash: 4.17.23
+      lodash: 4.18.1
       prop-types: 15.8.1
       randexp: 0.5.3
       randombytes: 2.1.0
