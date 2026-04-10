@@ -109,7 +109,7 @@
       "esbuild"
     ],
     "overrides": {
-      "axios": "1.13.5"
+      "axios": "1.15.0"
     }
   }
 }
