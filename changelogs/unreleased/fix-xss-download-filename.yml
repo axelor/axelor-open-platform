@@ -1,6 +1,0 @@
----
-title: Fix XSS vulnerability in download filename handling
-type: fix
-description: |
-  Use textContent instead of innerHTML when setting the download link text
-  to prevent script execution via crafted filenames.

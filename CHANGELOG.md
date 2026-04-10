@@ -1,3 +1,84 @@
+## 7.4.10 (2026-04-10)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade PostgreSQL JDBC from 42.7.4 to 42.7.10
+  - Upgrade Logback JDBC from 1.3.15 to 1.3.16
+  - Upgrade Jackson from 2.18.3 to 2.18.6
+  - Upgrade Tomcat from 9.0.102 to 9.0.116
+  
+  </details>
+
+#### Fix
+
+* Fix encrypted fields migration
+
+  <details>
+  
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINED` so they are 
+  migrated by the parent class.
+  
+  </details>
+
+* Fix XSS vulnerability in download filename handling
+
+  <details>
+  
+  Use textContent instead of innerHTML when setting the download link text
+  to prevent script execution via crafted filenames.
+  
+  </details>
+
+* Fix mail followers recipients request limit
+
+  <details>
+  
+  The mail followers recipient request limit wasn't provided, allowing related service to be called with an unbounded 
+  limit. Cap the effective limit to `api.pagination.max-per-page` so that the email search respects the configured 
+  pagination maximum and use `api.pagination.default-per-page` as the default when no limit is specified in the request.
+  
+  </details>
+
+#### Security
+
+* Upgrade Pac4j dependency
+
+  <details>
+  
+  Upgrade Pac4j from 5.7.7 to 5.7.10 for security reasons
+  
+  </details>
+
+* Fix RestService upload missing file content type validation
+
+  <details>
+  
+  Only the declared file type from the request data was validated against the whitelist/blacklist, allowing a malicious 
+  user to bypass validation by sending a file with an allowed extension but different content. Now the actual file 
+  content is inspected via Apache Tika for both attachment and non-attachment uploads.
+  
+  </details>
+
+* Fix file upload content type validation to prevent extension spoofing
+
+  <details>
+  
+  MetaFiles.checkType(File) now pass null as the filename hint to Tika, ensuring detection relies solely on magic
+  bytes. Previously, the filename was used as a hint and could influence the result, allowing a malicious file 
+  disguised with an allowed extension to bypass validation.
+  
+  </details>
+
+
 ## 7.4.9 (2026-03-06)
 
 #### Fix
