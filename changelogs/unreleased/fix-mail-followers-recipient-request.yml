@@ -1,7 +1,0 @@
----
-title: Fix mail followers recipients request limit
-type: fix
-description: |
-  The mail followers recipient request limit wasn't provided, allowing related service to be called with an unbounded 
-  limit. Cap the effective limit to `api.pagination.max-per-page` so that the email search respects the configured 
-  pagination maximum and use `api.pagination.default-per-page` as the default when no limit is specified in the request.

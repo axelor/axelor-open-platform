@@ -1,3 +1,188 @@
+## 8.1.2 (2026-04-10)
+
+#### Change
+
+* Move CacheBuilder#weakValues/weakKeys to CaffeineCacheBuilder
+
+#### Fix
+
+* Fix NPE from Mapper.toBean() with computed fields
+
+  <details>
+  
+  When mapping values to a bean, computed fields often depend on other
+  field values. By populating non-virtual fields first, we ensure that
+  dependencies are available when virtual fields are processed.
+  
+  </details>
+
+* Fix encrypted fields migration
+
+  <details>
+  
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINE`D so they are 
+  migrated by the parent class.
+  
+  Also few improvements has been done :
+  - Use JDBC batch statements instead of individual JPQL UPDATE queries : select decrypted values via JPA (so the old 
+  encryptor is applied automatically), then re-encrypt and persist via `PreparedStatement.addBatch()` / `executeBatch()`
+  for better performance and reduced DB load
+  - Add validation of migration settings (required password, known algorithms, warn on no-op rotations) before starting
+  - Infer missing old encryption settings from current values when rotating : only need to configure what actually 
+  changed. Ex : no need to set `old-password` is we rotate only the algorithm.
+  
+  </details>
+
+* Fix Tags widget readonly rendering in form and grid views
+
+  <details>
+  
+  When a Tags widget (`widget="Tags"`) was set to readonly, it rendered
+  as a plain empty text input instead of displaying tag pills. The readonly
+  Tags widget now renders tag pills directly using the same Overflow layout
+  as the grid cell renderer, with proper overflow menu support.
+  
+  </details>
+
+* Fix copy and export errors not displayed to user
+
+  <details>
+  
+  When an exception is thrown from the copy or export methods,
+  the error is now displayed in a dialog instead of being silently ignored.
+  
+  </details>
+
+* Consolidate form validation errors by priority per field
+
+  <details>
+  
+  When saving a form with multiple constraint violations on the same field,
+  all errors were shown (e.g. "Login is invalid" and "Login is too small").
+  Now only the highest-priority error per field is displayed, using this order:
+  required > min/max > pattern > custom errors > invalid.
+  
+  Also fix server-side validation errors using the raw field name (e.g. "code")
+  instead of the field title (e.g. "Login").
+  
+  </details>
+
+* Fix XSS vulnerability in download filename handling
+
+  <details>
+  
+  Use textContent instead of innerHTML when setting the download link text
+  to prevent script execution via crafted filenames.
+  
+  </details>
+
+* Fix mail followers recipients request limit
+
+  <details>
+  
+  The mail followers recipient request limit wasn't provided, allowing related service to be called with an unbounded 
+  limit. Cap the effective limit to `api.pagination.max-per-page` so that the email search respects the configured 
+  pagination maximum and use `api.pagination.default-per-page` as the default when no limit is specified in the request.
+  
+  </details>
+
+* Fix pass selected in custom collection field context
+* Fix ConcurrentModificationException in AuditTracker on entity delete
+
+  <details>
+  
+  AuditTracker.processDelete() now iterates over a snapshot of the deleted
+  entities set, preventing ConcurrentModificationException when cascaded
+  deletes add new entries during iteration.
+  
+  </details>
+
+* Fix various cache issues
+
+  <details>
+  
+  Fix various issues with caches including incorrect log arguments,
+  swallowed exceptions in eviction listeners,
+  NPE in default `getAll()` method,
+  premature eviction of tenant caches in cluster environments,
+  closing underlying tenant-specific caches when closing wrapper tenant-aware cache.
+  
+  </details>
+
+* Fix NPE in AuditProcessor when processing computed fields
+* Fix handle focus navigation in grid view search column
+* Fix NPE in MetaFiles.upload() recovery block
+
+  <details>
+  
+  Add null check for temporary file copy to prevent masking of root persistence exceptions with NPEs during new file uploads.
+  
+  </details>
+
+* Fix calendar drag-and-drop not saving when popover is open
+
+  <details>
+  
+  Close the event popover when a drag operation starts on the calendar view.
+  Previously, if the template popover was open, dragging an event to another
+  date would not trigger a save.
+  
+  </details>
+
+* Fix date widget portal focus handling in editable grid
+
+  <details>
+  
+  Keep the date picker rendered in portal mode for grid layout stability,
+  while preventing focus-trap and blur interactions from causing repeated
+  blur loops or React update crashes when using month/year selectors.
+  
+  </details>
+
+* Fix cache busting of JSP and HTML files
+
+  <details>
+  
+  Exclude .jsp, .html, and .htm files from static resource cache busting
+  in NoCacheFilter. These files should not receive immutable cache headers
+  as they are server-rendered or serve as application entry points.
+  
+  </details>
+
+#### Security
+
+* Upgrade Pac4j & Shiro dependencies
+
+  <details>
+  
+  Upgrade Pac4j from 6.3.1 to 6.4.1 and Shiro from 2.0.6 to 2.1.0 for security reasons
+  
+  </details>
+
+* Fix RestService upload missing file content type validation
+
+  <details>
+  
+  Only the declared file type from the request data was validated against the whitelist/blacklist, allowing a malicious 
+  user to bypass validation by sending a file with an allowed extension but different content. Now the actual file 
+  content is inspected via Apache Tika for both attachment and non-attachment uploads.
+  
+  </details>
+
+* Fix file upload content type validation to prevent extension spoofing
+
+  <details>
+  
+  MetaFiles.checkType(File) now pass null as the filename hint to Tika, ensuring detection relies solely on magic
+  bytes. Previously, the filename was used as a hint and could influence the result, allowing a malicious file 
+  disguised with an allowed extension to bypass validation.
+  
+  </details>
+
+
 ## 8.1.1 (2026-03-09)
 
 #### Change

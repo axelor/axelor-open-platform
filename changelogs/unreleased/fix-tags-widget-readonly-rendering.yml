@@ -1,8 +1,0 @@
----
-title: Fix Tags widget readonly rendering in form and grid views
-type: fix
-description: |
-  When a Tags widget (`widget="Tags"`) was set to readonly, it rendered
-  as a plain empty text input instead of displaying tag pills. The readonly
-  Tags widget now renders tag pills directly using the same Overflow layout
-  as the grid cell renderer, with proper overflow menu support.
