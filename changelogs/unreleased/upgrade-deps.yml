@@ -16,3 +16,4 @@ description: |
   - Upgrade Groovy from 4.0.30 to 4.0.31
   - Upgrade Tomcat from 10.1.52 to 10.1.54
   - Upgrade Undertow from 2.3.23 to 2.3.24
+  - Upgrade Gradle from 8.14.3 to 8.14.4
