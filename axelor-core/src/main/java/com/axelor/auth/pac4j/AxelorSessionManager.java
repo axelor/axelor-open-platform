@@ -59,6 +59,10 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
     currentRequest.set(WebUtils.getHttpRequest(context));
     try {
       super.onStart(session, context);
+      if (WebUtils.isHttp(context)) {
+        applySessionInfo(session, WebUtils.getHttpRequest(context));
+        onChange(session);
+      }
     } finally {
       currentRequest.remove();
     }
@@ -78,9 +82,12 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
   }
 
   private void applySessionInfo(Session session, HttpServletRequest request) {
-    session.setAttribute(AuthSessionService.REMOTE_IP, request.getRemoteAddr());
+    String ip = request.getRemoteAddr();
+    if (!ip.equals(session.getAttribute(AuthSessionService.REMOTE_IP))) {
+      session.setAttribute(AuthSessionService.REMOTE_IP, ip);
+    }
     String ua = request.getHeader(HttpHeaders.USER_AGENT);
-    if (ua != null) {
+    if (ua != null && !ua.equals(session.getAttribute(AuthSessionService.USER_AGENT))) {
       session.setAttribute(AuthSessionService.USER_AGENT, ua);
     }
   }
