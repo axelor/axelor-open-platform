@@ -5,19 +5,16 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuthSessionService;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionContext;
-import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
@@ -59,36 +56,8 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
     currentRequest.set(WebUtils.getHttpRequest(context));
     try {
       super.onStart(session, context);
-      if (WebUtils.isHttp(context)) {
-        applySessionInfo(session, WebUtils.getHttpRequest(context));
-        onChange(session);
-      }
     } finally {
       currentRequest.remove();
-    }
-  }
-
-  /**
-   * Sets {@code REMOTE_IP} and {@code USER_AGENT} on every request that carries a session,
-   * including {@code /callback}.
-   */
-  @Override
-  public Session getSession(SessionKey key) throws SessionException {
-    Session session = super.getSession(key);
-    if (session != null && WebUtils.isHttp(key)) {
-      applySessionInfo(session, WebUtils.getHttpRequest(key));
-    }
-    return session;
-  }
-
-  private void applySessionInfo(Session session, HttpServletRequest request) {
-    String ip = request.getRemoteAddr();
-    if (!ip.equals(session.getAttribute(AuthSessionService.REMOTE_IP))) {
-      session.setAttribute(AuthSessionService.REMOTE_IP, ip);
-    }
-    String ua = request.getHeader(HttpHeaders.USER_AGENT);
-    if (ua != null && !ua.equals(session.getAttribute(AuthSessionService.USER_AGENT))) {
-      session.setAttribute(AuthSessionService.USER_AGENT, ua);
     }
   }
 

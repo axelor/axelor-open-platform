@@ -28,6 +28,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import jakarta.servlet.Filter;
 import jakarta.servlet.ServletContext;
 import java.util.Collection;
 import java.util.Optional;
@@ -91,10 +92,10 @@ public class AuthPac4jModule extends ShiroWebModule {
     addFilterChain("/manifest.json", ANON);
     addFilterChain("/favicon.ico", ANON);
     addFilterChain("/login", Key.get(AxelorLoginFilter.class));
-    addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
+    addFilterChain("/logout", withSessionInfo(AxelorLogoutFilter.class));
     addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
     addFilterChain("/callback/**", Key.get(AxelorCallbackFilter.class));
-    addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
+    addFilterChain("/**", withSessionInfo(AxelorSecurityFilter.class));
 
     bindRealm().to(AuthPac4jRealm.class);
 
@@ -125,6 +126,14 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(AxelorSessionManager.class);
     expose(new TypeLiteral<Configuration<Object, Object>>() {}).annotatedWith(Names.named("shiro"));
     expose(new TypeLiteral<CacheManager>() {}).annotatedWith(Names.named("shiro"));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Filter> FilterConfig<? extends Filter>[] withSessionInfo(
+      Class<T> filterClass) {
+    return new FilterConfig[] {
+      filterConfig(Key.get(SessionInfoFilter.class)), filterConfig(Key.get(filterClass))
+    };
   }
 
   protected <T> AnnotatedBindingBuilder<T> bindAndExpose(Class<T> cls) {
