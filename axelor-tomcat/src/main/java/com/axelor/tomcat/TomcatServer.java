@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -82,8 +83,6 @@ public class TomcatServer {
     context.setResources(resources);
     context.setUnpackWAR(false);
 
-    // Skip scanning jars that cannot contain web fragments, TLDs, or annotations.
-    // Axelor modules and JSP-related jars are NOT skipped.
     configureJarScanFilter(context);
 
     // additional webapp resources
@@ -141,12 +140,16 @@ public class TomcatServer {
 
   private void configureJarScanFilter(StandardContext context) {
     var filter = new StandardJarScanFilter();
-    // Skip all jars by default, then allow only those that may contain
-    // web fragments, TLDs, or servlet annotations (axelor modules, JSP libs, taglibs).
     filter.setDefaultTldScan(false);
     filter.setDefaultPluggabilityScan(false);
-    filter.setTldScan("axelor-*.jar,javax.servlet.jsp.jstl-*.jar,jakarta.servlet.jsp.jstl-*.jar,taglibs-*.jar");
-    filter.setPluggabilityScan("axelor-*.jar");
+    Set<String> tldScanJars = options.getTldScanJars();
+    if (!tldScanJars.isEmpty()) {
+      filter.setTldScan(String.join(",", tldScanJars));
+    }
+    Set<String> pluggabilityScanJars = options.getPluggabilityScanJars();
+    if (!pluggabilityScanJars.isEmpty()) {
+      filter.setPluggabilityScan(String.join(",", pluggabilityScanJars));
+    }
     context.getJarScanner().setJarScanFilter(filter);
   }
 

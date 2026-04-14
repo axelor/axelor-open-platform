@@ -99,6 +99,14 @@ Start the embedded Tomcat server.
 
 | `--cache-max-size=<n>`
 | Set the maximum cache size for resources.
+
+| `--tld-scan-jars=<tldScanJars>[,<tldScanJars>...]`
+| Comma-separated jar name patterns (e.g. `jstl-*.jar,taglibs-*.jar`) to include when scanning for JSP taglib
+descriptors (`META-INF/**/*.tld`).
+
+| `--pluggability-scan-jars=<pluggabilityScanJars>[,<pluggabilityScanJars>...]`
+| Comma-separated jar name patterns (e.g. `axelor-*.jar`) to include when scanning for Servlet 3.0 pluggability
+(`META-INF/web-fragment.xm`l and `@WebServlet`/`@WebFilter`/`@WebListener` annotations).
 |===
 
 === database

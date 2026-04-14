@@ -37,6 +37,23 @@ public class RunCommand implements CliCommand {
   @Option(names = "--cache-max-size", description = "Set the maximum cache size for resources.")
   private int cacheMaxSize;
 
+  @Option(
+      names = "--tld-scan-jars",
+      split = ",",
+      description =
+          "Comma-separated jar name patterns (e.g. \"jstl-*.jar,taglibs-*.jar\") to include "
+              + "when scanning for JSP taglib descriptors (META-INF/**/*.tld).")
+  private List<String> tldScanJars;
+
+  @Option(
+      names = "--pluggability-scan-jars",
+      split = ",",
+      description =
+          "Comma-separated jar name patterns (e.g. \"axelor-*.jar\") to include when "
+              + "scanning for Servlet 3.0 pluggability (META-INF/web-fragment.xml and "
+              + "@WebServlet/@WebFilter/@WebListener annotations).")
+  private List<String> pluggabilityScanJars;
+
   @Option(names = "--help", usageHelp = true, hidden = true)
   private boolean help;
 
@@ -85,6 +102,16 @@ public class RunCommand implements CliCommand {
       if (cacheMaxSize > 0) {
         args.add("--cache-max-size");
         args.add(String.valueOf(cacheMaxSize));
+      }
+
+      if (tldScanJars != null && !tldScanJars.isEmpty()) {
+        args.add("--tld-scan-jars");
+        args.add(String.join(",", tldScanJars));
+      }
+
+      if (pluggabilityScanJars != null && !pluggabilityScanJars.isEmpty()) {
+        args.add("--pluggability-scan-jars");
+        args.add(String.join(",", pluggabilityScanJars));
       }
 
       // add webapp

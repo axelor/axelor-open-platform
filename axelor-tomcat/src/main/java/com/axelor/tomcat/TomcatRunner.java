@@ -54,6 +54,23 @@ public class TomcatRunner implements Runnable {
   @Option(names = "--extra-libs", split = ",", description = "Specify additional libraries.")
   private List<Path> extraLibs;
 
+  @Option(
+      names = "--tld-scan-jars",
+      split = ",",
+      description =
+          "Comma-separated jar name patterns (e.g. \"jstl-*.jar,taglibs-*.jar\") to include "
+              + "when scanning for JSP taglib descriptors (META-INF/**/*.tld).")
+  private List<String> tldScanJars;
+
+  @Option(
+      names = "--pluggability-scan-jars",
+      split = ",",
+      description =
+          "Comma-separated jar name patterns (e.g. \"axelor-*.jar\") to include when "
+              + "scanning for Servlet 3.0 pluggability (META-INF/web-fragment.xml and "
+              + "@WebServlet/@WebFilter/@WebListener annotations).")
+  private List<String> pluggabilityScanJars;
+
   @Option(names = "--port", description = "The tomcat port number.", defaultValue = "8080")
   private Integer port;
 
@@ -123,9 +140,14 @@ public class TomcatRunner implements Runnable {
 
     if (extraClasses != null) extraClasses.forEach(settings::addClasses);
     if (extraLibs != null) extraLibs.forEach(settings::addLib);
+    if (tldScanJars != null) tldScanJars.forEach(settings::addTldScanJar);
+    if (pluggabilityScanJars != null)
+      pluggabilityScanJars.forEach(settings::addPluggabilityScanJar);
 
     getList(props, "extraClasses").stream().map(Paths::get).forEach(settings::addClasses);
     getList(props, "extraLibs").stream().map(Paths::get).forEach(settings::addLib);
+    getList(props, "tldScanJars").forEach(settings::addTldScanJar);
+    getList(props, "pluggabilityScanJars").forEach(settings::addPluggabilityScanJar);
 
     new TomcatServer(settings).start();
   }
