@@ -108,9 +108,10 @@ public class MetaModelService {
               .filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName())
               .fetchOne();
       if (field == null) {
-        metaModel
-            .getMetaFields()
-            .add(createField(metaModel, getField(klass, property.getName()), property));
+        MetaField created = createField(metaModel, getField(klass, property.getName()), property);
+        if (created != null) {
+          metaModel.getMetaFields().add(created);
+        }
       } else {
         field.setLabel(property.getTitle());
         field.setDescription(property.getHelp());
@@ -134,7 +135,8 @@ public class MetaModelService {
 
     MetaField metaField = null;
 
-    if (!field.isSynthetic()
+    if (field != null
+        && !field.isSynthetic()
         && !field.isAnnotationPresent(Formula.class)
         && !Modifier.isTransient(field.getModifiers())) {
 
@@ -271,6 +273,9 @@ public class MetaModelService {
   }
 
   private Field getField(Class<?> klass, String name) {
+    if (klass == null) {
+      return null;
+    }
     try {
       return klass.getDeclaredField(name);
     } catch (NoSuchFieldException e) {
