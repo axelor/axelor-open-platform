@@ -79,6 +79,10 @@ public class Mapper {
       BeanInfo info = Introspector.getBeanInfo(beanClass, Object.class);
       for (PropertyDescriptor descriptor : info.getPropertyDescriptors()) {
         String name = descriptor.getName();
+        // Skip descriptors with no backing field.
+        if (getField(beanClass, name) == null) {
+          continue;
+        }
         Method getter = descriptor.getReadMethod();
         Method setter = descriptor.getWriteMethod();
         Class<?> type = descriptor.getPropertyType();
@@ -126,6 +130,7 @@ public class Mapper {
         types.put(name, type);
       }
     } catch (IntrospectionException e) {
+      // ignore
     }
   }
 
