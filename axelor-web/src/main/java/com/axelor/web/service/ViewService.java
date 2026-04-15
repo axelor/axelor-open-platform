@@ -423,7 +423,7 @@ public class ViewService extends AbstractService {
             : (GridView) XMLViews.findCustomView(Long.parseLong(customViewId.toString()));
     final SearchFilters filterView =
         filterViewName != null
-            ? (SearchFilters) XMLViews.findView(filterViewName, "search-filters", null, null, null)
+            ? (SearchFilters) XMLViews.findView(filterViewName, "search-filters")
             : null;
 
     if (view == null) {

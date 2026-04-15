@@ -318,7 +318,7 @@ public class MetaService {
 
     LOG.debug("Search : {}", name);
 
-    Search search = (Search) XMLViews.findView(name, "search", null, null, null);
+    Search search = (Search) XMLViews.findView(name, "search");
     ScriptHelper helper = search.scriptHandler(context);
 
     List<Object> data = new ArrayList<>();
@@ -464,7 +464,7 @@ public class MetaService {
       return response;
     }
 
-    ChartView chart = (ChartView) XMLViews.findView(name, "chart", null, null, null);
+    ChartView chart = (ChartView) XMLViews.findView(name, "chart");
     if (chart == null) {
       return response;
     }
@@ -585,7 +585,7 @@ public class MetaService {
       return response;
     }
 
-    CustomView report = (CustomView) XMLViews.findView(viewName, "custom", null, null, null);
+    CustomView report = (CustomView) XMLViews.findView(viewName, "custom");
     if (report == null) {
       return response;
     }
