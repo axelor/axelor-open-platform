@@ -312,13 +312,6 @@ public class ViewService extends AbstractService {
     return response;
   }
 
-  private String findJsonModel(Request request) {
-    return Optional.ofNullable(request.getRawContext())
-        .map(ctx -> ctx.get("jsonModel"))
-        .map(Object::toString)
-        .orElse(null);
-  }
-
   @POST
   @Path("view")
   @Hidden
@@ -326,7 +319,7 @@ public class ViewService extends AbstractService {
     final Map<String, Object> data = request.getData();
     final String name = (String) data.get("name");
     final String type = (String) data.get("type");
-    final String jsonModel = findJsonModel(request);
+    final String jsonModel = (String) data.get("jsonModel");
 
     return view(request.getModel(), name, type, jsonModel);
   }
@@ -336,7 +329,10 @@ public class ViewService extends AbstractService {
   @Hidden
   public Response viewFields(Request request) {
     final Response response = new Response();
-    final String jsonModel = findJsonModel(request);
+    final String jsonModel =
+        ObjectUtils.notEmpty(request.getData())
+            ? (String) request.getData().get("jsonModel")
+            : null;
     response.setData(MetaStore.findFields(request.getBeanClass(), request.getFields(), jsonModel));
     return response;
   }

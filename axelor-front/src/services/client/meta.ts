@@ -226,7 +226,7 @@ export async function viewFields(
     body: {
       fields,
       model,
-      context: { jsonModel },
+      jsonModel,
     },
   });
 
@@ -266,10 +266,8 @@ export async function view<
       data: {
         name,
         type,
-        context: {
-          ...context,
-          ...(jsonModel && { jsonModel }),
-        },
+        jsonModel,
+        context,
       },
     },
   });
