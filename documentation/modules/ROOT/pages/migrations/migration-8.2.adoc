@@ -147,4 +147,7 @@ Here is the full SQL migration script for all built-in AOP entities :
 [source,sql]
 ----
 ALTER TABLE meta_json_model ADD is_delegated boolean;
+
+ALTER TABLE meta_view ADD json_model varchar(255);
+ALTER TABLE meta_view_custom ADD json_model varchar(255);
 ----
