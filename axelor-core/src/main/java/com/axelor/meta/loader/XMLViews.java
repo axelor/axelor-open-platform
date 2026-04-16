@@ -402,8 +402,6 @@ public class XMLViews {
    *   <li>find custom view by name and current user
    *   <li>find view matching given params with user's group
    *   <li>find view matching given params but have no groups
-   *   <li>for jsonModel views, fallback to legacy naming convention
-   *       (custom-model-{jsonModel}-{type})
    * </ol>
    *
    * @param name find by name
@@ -466,14 +464,6 @@ public class XMLViews {
       // fallback without jsonModel
       view = view == null ? findMetaView(views, null, type, model, module, null, group) : view;
       view = view == null ? findMetaView(views, null, type, model, module, null, null) : view;
-
-      // fallback: try legacy naming convention for jsonModel views
-      if (view == null && jsonModel != null) {
-        String legacyName = "custom-model-" + jsonModel + "-" + type;
-        view = findMetaView(views, legacyName, null, model, module, null, group);
-        view =
-            view == null ? findMetaView(views, legacyName, null, model, module, null, null) : view;
-      }
     }
 
     final AbstractView xmlView;
