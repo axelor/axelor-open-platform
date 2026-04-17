@@ -456,6 +456,11 @@ public class JsonReferenceCascader {
     return hasJsonFieldCache.get(entityClass);
   }
 
+  public static boolean hasJsonField(Class<?> entityClass) {
+    if (entityClass == null || !Model.class.isAssignableFrom(entityClass)) return false;
+    return hasJsonFieldCache.get(entityClass);
+  }
+
   private Map<String, List<MetaJsonField>> groupByModelField(List<MetaJsonField> fields) {
     return fields.stream().collect(Collectors.groupingBy(MetaJsonField::getModelField));
   }

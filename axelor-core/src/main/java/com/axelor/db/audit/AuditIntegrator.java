@@ -30,7 +30,9 @@ public class AuditIntegrator implements Integrator {
     registry.appendListeners(EventType.PRE_UPDATE, auditListener);
     registry.appendListeners(EventType.PRE_DELETE, auditListener);
 
-    registry.appendListeners(EventType.PRE_UPDATE, new JsonReferenceListener());
+    final JsonReferenceListener jsonListener = new JsonReferenceListener();
+    registry.appendListeners(EventType.PRE_UPDATE, jsonListener);
+    registry.appendListeners(EventType.POST_COMMIT_UPDATE, jsonListener);
 
     Beans.get(HibernateListenerService.class).registerListeners(registry);
   }

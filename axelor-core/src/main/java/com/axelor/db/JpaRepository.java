@@ -103,6 +103,7 @@ public class JpaRepository<T extends Model> implements Repository<T> {
       jsonUpdater.afterSave(saved);
       return saved;
     } finally {
+      // Between-save JSON state cleanup for the current entity
       jsonManager.clearSaveState(entity);
     }
   }
