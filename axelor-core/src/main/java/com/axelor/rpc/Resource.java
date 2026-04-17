@@ -14,7 +14,6 @@ import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.auth.pac4j.local.ChangePasswordException;
 import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -115,6 +114,19 @@ public class Resource<T extends Model> {
   private final Event<PostRequest> postRequest;
 
   private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\.]+");
+
+  private static final Set<String> USER_RESTRICTED_FIELDS =
+      Set.of(
+          "code",
+          "group",
+          "blocked",
+          "activateOn",
+          "expiresOn",
+          "password",
+          "passwordUpdatedOn",
+          "roles",
+          "permissions",
+          "metaPermissions");
 
   private static JpaSecurity securityWarner;
 
@@ -1200,35 +1212,51 @@ public class Resource<T extends Model> {
     return response;
   }
 
-  private User changeUserPassword(User user, Map<String, Object> values) {
-    final String oldPassword = (String) values.get("oldPassword");
-    final String newPassword = (String) values.get("newPassword");
-    final String chkPassword = (String) values.get("chkPassword");
+  /**
+   * Handles User-specific save logic with restricted field enforcement for non-admins.
+   *
+   * <p>Non-admin users are rejected if they attempt to modify restricted fields on any user record.
+   */
+  private void handleUserSave(User user, Map<String, Object> values) {
+    final User currentUser = AuthUtils.getUser();
 
-    // no password change
-    if (StringUtils.isBlank(newPassword)) {
-      return user;
+    if (currentUser != null && !AuthUtils.isAdmin(currentUser)) {
+      enforceRestrictedFields(values);
     }
 
-    if (StringUtils.isBlank(oldPassword)) {
-      throw new ChangePasswordException(I18n.get("Current user password is not provided."));
+    final String password = (String) values.get("password");
+    if (StringUtils.notBlank(password)) {
+      AuthService.getInstance().changePassword(user, password);
+    }
+  }
+
+  /**
+   * Handles User-specific mass update logic.
+   *
+   * <p>Non-admin users are rejected if they attempt to modify restricted fields on any user record.
+   */
+  private void handleUserMassUpdate(Map<String, Object> values) {
+    final User currentUser = AuthUtils.getUser();
+
+    if (currentUser != null && !AuthUtils.isAdmin(currentUser)) {
+      enforceRestrictedFields(values);
     }
 
-    if (!newPassword.equals(chkPassword)) {
-      throw new ChangePasswordException(
-          I18n.get("Confirm password doesn't match with new password."));
+    // Never allow mass update password
+    if (values.containsKey("password")) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
     }
+  }
 
-    final User current = AuthUtils.getUser();
-    final AuthService authService = AuthService.getInstance();
-
-    if (!authService.match(oldPassword, current.getPassword())) {
-      throw new ChangePasswordException(I18n.get("Current user password is wrong."));
+  /** Throws an error if a non-admin user attempts to modify restricted fields on a user record. */
+  private void enforceRestrictedFields(Map<String, Object> values) {
+    for (String field : USER_RESTRICTED_FIELDS) {
+      if (values.containsKey(field)) {
+        final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+        throw new UnauthorizedException(cause.getMessage(), cause);
+      }
     }
-
-    authService.changePassword(user, newPassword);
-
-    return user;
   }
 
   @SuppressWarnings("all")
@@ -1292,9 +1320,9 @@ public class Resource<T extends Model> {
 
             Model bean = JPA.edit(model, (Map) record);
 
-            // if user, update password
+            // Handle restricted field enforcement for non-admins on User
             if (bean instanceof User user) {
-              changeUserPassword(user, (Map) record);
+              handleUserSave(user, (Map) record);
             }
 
             bean = JPA.manage(bean);
@@ -1395,6 +1423,11 @@ public class Resource<T extends Model> {
         throw new UnauthorizedException(cause.getMessage(), cause);
       }
     }
+
+    if (User.class.isAssignableFrom(model)) {
+      handleUserMassUpdate(values);
+    }
+
     final int total = JPA.callInTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
