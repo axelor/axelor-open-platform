@@ -6,7 +6,6 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -22,15 +21,12 @@ import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.UUID;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AuthPac4jUserService {
-
-  @Inject private AuthService authService;
 
   @Inject private AuthPac4jProfileService profileService;
 
@@ -82,8 +78,6 @@ public class AuthPac4jUserService {
   protected void persistUser(CommonProfile profile) {
     final User user =
         new User(profileService.getUserIdentifier(profile), profileService.getName(profile));
-    user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
-
     updateUser(user, profile);
 
     if (user.getGroup() == null) {

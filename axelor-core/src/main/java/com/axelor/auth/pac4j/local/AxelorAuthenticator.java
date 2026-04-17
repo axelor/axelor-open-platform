@@ -71,7 +71,7 @@ public class AxelorAuthenticator implements Authenticator {
 
     final AuthService authService = AuthService.getInstance();
 
-    if (!authService.match(password, user.getPassword())) {
+    if (user.getPassword() == null || !authService.match(password, user.getPassword())) {
       if (StringUtils.isBlank(newPassword)) {
         throw new BadCredentialsException(INCORRECT_CREDENTIALS);
       }
@@ -107,10 +107,12 @@ public class AxelorAuthenticator implements Authenticator {
           });
     }
 
-    final var context = ctx.webContext();
-    final var sessionStore = ctx.sessionStore();
-
-    sessionStore.set(context, PENDING_USER_NAME, null);
+    // Authenticator may be used outside of Pac4j flow
+    if (ctx != null) {
+      final var context = ctx.webContext();
+      final var sessionStore = ctx.sessionStore();
+      sessionStore.set(context, PENDING_USER_NAME, null);
+    }
 
     final CommonProfile profile = new CommonProfile();
     profile.setId(username);
