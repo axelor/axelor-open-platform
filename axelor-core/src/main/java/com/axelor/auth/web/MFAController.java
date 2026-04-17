@@ -12,9 +12,11 @@ import com.axelor.auth.db.MFAMethod;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.MFARepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.auth.identity.IdentityVerificationService;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.actions.ActionView.ActionViewBuilder;
 import com.axelor.rpc.ActionRequest;
@@ -37,6 +39,8 @@ public class MFAController {
   private static final Logger log = LoggerFactory.getLogger(MFAController.class);
 
   public void enableMFA(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -51,6 +55,8 @@ public class MFAController {
   }
 
   public void disableMFA(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -60,6 +66,8 @@ public class MFAController {
   }
 
   public void generateRecoveryCodes(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -100,6 +108,8 @@ public class MFAController {
   }
 
   public void configureTOTP(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -118,6 +128,8 @@ public class MFAController {
   }
 
   public void configureEmail(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -152,6 +164,8 @@ public class MFAController {
   }
 
   public void removeTOTP(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -162,6 +176,8 @@ public class MFAController {
   }
 
   public void removeEmail(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     MFA mfa = request.getContext().asType(MFA.class);
     mfa = mfaRepository.find(mfa.getId());
     checkAuthorized(mfa);
@@ -218,6 +234,7 @@ public class MFAController {
     try {
       mfaService.validateMethod(mfa, code, method);
       response.setCanClose(true);
+      Beans.get(IdentityVerificationService.class).markIdentityChecked();
     } catch (IllegalArgumentException e) {
       response.addError("_code", I18n.get("The verification code is invalid."));
     } catch (Exception e) {
@@ -274,11 +291,22 @@ public class MFAController {
     response.setError(userMessage);
   }
 
+  private boolean requiresIdentityCheck(ActionRequest request, ActionResponse response) {
+    var identityVerificationService = Beans.get(IdentityVerificationService.class);
+
+    if (identityVerificationService.requiresIdentityCheck()) {
+      response.setRequestIdentityCheck(request.getAction());
+      return true;
+    }
+
+    return false;
+  }
+
   private void checkAuthorized(MFA mfa) {
     var owner = mfa.getOwner();
     var user = AuthUtils.getUser();
 
-    if (user != null && owner != null && !user.equals(owner) && !AuthUtils.isAdmin(user)) {
+    if (user == null || owner == null || (!user.equals(owner) && !AuthUtils.isAdmin(user))) {
       throw new UnauthorizedException(I18n.get("You are not authorized to perform this action."));
     }
   }

@@ -37,10 +37,13 @@ import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.concurrent.locks.Lock;
@@ -112,6 +115,10 @@ public class MFAService {
 
   public List<MFAMethod> getMethods(MFA mfa) {
     List<MFAMethod> methods = new ArrayList<>();
+
+    if (mfa == null) {
+      return methods;
+    }
 
     if (Boolean.TRUE.equals(mfa.getIsTotpValidated())) {
       methods.add(MFAMethod.TOTP);
@@ -519,5 +526,36 @@ public class MFAService {
     }
 
     return codes.stream().collect(Collectors.joining(CODE_SEPARATOR));
+  }
+
+  public void processEmailMethod(
+      Map<String, Object> data, List<MFAMethod> mfaMethods, String username) {
+
+    if (mfaMethods.stream().noneMatch(method -> method == MFAMethod.EMAIL)) {
+      return;
+    }
+
+    User user = AuthUtils.getUser(username);
+    LocalDateTime emailRetryAfter = getEmailRetryAfter(user);
+    boolean isDefault = mfaMethods.get(0) == MFAMethod.EMAIL;
+
+    if (emailRetryAfter == null && isDefault) {
+      try {
+        emailRetryAfter = sendEmailCode(user);
+      } catch (Exception e) {
+        log.error("Failed to send MFA email for user %s".formatted(user.getCode()), e);
+      }
+    }
+
+    if (emailRetryAfter != null) {
+      data.put("emailRetryAfter", format(emailRetryAfter));
+    }
+  }
+
+  private String format(LocalDateTime localDateTime) {
+    return localDateTime
+        .atZone(ZoneId.systemDefault())
+        .withZoneSameInstant(ZoneOffset.UTC)
+        .toString();
   }
 }

@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -61,13 +62,23 @@ public class MFAEmailService {
         return forbidden();
       }
 
-      Object pendingUsername = session.getAttribute(AxelorProfileManager.PENDING_USER_NAME);
-      if (pendingUsername == null || StringUtils.isBlank(pendingUsername.toString())) {
-        return forbidden();
-      }
+      var currentUser = AuthUtils.getUser();
 
-      if (!username.equals(pendingUsername.toString())) {
-        return forbidden();
+      if (currentUser == null) {
+        // Check pending user when not authenticated
+        Object pendingUsername = session.getAttribute(AxelorProfileManager.PENDING_USER_NAME);
+        if (pendingUsername == null || StringUtils.isBlank(pendingUsername.toString())) {
+          return forbidden();
+        }
+
+        if (!username.equals(pendingUsername.toString())) {
+          return forbidden();
+        }
+      } else {
+        // When authenticated (e.g. identity check)
+        if (!Objects.equals(username, currentUser.getCode())) {
+          return forbidden();
+        }
       }
 
       user = AuthUtils.getUser(username);

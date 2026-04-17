@@ -8,10 +8,8 @@ import static com.axelor.auth.pac4j.AxelorProfileManager.AVAILABLE_MFA_METHODS;
 import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_USER_NAME;
 
 import com.axelor.app.AppSettings;
-import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
 import com.axelor.auth.db.MFAMethod;
-import com.axelor.auth.db.User;
 import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
@@ -21,9 +19,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +47,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   private final ErrorHandler errorHandler;
   private final AxelorCsrfMatcher csrfMatcher;
-  private final AuthPac4jInfo pac4jInfo;
   private final MFAService mfaService;
   private final AxelorUrlResolver urlResolver;
 
@@ -69,7 +63,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       AxelorUrlResolver urlResolver) {
     this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
-    this.pac4jInfo = pac4jInfo;
     this.mfaService = mfaService;
     this.urlResolver = urlResolver;
     setClientFinder(clientFinder);
@@ -207,9 +200,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       final Map<String, Object> state = new HashMap<>();
       state.putAll(Map.of("methods", methods, "username", username));
 
-      if (methods.stream().anyMatch(method -> method == MFAMethod.EMAIL)) {
-        processEmailMethod(state, username, methods.get(0) == MFAMethod.EMAIL);
-      }
+      mfaService.processEmailMethod(state, methods, username);
 
       final Map<String, Object> responseData =
           Map.of("route", Map.of("path", "/mfa", "state", state));
@@ -247,30 +238,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
             uriBuilder.queryParam(key, value.toString());
           }
         });
-  }
-
-  private void processEmailMethod(Map<String, Object> state, String username, boolean isDefault) {
-    User user = AuthUtils.getUser(username);
-    LocalDateTime emailRetryAfter = mfaService.getEmailRetryAfter(user);
-
-    if (emailRetryAfter == null && isDefault) {
-      try {
-        emailRetryAfter = mfaService.sendEmailCode(user);
-      } catch (Exception e) {
-        logger.error("Failed to send MFA email for user %s".formatted(user.getCode()), e);
-      }
-    }
-
-    if (emailRetryAfter != null) {
-      state.put("emailRetryAfter", format(emailRetryAfter));
-    }
-  }
-
-  private String format(LocalDateTime localDateTime) {
-    return localDateTime
-        .atZone(ZoneId.systemDefault())
-        .withZoneSameInstant(ZoneOffset.UTC)
-        .toString();
   }
 
   @Override
