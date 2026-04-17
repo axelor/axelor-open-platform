@@ -142,6 +142,10 @@ public class Response {
     this.setStatus(STATUS_FAILURE);
   }
 
+  public void setRequestIdentityCheck(String pendingAction) {
+    setData(List.of(Map.of("identityCheck", Map.of("pending", pendingAction))));
+  }
+
   public Object getItem(int index) {
     try {
       return ((List<?>) data).get(index);
