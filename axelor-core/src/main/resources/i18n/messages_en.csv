@@ -52,46 +52,6 @@
       </Box>
     </Box>
   )}
-  </>",,,
-"<>
-  {_passwordRequirements && _passwordRequirements.length > 0 && (
-    <Box
-      mb={2}
-      rounded
-      style={{
-        backgroundColor: ""var(--bs-tertiary-bg)"",
-        color: ""rgba(var(--bs-body-color-rgb), 0.65)"",
-        padding: ""0.65rem 0.75rem"",
-      }}
-    >
-      <Box
-        as=""p""
-        mb={1}
-        style={{ fontWeight: 600 }}
-      >
-        {_t(""Your new password must"")}
-      </Box>
-      <Box
-        as=""ul""
-        d=""flex""
-        flexDirection=""column""
-        style={{ listStyle: ""none"", padding: 0, margin: 0, gap: ""0.2rem"" }}
-      >
-        {_passwordRequirements.map((requirement, i) => (
-          <Box
-            as=""li""
-            key={i}
-            d=""flex""
-            alignItems=""center""
-            style={{ gap: ""0.25rem"" }}
-          >
-            <Icon icon=""dot"" />
-            {requirement}
-          </Box>
-        ))}
-      </Box>
-    </Box>
-  )}
 </>",,,
 "A field is required. Please provide a value.",,,
 "A new verification code has been sent to your email address.",,,
@@ -175,7 +135,8 @@
 "Cards",,,
 "Category",,,
 "Category name to group action menus.",,,
-"Change password?",,,
+"Change Password",,,
+"Change password",,,
 "Chart",,,
 "Check constraint violation",,,
 "Client side js expression",,,
@@ -198,9 +159,7 @@
 "Configure",,,
 "Confirm new password",,,
 "Confirm new password of the user (must be identical to the new password)",,,
-"Confirm password",,,
 "Confirm password doesn't match with new password.",,,
-"Confirm password of the new user (must be identical to the password)",,,
 "Consumed",,,
 "Content",,,
 "Content type",,,
@@ -215,12 +174,7 @@
 "Created by",,,
 "Created on",,,
 "Cron",,,
-"Current password",,,
-"Current password of the logged in user",,,
-"Current password of the user",,,
 "Current state",,,
-"Current user password is not provided.",,,
-"Current user password is wrong.",,,
 "Custom",,,
 "Custom Fields",,,
 "Custom Models",,,
@@ -366,6 +320,7 @@
 "Invalid password",,,
 "Invalid permission",,,
 "Invalid use of action-record: %s, must be the last action.",,,
+"Invalid verification code",,,
 "Inverse",,,
 "Is archived",,,
 "Is delegated",,,
@@ -452,10 +407,12 @@
 "Navigation",,,
 "New",,,
 "New password",,,
+"New password is required.",,,
 "New password must be different.",,,
 "New password of the user",,,
 "Next value",,,
 "No archived messages!",,,
+"No authenticated user",,,
 "No help",,,
 "No important messages!",,,
 "No messages",,,
@@ -490,7 +447,7 @@
 "Parent",,,
 "Parent menu",,,
 "Password",,,
-"Password of the new user",,,
+"Password changed successfully.",,,
 "Permission",,,
 "Permissions",,,
 "Permissions (fields)",,,
@@ -658,6 +615,7 @@
 "Unable to create API key",,,
 "Unable to revoke API key",,,
 "Unable to rotate API key",,,
+"Unable to verify identity",,,
 "Unexpected database error occurred on the server.",,,
 "Unique ID",,,
 "Unique constraint violation",,,
@@ -713,6 +671,7 @@
 "Widget attrs",,,
 "Write",,,
 "Wrong current password",,,
+"Wrong password",,,
 "Wrong username or password",,,
 "Xml",,,
 "Yellow",,,
@@ -722,6 +681,7 @@
 "You are not allowed to remove this filter.",,,
 "You are not allowed to share custom views.",,,
 "You are not allowed to update this filter.",,,
+"You are not authorized to change this user password.",,,
 "You are not authorized to create API key for this user",,,
 "You are not authorized to create this resource.",,,
 "You are not authorized to export the data.",,,
@@ -736,7 +696,6 @@
 "You can't move document here.",,,
 "You have changed your email address. Please reconfigure it for multi-factor authentication.",,,
 "You must have an email address in your user profile to use email confirmation method.",,,
-"Your current password",,,
 "Your new password must",,,
 "Your password reset token is invalid or expired.",,,
 "Your secret code and QR code have been successfully generated.<br> To complete the setup, scan this QR code with your authentication app to start receiving your security codes.<br>Can't scan the QR code? Use the security key below to manually set up your authenticator app.",,,
@@ -757,13 +716,11 @@
 "be different from the current password",,,
 "be sufficiently strong",,,
 "confirm new password",,,
-"confirm password",,,
 "contain at least {0} characters",,,
 "contain at least {0} digit(s)",,,
 "contain at least {0} lowercase character(s)",,,
 "contain at least {0} special character(s)",,,
 "contain at least {0} uppercase character(s)",,,
-"current password",,,
 "form::Select","Select",,
 "login name",,,
 "must be at least minimum length {0}",,,
@@ -776,12 +733,10 @@
 "must not contain the user code",,,
 "new password",,,
 "not contain your login code",,,
-"password",,,
 "strength score is too low (minimum required: {0}/4)",,,
 "updated document",,,
 "user group",,,
 "user name",,,
 "validate the pattern",,,
-"your current password",,,
 "{0} customized view is deleted.",,,
 "{0} customized views are deleted.",,,

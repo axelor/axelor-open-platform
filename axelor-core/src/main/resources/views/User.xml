@@ -33,62 +33,7 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="forcePasswordChange"/>
-      <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean" x-reset-state="true" onChange="action-method-user-display-password-requirements"/>
-      <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your current password" placeholder="your current password" help="Current password of the logged in user" widget="password" requiredIf="change || !id"  x-reset-state="true"/>
-        <panel itemSpan="12" showIf="id">
-          <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change || !id" x-reset-state="true"/>
-          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"  x-reset-state="true"/>
-        </panel>
-        <panel itemSpan="12" hideIf="id">
-          <field name="newPassword" title="Password" placeholder="password" help="Password of the new user" widget="password" requiredIf="change || !id" x-reset-state="true"/>
-          <field name="chkPassword" title="Confirm password" placeholder="confirm password" help="Confirm password of the new user (must be identical to the password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword" x-reset-state="true"/>
-        </panel>
-        <static>
-          <![CDATA[
-          <>
-            {_passwordRequirements && _passwordRequirements.length > 0 && (
-              <Box
-                mb={2}
-                rounded
-                style={{
-                  backgroundColor: "var(--bs-tertiary-bg)",
-                  color: "rgba(var(--bs-body-color-rgb), 0.65)",
-                  padding: "0.65rem 0.75rem",
-                }}
-              >
-                <Box
-                  as="p"
-                  mb={1}
-                  style={{ fontWeight: 600 }}
-                >
-                  {_t("Your new password must")}
-                </Box>
-                <Box
-                  as="ul"
-                  d="flex"
-                  flexDirection="column"
-                  style={{ listStyle: "none", padding: 0, margin: 0, gap: "0.2rem" }}
-                >
-                  {_passwordRequirements.map((requirement, i) => (
-                    <Box
-                      as="li"
-                      key={i}
-                      d="flex"
-                      alignItems="center"
-                      style={{ gap: "0.25rem" }}
-                    >
-                      <Icon icon="dot" />
-                      {requirement}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            )}
-          </>
-          ]]>
-        </static>
-      </panel>
+      <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" showIf="id" />
       <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" if="__repo__(UserToken).isPermitted()"/>
     </panel>
       <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
@@ -110,64 +55,72 @@
       <field name="theme" widget="theme-select"/>
       <field name="singleTab" widget="inline-checkbox"/>
       <field name="noHelp" widget="inline-checkbox" />
-      <field name="change" title="Change password?" widget="inline-checkbox" x-reset-state="true" onChange="action-method-user-display-password-requirements"/>
-      <panel showIf="change" itemSpan="12">
-          <field name="oldPassword" title="Current password" placeholder="current password" help="Current password of the user" widget="password" requiredIf="change" />
-          <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change" />
-          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
-        <static>
-          <![CDATA[
-          <>
-            {_passwordRequirements && _passwordRequirements.length > 0 && (
-              <Box
-                mb={2}
-                rounded
-                style={{
-                  backgroundColor: "var(--bs-tertiary-bg)",
-                  color: "rgba(var(--bs-body-color-rgb), 0.65)",
-                  padding: "0.65rem 0.75rem",
-                }}
-              >
-                <Box
-                  as="p"
-                  mb={1}
-                  style={{ fontWeight: 600 }}
-                >
-                  {_t("Your new password must")}
-                </Box>
-                <Box
-                  as="ul"
-                  d="flex"
-                  flexDirection="column"
-                  style={{ listStyle: "none", padding: 0, margin: 0, gap: "0.2rem" }}
-                >
-                  {_passwordRequirements.map((requirement, i) => (
-                    <Box
-                      as="li"
-                      key={i}
-                      d="flex"
-                      alignItems="center"
-                      style={{ gap: "0.25rem" }}
-                    >
-                      <Icon icon="dot" />
-                      {requirement}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            )}
-            </>
-          ]]>
-        </static>
-      </panel>
       <panel if="__repo__(UserToken).isPermitted()">
         <field name="$manageUserTokens" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
         <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageUserTokens"/>
       </panel>
+      <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" showIf="id" />
       <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
         <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
         <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
       </panel>
+    </panel>
+  </form>
+
+  <form name="user-change-password-form" model="com.axelor.auth.db.User" title="Change Password" onLoad="action-method-user-display-password-requirements">
+    <panel colSpan="12" itemSpan="12" showFrame="false">
+      <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" required="true" x-reset-state="true" x-dirty="false" />
+      <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" required="true" validIf="chkPassword === newPassword" x-reset-state="true" x-dirty="false" />
+      <panel hidden="true">
+        <field name="id" />
+        <field name="_passwordRequirements" x-dirty="false"/>
+      </panel>
+      <static>
+        <![CDATA[
+        <>
+          {_passwordRequirements && _passwordRequirements.length > 0 && (
+            <Box
+              mb={2}
+              rounded
+              style={{
+                backgroundColor: "var(--bs-tertiary-bg)",
+                color: "rgba(var(--bs-body-color-rgb), 0.65)",
+                padding: "0.65rem 0.75rem",
+              }}
+            >
+              <Box
+                as="p"
+                mb={1}
+                style={{ fontWeight: 600 }}
+              >
+                {_t("Your new password must")}
+              </Box>
+              <Box
+                as="ul"
+                d="flex"
+                flexDirection="column"
+                style={{ listStyle: "none", padding: 0, margin: 0, gap: "0.2rem" }}
+              >
+                {_passwordRequirements.map((requirement, i) => (
+                  <Box
+                    as="li"
+                    key={i}
+                    d="flex"
+                    alignItems="center"
+                    style={{ gap: "0.25rem" }}
+                  >
+                    <Icon icon="dot" />
+                    {requirement}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+        </>
+        ]]>
+      </static>
+      <spacer colSpan="6" />
+      <button colSpan="6" name="changePasswordBtn" title="Change password" onClick="action-method-user-change-password" readonlyIf="!chkPassword || !newPassword" />
     </panel>
   </form>
 
@@ -193,11 +146,19 @@
   </action-method>
 
   <action-method name="action-method-show-mfa-form">
-     <call class="com.axelor.auth.web.MFAController" method="showRelatedMfa"/>
+    <call class="com.axelor.auth.web.MFAController" method="showRelatedMfa"/>
   </action-method>
 
   <action-method name="action-method-user-display-password-requirements">
     <call class="com.axelor.auth.web.UserController" method="showPasswordRequirements"/>
+  </action-method>
+
+  <action-method name="action-method-show-user-change-password">
+    <call class="com.axelor.auth.web.UserController" method="showChangePassword"/>
+  </action-method>
+
+  <action-method name="action-method-user-change-password">
+    <call class="com.axelor.auth.web.UserController" method="changePassword"/>
   </action-method>
 
 </object-views>

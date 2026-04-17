@@ -241,6 +241,15 @@ export class DefaultActionExecutor implements ActionExecutor {
       await options?.handle(data);
     }
 
+    if (data.identityCheck) {
+      const { showIdentityCheck } = await import("@/components/identity-check");
+      const verified = await showIdentityCheck();
+      if (verified && data.identityCheck.pending) {
+        return this.#execute(data.identityCheck.pending, options);
+      }
+      return Promise.reject();
+    }
+
     if (data.exportFile) {
       if (data.attached) {
         const context = this.#handler.getContext();
@@ -440,7 +449,10 @@ export class DefaultActionExecutor implements ActionExecutor {
         const url = `ws/files/report?link=${data.reportLink}&name=${data.reportFile}`;
         if (device.isMobile && data.reportFormat !== "html") {
           download(url);
-        } else if (data.reportFormat && ['pdf', 'html'].indexOf(data.reportFormat) > -1) {
+        } else if (
+          data.reportFormat &&
+          ["pdf", "html"].indexOf(data.reportFormat) > -1
+        ) {
           await this.#openView({
             title: data.reportFile!,
             resource: url,

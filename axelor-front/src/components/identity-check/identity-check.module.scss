@@ -1,0 +1,13 @@
+.container {
+  width: 100%;
+}
+
+.description {
+  color: rgba(var(--bs-body-color-rgb), 0.75);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

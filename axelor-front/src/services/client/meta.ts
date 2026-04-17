@@ -343,6 +343,9 @@ export type ActionOptions = {
 
 export type ActionResult = {
   pending?: string;
+  identityCheck?: {
+    pending: string;
+  };
   exportFile?: string;
   exportToken?: string;
   signal?: string;

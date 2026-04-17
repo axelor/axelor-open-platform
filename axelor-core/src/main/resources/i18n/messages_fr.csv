@@ -52,46 +52,6 @@
       </Box>
     </Box>
   )}
-  </>",,,
-"<>
-  {_passwordRequirements && _passwordRequirements.length > 0 && (
-    <Box
-      mb={2}
-      rounded
-      style={{
-        backgroundColor: ""var(--bs-tertiary-bg)"",
-        color: ""rgba(var(--bs-body-color-rgb), 0.65)"",
-        padding: ""0.65rem 0.75rem"",
-      }}
-    >
-      <Box
-        as=""p""
-        mb={1}
-        style={{ fontWeight: 600 }}
-      >
-        {_t(""Your new password must"")}
-      </Box>
-      <Box
-        as=""ul""
-        d=""flex""
-        flexDirection=""column""
-        style={{ listStyle: ""none"", padding: 0, margin: 0, gap: ""0.2rem"" }}
-      >
-        {_passwordRequirements.map((requirement, i) => (
-          <Box
-            as=""li""
-            key={i}
-            d=""flex""
-            alignItems=""center""
-            style={{ gap: ""0.25rem"" }}
-          >
-            <Icon icon=""dot"" />
-            {requirement}
-          </Box>
-        ))}
-      </Box>
-    </Box>
-  )}
 </>",,,
 "A field is required. Please provide a value.","Un champ est obligatoire. Veuillez saisir une valeur.",,
 "A new verification code has been sent to your email address.","Un nouveau code de vérification a été envoyé à votre adresse email.",,
@@ -175,7 +135,8 @@
 "Cards","Cartes",,
 "Category","Catégorie",,
 "Category name to group action menus.","Nom de la catégorie pour grouper les actions menus",,
-"Change password?","Changer mot de passe ?",,
+"Change Password","Modifier le mot de passe",,
+"Change password","Modifier le mot de passe",,
 "Chart","Graphique",,
 "Check constraint violation","Valeur non conforme",,
 "Client side js expression","Expression js côté client",,
@@ -198,9 +159,7 @@
 "Configure","Configurer",,
 "Confirm new password","Confirmer le nouveau mot de passe",,
 "Confirm new password of the user (must be identical to the new password)","Confirmer le nouveau mot de passe de l’utilisateur (doit être identique au nouveau mot de passe)",,
-"Confirm password","Confirmer le mot de passe",,
 "Confirm password doesn't match with new password.","La confirmation du mot de passe ne correspond pas au nouveau mot de passe.",,
-"Confirm password of the new user (must be identical to the password)","Confirmer le mot de passe du nouvel utilisateur (doit être identique au mot de passe)",,
 "Consumed","Consommé",,
 "Content","Contenu",,
 "Content type","Type de contenu",,
@@ -215,12 +174,7 @@
 "Created by","Créé par",,
 "Created on","Créé le",,
 "Cron","Cron",,
-"Current password","Mot de passe actuel",,
-"Current password of the logged in user","Mot de passe actuel de l’utilisateur connecté",,
-"Current password of the user","Mot de passe actuel de l’utilisateur",,
 "Current state","État actuel",,
-"Current user password is not provided.","Le mot de passe de l'utilisateur actuel n'est pas fourni.",,
-"Current user password is wrong.","Le mot de passe de l'utilisateur actuel est incorrect.",,
 "Custom","Personnalisé",,
 "Custom Fields","Champs personnalisés",,
 "Custom Models","Modèles personnalisés",,
@@ -366,6 +320,7 @@
 "Invalid password","Mot de passe invalide",,
 "Invalid permission","Permission invalide",,
 "Invalid use of action-record: %s, must be the last action.","Utilisation incorrecte de l'action-record :%s, doit être la dernière action.",,
+"Invalid verification code","Code de vérification invalide",,
 "Inverse","Inverse",,
 "Is archived","Est archivé",,
 "Is delegated","Est délégué",,
@@ -452,10 +407,12 @@
 "Navigation","Navigation",,
 "New","Nouveau",,
 "New password","Nouveau mot de passe",,
+"New password is required.","Le nouveau mot de passe est requis.",,
 "New password must be different.","Le nouveau mot de passe doit être différent.",,
 "New password of the user","Nouveau mot de passe de l’utilisateur",,
 "Next value","Valeur suivante",,
 "No archived messages!","Aucun message archivé",,
+"No authenticated user","Aucun utilisateur authentifié",,
 "No help","Aucune aide",,
 "No important messages!","Aucun message important",,
 "No messages","Pas de messages",,
@@ -490,7 +447,7 @@
 "Parent","Parent",,
 "Parent menu","Menu parent",,
 "Password","Mot de passe",,
-"Password of the new user","Mot de passe du nouvel utilisateur",,
+"Password changed successfully.","Mot de passe modifié avec succès.",,
 "Permission","Permission",,
 "Permissions","Les Permissions",,
 "Permissions (fields)","Permissions (champs)",,
@@ -658,6 +615,7 @@
 "Unable to create API key","Échec de la création de la clé API",,
 "Unable to revoke API key","Échec de la révocation de la clé API",,
 "Unable to rotate API key","Échec du renouvellement de la clé API",,
+"Unable to verify identity","Impossible de vérifier l'identité",,
 "Unexpected database error occurred on the server.","Une erreur de base de données est survenue sur le serveur.",,
 "Unique ID","ID unique",,
 "Unique constraint violation","Violation de contrainte unique",,
@@ -713,6 +671,7 @@
 "Widget attrs","Attrs widget",,
 "Write","Modification",,
 "Wrong current password","Mauvais mot de passe actuel",,
+"Wrong password","Mot de passe incorrect",,
 "Wrong username or password","Mauvais nom d’utilisateur ou mot de passe",,
 "Xml","Xml",,
 "Yellow","Jaune",,
@@ -722,6 +681,7 @@
 "You are not allowed to remove this filter.","Vous n’êtes pas autorisé(e) à supprimer ce filtre.",,
 "You are not allowed to share custom views.","Vous n’êtes pas autorisé(e) à partager des vues personnalisées.",,
 "You are not allowed to update this filter.","Vous n’êtes pas autorisé(e) à mettre à jour ce filtre.",,
+"You are not authorized to change this user password.","Vous n’êtes pas autorisé(e) à changer le mot de passe de cet utilisateur.",,
 "You are not authorized to create API key for this user","Vous n'êtes pas autorisé à créer une clé API pour cet utilisateur",,
 "You are not authorized to create this resource.","Vous n’êtes pas autorisé(e) à créer cette ressource.",,
 "You are not authorized to export the data.","Vous n’êtes pas autorisé(e) à exporter cette ressource.",,
@@ -736,7 +696,6 @@
 "You can't move document here.","Vous ne pouvez pas déplacer le document ici.",,
 "You have changed your email address. Please reconfigure it for multi-factor authentication.","Vous avez changé votre adresse email. Veuillez la reconfigurer pour l'authentification à plusieurs facteurs.",,
 "You must have an email address in your user profile to use email confirmation method.","Vous devez avoir une adresse email dans votre profil utilisateur pour utiliser la méthode de confirmation par email.",,
-"Your current password","Votre mot de passe actuel",,
 "Your new password must","Votre nouveau mot de passe doit",,
 "Your password reset token is invalid or expired.","Votre jeton de réinitialisation de mot de passe est invalide ou expiré.",,
 "Your secret code and QR code have been successfully generated.<br> To complete the setup, scan this QR code with your authentication app to start receiving your security codes.<br>Can't scan the QR code? Use the security key below to manually set up your authenticator app.","Votre clé secrète et votre code QR ont été générés avec succès.<br>Pour finaliser la configuration, scannez ce code QR avec votre application d’authentification afin de recevoir vos codes de sécurité.<br> Vous ne pouvez pas scanner le code QR ? Utilisez la clé secrète ci-dessous pour configurer manuellement votre application.",,
@@ -757,13 +716,11 @@
 "be different from the current password","être différent du mot de passe actuel",,
 "be sufficiently strong","être suffisamment fort",,
 "confirm new password","confirmer le nouveau mot de passe",,
-"confirm password","confirmer le mot de passe",,
 "contain at least {0} characters","contenir au moins {0} caractères",,
 "contain at least {0} digit(s)","contenir au moins {0} chiffres",,
 "contain at least {0} lowercase character(s)","contenir au moins {0} caractères minuscules",,
 "contain at least {0} special character(s)","contenir au moins {0} caractères spéciaux",,
 "contain at least {0} uppercase character(s)","contenir au moins {0} caractères majuscules",,
-"current password","mot de passe actuel",,
 "form::Select","Sélection",,
 "login name","login",,
 "must be at least minimum length {0}","doit comporter au moins {0} caractères",,
@@ -776,12 +733,10 @@
 "must not contain the user code","doit ne pas contenir le code utilisateur",,
 "new password","nouveau mot de passe",,
 "not contain your login code","ne pas contenir le code utilisateur",,
-"password","mot de passe",,
 "strength score is too low (minimum required: {0}/4)","score de force est trop faible (minimum requis : {0}/4)",,
 "updated document","a modifié le document",,
 "user group","groupe",,
 "user name","nom",,
 "validate the pattern","valider l'expression régulière",,
-"your current password","votre mot de passe actuel",,
 "{0} customized view is deleted.","{0} vue personnalisée est supprimée",,
 "{0} customized views are deleted.","{0} vues personnalisées sont supprimées",,
