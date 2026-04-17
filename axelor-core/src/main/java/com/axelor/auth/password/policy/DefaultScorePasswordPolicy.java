@@ -25,13 +25,15 @@ public class DefaultScorePasswordPolicy implements ScorePasswordPolicy {
       "strength score is too low (minimum required: {0}/4)" /*)*/;
   private static final String DESCRIPTION = /*$$(*/ "be sufficiently strong" /*)*/;
 
-  private static final Zxcvbn ZXCVBN = new Zxcvbn();
+  private static final class ZxcvbnHolder {
+    static final Zxcvbn INSTANCE = new Zxcvbn();
+  }
 
   @Override
   public InvalidPolicy validate(@Nullable User user, String password) {
     int min = getMinScore();
 
-    if (ZXCVBN.measure(password).getScore() < min) {
+    if (ZxcvbnHolder.INSTANCE.measure(password).getScore() < min) {
       return new InvalidPolicy(ERROR_MESSAGE, min);
     }
     return null;
