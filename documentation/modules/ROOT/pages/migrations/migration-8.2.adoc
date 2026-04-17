@@ -140,6 +140,64 @@ requirements without imposing them on all deployments. See more details xref:dev
 `user-form` and `user-preferences-form` forms has been updated to reflect the changes. If any override was made, make
 sure to integrate them.
 
+== User password update flow changed
+
+The password update flow for users has been reworked to improve security. Changing a password now requires the user to
+prove their identity first: either by providing their current password (for local or LDAP-authenticated accounts) or
+by confirming a 2FA code.
+
+NOTE: For users authenticated through an external provider (SSO, OAuth) without a local password or and LDAP connection,
+2FA is the only way to prove their identity for password changes and other sensitive operations. Enabling multi-factor
+authentication on these accounts is strongly recommended.
+
+=== User model change
+
+The `password` field on `User` is no longer required. Users authenticated via external providers no longer receive a
+random UUID password when created — the field is left null, which disables local login for those accounts.
+
+Run the following SQL script to update the table :
+
+[source,sql]
+----
+ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+----
+
+Existing external-provider users created before 8.2 still carry the random UUID password assigned at creation time in
+the database. These values are unguessable, so leaving them as-is is not a security risk. If you want to explicitly
+disable local login for these accounts, clear the `password` column for the concerned users:
+
+[source,sql]
+----
+UPDATE auth_user SET password = NULL WHERE code IN ('sso-user1', 'sso-user2', ...);
+----
+
+=== Change password flow from the UI
+
+The inline password change panel on `user-form` and `user-preferences-form` has been replaced with a new flow:
+
+1. The user clicks *Change Password*.
+2. If the session is not already identity-checked, an identity verification dialog asks for the current password or a
+2FA code. On success, the session is flagged as identity-checked for 10 minutes.
+3. A popup is shown where the user enters and confirms the new password.
+
+The same identity check is now required before sensitive MFA operations.
+
+Non-admin users can change only their own password through the UI. Admins can change the password of any user.
+
+If any override was made on `user-form` or `user-preferences-form`, make sure to integrate the changes.
+
+=== CRUD endpoint changes
+
+Non-admin users can no longer change their own password through the standard `User` CRUD endpoint. Password changes must
+go through the UI flow described above.
+
+Admins can still change any user's password through the CRUD endpoint. The call has been simplified: only the new
+`password` value needs to be provided in the context — `oldPassword`/`newPassword` and `chkPassword` are no longer used.
+
+In addition, non-admin users are now blocked from modifying a set of restricted fields on any user record via the `User`
+CRUD endpoint: `code`, `group`, `blocked`, `activateOn`, `expiresOn`, `password`, `passwordUpdatedOn`, `roles`,
+`permissions`, `metaPermissions`. The `password` field is blocked from mass-updates for every user, including admins.
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :
@@ -150,4 +208,6 @@ ALTER TABLE meta_json_model ADD is_delegated boolean;
 
 ALTER TABLE meta_view ADD json_model varchar(255);
 ALTER TABLE meta_view_custom ADD json_model varchar(255);
+
+ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
 ----
