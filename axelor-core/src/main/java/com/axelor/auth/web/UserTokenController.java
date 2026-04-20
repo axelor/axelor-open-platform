@@ -8,8 +8,8 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.UserTokenService;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.UserToken;
-import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.auth.db.repo.UserTokenRepository;
+import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
@@ -21,13 +21,25 @@ public class UserTokenController {
 
   @Inject UserTokenService userTokenService;
   @Inject UserTokenRepository userTokenRepository;
-  @Inject UserRepository userRepository;
+
+  public void loadUserTokens(ActionRequest request, ActionResponse response) {
+    Long userId = (Long) request.getContext().get("id");
+
+    if (userId == null || userId <= 0) {
+      return;
+    }
+
+    User user = JPA.find(User.class, userId);
+    if (!isNotAuthorized(user)) {
+      response.setValue("_xActiveUserTokens", userTokenService.getTokenData(user));
+    }
+  }
 
   public void createToken(ActionRequest request, ActionResponse response) {
     try {
       UserToken userToken = request.getContext().asType(UserToken.class);
-      User owner = request.getContext().getParent().asType(User.class);
-      owner = userRepository.find(owner.getId());
+      User owner =
+          JPA.find(User.class, Long.valueOf(request.getContext().get("_xUserId").toString()));
       if (owner == null) {
         response.setError(I18n.get("API key should be attached to a valid user"));
         return;
@@ -61,8 +73,8 @@ public class UserTokenController {
 
   public void revokeToken(ActionRequest request, ActionResponse response) {
     try {
-      UserToken userToken = request.getContext().asType(UserToken.class);
-      userToken = userTokenRepository.find(userToken.getId());
+      Long userTokenId = Long.valueOf(request.getContext().get("_userTokenId").toString());
+      UserToken userToken = userTokenRepository.find(userTokenId);
       if (userToken == null) {
         response.setError(I18n.get("API key not found"));
         return;
@@ -81,8 +93,8 @@ public class UserTokenController {
 
   public void rotateToken(ActionRequest request, ActionResponse response) {
     try {
-      UserToken userToken = request.getContext().asType(UserToken.class);
-      userToken = userTokenRepository.find(userToken.getId());
+      Long userTokenId = Long.valueOf(request.getContext().get("_userTokenId").toString());
+      UserToken userToken = userTokenRepository.find(userTokenId);
       if (userToken == null) {
         response.setError(I18n.get("API key not found"));
         return;

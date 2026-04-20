@@ -8,10 +8,17 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.UserToken;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.auth.db.repo.UserTokenRepository;
+import com.axelor.db.Query;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +100,9 @@ public class UserTokenService {
   }
 
   public UserToken rotateUserToken(UserToken userToken) {
+    if (userToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+      throw new IllegalStateException("API key has expired, please create a new one");
+    }
     AuthService authService = AuthService.getInstance();
     String key;
     String token = generateRandomString(TOKEN_LENGTH);
@@ -131,5 +141,44 @@ public class UserTokenService {
       sb.append(CHARACTERS.charAt(secureRandom.nextInt(charactersLength)));
     }
     return sb.toString();
+  }
+
+  public List<Map<String, Object>> getTokenData(User user) {
+    List<Map<String, Object>> data = new ArrayList<>();
+    List<Map> tokensData =
+        Query.of(UserToken.class)
+            .filter("self.owner.id = :userId")
+            .bind("userId", user.getId())
+            .select("lastUsedAt", "expiresAt", "name", "createdOn")
+            .fetch(0, 0);
+    if (tokensData == null || tokensData.isEmpty()) {
+      return data;
+    }
+
+    for (Map tokenData : tokensData) {
+      Map<String, Object> result = new HashMap<>();
+      result.put("id", tokenData.get("id"));
+      result.put("name", tokenData.get("name"));
+      result.put("lastUsed", toEpochMillis(tokenData.get("lastUsedAt")));
+      result.put("createdOn", toEpochMillis(tokenData.get("createdOn")));
+      LocalDateTime expiresAt = LocalDateTime.parse(tokenData.get("expiresAt").toString());
+      result.put("expires", toEpochMillis(expiresAt));
+      result.put("isActive", expiresAt.isAfter(LocalDateTime.now()));
+      result.put(
+          "remainingDays",
+          expiresAt.isAfter(LocalDateTime.now())
+              ? ChronoUnit.DAYS.between(LocalDateTime.now(), expiresAt)
+              : 0);
+      data.add(result);
+    }
+
+    return data;
+  }
+
+  private Long toEpochMillis(Object expiresAt) {
+    if (expiresAt == null) {
+      return null;
+    }
+    return LocalDateTime.parse(expiresAt.toString()).toInstant(ZoneOffset.UTC).toEpochMilli();
   }
 }

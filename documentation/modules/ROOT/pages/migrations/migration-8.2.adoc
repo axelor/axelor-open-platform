@@ -210,4 +210,7 @@ ALTER TABLE meta_view ADD json_model varchar(255);
 ALTER TABLE meta_view_custom ADD json_model varchar(255);
 
 ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+
+DELETE FROM meta_action WHERE name = 'action.view.show.active.tokens';
+DELETE FROM meta_view WHERE name = 'user-token-grid';
 ----

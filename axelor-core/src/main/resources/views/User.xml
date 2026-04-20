@@ -36,36 +36,51 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="forcePasswordChange"/>
-      <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" showIf="id" />
-      <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" if="__repo__(UserToken).isPermitted()"/>
     </panel>
-      <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
-        <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
-        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
-      </panel>
-      <panel-tabs>
+    <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
       <panel-related field="permissions" grid-view="simple-permission-grid" form-view="permission-form"/>
       <panel-related field="metaPermissions"/>
     </panel-tabs>
+    <panel sidebar="true">
+      <panel title="Password">
+        <label title="Change the password" colSpan="12"/>
+        <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" icon="password" colSpan="8" />
+      </panel>
+      <panel title="Two-factor authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Two-factor authentication (2FA) adds an extra layer of security." colSpan="12"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage 2FA" icon="person_shield" colSpan="8"/>
+      </panel>
+      <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
+        <label title="Generate access token for each application you use that needs access to the API." colSpan="12"/>
+        <button name="manageApiKeys" onClick="action-user-show-user-tokens" title="Manage API keys" icon="key" colSpan="8"/>
+      </panel>
+    </panel>
   </form>
 
   <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User" onSave="action-method-user-save">
     <panel title="User preferences" itemSpan="12">
-      <field name="image" showTitle="false" />
-      <field name="email" widget="Email"/>
-      <field name="language"/>
+      <panel colSpan="3" itemSpan="12">
+        <field name="image" showTitle="false"/>
+      </panel>
+      <panel colSpan="9" itemSpan="12">
+        <field name="email" widget="Email"/>
+        <field name="language"/>
+      </panel>
       <field name="theme" widget="theme-select"/>
       <field name="singleTab" widget="inline-checkbox"/>
       <field name="noHelp" widget="inline-checkbox" />
-      <panel if="__repo__(UserToken).isPermitted()">
-        <field name="$manageUserTokens" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
-        <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageUserTokens"/>
+      <panel title="Password">
+        <label title="Change the password" colSpan="7"/>
+        <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" icon="password" colSpan="5" />
       </panel>
-      <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" showIf="id" />
-      <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
-        <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
-        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
+      <panel title="Two-factor authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Two-factor authentication (2FA) adds an extra layer of security." colSpan="7"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage 2FA" icon="person_shield" colSpan="5"/>
+      </panel>
+      <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
+        <label title="Generate access token for each application you use that needs access to the API." colSpan="7"/>
+        <button name="manageApiKeys" onClick="action-user-show-user-tokens" title="Manage API keys" icon="key" colSpan="5"/>
       </panel>
       <panel title="Devices">
         <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." colSpan="7"/>
@@ -139,15 +154,6 @@
     <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
   </action-condition>
 
-  <action-view name="action.view.show.active.tokens" title="API keys" model="com.axelor.auth.db.UserToken">
-    <view type="grid" name="user-token-grid" />
-    <view type="form" name="user-token-form" />
-    <view-param name="popup" value="true"/>
-    <view-param name="popup-save" value="false"/>
-    <domain>self.owner = :userId</domain>
-    <context name="userId" expr="eval: id" />
-  </action-view>
-
   <action-method name="action-method-user-save">
     <call class="com.axelor.auth.web.UserController" method="onSave"/>
   </action-method>
@@ -167,6 +173,14 @@
   <action-method name="action-method-user-change-password">
     <call class="com.axelor.auth.web.UserController" method="changePassword"/>
   </action-method>
+
+  <action-view name="action-user-show-user-tokens" title="API Keys" model="com.axelor.auth.db.User">
+    <view type="form" name="user-token-user-form" />
+    <view-param name="popup" value="true" />
+    <view-param name="popup-save" value="false" />
+    <view-param name="show-toolbar" value="false" />
+    <context name="_showRecord" expr="eval: id" />
+  </action-view>
 
   <action-view name="action-user-show-active-sessions" title="Active sessions" model="com.axelor.auth.db.User">
     <view type="form" name="user-session-form" />
