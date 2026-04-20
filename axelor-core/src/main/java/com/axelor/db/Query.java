@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -748,43 +749,113 @@ public class Query<T extends Model> {
    */
   public class Selector {
 
-    private List<String> names = Lists.newArrayList("id", "version");
+    /**
+     * Descriptor for one selected column, aligned 1:1 with {@code selects}.
+     */
+    private final class Entry {
+      private final String name;
+      private final String parent;
+      private final String key;
+
+      /**
+       * @param name map key for a flat field (e.g. {@code "firstName"}, {@code "title.code"})
+       * @param parent m2o reference name to group scalars under (e.g. {@code "title"});
+       * {@code null} for flat fields
+       * @param key key inside the compact parent map for m2o scalars ({@code "id"},
+       * {@code "$version"} or the nameField)
+       */
+      public Entry(String name, String parent, String key) {
+        this.name = name;
+        this.parent = parent;
+        this.key = key;
+      }
+
+      public Entry(String name) {
+        this.name = name;
+        this.parent = null;
+        int dot = name.lastIndexOf('.');
+        this.key = dot < 0 ? name : name.substring(dot + 1);
+      }
+
+      public String name() {
+        return name;
+      }
+
+      public String parent() {
+        return parent;
+      }
+
+      public String key() {
+        return key;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Entry entry = (Entry) o;
+        return Objects.equals(name, entry.name) &&
+                Objects.equals(parent, entry.parent) &&
+                Objects.equals(key, entry.key);
+      }
+
+      @Override
+      public int hashCode() {
+        return Objects.hash(name, parent, key);
+      }
+
+      @Override
+      public String toString() {
+        return "Entry[" +
+                "name='" + name + '\'' +
+                ", parent='" + parent + '\'' +
+                ", key='" + key + '\'' +
+                ']';
+      }
+    }
+
+    private List<Entry> names = Lists.newArrayList();
     private List<String> collections = Lists.newArrayList();
     private String query;
     private Mapper mapper = Mapper.of(beanClass);
 
     private Selector(String... names) {
       List<String> selects = Lists.newArrayList();
-      selects.add("self.id");
-      selects.add("self.version");
+      addSelect(selects, "self.id", new Entry("id"));
+      addSelect(selects, "self.version", new Entry("version"));
       for (String name : names) {
         Property property = getProperty(name);
         if (property != null
             && property.getType() != PropertyType.BINARY
             && !property.isTransient()
             && !hasTransientParent(name)) {
-          String alias = joinHelper.joinName(name);
-          if (alias != null) {
-            selects.add(alias);
-            this.names.add(name);
-          } else {
-            collections.add(name);
-          }
-          // select id,version,name field for m2o
+          // select id, version, nameField only for m2o — avoid fetching the full entity
           if (property.isReference() && property.getTargetName() != null) {
-            this.names.add(name + ".id");
-            this.names.add(name + ".version");
-            this.names.add(name + "." + property.getTargetName());
-            selects.add(joinHelper.joinName(name + ".id"));
-            selects.add(joinHelper.joinName(name + ".version"));
-            selects.add(joinHelper.joinName(name + "." + property.getTargetName()));
+            String nameField = property.getTargetName();
+            addSelect(
+                selects, joinHelper.joinName(name + ".id"), new Entry(name + ".id", name, "id"));
+            addSelect(
+                selects,
+                joinHelper.joinName(name + ".version"),
+                new Entry(name + ".version", name, "$version"));
+            addSelect(
+                selects,
+                joinHelper.joinName(name + "." + nameField),
+                new Entry(name + "." + nameField, name, nameField));
+          } else {
+            String alias = joinHelper.joinName(name);
+            if (alias != null) {
+              addSelect(selects, alias, new Entry(name));
+            } else {
+              collections.add(name);
+            }
           }
         } else if (name.indexOf('.') > -1) {
           final JsonFunction func = JsonFunction.fromPath(name);
           final Property json = mapper.getProperty(func.getField());
           if (json != null && json.isJson()) {
-            this.names.add(func.getField() + "." + func.getAttribute());
-            selects.add(func.toString());
+            addSelect(
+                selects, func.toString(), new Entry(func.getField() + "." + func.getAttribute()));
           }
         }
       }
@@ -803,6 +874,14 @@ public class Query<T extends Model> {
       if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
       sb.append(orderBy);
       query = joinHelper.fixSelect(sb.toString());
+    }
+
+    private void addSelect(List<String> selects, String select, Entry entry) {
+      if (names.contains(entry)) {
+        return;
+      }
+      selects.add(select);
+      this.names.add(entry);
     }
 
     private boolean hasTransientParent(String fieldName) {
@@ -862,17 +941,30 @@ public class Query<T extends Model> {
       for (List items : data) {
         Map<String, Object> map = Maps.newHashMap();
         for (int i = 0; i < names.size(); i++) {
+          Entry entry = names.get(i);
           Object value = items.get(i);
-          String name = names.get(i);
-          Property property = getProperty(name);
-          // in case of m2o, get the id,version,name tuple
-          if (property != null && property.isReference() && property.getTargetName() != null) {
-            value = getReferenceValue(items, i);
-            i += 3;
-          } else if (value instanceof Model) {
+          if (value instanceof Model) {
             value = Resource.toMapCompact(value);
           }
-          map.put(name, value);
+          if (entry.parent() == null) {
+            map.put(entry.name(), value);
+            continue;
+          }
+          // m2o scalar — first row to arrive creates the compact map (or sets null if the
+          // reference itself is null); subsequent rows fill it in
+          Map<String, Object> compact;
+          if (map.containsKey(entry.parent())) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> existing = (Map<String, Object>) map.get(entry.parent());
+            compact = existing;
+          } else {
+            compact = value == null ? null : new HashMap<>();
+            map.put(entry.parent(), compact);
+          }
+          if (compact == null) {
+            continue;
+          }
+          compact.put(entry.key(), value);
         }
         if (collections.size() > 0) {
           map.putAll(this.fetchCollections(items.get(0)));
@@ -881,21 +973,6 @@ public class Query<T extends Model> {
       }
 
       return result;
-    }
-
-    private Object getReferenceValue(List<?> items, int at) {
-      if (items.get(at) == null && items.get(at + 1) == null) {
-        return null;
-      }
-      Map<String, Object> value = Maps.newHashMap();
-      String name = names.get(at);
-      String nameField = names.get(at + 3).replace(name + ".", "");
-
-      value.put("id", items.get(at + 1));
-      value.put("$version", items.get(at + 2));
-      value.put(nameField, items.get(at + 3));
-
-      return value;
     }
 
     @SuppressWarnings("all")
