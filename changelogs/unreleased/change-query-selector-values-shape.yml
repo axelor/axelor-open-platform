@@ -1,0 +1,26 @@
+---
+title: Change Query Selector values() row shape for many-to-one fields
+type: change
+description: |
+  As a side-effect of dropping the redundant full-entity fetch for many-to-one fields in `Selector`, the raw row shape
+  returned by `Selector.values(int, int)` has changed for any `select()` that includes an m2o field.
+
+  Before, a single slot in each row held the fully materialized referenced entity (e.g. a `Title` instance), followed
+  by three scalar slots for `id`, `version` and the name field. Now, only the three scalars are emitted — the full-entity
+  slot is gone.
+
+  For example, with `select("firstName", "title", "title.code")` the row layout is now:
+
+  ```
+  [ id, version, firstName, title.id, title.version, title.name, title.code ]
+  ```
+
+  whereas previously it was:
+
+  ```
+  [ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+  ```
+
+  Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read
+  the three scalars instead. Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is
+  unchanged ({`id`, `$version`, `nameField`} compact map under the reference key).

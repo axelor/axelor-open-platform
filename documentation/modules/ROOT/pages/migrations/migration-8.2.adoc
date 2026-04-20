@@ -198,6 +198,35 @@ In addition, non-admin users are now blocked from modifying a set of restricted 
 CRUD endpoint: `code`, `group`, `blocked`, `activateOn`, `expiresOn`, `password`, `passwordUpdatedOn`, `roles`,
 `permissions`, `metaPermissions`. The `password` field is blocked from mass-updates for every user, including admins.
 
+== Query Selector `values()` row shape changed for many-to-one fields
+
+`Query.Selector` no longer fetches the full referenced entity for many-to-one fields included in a `select()`. Only the
+`id`, `version` and name-field scalars are now queried, avoiding a needless full-entity load at the database level.
+
+As a consequence, the raw row shape returned by `Selector.values(int, int)` has changed for any `select()` that
+includes a many-to-one field. Where a single slot used to hold the fully materialized referenced entity (e.g. a `Title`
+instance), three scalar slots for `id`, `version` and the name field now appear in its place.
+
+For example, with `select("firstName", "title", "title.code")` the row layout is now:
+
+[source]
+----
+[ id, version, firstName, title.id, title.version, title.name, title.code ]
+----
+
+whereas previously it was:
+
+[source]
+----
+[ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+----
+
+Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read the
+three scalars instead.
+
+NOTE: Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is unchanged, with the
+reference key still carrying the same `{id, $version, <nameField>}` compact map as before.
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :
