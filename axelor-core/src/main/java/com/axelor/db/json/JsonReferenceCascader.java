@@ -106,10 +106,6 @@ public class JsonReferenceCascader {
     }
   }
 
-  public static void clearCache(String modelKey) {
-    JsonReferenceResolver.clearCache(modelKey);
-  }
-
   public void beforeRemove(Model entity) {
     if (entity == null || !hasJsonField(entity)) return;
 

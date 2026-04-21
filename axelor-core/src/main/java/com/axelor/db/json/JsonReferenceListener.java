@@ -8,26 +8,63 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.MetaJsonModel;
 import java.util.Objects;
+import java.util.Optional;
 import org.hibernate.event.spi.PostCommitUpdateEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PreDeleteEvent;
+import org.hibernate.event.spi.PreDeleteEventListener;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
 public class JsonReferenceListener
-    implements PreUpdateEventListener, PostCommitUpdateEventListener {
-  private static final long serialVersionUID = 1L;
+    implements PreInsertEventListener,
+        PreUpdateEventListener,
+        PreDeleteEventListener,
+        PostCommitUpdateEventListener {
 
   private JsonReferenceCascader jsonReferenceCascader;
 
   @Override
+  public boolean onPreInsert(PreInsertEvent event) {
+    invalidateCaches(event.getEntity());
+    return false;
+  }
+
+  @Override
   public boolean onPreUpdate(PreUpdateEvent event) {
+    invalidateCaches(event.getEntity());
     if (event.getEntity() instanceof Model model) {
       captureJsonOldState(model, event);
     }
-
     return false;
+  }
+
+  @Override
+  public boolean onPreDelete(PreDeleteEvent event) {
+    invalidateCaches(event.getEntity());
+    return false;
+  }
+
+  private void invalidateCaches(Object entity) {
+    if (entity instanceof MetaJsonField field) {
+      JsonReferenceResolver.clearCache(
+          Optional.ofNullable(field.getJsonModel())
+              .map(MetaJsonModel::getName)
+              .orElse(field.getModel()));
+      JsonReferenceUpdater.clearCache(
+          Optional.ofNullable(field.getTargetJsonModel())
+              .map(MetaJsonModel::getName)
+              .orElse(field.getTargetModel()));
+    } else if (entity instanceof MetaJsonModel model) {
+      JsonReferenceResolver.clearCache(model.getName());
+      JsonReferenceUpdater.clearCache(model.getName());
+    }
   }
 
   private void captureJsonOldState(Model model, PreUpdateEvent event) {
