@@ -149,6 +149,7 @@ public class UserTokenService {
         Query.of(UserToken.class)
             .filter("self.owner.id = :userId")
             .bind("userId", user.getId())
+            .order("id")
             .select("lastUsedAt", "expiresAt", "name", "createdOn")
             .fetch(0, 0);
     if (tokensData == null || tokensData.isEmpty()) {

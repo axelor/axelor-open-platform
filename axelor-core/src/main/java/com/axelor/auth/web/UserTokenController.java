@@ -9,8 +9,10 @@ import com.axelor.auth.UserTokenService;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.UserToken;
 import com.axelor.auth.db.repo.UserTokenRepository;
+import com.axelor.auth.identity.IdentityVerificationService;
 import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -22,7 +24,29 @@ public class UserTokenController {
   @Inject UserTokenService userTokenService;
   @Inject UserTokenRepository userTokenRepository;
 
+  public void openUserTokens(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
+    User user = request.getContext().asType(User.class);
+    if (isNotAuthorized(user)) {
+      return;
+    }
+
+    response.setView(
+        ActionView.define(I18n.get("API Keys"))
+            .model(User.class.getName())
+            .add("form", "user-token-user-form")
+            .param("popup", "true")
+            .param("popup-save", "false")
+            .param("show-toolbar", "false")
+            .param("forceEdit", "true")
+            .context("_showRecord", user.getId())
+            .map());
+  }
+
   public void loadUserTokens(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     Long userId = (Long) request.getContext().get("id");
 
     if (userId == null || userId <= 0) {
@@ -36,6 +60,8 @@ public class UserTokenController {
   }
 
   public void createToken(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     try {
       UserToken userToken = request.getContext().asType(UserToken.class);
       User owner =
@@ -72,6 +98,8 @@ public class UserTokenController {
   }
 
   public void revokeToken(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     try {
       Long userTokenId = Long.valueOf(request.getContext().get("_userTokenId").toString());
       UserToken userToken = userTokenRepository.find(userTokenId);
@@ -92,6 +120,8 @@ public class UserTokenController {
   }
 
   public void rotateToken(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     try {
       Long userTokenId = Long.valueOf(request.getContext().get("_userTokenId").toString());
       UserToken userToken = userTokenRepository.find(userTokenId);
@@ -137,5 +167,16 @@ public class UserTokenController {
   private boolean isInvalidExpirationDate(UserToken userToken) {
     return userToken.getExpiresAt() == null
         || userToken.getExpiresAt().isBefore(LocalDateTime.now());
+  }
+
+  private boolean requiresIdentityCheck(ActionRequest request, ActionResponse response) {
+    var identityVerificationService = Beans.get(IdentityVerificationService.class);
+
+    if (identityVerificationService.requiresIdentityCheck()) {
+      response.setRequestIdentityCheck(request.getAction());
+      return true;
+    }
+
+    return false;
   }
 }

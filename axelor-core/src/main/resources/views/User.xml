@@ -53,7 +53,7 @@
       </panel>
       <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
         <label title="Generate access token for each application you use that needs access to the API." colSpan="12"/>
-        <button name="manageApiKeys" onClick="action-user-show-user-tokens" title="Manage API keys" icon="key" colSpan="8"/>
+        <button name="manageApiKeys" onClick="action-method-show-user-tokens" title="Manage API keys" icon="key" colSpan="8"/>
       </panel>
     </panel>
   </form>
@@ -80,7 +80,7 @@
       </panel>
       <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
         <label title="Generate access token for each application you use that needs access to the API." colSpan="7"/>
-        <button name="manageApiKeys" onClick="action-user-show-user-tokens" title="Manage API keys" icon="key" colSpan="5"/>
+        <button name="manageApiKeys" onClick="action-method-show-user-tokens" title="Manage API keys" icon="key" colSpan="5"/>
       </panel>
       <panel title="Devices">
         <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." colSpan="7"/>
@@ -174,13 +174,9 @@
     <call class="com.axelor.auth.web.UserController" method="changePassword"/>
   </action-method>
 
-  <action-view name="action-user-show-user-tokens" title="API Keys" model="com.axelor.auth.db.User">
-    <view type="form" name="user-token-user-form" />
-    <view-param name="popup" value="true" />
-    <view-param name="popup-save" value="false" />
-    <view-param name="show-toolbar" value="false" />
-    <context name="_showRecord" expr="eval: id" />
-  </action-view>
+  <action-method name="action-method-show-user-tokens">
+    <call class="com.axelor.auth.web.UserTokenController" method="openUserTokens"/>
+  </action-method>
 
   <action-view name="action-user-show-active-sessions" title="Active sessions" model="com.axelor.auth.db.User">
     <view type="form" name="user-session-form" />
