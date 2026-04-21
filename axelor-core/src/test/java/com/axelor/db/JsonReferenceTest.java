@@ -225,6 +225,11 @@ public class JsonReferenceTest extends JpaTest {
     contacts.save(contact);
 
     var refreshed = jsonRecords.find(parent.getId());
+
+    // JsonReferenceUpdater#executeUpdate() bypasses the persistence context
+    // call em.refresh(entity) after this to avoid stale L1 cache after bulk update
+    JPA.em().refresh(refreshed);
+
     var attrs = parseAttrs(refreshed);
     var contactRef = asMap(attrs.get("contact"));
     assertEquals(contacts.find(contact.getId()).getFullName(), contactRef.get("fullName"));
