@@ -266,8 +266,11 @@ public class MFAController {
   }
 
   public void showRelatedMfa(ActionRequest request, ActionResponse response) {
+    if (requiresIdentityCheck(request, response)) return;
+
     User user = request.getContext().asType(User.class);
     user = userRepository.find(user.getId());
+    checkAuthorized(user);
     MFA mfa = mfaService.getRelatedMfa(user);
 
     response.setView(
@@ -303,7 +306,10 @@ public class MFAController {
   }
 
   private void checkAuthorized(MFA mfa) {
-    var owner = mfa.getOwner();
+    checkAuthorized(mfa.getOwner());
+  }
+
+  private void checkAuthorized(User owner) {
     var user = AuthUtils.getUser();
 
     if (user == null || owner == null || (!user.equals(owner) && !AuthUtils.isAdmin(user))) {
