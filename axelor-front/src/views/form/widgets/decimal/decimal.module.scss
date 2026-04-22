@@ -14,11 +14,16 @@
   overflow: hidden;
 }
 
-$input-padding-x: 0.75rem;
+$input-padding-x: 0.35rem;
+$buttons-width: 1.5rem;
 
 .numberInput {
-  padding-right: $input-padding-x * 2;
   background-image: none !important;
+
+  &.inGridEditor {
+    padding-right: calc(#{$input-padding-x} + #{$buttons-width}) !important;
+    text-align: right;
+  }
 }
 
 .numberInput::-webkit-inner-spin-button,
@@ -33,8 +38,10 @@ $input-padding-x: 0.75rem;
 
 [dir="rtl"] {
   .numberInput {
-    padding-right: $input-padding-x;
-    padding-left: $input-padding-x * 2;
+    &.inGridEditor {
+      padding-right: $input-padding-x !important;
+      padding-left: calc(#{$input-padding-x} + #{$buttons-width}) !important;
+    }
   }
   .buttons {
     left: 0;
@@ -49,7 +56,7 @@ $input-padding-x: 0.75rem;
   align-items: center;
   height: 40%;
   visibility: hidden;
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(0, 0, 0, 0.01);
   opacity: 0.9;
   overflow: hidden;
 
@@ -71,6 +78,10 @@ $input-padding-x: 0.75rem;
     background-color: rgba(0, 0, 0, 0.08);
     opacity: 1;
   }
+}
+
+.buttons.inGridEditor > span {
+  visibility: visible;
 }
 
 [dir="rtl"] {

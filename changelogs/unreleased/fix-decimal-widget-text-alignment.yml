@@ -1,0 +1,6 @@
+---
+title: Set number input text alignment to right in editable grid
+type: feature
+description: |
+  Number values are now right-aligned in editable grid cells. Increment/decrement controls, which remain always visible 
+  in editable grid cells while normal form fields keep their existing hover behavior.

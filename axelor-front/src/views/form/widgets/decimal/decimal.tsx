@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useId, useMemo, useRef } from "react";
 
-import { Input } from "@axelor/ui";
+import { clsx, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field } from "@/services/client/meta.types";
@@ -30,6 +30,7 @@ export function Decimal(props: FieldProps<string | number>) {
   const { step: stepAttrs } = widgetAttrs;
 
   const id = useId();
+  const inGridEditor = Boolean(schema.inGridEditor);
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
@@ -217,7 +218,9 @@ export function Decimal(props: FieldProps<string | number>) {
             key={focus ? "focused" : "normal"}
             data-input
             data-testid="input"
-            className={styles.numberInput}
+            className={clsx(styles.numberInput, {
+              [styles.inGridEditor]: inGridEditor,
+            })}
             autoFocus={focus}
             type="number"
             min={min}
@@ -233,7 +236,11 @@ export function Decimal(props: FieldProps<string | number>) {
             onBlur={onBlur}
             onKeyDown={handleKeyDown}
           />
-          <div className={styles.buttons}>
+          <div
+            className={clsx(styles.buttons, {
+              [styles.inGridEditor]: inGridEditor,
+            })}
+          >
             <span
               onTouchStart={handleUp}
               onTouchEnd={clearTimer}
