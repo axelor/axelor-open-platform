@@ -824,11 +824,8 @@ public class Query<T extends Model> {
       addSelect(selects, "self.id", new Entry("id"));
       addSelect(selects, "self.version", new Entry("version"));
       for (String name : names) {
-        Property property = getProperty(name);
-        if (property != null
-            && property.getType() != PropertyType.BINARY
-            && !property.isTransient()
-            && !hasTransientParent(name)) {
+        if (isValidProperty(name)) {
+          Property property = getProperty(name);
           // select id, version, nameField only for m2o — avoid fetching the full entity
           if (property.isReference() && property.getTargetName() != null) {
             String nameField = property.getTargetName();
@@ -876,26 +873,36 @@ public class Query<T extends Model> {
       query = joinHelper.fixSelect(sb.toString());
     }
 
+    private boolean isValidProperty(String fieldName) {
+      // leaf must resolve, not be binary or transient, and not be a collection on a dotted path
+      final Property leaf = getProperty(fieldName);
+      if (leaf == null
+          || leaf.isTransient()
+          || leaf.getType() == PropertyType.BINARY
+          || (fieldName.contains(".") && leaf.isCollection())) {
+        return false;
+      }
+
+      // for dotted paths, no parent may be transient, binary or a collection
+      final List<String> parts = Splitter.on('.').splitToList(fieldName);
+      for (int i = 1; i < parts.size(); ++i) {
+        final Property parent = getProperty(Joiner.on('.').join(parts.subList(0, i)));
+        if (parent == null
+            || parent.isTransient()
+            || parent.getType() == PropertyType.BINARY
+            || parent.isCollection()) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     private void addSelect(List<String> selects, String select, Entry entry) {
       if (names.contains(entry)) {
         return;
       }
       selects.add(select);
       this.names.add(entry);
-    }
-
-    private boolean hasTransientParent(String fieldName) {
-      final List<String> fieldNameParts = Splitter.on('.').splitToList(fieldName);
-
-      for (int i = 1; i < fieldNameParts.size(); ++i) {
-        final String name = Joiner.on('.').join(fieldNameParts.subList(0, i));
-        final Property property = getProperty(name);
-        if (property != null && property.isTransient()) {
-          return true;
-        }
-      }
-
-      return false;
     }
 
     private Property getProperty(String field) {

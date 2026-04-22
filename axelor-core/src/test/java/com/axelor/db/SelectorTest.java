@@ -15,6 +15,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.script.ScriptTest;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.Person;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
@@ -48,6 +49,15 @@ public class SelectorTest extends ScriptTest {
     contact.setAttrs(getCustomerAttrsJson());
     contact.setAnotherAttrs(getCustomerAnotherAttrsJson());
     JPA.save(contact);
+
+    if (JPA.all(Person.class).filter("self.code = :code").bind("code", "Code").fetchOne() == null) {
+      Person person = new Person();
+      person.setName("Name");
+      person.setCode("Code");
+      person.setContact(contact);
+      JPA.save(person);
+    }
+
   }
 
   @Test
@@ -312,5 +322,17 @@ public class SelectorTest extends ScriptTest {
     assertEquals("Some Name", row.get("attrs.nickName"));
     assertEquals("1", row.get("attrs.guardian.id"));
     assertEquals("Some Custom Name", row.get("anotherAttrs.nickName"));
+  }
+
+  @Test
+  void testSelectDottedCollectionPathIgnored() {
+    // "addresses" alone is a valid collection selection (resolved separately).
+    // "addresses.street" or "contact.addresses" walks through a collection in its path and must be dropped
+    String jpqlContact =
+        Query.of(Contact.class).select("addresses", "addresses.street").toString();
+    assertFalse(jpqlContact.contains("addresses"), "dotted collection path must not be selected");
+
+    String jpqlPerson = Query.of(Person.class).select("contact.addresses", "contact.addresses.street").toString();
+    assertFalse(jpqlPerson.contains("addresses"), "dotted collection path must not be selected");
   }
 }
