@@ -57,7 +57,6 @@ public class SelectorTest extends ScriptTest {
       person.setContact(contact);
       JPA.save(person);
     }
-
   }
 
   @Test
@@ -327,12 +326,13 @@ public class SelectorTest extends ScriptTest {
   @Test
   void testSelectDottedCollectionPathIgnored() {
     // "addresses" alone is a valid collection selection (resolved separately).
-    // "addresses.street" or "contact.addresses" walks through a collection in its path and must be dropped
-    String jpqlContact =
-        Query.of(Contact.class).select("addresses", "addresses.street").toString();
+    // "addresses.street" or "contact.addresses" walks through a collection in its path and must be
+    // dropped
+    String jpqlContact = Query.of(Contact.class).select("addresses", "addresses.street").toString();
     assertFalse(jpqlContact.contains("addresses"), "dotted collection path must not be selected");
 
-    String jpqlPerson = Query.of(Person.class).select("contact.addresses", "contact.addresses.street").toString();
+    String jpqlPerson =
+        Query.of(Person.class).select("contact.addresses", "contact.addresses.street").toString();
     assertFalse(jpqlPerson.contains("addresses"), "dotted collection path must not be selected");
   }
 }
