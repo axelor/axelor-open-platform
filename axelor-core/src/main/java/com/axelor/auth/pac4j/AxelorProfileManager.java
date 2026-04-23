@@ -7,7 +7,7 @@ package com.axelor.auth.pac4j;
 import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
-import com.axelor.auth.db.MFA;
+import com.axelor.auth.MFASummaryDTO;
 import com.axelor.auth.db.MFAMethod;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.MFARepository;
@@ -98,9 +98,8 @@ public class AxelorProfileManager extends ShiroProfileManager {
       return true;
     }
 
-    MFA mfa = Beans.get(MFARepository.class).findByOwner(user);
-
-    if (mfa == null || !Boolean.TRUE.equals(mfa.getEnabled())) {
+    MFASummaryDTO mfa = Beans.get(MFARepository.class).findSummaryByOwner(user);
+    if (mfa == null || !Boolean.TRUE.equals(mfa.enabled())) {
       return true;
     }
 

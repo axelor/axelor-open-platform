@@ -6,7 +6,6 @@ package com.axelor.auth.identity;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
-import com.axelor.auth.db.MFA;
 import com.axelor.auth.db.MFAMethod;
 import com.axelor.auth.db.User;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
@@ -55,8 +54,7 @@ public class IdentityVerificationService {
       throw new IllegalStateException(I18n.get("No authenticated user"));
     }
 
-    MFA mfa = mfaService.getRelatedMfa(user, false);
-    List<MFAMethod> mfaMethods = mfaService.getMethods(mfa);
+    List<MFAMethod> mfaMethods = mfaService.getMethods(user);
     boolean requiresPassword = StringUtils.notEmpty(user.getPassword()) || isLdapConfigured();
     boolean requiresMfa = ObjectUtils.notEmpty(mfaMethods) && !requiresPassword;
 

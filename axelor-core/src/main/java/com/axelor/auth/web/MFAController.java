@@ -6,6 +6,7 @@ package com.axelor.auth.web;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
+import com.axelor.auth.MFASummaryDTO;
 import com.axelor.auth.MFATooManyRequestsException;
 import com.axelor.auth.db.MFA;
 import com.axelor.auth.db.MFAMethod;
@@ -110,9 +111,16 @@ public class MFAController {
   public void configureTOTP(ActionRequest request, ActionResponse response) {
     if (requiresIdentityCheck(request, response)) return;
 
-    MFA mfa = request.getContext().asType(MFA.class);
-    mfa = mfaRepository.find(mfa.getId());
-    checkAuthorized(mfa);
+    Object id = request.getContext().get("id");
+    if (id == null) {
+      return;
+    }
+
+    MFASummaryDTO mfaSummaryDTO = mfaRepository.findSummaryById(Long.valueOf(id.toString()));
+    if (mfaSummaryDTO == null) {
+      return;
+    }
+    checkAuthorized(mfaSummaryDTO.owner());
 
     response.setView(
         ActionView.define("TOTP authentication configuration")
@@ -123,7 +131,7 @@ public class MFAController {
             .param("show-confirm", "false")
             .param("popup-save", "false")
             .param("forceEdit", "true")
-            .context("_showRecord", mfa.getId())
+            .context("_showRecord", mfaSummaryDTO.id())
             .map());
   }
 

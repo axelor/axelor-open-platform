@@ -110,26 +110,26 @@ public class MFAService {
   }
 
   public List<MFAMethod> getMethods(User user) {
-    return getMethods(getRelatedMfa(user));
+    return getMethods(mfaRepository.findSummaryByOwner(user));
   }
 
-  public List<MFAMethod> getMethods(MFA mfa) {
+  public List<MFAMethod> getMethods(MFASummaryDTO mfaDTO) {
     List<MFAMethod> methods = new ArrayList<>();
 
-    if (mfa == null) {
+    if (mfaDTO == null) {
       return methods;
     }
 
-    if (Boolean.TRUE.equals(mfa.getIsTotpValidated())) {
+    if (Boolean.TRUE.equals(mfaDTO.isTotpValidated())) {
       methods.add(MFAMethod.TOTP);
     }
 
-    if (Boolean.TRUE.equals(mfa.getIsEmailValidated())) {
+    if (Boolean.TRUE.equals(mfaDTO.isEmailValidated())) {
       methods.add(MFAMethod.EMAIL);
     }
 
     // Move default to first position
-    MFAMethod defaultMethod = mfa.getDefaultMethod();
+    MFAMethod defaultMethod = mfaDTO.defaultMethod();
     if (defaultMethod != null && methods.remove(defaultMethod)) {
       methods.add(0, defaultMethod);
     }
@@ -179,7 +179,7 @@ public class MFAService {
 
   private void updatedDefaultMethod(MFA mfa) {
     mfa.setDefaultMethod(null);
-    var methods = getMethods(mfa);
+    var methods = getMethods(MFASummaryDTO.from(mfa));
 
     if (methods.isEmpty()) {
       disableMFA(mfa);
@@ -491,12 +491,7 @@ public class MFAService {
 
   @Transactional
   public @Nullable MFA getRelatedMfa(User user, boolean create) {
-    MFA mfa =
-        mfaRepository
-            .all()
-            .filter("self.owner.id = :userId")
-            .bind("userId", user.getId())
-            .fetchOne();
+    MFA mfa = mfaRepository.findByOwner(user);
 
     if (mfa == null && create) {
       mfa = new MFA();
