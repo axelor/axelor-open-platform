@@ -13,7 +13,9 @@ import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.MFA;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.UserToken;
 import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -259,6 +261,12 @@ public class Resource<T extends Model> {
 
   public Response perms(Long id) {
     Set<JpaSecurity.AccessType> perms = security.get().getAccessTypes(model, id);
+    try {
+      checkSpecialModel(model, new Long[] {id}, AccessType.READ);
+    } catch (UnauthorizedException e) {
+      perms = new HashSet<>();
+    }
+
     Response response = new Response();
 
     response.setData(perms);
@@ -279,6 +287,7 @@ public class Resource<T extends Model> {
 
     try {
       sec.check(type, model, ids);
+      checkSpecialModel(model, ids, AccessType.READ);
       response.setStatus(Response.STATUS_SUCCESS);
     } catch (Exception e) {
       response.addError(perm, e.getMessage());
@@ -447,6 +456,14 @@ public class Resource<T extends Model> {
       }
     } else {
       security.get().check(JpaSecurity.CAN_READ, model);
+    }
+
+    User currentUser = AuthUtils.getUser();
+    if ((MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model))
+        && currentUser != null
+        && !AuthUtils.isAdmin(currentUser)) {
+      Filter specialModelFilters = new JPQLFilter("self.owner.id = ?", currentUser.getId());
+      filter = filter == null ? specialModelFilters : Filter.and(filter, specialModelFilters);
     }
 
     if (LOG.isTraceEnabled()) {
@@ -620,6 +637,11 @@ public class Resource<T extends Model> {
   public Response export(Request request, Charset charset, Locale locale, char separator) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
+
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.EXPORT, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("Exporting '{}' with {}", model.getName(), request.getData());
@@ -1000,6 +1022,9 @@ public class Resource<T extends Model> {
 
     final Repository<?> repository = JpaRepository.of(model);
     final Model entity = repository.find(id);
+
+    checkSpecialAllow(entity, AccessType.READ);
+
     if (entity != null) {
       data.add(repository.populate(toMap(entity, request), request.getContext()));
     }
@@ -1025,6 +1050,8 @@ public class Resource<T extends Model> {
     if (entity == null) {
       throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
     }
+
+    checkSpecialAllow(entity, AccessType.READ);
 
     final List<Object> data = new ArrayList<>();
 
@@ -1265,6 +1292,11 @@ public class Resource<T extends Model> {
     final Response response = new Response();
     final Repository repository = JpaRepository.of(model);
 
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
+
     final List<Object> records;
 
     if (ObjectUtils.isEmpty(request.getRecords())) {
@@ -1382,6 +1414,14 @@ public class Resource<T extends Model> {
   private void checkRelationalPermissions(
       Map<String, Object> recordMap, Class<? extends Model> target) {
     final Long valueId = findId(recordMap);
+    AccessType accessType =
+        valueId == null || valueId <= 0L ? JpaSecurity.CAN_READ : JpaSecurity.CAN_WRITE;
+
+    if (MFA.class.isAssignableFrom(target) || UserToken.class.isAssignableFrom(target)) {
+      final AuthSecurityException cause = new AuthSecurityException(accessType, target);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
+
     if (valueId == null || valueId <= 0L) {
       getSecurityWarner().check(JpaSecurity.CAN_CREATE, target);
     } else if (recordMap.containsKey("version")) {
@@ -1428,6 +1468,11 @@ public class Resource<T extends Model> {
       handleUserMassUpdate(values);
     }
 
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
+
     final int total = JPA.callInTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
@@ -1444,6 +1489,7 @@ public class Resource<T extends Model> {
   public Response remove(long id, Request request) {
 
     security.get().check(JpaSecurity.CAN_REMOVE, model, id);
+    checkSpecialModel(model, new Long[] {id}, AccessType.REMOVE);
     final Response response = new Response();
     final Repository repository = JpaRepository.of(model);
     final Map<String, Object> data = new HashMap<>();
@@ -1509,6 +1555,9 @@ public class Resource<T extends Model> {
             if (bean == null || (version != null && !Objects.equals(version, bean.getVersion()))) {
               throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
             }
+
+            checkSpecialAllow(bean, JpaSecurity.CAN_REMOVE);
+
             entities.add(bean);
           }
 
@@ -1545,6 +1594,11 @@ public class Resource<T extends Model> {
   @SuppressWarnings("all")
   public Response copy(long id) {
     security.get().check(JpaSecurity.CAN_CREATE, model, id);
+
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
 
     final Request request = newRequest(null, id);
     final Response response = new Response();
@@ -1609,6 +1663,11 @@ public class Resource<T extends Model> {
    * @return response with the updated values with record name
    */
   public Response getRecordName(Request request) {
+
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      final AuthSecurityException cause = new AuthSecurityException(AccessType.READ, model);
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
 
     Response response = new Response();
 
@@ -1737,6 +1796,13 @@ public class Resource<T extends Model> {
         final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
         try {
           getSecurityWarner().check(JpaSecurity.CAN_READ, modelClass, modelValue.getId());
+
+          if (MFA.class.isAssignableFrom(modelClass)
+              || UserToken.class.isAssignableFrom(modelClass)) {
+            final AuthSecurityException cause =
+                new AuthSecurityException(AccessType.READ, modelClass);
+            throw new UnauthorizedException(cause.getMessage(), cause);
+          }
         } catch (UnauthorizedException e) {
           notPermitted.accept(name);
           permittedName = nameParts.subList(0, i + 1).stream().collect(Collectors.joining("."));
@@ -1909,5 +1975,50 @@ public class Resource<T extends Model> {
       }
     }
     return map;
+  }
+
+  private void checkSpecialModel(Class<T> modelToCheck, Long[] ids, AccessType accessType) {
+    if (!(MFA.class.isAssignableFrom(modelToCheck)
+        || UserToken.class.isAssignableFrom(modelToCheck))) {
+      return;
+    }
+    User currentUser = AuthUtils.getUser();
+    if (currentUser == null || AuthUtils.isAdmin(currentUser)) {
+      return;
+    }
+    if (ids == null || ids.length == 0) {
+      return;
+    }
+
+    Set<Long> idSet = new HashSet<>(Arrays.asList(ids));
+    Filter filter =
+        new JPQLFilter("self.owner.id = ? AND self.id IN (?)", currentUser.getId(), idSet);
+    if (filter.build(modelToCheck).count() == idSet.size()) {
+      return;
+    }
+
+    final AuthSecurityException cause = new AuthSecurityException(accessType, model);
+    throw new UnauthorizedException(cause.getMessage(), cause);
+  }
+
+  private void checkSpecialAllow(Model bean, AccessType accessType) {
+    if (!(bean instanceof MFA || bean instanceof UserToken)) {
+      return;
+    }
+
+    User currentUser = AuthUtils.getUser();
+    if (currentUser == null || AuthUtils.isAdmin(currentUser)) {
+      return;
+    }
+
+    User owner =
+        bean instanceof MFA
+            ? ((MFA) bean).getOwner()
+            : bean instanceof UserToken ? ((UserToken) bean).getOwner() : null;
+
+    if (owner == null || !currentUser.getId().equals(owner.getId())) {
+      final AuthSecurityException cause = new AuthSecurityException(accessType, bean.getClass());
+      throw new UnauthorizedException(cause.getMessage(), cause);
+    }
   }
 }
