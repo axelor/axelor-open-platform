@@ -198,6 +198,18 @@ In addition, non-admin users are now blocked from modifying a set of restricted 
 CRUD endpoint: `code`, `group`, `blocked`, `activateOn`, `expiresOn`, `password`, `passwordUpdatedOn`, `roles`,
 `permissions`, `metaPermissions`. The `password` field is blocked from mass-updates for every user, including admins.
 
+== MFA and users token records are now private
+
+Multi-factor authentication records (`MFA`) and personal API tokens (`UserToken`) hold sensitive authentication
+material. To prevent a user from reaching another user's secrets through generic data access — and to guard against
+misconfigured permission rules that could otherwise expose this data — these records are now treated as private:
+
+* Non-admin users can only see and manage their own records. Listings, form views, and related-field lookups no longer
+expose records belonging to other users.
+* Creation, update, duplication, export, and mass-update through the generic data layer are disabled for everyone,
+including administrators. These records are managed exclusively through the dedicated MFA and user-token screens and
+services.
+
 == Query Selector `values()` row shape changed for many-to-one fields
 
 `Query.Selector` no longer fetches the full referenced entity for many-to-one fields included in a `select()`. Only the
