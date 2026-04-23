@@ -264,13 +264,25 @@ public class MFAController {
   }
 
   public void changeDefaultMethodTOTP(ActionRequest request, ActionResponse response) {
-    response.setValue("defaultMethod", MFAMethod.TOTP);
+    changeDefaultMethod(request, response, MFAMethod.TOTP);
     response.setNotify(I18n.get("Authenticator app method has been selected as default."));
   }
 
   public void changeDefaultMethodEmail(ActionRequest request, ActionResponse response) {
-    response.setValue("defaultMethod", MFAMethod.EMAIL);
+    changeDefaultMethod(request, response, MFAMethod.EMAIL);
     response.setNotify(I18n.get("Email confirmation method has been selected as default."));
+  }
+
+  private void changeDefaultMethod(
+      ActionRequest request, ActionResponse response, MFAMethod method) {
+    if (requiresIdentityCheck(request, response)) return;
+
+    MFA mfa = request.getContext().asType(MFA.class);
+    mfa = mfaRepository.find(mfa.getId());
+    checkAuthorized(mfa);
+
+    mfaService.setDefaultMethod(mfa, method);
+    response.setValue("defaultMethod", method);
   }
 
   public void showRelatedMfa(ActionRequest request, ActionResponse response) {
@@ -286,6 +298,7 @@ public class MFAController {
             .model(MFA.class.getName())
             .add("form", "mfa-form")
             .param("popup", "reload")
+            .param("popup-save", "false")
             .param("show-toolbar", "false")
             .param("forceEdit", "true")
             .context("_showRecord", mfa.getId())

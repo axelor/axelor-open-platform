@@ -28,8 +28,8 @@
       </panel>
     </panel>
     <panel name="methodsPanel" title="Multi-factor authentication methods" colSpan="12" showIf="enabled">
-      <field name="defaultMethod" hidden="true" colSpan="12" />
-      <field name="isTotpValidated" showTitle="false">
+      <field name="defaultMethod" hidden="true" colSpan="12" x-dirty="false"/>
+      <field name="isTotpValidated" showTitle="false" x-dirty="false">
         <viewer><![CDATA[
             <>
               <Box d="flex" alignItems="center" justifyContent="center" p={2} mb={2} gap="4">
@@ -75,7 +75,7 @@
           ]]>
           </viewer>
       </field>
-      <field name="isEmailValidated" showTitle="false">
+      <field name="isEmailValidated" showTitle="false" x-dirty="false">
         <viewer><![CDATA[
             <>
               <Box d="flex" alignItems="center" justifyContent="center" p={2} mb={2} gap="4">
