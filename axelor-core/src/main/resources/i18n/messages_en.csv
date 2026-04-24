@@ -179,6 +179,7 @@
 "Created on",,,
 "Created on:",,,
 "Cron",,,
+"Cron expression is required.",,,
 "Current state",,,
 "Custom",,,
 "Custom Fields",,,

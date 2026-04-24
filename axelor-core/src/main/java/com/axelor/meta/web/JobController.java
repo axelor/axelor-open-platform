@@ -5,6 +5,7 @@
 package com.axelor.meta.web;
 
 import com.axelor.app.internal.AppFilter;
+import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.quartz.JobRunner;
@@ -26,9 +27,10 @@ public class JobController {
 
   public void validate(ActionRequest request, ActionResponse response) {
     String cronExpression = request.getContext().asType(MetaSchedule.class).getCron();
+    if (StringUtils.isBlank(cronExpression)) {
+      response.setError(I18n.get("Cron expression is required."));
+    }
     try {
-      CronExpression.validateExpression(cronExpression);
-
       response.setNotify(
           I18n.get("Valid cron. Next execution dates are:")
               + "<br/>"
@@ -80,6 +82,9 @@ public class JobController {
     Date date = new Date();
     for (int i = 0; i < 5; i++) {
       Date next = expression.getNextValidTimeAfter(date);
+      if (next == null) {
+        break;
+      }
       nextTriggerDates.add(next);
       date = next;
     }
