@@ -1,0 +1,6 @@
+---
+title: Improve related messages endpoint performance
+type: change
+description: |
+  The messages endpoint loaded the full related entity just to read its id and class. It now uses a
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.

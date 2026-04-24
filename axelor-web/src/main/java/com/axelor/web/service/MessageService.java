@@ -145,7 +145,7 @@ public class MessageService extends AbstractService {
       return res;
     }
 
-    Model related = JpaRepository.of(relatedClass.asSubclass(Model.class)).find(relatedId);
+    Model related = JPA.findReferenceById(relatedClass.asSubclass(Model.class), relatedId);
 
     if (related != null) {
       final List<Object> records = new ArrayList<>();
