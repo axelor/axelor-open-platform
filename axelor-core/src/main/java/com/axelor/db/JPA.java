@@ -169,6 +169,32 @@ public final class JPA {
   }
 
   /**
+   * Returns a lazy reference (proxy) to an entity if a row with the given id exists, or {@code
+   * null} otherwise.
+   *
+   * <p>Performs a cheap {@code SELECT COUNT(*)} hitting only the primary-key index, then returns
+   * {@link com.axelor.db.JPA#getReferenceById(Class, Long)}. Use this when callers only need {@link
+   * Model#getId()} / {@link com.axelor.db.EntityHelper#getEntityClass(Object)} from the entity and
+   * want {@code null} semantics for missing rows without paying the cost of a full row fetch.
+   *
+   * @param <T> the type of the model class
+   * @param klass the class of the entity
+   * @param id the primary key
+   * @return a proxy if the row exists, {@code null} otherwise
+   */
+  public static <T extends Model> T findReferenceById(Class<T> klass, Long id) {
+    if (id == null || id <= 0 || !Model.class.isAssignableFrom(klass)) {
+      return null;
+    }
+    final Long count =
+        em().createQuery(
+                "SELECT COUNT(e) FROM " + klass.getName() + " e WHERE e.id = :id", Long.class)
+            .setParameter("id", id)
+            .getSingleResult();
+    return count > 0 ? getReferenceById(klass, id) : null;
+  }
+
+  /**
    * Make an entity managed and persistent.
    *
    * @see EntityManager#persist(Object)

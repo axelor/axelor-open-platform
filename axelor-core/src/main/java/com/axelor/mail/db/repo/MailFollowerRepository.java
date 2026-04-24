@@ -241,7 +241,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
     follower.setArchived(false);
     follower.setRelatedId(entity.getId());
-    follower.setRelatedModel(entity.getClass().getName());
+    follower.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
     follower.setUser(user);
 
     // create menu
@@ -281,7 +281,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
     follower.setArchived(false);
     follower.setRelatedId(entity.getId());
-    follower.setRelatedModel(entity.getClass().getName());
+    follower.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
     follower.setEmail(managed);
 
     save(follower);
