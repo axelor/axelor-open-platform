@@ -140,6 +140,57 @@ public final class JPA {
   }
 
   /**
+   * Retrieves a reference (proxy) to an entity instance with the specified ID without immediately
+   * loading its state from the database.
+   *
+   * <p>This method delegates to {@link jakarta.persistence.EntityManager#getReference(Class,
+   * Object)}. It is designed for performance optimization, particularly when you need to associate
+   * an entity (set a foreign key) without the overhead of a database SELECT query.
+   *
+   * <p><strong>Note:</strong> The returned object is likely a dynamic proxy. The database will only
+   * be accessed when you invoke a method on the proxy (other than getting the ID). If the entity
+   * does not exist in the database, an {@link jakarta.persistence.EntityNotFoundException} will be
+   * thrown at the time of that access, not at the time of calling this method.
+   *
+   * @param <T> the type of the model class
+   * @param modelClass the class of the entity to retrieve
+   * @param id the primary key of the entity
+   * @return a managed entity proxy instance with the state lazily fetched
+   * @throws jakarta.persistence.EntityNotFoundException if the entity state is accessed, and the
+   *     entity does not exist in the database
+   * @see jakarta.persistence.EntityManager#getReference(Class, Object)
+   */
+  public static <T extends Model> T getReferenceById(Class<T> modelClass, Long id) {
+    return JPA.em().getReference(modelClass, id);
+  }
+
+  /**
+   * Returns a lazy reference (proxy) to an entity if a row with the given id exists, or {@code
+   * null} otherwise.
+   *
+   * <p>Performs a cheap {@code SELECT COUNT(*)} hitting only the primary-key index, then returns
+   * {@link com.axelor.db.JPA#getReferenceById(Class, Long)}. Use this when callers only need {@link
+   * Model#getId()} / {@link com.axelor.db.EntityHelper#getEntityClass(Object)} from the entity and
+   * want {@code null} semantics for missing rows without paying the cost of a full row fetch.
+   *
+   * @param <T> the type of the model class
+   * @param klass the class of the entity
+   * @param id the primary key
+   * @return a proxy if the row exists, {@code null} otherwise
+   */
+  public static <T extends Model> T findReferenceById(Class<T> klass, Long id) {
+    if (id == null || id <= 0 || !Model.class.isAssignableFrom(klass)) {
+      return null;
+    }
+    final Long count =
+        em().createQuery(
+                "SELECT COUNT(e) FROM " + klass.getName() + " e WHERE e.id = :id", Long.class)
+            .setParameter("id", id)
+            .getSingleResult();
+    return count > 0 ? getReferenceById(klass, id) : null;
+  }
+
+  /**
    * Make an entity managed and persistent.
    *
    * @see EntityManager#persist(Object)

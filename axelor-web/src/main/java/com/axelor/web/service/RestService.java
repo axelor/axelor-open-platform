@@ -877,9 +877,10 @@ public class RestService extends ResourceService {
   public Response messageFollowers(@PathParam("id") long id) {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+    return followers(JPA.findReferenceById(entityClass, id));
+  }
 
-    final Repository<?> repo = JpaRepository.of(entityClass);
-    final Model entity = repo.find(id);
+  private Response followers(Model entity) {
     final Response response = new Response();
 
     final Object all = followers.findFollowers(entity);
@@ -897,20 +898,19 @@ public class RestService extends ResourceService {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
 
-    final Repository<?> repo = JpaRepository.of(entityClass);
-    final Model entity = repo.find(id);
+    final Model entity = JPA.findReferenceById(entityClass, id);
 
     if (entity == null) {
-      return messageFollowers(id);
+      return followers(null);
     }
     if (request == null || request.getData() == null) {
       followers.follow(entity, AuthUtils.getUser());
-      return messageFollowers(id);
+      return followers(entity);
     }
 
     final MailMessage message = Mapper.toBean(MailMessage.class, request.getData());
     if (message == null || message.getRecipients() == null || message.getRecipients().isEmpty()) {
-      return messageFollowers(id);
+      return followers(entity);
     }
 
     for (MailAddress address : message.getRecipients()) {
@@ -926,7 +926,7 @@ public class RestService extends ResourceService {
       }
     }
 
-    return messageFollowers(id);
+    return followers(entity);
   }
 
   @POST
@@ -936,25 +936,23 @@ public class RestService extends ResourceService {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
 
-    final Repository<?> repo = JpaRepository.of(entityClass);
-    final Model entity = repo.find(id);
+    final Model entity = JPA.findReferenceById(entityClass, id);
     if (entity == null) {
-      return messageFollowers(id);
+      return followers(null);
     }
 
     if (request == null || request.getRecords() == null || request.getRecords().isEmpty()) {
       followers.unfollow(entity, AuthUtils.getUser());
-      return messageFollowers(id);
-    }
-
-    for (Object item : request.getRecords()) {
-      final MailFollower follower = followers.find(Longs.tryParse(item.toString()));
-      if (follower != null) {
-        followers.unfollow(follower);
+    } else {
+      for (Object item : request.getRecords()) {
+        final MailFollower follower = followers.find(Longs.tryParse(item.toString()));
+        if (follower != null) {
+          followers.unfollow(follower);
+        }
       }
     }
 
-    return messageFollowers(id);
+    return followers(entity);
   }
 
   @POST

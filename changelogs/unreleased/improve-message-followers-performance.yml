@@ -1,0 +1,6 @@
+---
+title: Improve message followers endpoints performance
+type: change
+description: |
+  The message followers endpoints loaded the full target entity just to read its id and class. They now use a 
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
