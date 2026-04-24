@@ -12,6 +12,7 @@ import com.axelor.auth.pac4j.AxelorProfileManager;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -32,6 +33,7 @@ import org.apache.shiro.subject.Subject;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/public/mfa/email-code")
+@Hidden
 public class MFAEmailService {
   private final MFAService mfaService;
 
