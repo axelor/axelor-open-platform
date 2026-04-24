@@ -1,0 +1,7 @@
+---
+title: Improve RestService download performance
+type: change
+description: |
+  The download endpoint loaded the full entity to read a single field, which triggered an unnecessary fetch of the 
+  entire row including its associations. The field is now retrieved with a targeted projection query, reducing 
+  latency and avoiding spikes on entities with heavy relations. The permission check has also been consolidated.

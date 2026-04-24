@@ -87,6 +87,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -514,34 +515,46 @@ public class RestService extends ResourceService {
       boolean checkOnly) {
 
     final Class klass = getResource().getModel();
-    final boolean permitted;
     final Mapper mapper = Mapper.of(klass);
-    final Model bean = JPA.find(klass, id);
 
     if (MetaFile.class.isAssignableFrom(klass)) {
-      permitted =
-          bean != null && Objects.equals(mapper.get(bean, "createdBy"), AuthUtils.getUser())
-              || checkMetaFileParentPermission(id, parentId, parentModel);
-    } else {
-      permitted = false;
+      final MetaFile metaFile = JPA.em().find(MetaFile.class, id);
+      if (!canDownload(klass, metaFile, id, parentId, parentModel)) {
+        return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+      }
+      if (metaFile == null) {
+        return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      }
+      return download(metaFile, fileName, checkOnly);
     }
 
-    if (!permitted && !getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
+    if (!canDownload(klass, null, id, parentId, parentModel)) {
       return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
-    if (bean == null) {
+    final Property prop = mapper.getProperty(field);
+    if (prop == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
-    if (bean instanceof MetaFile) {
-      return download((MetaFile) bean, fileName, checkOnly);
+    Object data;
+    try {
+      data =
+          JPA.em()
+              .createQuery(
+                  String.format(
+                      "SELECT e.%s FROM %s e WHERE e.id = :id",
+                      prop.getName(), klass.getSimpleName()),
+                  Object.class)
+              .setParameter("id", id)
+              .getSingleResult();
+    } catch (NoResultException e) {
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     if (StringUtils.isBlank(fileName)) {
       fileName = getModel() + "_" + field;
     }
-    Object data = mapper.get(bean, field);
 
     if (data instanceof MetaFile) {
       return download((MetaFile) data, fileName, checkOnly);
@@ -610,6 +623,21 @@ public class RestService extends ResourceService {
       throws IOException {
 
     return download(id, field, isImage, parentId, parentModel, fileName, false);
+  }
+
+  private boolean canDownload(
+      Class<?> klass, Model bean, Long id, Long parentId, String parentModel) {
+    if (getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
+      return true;
+    }
+    if (!MetaFile.class.isAssignableFrom(klass)) {
+      return false;
+    }
+    final User user = AuthUtils.getUser();
+    return user != null
+            && bean != null
+            && Objects.equals(Mapper.of(klass).get(bean, "createdBy"), user)
+        || checkMetaFileParentPermission(id, parentId, parentModel);
   }
 
   private boolean checkMetaFileParentPermission(Long id, Long parentId, String parentModel) {
