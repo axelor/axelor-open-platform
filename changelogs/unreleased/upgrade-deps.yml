@@ -19,3 +19,4 @@ description: |
   - Upgrade Gradle from 8.14.3 to 8.14.4
   - Upgrade PostgreSQL JDBC from 42.7.10 to 42.7.11
   - Upgrade Caffeine from 3.2.3 to 3.2.4
+  - Upgrade Resteasy from 6.2.15 to 6.2.16

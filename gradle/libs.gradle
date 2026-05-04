@@ -11,7 +11,7 @@ versions.redisson = "4.3.1"
 
 versions.groovy = "4.0.31"
 versions.graal_js = "25.0.2"
-versions.resteasy = "6.2.15.Final"
+versions.resteasy = "6.2.16.Final"
 versions.jackson = "2.21.3"
 versions.jackson_annotations = "2.21"
 versions.shiro = "2.1.0"
