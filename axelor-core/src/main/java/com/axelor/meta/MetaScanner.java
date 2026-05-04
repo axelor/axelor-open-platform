@@ -184,7 +184,7 @@ public final class MetaScanner {
    *
    * @return list of class path entry urls of the modules.
    */
-  private static List<URL> findClassPath() {
+  public static List<URL> findClassPath() {
     return findModuleFiles().stream()
         .flatMap(file -> findClassPath(file).stream())
         .collect(Collectors.toList());
