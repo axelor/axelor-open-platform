@@ -10,7 +10,6 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,7 +47,7 @@ class JsonReferenceResolver {
     }
   }
 
-  private static final AxelorCache<String, List<MetaJsonField>> referenceFieldCache =
+  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> referenceFieldCache =
       CacheBuilder.newBuilder("referenceFieldCache")
           .expireAfterWrite(Duration.ofHours(1))
           .build(
@@ -58,29 +57,19 @@ class JsonReferenceResolver {
                     modelKey.contains(".")
                         ? "self.type IN :types AND self.model = :model"
                         : "self.type IN :types AND self.jsonModel.name = :model";
-                var fields =
-                    fieldRepository
-                        .all()
-                        .filter(filter)
-                        .bind("types", ALL_REF_TYPES)
-                        .bind("model", modelKey)
-                        .cacheable()
-                        .fetch();
-
-                // Initialize lazy proxy to avoid LazyInitializationException outside session
-                for (var field : fields) {
-                  if (field.getJsonModel() != null) {
-                    field.getJsonModel().getName();
-                  }
-                  if (field.getTargetJsonModel() != null) {
-                    field.getTargetJsonModel().getName();
-                  }
-                }
-
-                return fields;
+                return fieldRepository
+                    .all()
+                    .filter(filter)
+                    .bind("types", ALL_REF_TYPES)
+                    .bind("model", modelKey)
+                    .cacheable()
+                    .fetch()
+                    .stream()
+                    .map(JsonReferenceFieldDTO::from)
+                    .toList();
               });
 
-  public List<MetaJsonField> findReferenceFields(SourceContext ctx) {
+  public List<JsonReferenceFieldDTO> findReferenceFields(SourceContext ctx) {
     var modelKey = ctx.jsonModel() != null ? ctx.jsonModel() : ctx.model();
     return referenceFieldCache.get(modelKey);
   }
@@ -130,11 +119,10 @@ class JsonReferenceResolver {
     return idValue > 0 ? idValue : null;
   }
 
-  public List<Long> extractReferenceIds(Map<?, ?> attrs, MetaJsonField field) {
-    var type = field.getType();
-    return isToManyType(type)
-        ? extractCollectionIds(attrs, field.getName())
-        : extractSingleId(attrs, field.getName());
+  public List<Long> extractReferenceIds(Map<?, ?> attrs, JsonReferenceFieldDTO field) {
+    return isToManyType(field.type())
+        ? extractCollectionIds(attrs, field.name())
+        : extractSingleId(attrs, field.name());
   }
 
   private static List<Long> extractSingleId(Map<?, ?> attrs, String fieldName) {
@@ -169,20 +157,11 @@ class JsonReferenceResolver {
     }
   }
 
-  public static boolean isJsonModelTarget(MetaJsonField field) {
-    return field.getTargetModel() == null
-        || MetaJsonRecord.class.getName().equals(field.getTargetModel());
-  }
-
   public static boolean isToManyType(String type) {
     return type != null && type.endsWith("-to-many");
   }
 
   public static boolean isOneToManyType(String type) {
     return ONE_TO_MANY.equals(type) || JSON_ONE_TO_MANY.equals(type);
-  }
-
-  public static String resolveTargetModel(MetaJsonField field) {
-    return field.getTargetModel() != null ? field.getTargetModel() : MetaJsonRecord.class.getName();
   }
 }

@@ -12,7 +12,6 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.json.JsonReferenceResolver.SourceContext;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.JsonContext;
@@ -133,7 +132,7 @@ public class JsonReferenceCascader {
   private void handleSave(
       Model entity,
       String jsonField,
-      List<MetaJsonField> fields,
+      List<JsonReferenceFieldDTO> fields,
       Map<String, Object> data,
       Map<String, Object> oldData) {
 
@@ -151,14 +150,15 @@ public class JsonReferenceCascader {
   }
 
   @SuppressWarnings("unchecked")
-  private void validateReferencePayloads(List<MetaJsonField> fields, Map<String, Object> data) {
+  private void validateReferencePayloads(
+      List<JsonReferenceFieldDTO> fields, Map<String, Object> data) {
     for (var field : fields) {
       if (canCascadePersist(field)) continue;
 
-      var value = data.get(field.getName());
+      var value = data.get(field.name());
       if (value == null) continue;
 
-      if (JsonReferenceResolver.isToManyType(field.getType())) {
+      if (JsonReferenceResolver.isToManyType(field.type())) {
         if (!(value instanceof List<?> items)) continue;
         for (var item : items) {
           if (item instanceof Map<?, ?> ref && isUnsaved((Map<String, Object>) ref)) {
@@ -173,7 +173,8 @@ public class JsonReferenceCascader {
     }
   }
 
-  private boolean persistTransientChildren(List<MetaJsonField> fields, Map<String, Object> data) {
+  private boolean persistTransientChildren(
+      List<JsonReferenceFieldDTO> fields, Map<String, Object> data) {
     var modified = false;
 
     for (var field : fields) {
@@ -186,11 +187,11 @@ public class JsonReferenceCascader {
   }
 
   @SuppressWarnings("unchecked")
-  private boolean cascadeSaveField(Map<String, Object> data, MetaJsonField field) {
-    var value = data.get(field.getName());
+  private boolean cascadeSaveField(Map<String, Object> data, JsonReferenceFieldDTO field) {
+    var value = data.get(field.name());
     if (value == null) return false;
 
-    if (JsonReferenceResolver.isToManyType(field.getType())) {
+    if (JsonReferenceResolver.isToManyType(field.type())) {
       if (!(value instanceof List<?> list)) return false;
       return cascadeSaveCollection(data, field, (List<Map<String, Object>>) list);
     } else {
@@ -200,16 +201,16 @@ public class JsonReferenceCascader {
   }
 
   private boolean cascadeSaveSingle(
-      Map<String, Object> data, MetaJsonField field, Map<String, Object> ref) {
+      Map<String, Object> data, JsonReferenceFieldDTO field, Map<String, Object> ref) {
     if (!isUnsaved(ref)) return false;
 
     var saved = cascadeSaveRecord(field, ref);
-    data.put(field.getName(), toReferenceMap(saved));
+    data.put(field.name(), toReferenceMap(saved));
     return true;
   }
 
   private boolean cascadeSaveCollection(
-      Map<String, Object> data, MetaJsonField field, List<Map<String, Object>> items) {
+      Map<String, Object> data, JsonReferenceFieldDTO field, List<Map<String, Object>> items) {
     var modified = false;
     var updatedItems = new ArrayList<Map<String, Object>>();
 
@@ -224,18 +225,18 @@ public class JsonReferenceCascader {
     }
 
     if (modified) {
-      data.put(field.getName(), updatedItems);
+      data.put(field.name(), updatedItems);
     }
     return modified;
   }
 
-  private Model cascadeSaveRecord(MetaJsonField field, Map<String, Object> data) {
-    if (!JsonReferenceResolver.isJsonModelTarget(field)) {
+  private Model cascadeSaveRecord(JsonReferenceFieldDTO field, Map<String, Object> data) {
+    if (!field.isJsonModelTarget()) {
       throwUnsavedReference(field);
     }
 
     var record = new MetaJsonRecord();
-    record.setJsonModel(getTargetJsonModelName(field));
+    record.setJsonModel(field.targetJsonModel());
     record.setAttrs(JsonReferenceResolver.toJson(new HashMap<>(data)));
     var saved = JPA.save(record);
 
@@ -269,16 +270,16 @@ public class JsonReferenceCascader {
   }
 
   @SuppressWarnings("unchecked")
-  private void mergeExistingChildren(List<MetaJsonField> fields, Map<String, Object> data) {
+  private void mergeExistingChildren(List<JsonReferenceFieldDTO> fields, Map<String, Object> data) {
     var childDataMap = new HashMap<Long, Map<String, Object>>();
 
     for (var field : fields) {
-      if (!canCascadeMerge(field) || !JsonReferenceResolver.isJsonModelTarget(field)) continue;
+      if (!canCascadeMerge(field) || !field.isJsonModelTarget()) continue;
 
-      var value = data.get(field.getName());
+      var value = data.get(field.name());
       if (value == null) continue;
 
-      if (JsonReferenceResolver.isToManyType(field.getType())) {
+      if (JsonReferenceResolver.isToManyType(field.type())) {
         if (!(value instanceof List<?> items)) continue;
 
         for (var item : items) {
@@ -360,11 +361,11 @@ public class JsonReferenceCascader {
     return false;
   }
 
-  private void throwUnsavedReference(MetaJsonField field) {
+  private void throwUnsavedReference(JsonReferenceFieldDTO field) {
     throw new IllegalStateException(
         String.format(
             "Field '%s': unsaved %s reference not allowed. Save the target entity first.",
-            field.getName(), field.getTargetModel()));
+            field.name(), field.targetModel()));
   }
 
   private Map<String, Object> patchChildAttrs(MetaJsonRecord child, Map<String, Object> newData) {
@@ -382,11 +383,6 @@ public class JsonReferenceCascader {
     return mutableAttrs;
   }
 
-  private String getTargetJsonModelName(MetaJsonField field) {
-    var targetJsonModel = field.getTargetJsonModel();
-    return targetJsonModel != null ? targetJsonModel.getName() : null;
-  }
-
   private Map<String, Object> toReferenceMap(Model saved) {
     var ref = new HashMap<String, Object>();
     ref.put("id", saved.getId());
@@ -401,9 +397,11 @@ public class JsonReferenceCascader {
   }
 
   private void deleteOrphans(
-      List<MetaJsonField> fields, Map<String, Object> oldData, Map<String, Object> newData) {
+      List<JsonReferenceFieldDTO> fields,
+      Map<String, Object> oldData,
+      Map<String, Object> newData) {
     var fieldsByName =
-        fields.stream().collect(Collectors.toMap(MetaJsonField::getName, Function.identity()));
+        fields.stream().collect(Collectors.toMap(JsonReferenceFieldDTO::name, Function.identity()));
 
     for (var entry : fieldsByName.entrySet()) {
       var field = entry.getValue();
@@ -419,7 +417,8 @@ public class JsonReferenceCascader {
     }
   }
 
-  private void deleteOwnedDescendants(List<MetaJsonField> fields, Map<String, Object> data) {
+  private void deleteOwnedDescendants(
+      List<JsonReferenceFieldDTO> fields, Map<String, Object> data) {
     for (var field : fields) {
       if (!canCascadeRemove(field)) continue;
       var ids = new HashSet<>(resolver.extractReferenceIds(data, field));
@@ -429,8 +428,8 @@ public class JsonReferenceCascader {
   }
 
   @SuppressWarnings("unchecked")
-  private void deleteEntities(MetaJsonField field, Set<Long> ids) {
-    var targetModel = JsonReferenceResolver.resolveTargetModel(field);
+  private void deleteEntities(JsonReferenceFieldDTO field, Set<Long> ids) {
+    var targetModel = field.resolveTargetModel();
     var modelClass = JsonReferenceResolver.findClass(targetModel);
     var modelRepo = (JpaRepository<Model>) JpaRepository.of(modelClass);
     var entities = modelRepo.findByIds(new ArrayList<>(ids));
@@ -457,25 +456,25 @@ public class JsonReferenceCascader {
     return hasJsonFieldCache.get(entityClass);
   }
 
-  private Map<String, List<MetaJsonField>> groupByModelField(List<MetaJsonField> fields) {
-    return fields.stream().collect(Collectors.groupingBy(MetaJsonField::getModelField));
+  private Map<String, List<JsonReferenceFieldDTO>> groupByModelField(
+      List<JsonReferenceFieldDTO> fields) {
+    return fields.stream().collect(Collectors.groupingBy(JsonReferenceFieldDTO::modelField));
   }
 
-  private boolean canCascadePersist(MetaJsonField field) {
-    return JsonReferenceResolver.isJsonModelTarget(field);
+  private boolean canCascadePersist(JsonReferenceFieldDTO field) {
+    return field.isJsonModelTarget();
   }
 
-  private boolean canCascadeMerge(MetaJsonField field) {
-    return JsonReferenceResolver.isJsonModelTarget(field);
+  private boolean canCascadeMerge(JsonReferenceFieldDTO field) {
+    return field.isJsonModelTarget();
   }
 
-  private boolean canCascadeRemove(MetaJsonField field) {
+  private boolean canCascadeRemove(JsonReferenceFieldDTO field) {
     return isOwned(field);
   }
 
-  private boolean isOwned(MetaJsonField field) {
-    return JsonReferenceResolver.isOneToManyType(field.getType())
-        && JsonReferenceResolver.isJsonModelTarget(field);
+  private boolean isOwned(JsonReferenceFieldDTO field) {
+    return JsonReferenceResolver.isOneToManyType(field.type()) && field.isJsonModelTarget();
   }
 
   private void refreshJsonRecordName(MetaJsonRecord record) {

@@ -13,7 +13,6 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import jakarta.inject.Singleton;
@@ -24,7 +23,7 @@ import java.util.List;
 @Singleton
 public class JsonReferenceUpdater {
 
-  private static final AxelorCache<String, List<MetaJsonField>> targetFieldCache =
+  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> targetFieldCache =
       CacheBuilder.newBuilder("targetFieldCache")
           .expireAfterWrite(Duration.ofHours(1))
           .build(
@@ -39,7 +38,10 @@ public class JsonReferenceUpdater {
                     .filter(filter)
                     .bind("model", modelKey)
                     .cacheable()
-                    .fetch();
+                    .fetch()
+                    .stream()
+                    .map(JsonReferenceFieldDTO::from)
+                    .toList();
               });
 
   public static void clearCache(String targetModelKey) {
@@ -71,13 +73,13 @@ public class JsonReferenceUpdater {
               .createQuery(
                   "UPDATE %s self SET self.%s = json_set(self.%s, '%s.%s', :value) WHERE json_extract(self.%s, '%s', 'id') = :id"
                       .formatted(
-                          field.getModel(),
-                          field.getModelField(),
-                          field.getModelField(),
-                          field.getName(),
+                          field.model(),
+                          field.modelField(),
+                          field.modelField(),
+                          field.name(),
                           nameField.getName(),
-                          field.getModelField(),
-                          field.getName()));
+                          field.modelField(),
+                          field.name()));
       query.setParameter("value", nameValue);
       query.setParameter("id", entityId);
       query.executeUpdate();
