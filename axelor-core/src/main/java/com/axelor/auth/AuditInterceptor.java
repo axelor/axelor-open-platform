@@ -33,6 +33,8 @@ import java.time.LocalDateTime;
 import javax.persistence.PersistenceException;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
+import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 
 @SuppressWarnings("serial")
@@ -53,19 +55,32 @@ public class AuditInterceptor extends EmptyInterceptor {
   @Override
   public void afterTransactionBegin(Transaction tx) {
     currentUser.set(AuthUtils.getUser());
-    tracker.set(new AuditTracker());
+    final AuditTracker auditTracker = new AuditTracker();
+    tracker.set(auditTracker);
+
+    // Use action queue so exceptions propagate (Hibernate swallows them from
+    // Interceptor#beforeTransactionCompletion). Identity-guard against stale
+    // callbacks left queued by a rolled-back transaction on the same Session.
+    JPA.em()
+        .unwrap(SessionImplementor.class)
+        .getActionQueue()
+        .registerProcess(
+            (BeforeTransactionCompletionProcess)
+                session -> {
+                  if (tracker.get() == auditTracker) {
+                    auditTracker.onComplete(tx, getUser());
+                  }
+                });
   }
 
   @Override
   public void afterTransactionCompletion(Transaction tx) {
-    tracker.get().clear();
+    final AuditTracker auditTracker = tracker.get();
+    if (auditTracker != null) {
+      auditTracker.clear();
+    }
     tracker.remove();
     currentUser.remove();
-  }
-
-  @Override
-  public void beforeTransactionCompletion(Transaction tx) {
-    tracker.get().onComplete(tx, getUser());
   }
 
   private User getUser() {
