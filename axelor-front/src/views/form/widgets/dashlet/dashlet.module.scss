@@ -1,32 +1,45 @@
+
 .container {
-  display: flex;
   max-width: 100%;
   height: 400px;
   overflow: hidden;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  padding: 0.25rem;
-  border-bottom: var(--ax-panel-header-border, none);
-}
+.panel {
+  --ax-panel-header-title-padding: 0;
+  --ax-panel-body-padding: 0;
+  height: 100%;
 
-.header.search {
-  --ax-panel-header-border: 1px solid var(--bs-border-color);
+  // header → headerInner → title
+  & > :first-child > div > div {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  // bodyWrapper → body → content (ContentPane)
+  // bodyWrapper and body lack flex: 1 by default, so chart views don't fill the panel height
+  & > :last-child {
+    // bodyWrapper
+    flex: 1;
+    min-height: 0;
+
+    & > div {
+      // body
+      flex: 1;
+      min-height: 0;
+
+      & > :first-child {
+        // content (ContentPane) — display: flex so chart children get proper dimensions
+        display: flex;
+      }
+    }
+  }
 }
 
 .title {
-  font-weight: 600;
   flex: 1;
-  padding: 0.5rem;
+  padding: var(--ax-theme-panel-header-title-padding, 0.5rem);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.content {
-  flex: 1;
-  display: flex;
-  overflow: auto;
 }
