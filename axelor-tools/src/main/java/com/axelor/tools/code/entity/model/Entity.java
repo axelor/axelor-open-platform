@@ -267,6 +267,12 @@ public class Entity implements BaseType<Entity> {
         Stream.of(extraCode, other.extraCode)
             .filter(Utils::notBlank)
             .collect(Collectors.joining("\n"));
+
+    superInterfaces =
+        Stream.concat(stream(superInterfaces), stream(other.superInterfaces))
+            .distinct()
+            .filter(Utils::notBlank)
+            .collect(Collectors.joining(","));
   }
 
   private boolean merge(Property existing, Property property) {
