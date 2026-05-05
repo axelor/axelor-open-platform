@@ -4,11 +4,11 @@
   min-height: 0;
   margin-bottom: 1rem;
   --ax-panel-body-padding: 0;
+}
 
-  & > div:last-child > div > div {
-    overflow: hidden;
-    display: flex;
-  }
+.panelContent {
+  overflow: hidden;
+  display: flex;
 }
 
 .checkbox {

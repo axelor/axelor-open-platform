@@ -9,31 +9,20 @@
   --ax-panel-header-title-padding: 0;
   --ax-panel-body-padding: 0;
   height: 100%;
+}
 
-  // header → headerInner → title
-  & > :first-child > div > div {
-    min-width: 0;
-    overflow: hidden;
-  }
+.panelHeaderTitle {
+  min-width: 0;
+  overflow: hidden;
+}
 
-  // bodyWrapper → body → content (ContentPane)
-  // bodyWrapper and body lack flex: 1 by default, so chart views don't fill the panel height
-  & > :last-child {
-    // bodyWrapper
-    flex: 1;
-    min-height: 0;
+.panelBody {
+  flex: 1;
+  min-height: 0;
+}
 
-    & > div {
-      // body
-      flex: 1;
-      min-height: 0;
-
-      & > :first-child {
-        // content (ContentPane) — display: flex so chart children get proper dimensions
-        display: flex;
-      }
-    }
-  }
+.panelContent {
+  display: flex;
 }
 
 .title {

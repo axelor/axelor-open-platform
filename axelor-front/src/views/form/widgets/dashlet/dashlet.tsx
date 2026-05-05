@@ -268,6 +268,9 @@ export function DashletComponent({
             }
             toolbar={toolbar}
             className={classes.panel}
+            headerTitleClassName={classes.panelHeaderTitle}
+            bodyClassName={classes.panelBody}
+            contentClassName={classes.panelContent}
           >
             <ScopeProvider scope={PopupScope} value={{}}>
               {tab && <Views tab={tab} />}

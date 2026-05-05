@@ -162,6 +162,7 @@ function CustomizeDialog({
     <Box d="flex" flexDirection="column" flex={1} p={3}>
       <Panel
         className={styles.panel}
+        contentClassName={styles.panelContent}
         header={title}
         toolbar={{
           items: [

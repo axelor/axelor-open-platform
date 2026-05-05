@@ -7,9 +7,10 @@ $treeNodePadding: 1.175rem;
   &.hasActions {
     --ax-panel-header-title-padding: 0 0.5rem;
   }
-  > div:first-child > div > div:first-child {
-    min-width: 0;
-  }
+}
+
+.headerTitle {
+  min-width: 0;
 }
 
 .tree {

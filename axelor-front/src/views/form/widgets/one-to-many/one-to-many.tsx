@@ -2156,6 +2156,7 @@ function OneToManyInner({
       <Panel
         ref={panelRef}
         data-testid={testId}
+        headerTitleClassName={styles.headerTitle}
         className={clsx(styles.container, panelClass, {
           [styles.tree]: isTreeGrid,
           [styles.subTree]: isSubTreeGrid,
