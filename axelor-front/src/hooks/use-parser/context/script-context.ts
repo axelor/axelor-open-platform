@@ -191,10 +191,26 @@ export function createScriptContext(
       let model = context._model;
 
       if (fieldName) {
-        const field = getField(fieldName);
-        if (field && field.target) {
-          record = get(record, fieldName) || {};
-          model = field.target;
+        const dotIndex = fieldName.indexOf(".");
+        const key = fieldName.substring(0, dotIndex);
+        if (isJsonField(key)) {
+          const jsonField = getField(key);
+          const subPath = fieldName.substring(dotIndex + 1);
+          const field = jsonField ? getField(subPath) : undefined;
+          if (field && field.target) {
+            const jsonText = record[key];
+            const json = tryJson(jsonText);
+            if (json) {
+              record = get(json, subPath) || {};
+              model = field.target;
+            }
+          }
+        } else {
+          const field = getField(fieldName);
+          if (field && field.target) {
+            record = get(record, fieldName) || {};
+            model = field.target;
+          }
         }
       }
 
