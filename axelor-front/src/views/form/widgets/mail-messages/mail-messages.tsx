@@ -9,6 +9,7 @@ import { findFields } from "@/services/client/meta-cache.ts";
 import { DEFAULT_MESSAGE_PAGE_SIZE } from "@/utils/app-settings.ts";
 import {
   useViewAction,
+  useViewMeta,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
@@ -60,13 +61,19 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
     total: 0,
   });
   const { name } = useViewAction();
+  const {
+    meta: { view },
+  } = useViewMeta();
   const { model, modelId: recordId } = schema;
   const { messages, offset, limit, hasNext, total } = state;
   const { fetchTags } = useTags();
 
   const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
-  const { data: meta } = useAsync(async () => await findFields(model), [model]);
+  const { data: meta } = useAsync(
+    async () => await findFields(model, view?.jsonModel),
+    [model],
+  );
   const isMessageBox = model === "com.axelor.mail.db.MailMessage";
   const folder = isMessageBox ? name.split(".").pop() : "";
   const hasMessages = isMessageBox || (recordId ?? 0) > 0;
