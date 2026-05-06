@@ -176,6 +176,13 @@ export function TemplateRenderer({
     Object.keys(propsContext)
       .filter((key) => key.includes("."))
       .reduce((cur, key) => {
+        const topKey = key.substring(0, key.indexOf("."));
+        // Skip merging when the top-level parent is a string (e.g. a JSON field like
+        // attrs) — merging would overwrite the original JSON text with an object,
+        // breaking helpers such as $image and $get that rely on JSON.parse.
+        if (typeof cur[topKey] === "string") {
+          return cur;
+        }
         const value = cloneDeep(propsContext[key]);
         const prev = getValue(cur, key);
         return setValue(
