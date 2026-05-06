@@ -608,6 +608,7 @@
 "This is your current session",,,
 "This is your new API key. <br> Please make sure to copy and store it securely now — you won't be able to view it again later.",,,
 "This may terminate any running jobs. Are you sure you want to continue?",,,
+"This model is flagged as delegated. Make appropriate change depending on the delegation requirements.",,,
 "This will make the theme available for users. Are you sure you want to continue?",,,
 "This will revert any users having this theme with the default theme. Are you sure you want to continue?",,,
 "This will update job with current settings. Are you sure you want to continue?",,,

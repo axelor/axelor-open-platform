@@ -608,6 +608,7 @@
 "This is your current session","Ceci est votre session actuelle",,
 "This is your new API key. <br> Please make sure to copy and store it securely now — you won't be able to view it again later.","Voici votre nouvelle clé API. <br> Veuillez la copier et la conserver en lieu sûr dès maintenant — vous ne pourrez plus la consulter par la suite.",,
 "This may terminate any running jobs. Are you sure you want to continue?","Cela va arrêter les instances en cours. Voulez-vous continuer ?",,
+"This model is flagged as delegated. Make appropriate change depending on the delegation requirements.","Ce modèle est signalé comme délégué. Apportez les modifications nécessaires en fonction des exigences de délégation.",,
 "This will make the theme available for users. Are you sure you want to continue?","Cela rendra le thème disponible pour les utilisateurs. Êtes-vous sûr de vouloir continuer ?",,
 "This will revert any users having this theme with the default theme. Are you sure you want to continue?","Cela rétablira le thème par défaut pour tous les utilisateurs ayant ce thème. Êtes-vous sûr de vouloir continuer ?",,
 "This will update job with current settings. Are you sure you want to continue?","Cela va mettre à jour l’instance avec les paramètres actuels. Voulez-vous continuer ?",,

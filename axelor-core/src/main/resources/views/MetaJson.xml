@@ -167,20 +167,26 @@
     <panel title="Overview">
       <field name="name" readonlyIf="id" pattern="^[a-zA-Z][a-zA-Z0-9_\\$]+$"/>
       <field name="title" />
-      <field name="onNew" />
-      <field name="onSave" />
-      <field name="formWidth" />
-      <field name="orderBy" />
-      <field name="groupBy" />
-      <field name="panelMailDisplay" />
+      <label showIf="isDelegated" hidden="true" title="This model is flagged as delegated. Make appropriate change depending on the delegation requirements." colSpan="12"/>
+      <field name="isDelegated" hidden="true"/>
     </panel>
-    <panel title="Menu">
-      <field name="menuTitle" title="Title"/>
-      <field name="menuParent" title="Parent menu" domain="self.action is null" canNew="true" form-view="meta-menu-form"/>
-      <field name="menuIcon" title="Icon"/>
-      <field name="menuBackground" title="Icon background"/>
-      <field name="menuOrder" title="aop.meta.order"/>
-    </panel>
+    <panel-tabs hideIf="isDelegated">
+      <panel title="Views">
+        <field name="onNew" />
+        <field name="onSave" />
+        <field name="formWidth" />
+        <field name="orderBy" />
+        <field name="groupBy" />
+        <field name="panelMailDisplay" />
+      </panel>
+      <panel title="Menu">
+        <field name="menuTitle" title="Title"/>
+        <field name="menuParent" title="Parent menu" domain="self.action is null" canNew="true" form-view="meta-menu-form"/>
+        <field name="menuIcon" title="Icon"/>
+        <field name="menuBackground" title="Icon background"/>
+        <field name="menuOrder" title="aop.meta.order"/>
+      </panel>
+    </panel-tabs>
     <panel-tabs>
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
         <field name="name"/>
@@ -225,7 +231,6 @@
     model="com.axelor.meta.db.MetaJsonModel">
     <view type="grid" name="json-model-grid" />
     <view type="form" name="json-model-form" />
-    <domain>COALESCE(self.isDelegated, FALSE) = FALSE</domain>
   </action-view>
 
   <action-view name="custom.fields.all"
