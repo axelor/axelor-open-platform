@@ -65,11 +65,12 @@ public class SearchService {
     final String matching = (String) request.getData().get("search");
     final List selected = (List) request.getData().get("selected");
     int limit = request.getLimit();
-    int maxPerPage = AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, 500);
-    int defaultPerPage = AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_DEFAULT_PER_PAGE, 40);
+    int maxPerPage =
+        AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, 500);
+    int defaultPerPage =
+        AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_DEFAULT_PER_PAGE, 40);
     limit = limit > 0 ? Math.min(limit, maxPerPage) : defaultPerPage;
-    final List<InternetAddress> addresses =
-        mailService.findEmails(matching, selected, limit);
+    final List<InternetAddress> addresses = mailService.findEmails(matching, selected, limit);
     final List<Object> data = new ArrayList<>();
 
     for (InternetAddress address : addresses) {
