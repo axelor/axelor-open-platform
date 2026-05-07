@@ -290,7 +290,7 @@ public class ViewService extends AbstractService {
       final Map<String, Object> jsonFieldsMap = new HashMap<>();
       for (Property jsonField : jsonFields) {
         Map<String, Object> jsonFieldMap =
-            MetaJsonRecord.class.getName().equals(model) && ObjectUtils.notEmpty(jsonModel)
+            MetaJsonRecord.class.getName().equals(model)
                 ? MetaStore.findJsonFields(jsonModel)
                 : MetaStore.findJsonFields(model, jsonField.getName());
         if (ObjectUtils.notEmpty(jsonFieldMap)) {
