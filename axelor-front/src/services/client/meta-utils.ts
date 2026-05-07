@@ -596,7 +596,7 @@ export function processView(
         jsonFields: [jsonItem],
         json: true,
         cols: 12,
-        colSpan: item.colSpan ?? 6,
+        colSpan: item.colSpan,
         showTitle: false,
       };
       processWidget(item);
