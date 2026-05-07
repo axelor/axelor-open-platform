@@ -98,8 +98,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         return {
           field,
           countOn: fieldName,
-          jsonField: undefined,
-          jsonPath: undefined,
         };
       }
       if (field?.jsonField && field?.jsonPath) {
@@ -252,6 +250,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const dataStore = useMemo<DataStore | null>(() => {
     const { nodes } = view;
     const { model, items = [] } = nodes?.[0] || {};
+    const limit = +((action.params?.limit as string) || 0);
     const fields = uniq([
       ...items.map((item) => item.name),
       ...getNodeFieldNames(nodes?.[0]),
@@ -259,9 +258,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     return model
       ? new DataStore(model, {
           fields,
+          ...(limit && { limit }),
         })
       : null;
-  }, [view, getNodeFieldNames]);
+  }, [view, action.params, getNodeFieldNames]);
 
   const columns = useMemo(() => {
     return (view.columns || []).map((column) => {

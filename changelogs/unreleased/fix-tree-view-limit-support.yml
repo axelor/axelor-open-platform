@@ -1,0 +1,5 @@
+---
+title: Fix view-param limit support in tree view
+type: fix
+description: |
+  The view-param limit support in tree view was not being applied to the root node.
