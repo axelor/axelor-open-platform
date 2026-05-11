@@ -1,14 +1,12 @@
 import { useId } from "react";
 import { clsx } from "@axelor/ui";
 
-import { i18n } from "@/services/client/i18n";
-
 import { FieldControl, FieldProps } from "../../builder";
 import EditorComponent from "./editor";
 import ViewerComponent from "./viewer";
 
 import { useInput } from "../../builder/hooks";
-import { useTranslateModal, useTranslationValue } from "../string/translatable";
+import { Translatable, useTranslateModal, useTranslationValue } from "../string/translatable";
 import styles from "./html.module.scss";
 
 export function Html(props: FieldProps<string>) {
@@ -38,12 +36,20 @@ export function Html(props: FieldProps<string>) {
       })}
     >
       {readonly || trValue ? (
-        <ViewerComponent
-          className={clsx({
-            [styles.viewer]: translatable,
-          })}
-          value={trValue ?? text}
-        />
+        <>
+          <ViewerComponent
+            className={styles.viewer}
+            value={trValue ?? text}
+          />
+          {translatable && !readonly && (
+            <Translatable
+              className={styles.translate}
+              value={text}
+              onValueChange={setValue}
+              onUpdate={setTranslateValue}
+            />
+          )}
+        </>
       ) : (
         <EditorComponent
           id={id}
