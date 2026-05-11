@@ -36,12 +36,16 @@
   display: flex;
   flex-direction: column;
   text-align: start;
+  min-width: 0;
+  word-wrap: break-word;
 }
 
 .value {
   font-size: 1.25rem;
   font-weight: 600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .title {
