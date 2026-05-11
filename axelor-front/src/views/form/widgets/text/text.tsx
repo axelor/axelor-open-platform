@@ -29,7 +29,7 @@ export function Text({
 
   const id = useId();
 
-  const [_, setTranslateValue] = useTranslationValue(props);
+  const [trValue, setTranslateValue] = useTranslationValue(props);
 
   const [changed, setChanged] = useState(false);
   const {
@@ -69,14 +69,14 @@ export function Text({
         [styles.translatable]: translatable && !readonly,
       })}
     >
-      {readonly ? (
+      {readonly || trValue ? (
         <Input
           as="pre"
           bg={themeMode === "dark" ? "body" : "light"}
           mb={0}
           className={styles.pre}
         >
-          {text}
+          {trValue ?? text}
         </Input>
       ) : (
         <Input
