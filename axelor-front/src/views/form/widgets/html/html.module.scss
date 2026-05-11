@@ -17,10 +17,19 @@
 }
 
 .translate {
-  top: 0.25rem !important;
+  position: absolute;
+  padding-right: 0.25rem;
+  padding-top: 0.25rem;
+  right: 0;
+  [dir="rtl"] & {
+    right: unset;
+    left: 0;
+    padding-left: 0.25rem;
+    padding-right: unset;
+  }
 }
 
-.viewer {
+.translatable .viewer {
   padding-right: 1.75rem !important;
   [dir="rtl"] & {
     padding-right: unset !important;

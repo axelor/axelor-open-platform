@@ -94,7 +94,7 @@ export function Text({
       )}
       {translatable && !readonly && (
         <Translatable
-          position="top"
+          className={styles.translatableButton}
           value={text}
           onValueChange={setValue}
           onUpdate={setTranslateValue}
