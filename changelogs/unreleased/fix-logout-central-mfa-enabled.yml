@@ -1,0 +1,6 @@
+---
+title: Fix central logout and session timeout redirect when MFA is enabled
+type: fix
+description: |
+  MfaClient restores pending profile but overwrites its clientName.
+  Now always restore pending client name when session is marked as fully authenticated by MFA authenticator.
