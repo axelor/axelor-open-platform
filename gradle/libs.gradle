@@ -30,6 +30,8 @@ versions.asm = "9.9.1"
 
 versions.flyway = "11.20.3"
 
+versions.swagger = "2.2.49"
+
 // unit testing
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit}"
 libs.junit_launcher = "org.junit.platform:junit-platform-launcher:${versions.junit}" // for IDE
@@ -221,7 +223,7 @@ libs.resteasy_server = [
 ]
 
 libs.swagger_jaxrs2 = [
-  dependencies.create("io.swagger.core.v3:swagger-jaxrs2-jakarta:2.2.49") {
+  dependencies.create("io.swagger.core.v3:swagger-jaxrs2-jakarta:${versions.swagger}") {
     exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
     exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
     exclude group: "com.fasterxml.jackson.jakarta.rs", module: "jackson-jakarta-rs-json-provider"
