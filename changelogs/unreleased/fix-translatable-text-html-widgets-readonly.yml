@@ -1,0 +1,8 @@
+---
+title: Fix translatable text/html widgets ignoring translation in readonly
+type: fix
+description: |
+  When a translation exists for the current locale, the text and html widgets
+  now display the translated value in readonly mode, matching the behavior of
+  the string widget. Previously the editable input was shown with the raw
+  stored value instead.

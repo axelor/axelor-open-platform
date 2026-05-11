@@ -33,12 +33,12 @@ export function Html(props: FieldProps<string>) {
         [styles.translatable]: translatable && !readonly,
       })}
     >
-      {readonly ? (
+      {readonly || trValue ? (
         <ViewerComponent
           className={clsx({
             [styles.viewer]: translatable,
           })}
-          value={text}
+          value={trValue ?? text}
         />
       ) : (
         <EditorComponent
