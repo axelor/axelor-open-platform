@@ -7,3 +7,4 @@ description: |
   - Upgrade Quartz from 2.4.0 to 2.4.1
   - Upgrade PostgreSQL JDBC driver from 42.7.10 to 42.7.11
   - Upgrade Resteasy from 4.7.9 to 4.7.10
+  - Upgrade Groovy from 3.0.24 to 3.0.25
