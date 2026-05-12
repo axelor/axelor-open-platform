@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Upgrade Quartz from 2.4.0 to 2.4.1
+  - Upgrade PostgreSQL JDBC driver from 42.7.10 to 42.7.11
