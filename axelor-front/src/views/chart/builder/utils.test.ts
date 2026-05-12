@@ -410,7 +410,13 @@ describe("getDataZoom", () => {
 
   it("should support yAxis for horizontal bar charts", () => {
     const zoom = getDataZoom(100, "yAxis");
-    expect(zoom![0]).toMatchObject({ type: "slider", yAxisIndex: 0 });
+    expect(zoom![0]).toMatchObject({
+      type: "slider",
+      yAxisIndex: 0,
+      orient: "vertical",
+      right: 5,
+      width: 20,
+    });
     expect(zoom![1]).toMatchObject({ type: "inside", yAxisIndex: 0 });
   });
 

@@ -33,6 +33,7 @@ export function getDataZoom(
 
   const endPercent = Math.min((maxVisible / dataLength) * 100, 100);
   const axisIndex = axis === "xAxis" ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
+  const isVertical = axis === "yAxis";
 
   return [
     {
@@ -40,8 +41,9 @@ export function getDataZoom(
       ...axisIndex,
       start: 0,
       end: endPercent,
-      bottom: 5,
-      height: 20,
+      ...(isVertical
+        ? { orient: "vertical", right: 5, width: 20 }
+        : { bottom: 5, height: 20 }),
     },
     { type: "inside", ...axisIndex, start: 0, end: endPercent },
   ];
