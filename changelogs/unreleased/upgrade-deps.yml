@@ -9,3 +9,4 @@ description: |
   - Upgrade Resteasy from 4.7.9 to 4.7.10
   - Upgrade Groovy from 3.0.24 to 3.0.25
   - Upgrade Tomcat from 9.0.116 to 9.0.118
+  - Upgrade Jackson from 2.18.6 to 2.18.7
