@@ -21,13 +21,21 @@ package com.axelor.web.openapi;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ObjectUtils;
+import com.axelor.meta.MetaScanner;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Webhooks;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.ws.rs.ApplicationPath;
 
 public class AxelorOpenApiScanner extends JaxrsApplicationAndAnnotationScanner {
 
@@ -42,6 +50,7 @@ public class AxelorOpenApiScanner extends JaxrsApplicationAndAnnotationScanner {
       AppSettings.get().getList(AvailableAppSettings.APPLICATION_OPENAPI_SCAN_PACKAGES);
 
   static {
+    // RESTEasy's internal dispatcher is not a real REST endpoint; ignore to avoid noise.
     IGNORED.add("org.jboss.resteasy.core.AsynchronousDispatcher");
   }
 
@@ -51,10 +60,79 @@ public class AxelorOpenApiScanner extends JaxrsApplicationAndAnnotationScanner {
 
   @Override
   public Set<Class<?>> classes() {
-    Set<Class<?>> classes = super.classes();
+
+    // Mirror parent's lazy-init guard so isAlwaysResolveAppPath() below is safe even when
+    // the scanner is instantiated before setConfiguration() is called.
+    if (openApiConfiguration == null) {
+      openApiConfiguration = new SwaggerConfiguration();
+    }
+
+    // Narrow the ClassGraph scan to Axelor module JARs to avoid full-classpath OOM.
+    // Directory-based classpath elements (build/classes, WEB-INF/classes) are not affected
+    // by acceptJars() and remain accepted by default.
+    ClassGraph graph = new ClassGraph().enableAllInfo();
+    String[] jarNames = getAxelorModulesJarsNames();
+    if (jarNames.length > 0) {
+      graph.acceptJars(jarNames);
+    }
+
+    // Annotation pass — mirrors JaxrsAnnotationScanner#classes()
+    final Set<Class<?>> classes;
+    try (ScanResult scanResult = graph.scan()) {
+      classes =
+          new HashSet<>(
+              scanResult.getClassesWithAnnotation(javax.ws.rs.Path.class.getName()).loadClasses());
+      classes.addAll(
+          new HashSet<>(
+              scanResult
+                  .getClassesWithAnnotation(OpenAPIDefinition.class.getName())
+                  .loadClasses()));
+      classes.addAll(
+          new HashSet<>(
+              scanResult.getClassesWithAnnotation(Webhooks.class.getName()).loadClasses()));
+      if (Boolean.TRUE.equals(openApiConfiguration.isAlwaysResolveAppPath())) {
+        classes.addAll(
+            new HashSet<>(
+                scanResult
+                    .getClassesWithAnnotation(ApplicationPath.class.getName())
+                    .loadClasses()));
+      }
+    }
+
+    // Application pass — mirrors JaxrsApplicationAndAnnotationScanner#classes().
+    // Pulls in resources contributed programmatically by a JAX-RS Application subclass via
+    // getClasses() / getSingletons(). These bypass the JAR whitelist on purpose: the user
+    // registered them explicitly, so location on the classpath is irrelevant.
+    classes.addAll(addApplicationClasses());
+
     return classes.stream()
         .filter(aClass -> !this.isIgnored(aClass.getName()))
         .collect(Collectors.toSet());
+  }
+
+  /** Returns the list of Axelor module JAR file names */
+  private String[] getAxelorModulesJarsNames() {
+    return MetaScanner.findClassPath().stream()
+        .map(URL::getFile)
+        .filter(file -> file.endsWith(".jar"))
+        .map(file -> file.substring(file.lastIndexOf('/') + 1))
+        .toArray(String[]::new);
+  }
+
+  private Set<Class<?>> addApplicationClasses() {
+    Set<Class<?>> output = new HashSet<>();
+    if (application == null) {
+      return output;
+    }
+    Set<Class<?>> appClasses = application.getClasses();
+    if (appClasses != null) {
+      output.addAll(appClasses);
+    }
+    Set<Object> singletons = application.getSingletons();
+    if (singletons != null) {
+      singletons.stream().map(Object::getClass).forEach(output::add);
+    }
+    return output;
   }
 
   /** */

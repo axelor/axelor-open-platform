@@ -1,0 +1,6 @@
+---
+title: Fix OOM in OpenAPI scanner by limiting scan to Axelor modules
+type: fix
+description: |
+  OpenAPI scanner now limits the scan to Axelor modules only, reducing memory usage and preventing OutOfMemoryError. So 
+  resources in non-Axelor JARs no longer appear in the spec.
