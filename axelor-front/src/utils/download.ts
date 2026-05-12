@@ -44,9 +44,9 @@ export async function download(url: string, fileName?: string) {
     link.href = url;
 
     Object.assign(link.style, {
-      position: "absolute",
-      visibility: "hidden",
-      zIndex: 1000000000,
+      position: "fixed",
+      top: "-9999px",
+      left: "-9999px",
     });
 
     document.body.appendChild(link);
