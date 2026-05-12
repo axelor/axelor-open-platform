@@ -182,7 +182,7 @@ export class DataSource {
       const uploads = Array.isArray(data.$upload)
         ? data.$upload
         : [data.$upload];
-      const result = await this.upload(data as DataRecord, uploads);
+      const result = await this.upload(data, uploads, saveOptions);
       return result as SaveResult<T>;
     }
 
@@ -280,6 +280,7 @@ export class DataSource {
   async upload(
     data: DataRecord,
     uploads: UploadItem[],
+    options?: ReadOptions,
     onProgress?: (complete?: number) => void,
   ): Promise<DataRecord> {
     const xhr = new XMLHttpRequest();
@@ -299,7 +300,10 @@ export class DataSource {
       formData.append("field", upload.field);
     }
 
-    formData.append("request", JSON.stringify({ data: requestData }));
+    formData.append(
+      "request",
+      JSON.stringify({ data: requestData, ...options }),
+    );
 
     return new Promise<DataRecord>(function (resolve, rejectPromise) {
       if (onProgress) {
