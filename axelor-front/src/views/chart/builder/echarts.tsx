@@ -27,7 +27,6 @@ import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
 import classes from "./echarts.module.scss";
 
 echarts.use([
@@ -57,9 +56,8 @@ export function ECharts({
   width,
   options,
   legend = true,
-  loading = false,
   onClick,
-}: Pick<ChartProps, "data" | "legend" | "loading" | "onClick"> & {
+}: Pick<ChartProps, "data" | "legend" | "onClick"> & {
   type: ChartType;
   height: number;
   width: number;
@@ -118,18 +116,6 @@ export function ECharts({
     }
   }, [height, width]);
 
-  useEffect(() => {
-    if (!chart.current) return;
-
-    if (loading) {
-      chart.current.showLoading("default", {
-        text: i18n.get("Please wait..."),
-      });
-      return;
-    }
-
-    chart.current.hideLoading();
-  }, [loading]);
 
   useEffect(() => {
     if (chart.current) {
