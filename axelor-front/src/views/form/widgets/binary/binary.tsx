@@ -5,6 +5,7 @@ import { ChangeEvent, useCallback, useId, useMemo, useRef } from "react";
 import { Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { FileDroppable } from "@/components/file-droppable";
+import { UploadItem, UploadValue } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { download } from "@/utils/download";
@@ -41,12 +42,36 @@ export function Binary(
     ),
   );
 
-  const setUpload = useFormFieldSetter(formAtom, "$upload");
   const setFileSize = useFormFieldSetter(formAtom, "fileSize");
   const setFileName = useFormFieldSetter(formAtom, "fileName");
   const setFileType = useFormFieldSetter(formAtom, "fileType");
 
   const isMetaModel = record._model === META_FILE_MODEL;
+
+  const setUpload = useAtomCallback(
+    useCallback(
+      (get, set, upload?: UploadItem) => {
+        const { record, ...rest } = get(formAtom);
+        const uploads = Array.isArray(record.$upload)
+          ? record.$upload
+          : record.$upload
+            ? [record.$upload]
+            : [];
+        const nextUploads = upload
+          ? [...uploads.filter((item: UploadItem) => item.field !== upload.field), upload]
+          : uploads.filter((item: UploadItem) => item.field !== name);
+
+        set(formAtom, {
+          ...rest,
+          record: {
+            ...record,
+            $upload: nextUploads.length === 0 ? undefined : (nextUploads as UploadValue),
+          },
+        });
+      },
+      [formAtom, name],
+    ),
+  );
 
   function canDownload() {
     if ((record?.id ?? -1) < 0) return false;

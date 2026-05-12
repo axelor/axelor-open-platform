@@ -408,27 +408,47 @@ public class RestService extends ResourceService {
       return new Response().fail(e.getLocalizedMessage());
     }
 
-    final InputPart filePart = formData.get("file").getFirst();
-    final InputPart fieldPart = formData.get("field").getFirst();
+    final List<InputPart> fileParts = formData.get("file");
+    final List<InputPart> fieldParts = formData.get("field");
     final boolean isAttachment = MetaFile.class.getName().equals(getModel());
-    final String field = fieldPart.getBodyAsString();
-    final InputStream fileStream = filePart.getBody(InputStream.class, null);
-    if (fileStream == null) {
-      return new Response().fail("file stream to upload is missing or empty");
+
+    if (isEmpty(fileParts)) {
+      return fail();
     }
 
     if (!isAttachment) {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      uploadSave(fileStream, out);
-      final byte[] bytes = out.toByteArray();
-      try {
-        // check if file content is valid
-        MetaFiles.checkType(new ByteArrayInputStream(bytes));
-      } catch (IllegalFileException e) {
-        return new Response().fail(e.getLocalizedMessage());
+      if (fieldParts == null || fieldParts.size() != fileParts.size()) {
+        return fail();
       }
-      data.put(field, bytes);
+
+      for (int i = 0; i < fileParts.size(); ++i) {
+        final InputPart filePart = fileParts.get(i);
+        final InputStream fileStream = filePart.getBody(InputStream.class, null);
+        if (fileStream == null) {
+          return new Response().fail("file stream to upload is missing or empty");
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        uploadSave(fileStream, out);
+        final byte[] bytes = out.toByteArray();
+        try {
+          // check if file content is valid
+          MetaFiles.checkType(new ByteArrayInputStream(bytes));
+        } catch (IllegalFileException e) {
+          return new Response().fail(e.getLocalizedMessage());
+        }
+
+        final InputPart fieldPart = fieldParts.get(i);
+        final String field = fieldPart.getBodyAsString();
+        data.put(field, bytes);
+      }
       return getResource().save(request);
+    }
+
+    final InputPart filePart = fileParts.getFirst();
+    final InputStream fileStream = filePart.getBody(InputStream.class, null);
+    if (fileStream == null) {
+      return new Response().fail("file stream to upload is missing or empty");
     }
 
     data.put("fileName", safeFileName);

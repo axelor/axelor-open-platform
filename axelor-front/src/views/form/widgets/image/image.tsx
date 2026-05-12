@@ -13,6 +13,7 @@ import {
 import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { FileDroppable } from "@/components/file-droppable";
+import { UploadItem, UploadValue } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { focusAtom } from "@/utils/atoms";
@@ -21,7 +22,6 @@ import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { formDirtyUpdater } from "../../builder/atoms";
-import { useFormFieldSetter } from "../../builder/hooks";
 import { META_FILE_MODEL, makeImageURL } from "./utils";
 
 import styles from "./image.module.scss";
@@ -40,7 +40,6 @@ export function Image(
     attrs: { title, required },
   } = useAtomValue(widgetAtom);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const setUpload = useFormFieldSetter(formAtom, "$upload");
   const dirtyAtom = useViewDirtyAtom();
 
   const setDirty = useAtomCallback(
@@ -93,6 +92,31 @@ export function Image(
   } as DataRecord;
 
   const record = (isBinary ? parent : value) as DataRecord;
+
+  const setUpload = useAtomCallback(
+    useCallback(
+      (get, set, upload?: UploadItem) => {
+        const { record, ...rest } = get(formAtom);
+        const uploads = Array.isArray(record.$upload)
+          ? record.$upload
+          : record.$upload
+            ? [record.$upload]
+            : [];
+        const nextUploads = upload
+          ? [...uploads.filter((item: UploadItem) => item.field !== upload.field), upload]
+          : uploads.filter((item: UploadItem) => item.field !== schema.name);
+
+        set(formAtom, {
+          ...rest,
+          record: {
+            ...record,
+            $upload: nextUploads.length === 0 ? undefined : (nextUploads as UploadValue),
+          },
+        });
+      },
+      [formAtom, schema.name],
+    ),
+  );
 
   function handleUpload() {
     const file = inputRef.current;

@@ -66,6 +66,13 @@ export type ExportResult = {
 
 export type AccessType = "read" | "write" | "create" | "remove" | "export";
 
+export type UploadItem = {
+  field: string;
+  file: File;
+};
+
+export type UploadValue = UploadItem | UploadItem[];
+
 type UploadErrorPayload = {
   status?: number;
   data?: ErrorReport | string | null;
@@ -172,10 +179,9 @@ export class DataSource {
     const { onError } = options ?? {};
 
     if (!Array.isArray(data) && data?.$upload) {
-      const upload = data.$upload;
-      return this.upload(data, upload.field, upload.file) as Promise<
-        SaveResult<T>
-      >;
+      const uploads = Array.isArray(data.$upload) ? data.$upload : [data.$upload];
+      const result = await this.upload(data as DataRecord, uploads);
+      return result as SaveResult<T>;
     }
 
     const isRecords = Array.isArray(data);
@@ -269,24 +275,27 @@ export class DataSource {
 
   async upload(
     data: DataRecord,
-    field: string | Blob,
-    file: File,
+    uploads: UploadItem[],
     onProgress?: (complete?: number) => void,
   ): Promise<DataRecord> {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
     const url = `ws/rest/${this.model}/upload`;
 
-    let fileToUpload = file;
-    if (file.type === "message/rfc822") {
-      fileToUpload = new File([file], file.name, {
-        type: "application/octet-stream",
-      });
+    const { $upload: _upload, ...requestData } = data;
+
+    for (const upload of uploads) {
+      let fileToUpload = upload.file;
+      if (upload.file.type === "message/rfc822") {
+        fileToUpload = new File([upload.file], upload.file.name, {
+          type: "application/octet-stream",
+        });
+      }
+      formData.append("file", fileToUpload);
+      formData.append("field", upload.field);
     }
 
-    formData.append("file", fileToUpload);
-    formData.append("field", field);
-    formData.append("request", JSON.stringify({ data }));
+    formData.append("request", JSON.stringify({ data: requestData }));
 
     return new Promise<DataRecord>(function (resolve, rejectPromise) {
       if (onProgress) {
