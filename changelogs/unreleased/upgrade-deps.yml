@@ -11,3 +11,4 @@ description: |
   - Upgrade Tomcat from 9.0.116 to 9.0.118
   - Upgrade Jackson from 2.18.6 to 2.18.7
   - Upgrade Undertow from 2.2.37 to 2.2.39
+  - Upgrade Byte Buddy from 1.15.10 to 1.15.11
