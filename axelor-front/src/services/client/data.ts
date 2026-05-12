@@ -176,10 +176,12 @@ export class DataSource {
     data: T,
     options?: SaveOptions<T>,
   ): Promise<SaveResult<T>> {
-    const { onError } = options ?? {};
+    const { onError, ...saveOptions } = options ?? {};
 
     if (!Array.isArray(data) && data?.$upload) {
-      const uploads = Array.isArray(data.$upload) ? data.$upload : [data.$upload];
+      const uploads = Array.isArray(data.$upload)
+        ? data.$upload
+        : [data.$upload];
       const result = await this.upload(data as DataRecord, uploads);
       return result as SaveResult<T>;
     }
@@ -189,7 +191,9 @@ export class DataSource {
     const resp = await request({
       url,
       method: "POST",
-      body: isRecords ? { records: data, ...options } : { data, ...options },
+      body: isRecords
+        ? { records: data, ...saveOptions }
+        : { data, ...saveOptions },
     });
 
     if (resp.ok) {
