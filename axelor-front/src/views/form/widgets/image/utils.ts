@@ -14,6 +14,7 @@ export const META_FILE_MODEL = "com.axelor.meta.db.MetaFile";
  * @param {string} model - target model
  * @param {string} [field] - target field name
  * @param {DataRecord} [parent] - parent with `id` and `_model`
+ * @param {boolean} [download] - whether to download the image
  * @return {string} The generated image URL
  */
 export function makeImageURL(
@@ -21,7 +22,7 @@ export function makeImageURL(
   model?: string,
   field?: string,
   parent?: DataRecord | null,
-  binary?: boolean,
+  download?: boolean,
 ): string {
   if (!value) return BLANK;
 
@@ -33,7 +34,7 @@ export function makeImageURL(
 
   const url = `ws/rest/${model || parent?._model || META_FILE_MODEL}/${id}/${
     image ? field : "content"
-  }/download?${image && !binary ? "image=true&" : ""}v=${ver}`;
+  }/download?${image && !download ? "image=true&" : ""}v=${ver}`;
 
   if (parent) {
     const { id: parentId, _model: parentModel } = parent;

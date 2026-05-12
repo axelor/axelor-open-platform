@@ -177,9 +177,7 @@ export function Image(
     ? previewUrl
     : isBinary && value === null
       ? makeImageURL(null)
-      : isBinary
-        ? makeImageURL(record, target, name, parent, true)
-        : makeImageURL(record, target, name, parent);
+      : makeImageURL(record, target, name, parent);
 
   // Clean up object URL on unmount or when preview changes
   useEffect(() => {
