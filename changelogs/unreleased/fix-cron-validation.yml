@@ -1,0 +1,3 @@
+---
+title: Fix NPE in JobController cron validation with no further valid firing times
+type: fix

@@ -41,8 +41,6 @@ public class JobController {
   public void validate(ActionRequest request, ActionResponse response) {
     String cronExpression = request.getContext().asType(MetaSchedule.class).getCron();
     try {
-      CronExpression.validateExpression(cronExpression);
-
       response.setNotify(
           I18n.get("Valid cron. Next execution dates are:")
               + "<br/>"
@@ -94,6 +92,9 @@ public class JobController {
     Date date = new Date();
     for (int i = 0; i < 5; i++) {
       Date next = expression.getNextValidTimeAfter(date);
+      if (next == null) {
+        break;
+      }
       nextTriggerDates.add(next);
       date = next;
     }
