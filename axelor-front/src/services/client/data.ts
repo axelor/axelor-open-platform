@@ -73,34 +73,6 @@ export type UploadItem = {
 
 export type UploadValue = UploadItem | UploadItem[];
 
-type UploadErrorPayload = {
-  status?: number;
-  data?: ErrorReport | string | null;
-  error?: ErrorReport | string | null;
-};
-
-function getUploadError(data: unknown): number | string | ErrorReport | null {
-  if (data == null) {
-    return null;
-  }
-
-  if (typeof data === "number" || typeof data === "string") {
-    return data;
-  }
-
-  const payload = data as UploadErrorPayload;
-
-  if (payload.error) {
-    return payload.error;
-  }
-
-  if (payload.status !== 0 && payload.data) {
-    return payload.data;
-  }
-
-  return payload.data ?? null;
-}
-
 export class DataSource {
   #model;
 
@@ -177,31 +149,30 @@ export class DataSource {
     options?: SaveOptions<T>,
   ): Promise<SaveResult<T>> {
     const { onError, ...saveOptions } = options ?? {};
+    const isRecords = Array.isArray(data);
 
-    if (!Array.isArray(data) && data?.$upload) {
+    let resp: Response;
+    if (!isRecords && data?.$upload) {
       const uploads = Array.isArray(data.$upload)
         ? data.$upload
         : [data.$upload];
-      const result = await this.upload(data, uploads, saveOptions);
-      return result as SaveResult<T>;
+      resp = await this.upload(data, uploads, saveOptions);
+    } else {
+      resp = await request({
+        url: `ws/rest/${this.model}`,
+        method: "POST",
+        body: isRecords
+          ? { records: data, ...saveOptions }
+          : { data, ...saveOptions },
+      });
     }
 
-    const isRecords = Array.isArray(data);
-    const url = `ws/rest/${this.model}`;
-    const resp = await request({
-      url,
-      method: "POST",
-      body: isRecords
-        ? { records: data, ...saveOptions }
-        : { data, ...saveOptions },
-    });
-
     if (resp.ok) {
-      const { status, data } = await resp.json();
+      const { status, data: respData } = await resp.json();
       if (status === 0) {
-        return isRecords ? data : data[0];
+        return isRecords ? respData : respData[0];
       }
-      return onError ? onError(data).catch(reject) : reject(data);
+      return onError ? onError(respData).catch(reject) : reject(respData);
     }
 
     return Promise.reject(resp.status);
@@ -282,7 +253,7 @@ export class DataSource {
     uploads: UploadItem[],
     options?: ReadOptions,
     onProgress?: (complete?: number) => void,
-  ): Promise<DataRecord> {
+  ): Promise<Response> {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
     const url = `ws/rest/${this.model}/upload`;
@@ -305,7 +276,7 @@ export class DataSource {
       JSON.stringify({ data: requestData, ...options }),
     );
 
-    return new Promise<DataRecord>(function (resolve, rejectPromise) {
+    return new Promise<Response>(function (resolve, rejectPromise) {
       if (onProgress) {
         xhr.upload.addEventListener(
           "progress",
@@ -321,36 +292,32 @@ export class DataSource {
       xhr.onabort = rejectPromise;
 
       xhr.onload = function () {
-        let responseData: unknown = {};
-        try {
-          responseData = JSON.parse(xhr.response || xhr.responseText);
-        } catch {
-          // ignore
-        }
+        const headers = new Headers();
+        xhr
+          .getAllResponseHeaders()
+          .trim()
+          .split(/[\r\n]+/)
+          .forEach((line) => {
+            const idx = line.indexOf(":");
+            if (idx > 0) {
+              headers.append(
+                line.slice(0, idx).trim(),
+                line.slice(idx + 1).trim(),
+              );
+            }
+          });
 
-        const response = {
-          data: responseData,
+        const response = new Response(xhr.response ?? xhr.responseText, {
           status: xhr.status,
-        };
+          statusText: xhr.statusText,
+          headers,
+        });
+        Object.defineProperties(response, {
+          url: { value: xhr.responseURL },
+          redirected: { value: xhr.responseURL !== new URL(url, location.href).href },
+        });
 
-        if (xhr.status === 200) {
-          if (
-            typeof responseData === "object" &&
-            responseData !== null &&
-            "status" in responseData &&
-            responseData.status === 0 &&
-            "data" in responseData &&
-            Array.isArray(responseData.data)
-          ) {
-            resolve(responseData.data[0]);
-          } else {
-            rejectAsAlert(getUploadError(responseData)).catch(rejectPromise);
-          }
-        } else {
-          rejectAsAlert(getUploadError(responseData) ?? response.status).catch(
-            rejectPromise,
-          );
-        }
+        resolve(response);
       };
 
       xhr.open("POST", url, true);
