@@ -37,7 +37,7 @@ export function Bar(props: ChartProps) {
     return produce(defaultOption, (draft: any) => {
       const rotateLabels = source.length > 6;
       applyTitles(draft, data, {
-        xAxis: { nameGap: rotateLabels ? 75 : 25 },
+        xAxis: { nameGap: rotateLabels ? 40 : 25 },
       });
       draft.series = dimensions.map((key) => ({
         type: "bar",
@@ -74,6 +74,7 @@ export function Bar(props: ChartProps) {
         draft.grid = { ...draft.grid, bottom: 110 };
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;
+        draft.xAxis.nameGap = 30;
       } else if (rotateLabels) {
         draft.xAxis.axisLabel = {
           ...draft.xAxis.axisLabel,
@@ -83,7 +84,7 @@ export function Bar(props: ChartProps) {
           width: 110,
           tooltip: { show: true },
         };
-        draft.grid = { ...draft.grid, bottom: 120 };
+        draft.grid = { ...draft.grid, bottom: 90 };
       } else {
         draft.xAxis.axisLabel = { interval: 0 };
       }

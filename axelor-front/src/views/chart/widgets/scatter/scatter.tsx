@@ -35,11 +35,13 @@ export function Scatter({ data, ...rest }: ChartProps) {
       draft.legend.data = series.map((x: any) => x.key).filter((x) => x);
       draft.tooltip.valueFormatter = formatter;
 
+      draft.grid = { ...draft.grid, top: 20 };
+
       const dataZoom = getDataZoom(types.length);
       if (dataZoom) {
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;
-        draft.grid = { ...draft.grid, bottom: 65 };
+        draft.grid = { ...draft.grid, bottom: 100 };
       }
     });
   }, [data]);
