@@ -21,6 +21,7 @@ export type DashletHandler = {
   onAction?: (action: string, context?: DataContext) => Promise<any>;
   onLegendShowHide?: (show: boolean) => void;
   onExport?: () => Promise<void>;
+  onExportPNG?: () => void;
   onRefresh?: (options?: Partial<SearchOptions>) => Promise<void | any>;
 };
 

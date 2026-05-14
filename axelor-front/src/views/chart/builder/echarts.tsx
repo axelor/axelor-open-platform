@@ -17,7 +17,6 @@ import {
   GridComponent,
   LegendScrollComponent,
   RadarComponent,
-  ToolboxComponent,
   TooltipComponent,
   TransformComponent,
 } from "echarts/components";
@@ -26,7 +25,6 @@ import { CanvasRenderer } from "echarts/renderers";
 import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
-import { sanitizeFilename } from "@/utils/sanitize";
 import { DataRecord } from "@/services/client/data.types";
 import classes from "./echarts.module.scss";
 
@@ -44,7 +42,6 @@ echarts.use([
   GridComponent,
   LegendScrollComponent,
   RadarComponent,
-  ToolboxComponent,
   TooltipComponent,
   TransformComponent,
   CanvasRenderer,
@@ -58,7 +55,8 @@ export function ECharts({
   options,
   legend = true,
   onClick,
-}: Pick<ChartProps, "data" | "legend" | "onClick"> & {
+  onChartReady,
+}: Pick<ChartProps, "data" | "legend" | "onClick" | "onChartReady"> & {
   type: ChartType;
   height: number;
   width: number;
@@ -82,12 +80,14 @@ export function ECharts({
   useEffect(() => {
     if (divRef.current !== null) {
       const $chart = (chart.current = echarts.init(divRef.current, theme));
+      onChartReady?.($chart);
       return () => {
         $chart.dispose();
         chart.current = null;
+        onChartReady?.(null);
       };
     }
-  }, [theme]);
+  }, [theme, onChartReady]);
 
   useEffect(() => {
     const instance = chart.current;
@@ -156,15 +156,6 @@ export function ECharts({
           ...$options,
           ...(legendOption !== undefined && { legend: legendOption }),
           color: getColor(type, data.config?.colors, data.config?.shades),
-          toolbox: {
-            feature: {
-              saveAsImage: {
-                title: " ",
-                pixelRatio: 2,
-                name: sanitizeFilename(data.title),
-              },
-            },
-          },
         },
         {
           // Full replacement avoids stale branches when options shrink.

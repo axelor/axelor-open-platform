@@ -1,3 +1,4 @@
+import type * as echarts from "echarts/core";
 import { Box, useTheme } from "@axelor/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
@@ -20,6 +21,7 @@ import {
 import { ViewData, chart as fetchChart } from "@/services/client/meta";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { download } from "@/utils/download";
+import { sanitizeFilename } from "@/utils/sanitize";
 
 import { Form, FormAtom, useFormHandlers } from "../form/builder";
 import { ChartDataRecord, Chart as ChartComponent } from "./builder";
@@ -72,6 +74,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const { dashlet } = useViewTab();
   const [records, setRecords] = useState<ChartDataRecord[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(null);
   const [legend, showLegend] = useState(
     () => String(view.config?.hideLegend) !== "true",
   );
@@ -261,6 +264,18 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     download(encodeURI(content), `${name}.csv`);
   }, [view, records]);
 
+  const onExportPNG = useCallback(() => {
+    if (!chartInstance) return;
+    const url = chartInstance.getDataURL({ type: "png", pixelRatio: 2 });
+    const name = sanitizeFilename(view?.title);
+    const link = document.createElement("a");
+    link.download = `${name}.png`;
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }, [chartInstance, view]);
+
   const onAction = useCallback(
     async (action: string, options?: ActionOptions) => {
       return actionExecutor.execute(action, options);
@@ -331,9 +346,10 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         onAction: onDatasetAction,
         onRefresh,
         onExport,
+        ...(chartInstance && { onExportPNG }),
       });
     }
-  }, [dashlet, view, onDatasetAction, onRefresh, onExport, setDashletHandlers]);
+  }, [dashlet, view, onDatasetAction, onRefresh, onExport, onExportPNG, chartInstance, setDashletHandlers]);
 
   // register tab:refresh
   useViewTabRefresh("chart", onRefresh);
@@ -363,6 +379,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           legend={legend}
           {...chartOptions}
           {...(hasAction && { onClick: onClickAction })}
+          onChartReady={setChartInstance}
         />
       ) : (
         !loading &&
