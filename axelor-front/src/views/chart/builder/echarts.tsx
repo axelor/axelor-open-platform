@@ -26,6 +26,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { sanitizeFilename } from "@/utils/sanitize";
 import { DataRecord } from "@/services/client/data.types";
 import classes from "./echarts.module.scss";
 
@@ -160,6 +161,7 @@ export function ECharts({
               saveAsImage: {
                 title: " ",
                 pixelRatio: 2,
+                name: sanitizeFilename(data.title),
               },
             },
           },
