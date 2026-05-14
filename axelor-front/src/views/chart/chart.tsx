@@ -20,8 +20,7 @@ import {
 } from "@/view-containers/views/scope";
 import { ViewData, chart as fetchChart } from "@/services/client/meta";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { download } from "@/utils/download";
-import { sanitizeFilename } from "@/utils/sanitize";
+import { download, saveAs } from "@/utils/download";
 
 import { Form, FormAtom, useFormHandlers } from "../form/builder";
 import { ChartDataRecord, Chart as ChartComponent } from "./builder";
@@ -267,13 +266,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const onExportPNG = useCallback(() => {
     if (!chartInstance) return;
     const url = chartInstance.getDataURL({ type: "png", pixelRatio: 2 });
-    const name = sanitizeFilename(view?.title);
-    const link = document.createElement("a");
-    link.download = `${name}.png`;
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    saveAs(url, `${view?.title ?? "chart"}.png`);
   }, [chartInstance, view]);
 
   const onAction = useCallback(
