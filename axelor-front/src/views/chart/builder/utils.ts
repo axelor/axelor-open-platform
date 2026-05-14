@@ -16,8 +16,8 @@ import { ChartView, Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
 import { ChartDataRecord, ChartType } from "./types";
 
-const DEFAULT_MAX_SERIES = 50;
-const DATA_ZOOM_THRESHOLD = 20;
+const DEFAULT_MAX_SERIES = 200;
+const DATA_ZOOM_THRESHOLD = 50;
 
 /**
  * Build dataZoom config for charts with many xAxis categories.

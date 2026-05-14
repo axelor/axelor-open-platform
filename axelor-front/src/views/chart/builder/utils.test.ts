@@ -86,24 +86,24 @@ describe("PlusData maxSeries capping", () => {
       expect(result.data).toHaveLength(2); // 2 years
     });
 
-    it("should cap 200 products to default 50 (no Others for bar)", () => {
-      const data = makeBarData(200);
+    it("should cap 500 products to default 200 (no Others for bar)", () => {
+      const data = makeBarData(500);
       const result = PlusData(data);
 
       // Bar/hbar drops tail dimensions without "Others" to preserve Y-axis scale
-      expect(result.types).toHaveLength(50);
+      expect(result.types).toHaveLength(200);
       expect(result.types).not.toContain("Others");
 
       // Top products should be the highest-value ones
-      expect(result.types).toContain("Product_199");
-      expect(result.types).toContain("Product_198");
+      expect(result.types).toContain("Product_499");
+      expect(result.types).toContain("Product_498");
 
       // Each source row (year) should only have top dimensions
       for (const row of result.data) {
         const keys = Object.keys(row).filter(
           (k) => !["raw", "x", "y"].includes(k),
         );
-        expect(keys.length).toBeLessThanOrEqual(50);
+        expect(keys.length).toBeLessThanOrEqual(200);
       }
     });
 
@@ -158,8 +158,8 @@ describe("PlusData maxSeries capping", () => {
       data.config = { maxSeries: "abc" };
       const result = PlusData(data);
 
-      // Should fall back to DEFAULT_MAX_SERIES (50)
-      expect(result.types.length).toBeLessThanOrEqual(51);
+      // Should fall back to DEFAULT_MAX_SERIES (200)
+      expect(result.types.length).toBeLessThanOrEqual(201);
     });
   });
 
@@ -205,16 +205,16 @@ describe("PlusData maxSeries capping", () => {
   });
 
   describe("pie/donut/radar (groupField === xAxis)", () => {
-    it("should cap 200 items to default 50 + Others", () => {
-      const data = makePieData(200);
+    it("should cap 500 items to default 200 + Others", () => {
+      const data = makePieData(500);
       const result = PlusData(data);
 
-      expect(result.types.length).toBeLessThanOrEqual(51);
-      expect(result.data.length).toBeLessThanOrEqual(51);
+      expect(result.types.length).toBeLessThanOrEqual(201);
+      expect(result.data.length).toBeLessThanOrEqual(201);
       expect(result.types).toContain("Others");
 
       // Highest-value product should be kept
-      expect(result.types).toContain("Product_199");
+      expect(result.types).toContain("Product_499");
     });
 
     it("should merge tail rows into Others with correct value", () => {
@@ -286,48 +286,48 @@ function countDimensionKeys(data: any[]): number {
 }
 
 describe("maxSeries output size reduction", () => {
-  it("bar: capped output should have far fewer dimension keys for 200 products", () => {
-    const uncapped = PlusData(makeBarData(200, 0));
-    const capped = PlusData(makeBarData(200)); // default 50
+  it("bar: capped output should have far fewer dimension keys for 500 products", () => {
+    const uncapped = PlusData(makeBarData(500, 0));
+    const capped = PlusData(makeBarData(500)); // default 200
 
-    // Uncapped: 200 types → 200 dimension keys per row × 2 rows = 400
-    expect(uncapped.types).toHaveLength(200);
+    // Uncapped: 500 types → 500 dimension keys per row × 2 rows = 1000
+    expect(uncapped.types).toHaveLength(500);
     const uncappedKeys = countDimensionKeys(uncapped.data);
 
-    // Capped: 50 types (no Others) → 50 keys per row × 2 rows = 100
-    expect(capped.types).toHaveLength(50);
+    // Capped: 200 types → 200 keys per row × 2 rows = 400
+    expect(capped.types).toHaveLength(200);
     const cappedKeys = countDimensionKeys(capped.data);
 
-    expect(cappedKeys).toBeLessThan(uncappedKeys / 3);
+    expect(cappedKeys).toBeLessThan(uncappedKeys / 2);
   });
 
-  it("pie: capped output should have far fewer rows for 200 items", () => {
-    const uncapped = PlusData(makePieData(200, 0));
-    const capped = PlusData(makePieData(200)); // default 50
+  it("pie: capped output should have far fewer rows for 500 items", () => {
+    const uncapped = PlusData(makePieData(500, 0));
+    const capped = PlusData(makePieData(500)); // default 200
 
-    expect(uncapped.data).toHaveLength(200);
-    expect(capped.data.length).toBeLessThanOrEqual(51);
-    // At least 3x fewer rows
-    expect(capped.data.length).toBeLessThan(uncapped.data.length / 3);
+    expect(uncapped.data).toHaveLength(500);
+    expect(capped.data.length).toBeLessThanOrEqual(201);
+    // At least 2x fewer rows
+    expect(capped.data.length).toBeLessThan(uncapped.data.length / 2);
   });
 
   it("line: capped output should have far fewer series for 10000 groups", () => {
     const uncapped = PlotData(makeLineData(10000, 0));
-    const capped = PlotData(makeLineData(10000)); // default 50
+    const capped = PlotData(makeLineData(10000)); // default 200
 
     expect(uncapped.data).toHaveLength(10000);
-    expect(capped.data.length).toBeLessThanOrEqual(51);
-    // 10000 → 51 = ~196x fewer series
-    expect(capped.data.length).toBeLessThan(uncapped.data.length / 100);
+    expect(capped.data.length).toBeLessThanOrEqual(201);
+    // 10000 → 201 = ~49x fewer series
+    expect(capped.data.length).toBeLessThan(uncapped.data.length / 20);
   });
 });
 
 describe("PlotData maxSeries capping", () => {
-  it("should cap 10000 series to default 50 + Others", () => {
+  it("should cap 10000 series to default 200 + Others", () => {
     const data = makeLineData(10000);
     const result = PlotData(data);
 
-    expect(result.data.length).toBeLessThanOrEqual(51);
+    expect(result.data.length).toBeLessThanOrEqual(201);
     expect(result.data.some((s: any) => s.key === "Others")).toBe(true);
 
     // Highest-value series should be kept
@@ -384,15 +384,15 @@ describe("PlotData maxSeries capping", () => {
     data.config = { maxSeries: "invalid" };
     const result = PlotData(data);
 
-    // Falls back to DEFAULT_MAX_SERIES (50)
-    expect(result.data.length).toBeLessThanOrEqual(51);
+    // Falls back to DEFAULT_MAX_SERIES (200)
+    expect(result.data.length).toBeLessThanOrEqual(201);
   });
 });
 
 describe("getDataZoom", () => {
   it("should return undefined when data fits within threshold", () => {
     expect(getDataZoom(10)).toBeUndefined();
-    expect(getDataZoom(20)).toBeUndefined();
+    expect(getDataZoom(50)).toBeUndefined();
   });
 
   it("should return slider + inside zoom for large data", () => {
@@ -404,8 +404,8 @@ describe("getDataZoom", () => {
 
   it("should calculate correct end percentage", () => {
     const zoom = getDataZoom(200);
-    // 20/200 = 10%
-    expect(zoom![0].end).toBe(10);
+    // 50/200 = 25%
+    expect(zoom![0].end).toBe(25);
   });
 
   it("should support yAxis for horizontal bar charts", () => {
