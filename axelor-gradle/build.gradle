@@ -61,3 +61,7 @@ classes.doLast {
   generateLibsList "database"
   generateLibsList "provided"
 }
+
+checkDuplicateClasses {
+  excludes = ["gradle-api.*"]
+}
