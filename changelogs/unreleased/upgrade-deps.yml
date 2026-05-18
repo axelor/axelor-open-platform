@@ -6,7 +6,7 @@ description: |
   
   - Upgrade Jackson from 2.21.0 to 2.21.3
   - Upgrade Jsoup from 1.22.1 to 1.22.2
-  - Upgrade Swagger from 2.2.43 to 2.2.49
+  - Upgrade Swagger from 2.2.43 to 2.2.50
   - Upgrade ByteBuddy from 1.18.5 to 1.18.8
   - Upgrade Birt from 4.22.0 to 4.23.0
   - Upgrade Snakeyaml from 2.5 to 2.6

@@ -30,7 +30,7 @@ versions.asm = "9.9.1"
 
 versions.flyway = "11.20.3"
 
-versions.swagger = "2.2.49"
+versions.swagger = "2.2.50"
 
 // unit testing
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit}"
