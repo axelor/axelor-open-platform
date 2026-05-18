@@ -49,7 +49,7 @@ libs.slf4j_base = [
 libs.slf4j_logback = libs.slf4j_base + [
   "ch.qos.logback:logback-core:1.5.32",
   "ch.qos.logback:logback-classic:1.5.32",
-  "org.jline:jansi:3.30.9"
+  "org.jline:jansi:4.1.0"
 ]
 
 // Guava
