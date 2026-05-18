@@ -14,7 +14,7 @@ description: |
   - Upgrade Hibernate from 6.6.42 to 6.6.50
   - Upgrade Redisson from 3.52.0 to 4.3.1
   - Upgrade Junit from 5.14.3 to 6.0.3
-  - Upgrade Groovy from 4.0.30 to 4.0.31
+  - Upgrade Groovy from 4.0.30 to 4.0.32
   - Upgrade Tomcat from 10.1.52 to 10.1.54
   - Upgrade Undertow from 2.3.23 to 2.3.24
   - Upgrade Gradle from 8.14.3 to 8.14.5
