@@ -49,9 +49,6 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
   /**
    * Matches {@link AxelorCsrfGenerator} behavior.
    *
-   * <p>Code based on:
-   * https://github.com/pac4j/pac4j/blob/4.5.x/pac4j-core/src/main/java/org/pac4j/core/authorization/authorizer/CsrfAuthorizer.java#L40
-   *
    * @param context the web context
    * @param sessionStore the session store
    * @param profiles the user profiles
@@ -79,9 +76,13 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
       @SuppressWarnings("unchecked")
       final Optional<String> sessionToken =
           (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
-      return !sessionToken.isPresent()
-          || (strEquals(sessionToken.get(), parameterToken)
-              || strEquals(sessionToken.get(), headerToken));
+      final boolean hasSessionData = sessionToken.isPresent();
+      final String token = sessionToken.orElse(null);
+      final boolean isGoodToken =
+          strEquals(token, parameterToken) | strEquals(token, headerToken);
+      if (!hasSessionData | !isGoodToken) {
+        return false;
+      }
     }
     return true;
   }
