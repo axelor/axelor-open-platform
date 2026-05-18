@@ -5,6 +5,23 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 8.2
+
+The main highlights are :
+
+- Add UUID field type support for domain entities
+- Add custom model support across all view types: kanban, calendar, tree, gantt, cards, grid and form
+- Add cascade persist/merge/delete handling for custom JSON field relations
+- Add active session management: users can view and revoke their active sessions; admins can manage sessions for any user
+- Rework user password update flow with identity verification, and improve built-in password policies (length, complexity, score, custom patterns, ...)
+- Strengthen encrypted fields: migrate to PBKDF2WithHmacSHA256 and AES/GCM with a self-describing ciphertext format
+- Remove MySQL and Oracle database support to focus on PostgreSQL
+- Lighter and more usable CodeEditor with new auto-size and lite modes
+- Allow extending the `implements` attribute when overriding an entity
+
+Please check the {github-repo-url}/blob/8.2/CHANGELOG.md[change log] for a detailed list of changes and
+the xref:ROOT:migrations/migration-8.2.adoc[8.2 migration guide].
+
 == 8.1
 
 The main highlights are :
