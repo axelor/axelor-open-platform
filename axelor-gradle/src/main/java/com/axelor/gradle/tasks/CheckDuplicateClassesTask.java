@@ -4,17 +4,17 @@
  */
 package com.axelor.gradle.tasks;
 
-import com.axelor.common.reflections.Reflections;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -57,85 +57,71 @@ public class CheckDuplicateClassesTask extends DefaultTask implements Verificati
     return excludes;
   }
 
-  private URL toURL(File file) {
-    try {
-      return file.toURI().toURL();
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("Invalid file URL: " + file, e);
+  private record JarScan(boolean axelorModule, List<String> classNames) {}
+
+  private boolean isExcluded(File file) {
+    String name = file.getName();
+    return excludes.stream().anyMatch(name::matches);
+  }
+
+  private JarScan scanJar(File file) {
+    try (var jar = new JarFile(file)) {
+      // O(1) lookup — Axelor jars short-circuit without enumerating entries.
+      if (jar.getJarEntry("META-INF/axelor-module.properties") != null) {
+        return new JarScan(true, List.of());
+      }
+      var names = new ArrayList<String>();
+      var entries = jar.entries();
+      while (entries.hasMoreElements()) {
+        var name = entries.nextElement().getName();
+        if (name.endsWith(".class") && !name.endsWith("module-info.class")) {
+          names.add(name.substring(0, name.length() - ".class".length()).replace('/', '.'));
+        }
+      }
+      return new JarScan(false, names);
+    } catch (IOException e) {
+      throw new GradleException("Error reading jar: " + file, e);
     }
-  }
-
-  private List<URL> findWithin(URL jar, String pattern) {
-    URL[] urls = {jar};
-    try (var loader = new URLClassLoader(urls, null)) {
-      return Reflections.findResources(loader).byName(pattern).find().stream()
-          .filter(x -> !x.toString().contains("module-info"))
-          .toList();
-    } catch (Exception e) {
-      throw new RuntimeException("Error finding resources in jar: " + jar, e);
-    }
-  }
-
-  private List<URL> findClassURLs(URL jar) {
-    return findWithin(jar, ".*\\.class");
-  }
-
-  private boolean isNotAxelorLib(URL jar) {
-    return findWithin(jar, "META-INF/axelor-module.properties").isEmpty();
-  }
-
-  private boolean isExcluded(URL jar) {
-    String jarName = new File(jar.getFile()).getName();
-    return excludes.stream().anyMatch(jarName::matches);
-  }
-
-  private boolean isCandidate(URL jar) {
-    return isNotAxelorLib(jar) && !isExcluded(jar);
-  }
-
-  private List<String> findClassNames(URL jar) {
-    return findClassURLs(jar).stream()
-        .map(
-            url -> {
-              return url.getPath()
-                  .replaceAll(".*\\.jar!", "")
-                  .replaceAll("^/", "")
-                  .replaceAll("\\.class$", "")
-                  .replaceAll("/", ".");
-            })
-        .toList();
   }
 
   @TaskAction
   public void check() {
-    var urls = classpathToScan.getFiles().stream().map(this::toURL).toList();
-    var libs =
-        urls.parallelStream()
-            .filter(this::isCandidate)
-            .map(
-                url -> {
-                  var name = new File(url.getFile()).getName();
-                  var classes = findClassNames(url);
-                  return Map.entry(name, classes);
-                })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, List<String>> libs =
+        classpathToScan.getFiles().parallelStream()
+            .filter(f -> f.isFile() && f.getName().endsWith(".jar"))
+            .filter(f -> !isExcluded(f))
+            .map(f -> Map.entry(f.getName(), scanJar(f)))
+            .filter(e -> !e.getValue().axelorModule())
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().classNames()));
 
-    var conflicts = new HashMap<String, List<String>>();
-
-    // Find conflicts between libraries
+    // class name -> jars that declare it.
+    Map<String, List<String>> classOwners = new HashMap<>();
     for (var entry : libs.entrySet()) {
       var lib = entry.getKey();
-      var classes = entry.getValue();
-      for (var otherEntry : libs.entrySet()) {
-        var otherLib = otherEntry.getKey();
-        if (lib.equals(otherLib)) {
-          continue;
-        }
-        var otherClasses = otherEntry.getValue();
-        if (otherClasses.stream().anyMatch(classes::contains)
-            // Don't add mirrored duplicates (B,A) if (A,B) exist
-            && (conflicts.get(otherLib) == null || !conflicts.get(otherLib).contains(lib))) {
-          conflicts.computeIfAbsent(lib, k -> new ArrayList<>()).add(otherLib);
+      for (var cls : entry.getValue()) {
+        classOwners.computeIfAbsent(cls, k -> new ArrayList<>(2)).add(lib);
+      }
+    }
+
+    // Canonical (A < B) pairs — deterministic and no mirror dedup needed.
+    Map<String, Set<String>> conflicts = new TreeMap<>();
+    for (var owners : classOwners.values()) {
+      if (owners.size() < 2) {
+        continue;
+      }
+      for (int i = 0; i < owners.size(); i++) {
+        for (int j = i + 1; j < owners.size(); j++) {
+          var a = owners.get(i);
+          var b = owners.get(j);
+          if (a.equals(b)) {
+            continue;
+          }
+          if (a.compareTo(b) > 0) {
+            var t = a;
+            a = b;
+            b = t;
+          }
+          conflicts.computeIfAbsent(a, k -> new TreeSet<>()).add(b);
         }
       }
     }
@@ -149,13 +135,12 @@ public class CheckDuplicateClassesTask extends DefaultTask implements Verificati
     getLogger().lifecycle("Conflicts found:");
     getLogger().lifecycle("");
 
-    for (var entry : conflicts.entrySet()) {
-      var lib = entry.getKey();
-      var conflictingLibs = entry.getValue();
-      getLogger().lifecycle("Library: " + lib);
-      getLogger().lifecycle("Conflicts with: " + String.join(", ", conflictingLibs));
-      getLogger().lifecycle("");
-    }
+    conflicts.forEach(
+        (lib, others) -> {
+          getLogger().lifecycle("Library: " + lib);
+          getLogger().lifecycle("Conflicts with: " + String.join(", ", others));
+          getLogger().lifecycle("");
+        });
 
     if (!ignoreFailures) {
       throw new GradleException("Duplicate classes detected");
