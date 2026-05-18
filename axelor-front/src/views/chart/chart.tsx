@@ -242,7 +242,6 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const onExport = useCallback(async () => {
     if (!view || !records) return;
 
-    const name = (view.title || "export").toLowerCase().replace(/ /g, "_");
     const header = records.reduce(
       (list, row) => unique([...(list as []), ...Object.keys(row)]),
       [],
@@ -260,13 +259,13 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       content += row.join(";") + "\n";
     });
 
-    download(encodeURI(content), `${name}.csv`);
+    download(encodeURI(content), `${view.title || "export"}.csv`);
   }, [view, records]);
 
   const onExportPNG = useCallback(() => {
     if (!chartInstance) return;
     const url = chartInstance.getDataURL({ type: "png", pixelRatio: 2 });
-    saveAs(url, `${view?.title ?? "chart"}.png`);
+    saveAs(url, `${view?.title || "chart"}.png`);
   }, [chartInstance, view]);
 
   const onAction = useCallback(
