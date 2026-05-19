@@ -8,6 +8,7 @@ import { ChartProps, ECharts } from "../../builder";
 const defaultOption = {
   legend: {
     bottom: 5,
+    left: "center",
     type: "scroll",
   },
   tooltip: {
@@ -66,6 +67,8 @@ export function Line({ data, type, ...rest }: ChartProps) {
         };
       }
 
+      draft.grid = { ...draft.grid, top: 45 };
+
       const configZoom = Number(data.config?.zoomThreshold);
       const dataZoom = getDataZoom(
         types.length,
@@ -75,7 +78,7 @@ export function Line({ data, type, ...rest }: ChartProps) {
       if (dataZoom) {
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;
-        draft.grid = { ...draft.grid, bottom: 65 };
+        draft.grid = { ...draft.grid, bottom: 95 };
       }
     });
   }, [type, data]);

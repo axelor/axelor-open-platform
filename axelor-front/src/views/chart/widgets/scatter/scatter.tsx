@@ -7,6 +7,7 @@ import { ChartProps, ECharts } from "../../builder";
 const defaultOption = {
   legend: {
     bottom: 5,
+    left: "center",
     type: "scroll",
   },
   tooltip: {
@@ -35,7 +36,7 @@ export function Scatter({ data, ...rest }: ChartProps) {
       draft.legend.data = series.map((x: any) => x.key).filter((x) => x);
       draft.tooltip.valueFormatter = formatter;
 
-      draft.grid = { ...draft.grid, top: 20 };
+      draft.grid = { ...draft.grid, top: 45 };
 
       const configZoom = Number(data.config?.zoomThreshold);
       const dataZoom = getDataZoom(

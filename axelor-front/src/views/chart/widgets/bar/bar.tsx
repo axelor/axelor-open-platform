@@ -13,6 +13,7 @@ import { BarGroup } from "./bar-group";
 const defaultOption = {
   legend: {
     bottom: 5,
+    left: "center",
     type: "scroll",
   },
   tooltip: {},
@@ -37,7 +38,7 @@ export function Bar(props: ChartProps) {
     return produce(defaultOption, (draft: any) => {
       const rotateLabels = source.length > 6;
       applyTitles(draft, data, {
-        xAxis: { nameGap: rotateLabels ? 40 : 25 },
+        xAxis: { nameGap: rotateLabels ? 55 : 25 },
       });
       draft.series = dimensions.map((key) => ({
         type: "bar",
@@ -59,6 +60,7 @@ export function Bar(props: ChartProps) {
       draft.tooltip.valueFormatter = formatter;
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
+      draft.grid = { ...draft.grid, top: 45 };
 
       const configZoom = Number(data.config?.zoomThreshold);
       const dataZoom = getDataZoom(
@@ -76,20 +78,20 @@ export function Bar(props: ChartProps) {
           width: 60,
           tooltip: { show: true },
         };
-        draft.grid = { ...draft.grid, bottom: 110 };
+        draft.grid = { ...draft.grid, bottom: 130 };
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;
-        draft.xAxis.nameGap = 30;
+        draft.xAxis.nameGap = 55;
       } else if (rotateLabels) {
         draft.xAxis.axisLabel = {
           ...draft.xAxis.axisLabel,
           rotate: 30,
           interval: 0,
           overflow: "truncate",
-          width: 110,
+          width: 75,
           tooltip: { show: true },
         };
-        draft.grid = { ...draft.grid, bottom: 90 };
+        draft.grid = { ...draft.grid, bottom: 105 };
       } else {
         draft.xAxis.axisLabel = { interval: 0 };
       }

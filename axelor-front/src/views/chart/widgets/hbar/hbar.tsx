@@ -13,6 +13,7 @@ import { BarGroup } from "../bar/bar-group";
 const defaultOption = {
   legend: {
     bottom: 5,
+    left: "center",
     type: "scroll",
   },
   tooltip: {},
@@ -64,6 +65,7 @@ export function Hbar(props: ChartProps) {
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
       draft.tooltip.valueFormatter = formatter;
+      draft.grid = { ...draft.grid, top: 45 };
 
       const configZoom = Number(data.config?.zoomThreshold);
       const dataZoom = getDataZoom(
