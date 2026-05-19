@@ -902,6 +902,14 @@ export function prepareTheme(type: ChartType) {
     emphasis: {
       label: { color },
     },
+    radar: {
+      axisName: { color },
+    },
+    gauge: {
+      axisLabel: { color },
+      detail: { color },
+      title: { color },
+    },
   };
 }
 
