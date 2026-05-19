@@ -37,7 +37,12 @@ export function Scatter({ data, ...rest }: ChartProps) {
 
       draft.grid = { ...draft.grid, top: 20 };
 
-      const dataZoom = getDataZoom(types.length);
+      const configZoom = Number(data.config?.zoomThreshold);
+      const dataZoom = getDataZoom(
+        types.length,
+        "xAxis",
+        Number.isFinite(configZoom) ? configZoom : undefined,
+      );
       if (dataZoom) {
         draft.dataZoom = dataZoom;
         draft.legend.bottom = 30;

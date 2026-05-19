@@ -425,4 +425,23 @@ describe("getDataZoom", () => {
     // 20/100 = 20%
     expect(zoom![0].end).toBe(20);
   });
+
+  it("should return undefined when maxVisible is negative (zoom disabled)", () => {
+    expect(getDataZoom(100, "xAxis", -1)).toBeUndefined();
+    expect(getDataZoom(10, "xAxis", -99)).toBeUndefined();
+  });
+
+  it("should return full-view zoom when maxVisible is 0, regardless of dataLength", () => {
+    const zoom = getDataZoom(10, "xAxis", 0);
+    expect(zoom).toHaveLength(2);
+    expect(zoom![0]).toMatchObject({ type: "slider", xAxisIndex: 0, start: 0, end: 100 });
+    expect(zoom![1]).toMatchObject({ type: "inside", xAxisIndex: 0, start: 0, end: 100 });
+  });
+
+  it("should return full-view zoom when maxVisible is 0 and dataLength is 0", () => {
+    const zoom = getDataZoom(0, "xAxis", 0);
+    expect(zoom).toHaveLength(2);
+    expect(zoom![0]).toMatchObject({ start: 0, end: 100 });
+    expect(zoom![1]).toMatchObject({ start: 0, end: 100 });
+  });
 });

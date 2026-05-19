@@ -60,7 +60,12 @@ export function Bar(props: ChartProps) {
       draft.dataset.dimensions = ["x", ...dimensions];
       draft.dataset.source = source;
 
-      const dataZoom = getDataZoom(source.length);
+      const configZoom = Number(data.config?.zoomThreshold);
+      const dataZoom = getDataZoom(
+        source.length,
+        "xAxis",
+        Number.isFinite(configZoom) ? configZoom : undefined,
+      );
 
       if (dataZoom) {
         // With dataZoom, use compact labels since users can zoom in

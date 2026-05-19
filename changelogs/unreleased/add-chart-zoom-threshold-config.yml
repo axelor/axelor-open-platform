@@ -1,0 +1,23 @@
+---
+title: Add zoomThreshold config option to charts
+type: feature
+description: |
+  A new `zoomThreshold` per-chart config option controls data zoom slider behavior.
+  Defaults to `50`.
+
+  - **`> 0`** — zoom slider enabled only when the number of data points exceeds the value;
+    initial view shows the first N items.
+  - **`= 0`** — zoom slider always shown, fully zoomed out (all data visible); useful when you
+    want precise zoom controls regardless of series size.
+  - **`< 0`** — zoom disabled; no zoom controls are shown.
+
+  ```xml
+  <!-- Enable zoom slider only when more than 20 data points are present -->
+  <config name="zoomThreshold" value="20" />
+
+  <!-- Always show zoom controls, full data visible -->
+  <config name="zoomThreshold" value="0" />
+
+  <!-- Disable zoom controls entirely -->
+  <config name="zoomThreshold" value="-1" />
+  ```

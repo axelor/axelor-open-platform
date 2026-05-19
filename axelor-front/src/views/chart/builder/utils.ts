@@ -20,30 +20,45 @@ const DEFAULT_MAX_SERIES = 200;
 const DATA_ZOOM_THRESHOLD = 50;
 
 /**
- * Build dataZoom config for charts with many xAxis categories.
- * Shows a slider + inside (scroll/pinch) zoom, initially displaying
- * the first `maxVisible` items.
+ * Build dataZoom config for charts with many categories.
+ *
+ * `maxVisible` semantics:
+ *  - `< 0`  — zoom disabled; returns undefined regardless of data length
+ *  - `= 0`  — zoom always shown with 100% of data visible (useful for limited
+ *              series where you still want precise zoom controls)
+ *  - `> 0`  — threshold mode: zoom shown only when `dataLength > maxVisible`;
+ *              initial viewport shows the first `maxVisible` items
  */
 export function getDataZoom(
   dataLength: number,
   axis: "xAxis" | "yAxis" = "xAxis",
   maxVisible = DATA_ZOOM_THRESHOLD,
 ) {
+  if (maxVisible < 0) return undefined;
+
+  const axisIndex = axis === "xAxis" ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
+  const isVertical = axis === "yAxis";
+  const layout = isVertical
+    ? { orient: "vertical", right: 5, width: 20 }
+    : { bottom: 5, height: 20 };
+
+  if (maxVisible === 0) {
+    return [
+      { type: "slider", ...axisIndex, start: 0, end: 100, ...layout },
+      { type: "inside", ...axisIndex, start: 0, end: 100 },
+    ];
+  }
+
   if (dataLength <= maxVisible) return undefined;
 
   const endPercent = Math.min((maxVisible / dataLength) * 100, 100);
-  const axisIndex = axis === "xAxis" ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
-  const isVertical = axis === "yAxis";
-
   return [
     {
       type: "slider",
       ...axisIndex,
       start: 0,
       end: endPercent,
-      ...(isVertical
-        ? { orient: "vertical", right: 5, width: 20 }
-        : { bottom: 5, height: 20 }),
+      ...layout,
     },
     { type: "inside", ...axisIndex, start: 0, end: endPercent },
   ];

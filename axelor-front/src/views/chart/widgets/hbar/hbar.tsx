@@ -65,7 +65,12 @@ export function Hbar(props: ChartProps) {
       draft.dataset.source = source;
       draft.tooltip.valueFormatter = formatter;
 
-      const dataZoom = getDataZoom(source.length, "yAxis");
+      const configZoom = Number(data.config?.zoomThreshold);
+      const dataZoom = getDataZoom(
+        source.length,
+        "yAxis",
+        Number.isFinite(configZoom) ? configZoom : undefined,
+      );
       if (dataZoom) {
         draft.dataZoom = dataZoom;
         // Slider on the right side — no legend overlap

@@ -650,6 +650,7 @@ export interface ChartConfig {
   min?: number;
   max?: number;
   maxSeries?: number;
+  zoomThreshold?: number;
   axisScale?: "fixed" | "distinct" | "unique"; // radar chart config
   onClick?: string;
   hideLegend?: boolean;
