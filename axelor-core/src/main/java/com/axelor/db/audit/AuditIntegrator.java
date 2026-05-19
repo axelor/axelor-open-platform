@@ -6,6 +6,7 @@ package com.axelor.db.audit;
 
 import com.axelor.db.json.JsonReferenceListener;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStoreCacheInvalidator;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -36,6 +37,11 @@ public class AuditIntegrator implements Integrator {
     registry.appendListeners(EventType.PRE_UPDATE, jsonListener);
     registry.appendListeners(EventType.PRE_DELETE, jsonListener);
     registry.appendListeners(EventType.POST_COMMIT_UPDATE, jsonListener);
+
+    final MetaStoreCacheInvalidator metaStoreCacheInvalidator = new MetaStoreCacheInvalidator();
+    registry.appendListeners(EventType.POST_COMMIT_INSERT, metaStoreCacheInvalidator);
+    registry.appendListeners(EventType.POST_COMMIT_UPDATE, metaStoreCacheInvalidator);
+    registry.appendListeners(EventType.POST_COMMIT_DELETE, metaStoreCacheInvalidator);
 
     Beans.get(HibernateListenerService.class).registerListeners(registry);
   }

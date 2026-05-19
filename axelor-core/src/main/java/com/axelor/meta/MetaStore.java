@@ -40,7 +40,10 @@ import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import jakarta.annotation.Nullable;
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -63,6 +67,30 @@ public final class MetaStore {
 
   private static final AxelorCache<String, Action> ACTIONS =
       CacheBuilder.newBuilder("actions").maximumSize(1000).build(XMLViews::findAction);
+
+  private static final AxelorCache<ModelFieldKey, Map<String, FieldEntry>> JSON_FIELDS =
+      CacheBuilder.newBuilder("jsonFields")
+          .maximumSize(1000)
+          .expireAfterAccess(Duration.ofDays(1))
+          .build();
+
+  /** Key used to store and retrieve JSON fields from the json fields cache. */
+  private record ModelFieldKey(String modelName, String fieldName) implements Serializable {
+    public static ModelFieldKey of(String modelName, String fieldName) {
+      return new ModelFieldKey(modelName, fieldName);
+    }
+
+    public static ModelFieldKey of(String jsonModel) {
+      return new ModelFieldKey(jsonModel, null);
+    }
+  }
+
+  /**
+   * Cached, user-agnostic representation of a JSON field. {@code attrs} contains static metadata
+   * with raw (untranslated) title; per-user/per-locale logic is applied on read.
+   */
+  private record FieldEntry(Map<String, Object> attrs, Set<Long> roleIds, String includeIfScript)
+      implements Serializable {}
 
   private MetaStore() {}
 
@@ -302,44 +330,72 @@ public final class MetaStore {
     return result;
   }
 
+  @Nullable
   public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
-    try {
-      if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
-        return null;
-      }
-    } catch (Exception e) {
+    final Map<String, FieldEntry> raw =
+        JSON_FIELDS.get(
+            ModelFieldKey.of(modelName, fieldName), MetaStore::loadJsonFieldsByModelField);
+    return applyUserContext(raw, modelName, fieldName);
+  }
+
+  @Nullable
+  public static Map<String, Object> findJsonFields(String jsonModel) {
+    if (StringUtils.isBlank(jsonModel)) {
       return null;
     }
-    final List<MetaJsonField> fields =
+    final Map<String, FieldEntry> raw =
+        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+    return applyUserContext(raw, jsonModel, null);
+  }
+
+  @Nullable
+  private static Map<String, FieldEntry> loadJsonFieldsByModelField(ModelFieldKey key) {
+    String modelName = key.modelName();
+    String fieldName = key.fieldName();
+
+    try {
+      if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
+        return Collections.emptyMap();
+      }
+    } catch (Exception e) {
+      return Collections.emptyMap();
+    }
+
+    var fields =
         Query.of(MetaJsonField.class)
             .filter("self.model = :model AND self.modelField = :field")
             .bind("model", modelName)
             .bind("field", fieldName)
             .order("sequence")
             .order("id")
+            .cacheable()
             .fetch();
-
-    final Map<String, Object> result = updateJsonFields(fields, fieldName);
-    return checkPermissions(result, modelName, fieldName);
+    return updateJsonFields(fields, fieldName);
   }
 
-  public static Map<String, Object> findJsonFields(String jsonModel) {
+  @Nullable
+  private static Map<String, FieldEntry> loadJsonFieldsByJsonModel(ModelFieldKey key) {
     final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
-    final MetaJsonModel found = forms.findByName(jsonModel);
-    if (found == null) return null;
-    final Map<String, Object> result = updateJsonFields(found.getFields(), "attrs");
-    return checkPermissions(result, jsonModel, null);
+    final MetaJsonModel found = forms.findByName(key.modelName());
+
+    if (found == null) {
+      return Collections.emptyMap();
+    }
+
+    return updateJsonFields(found.getFields(), "attrs");
   }
 
-  private static Map<String, Object> updateJsonFields(
+  /**
+   * Builds the raw, user/locale-agnostic field metadata cached by the JSON field caches. Per-user
+   * (role, includeIf, permissions) and per-locale (title) logic is applied later by {@link
+   * #applyUserContext}.
+   */
+  private static Map<String, FieldEntry> updateJsonFields(
       List<MetaJsonField> records, String fieldName) {
     final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
     final Mapper mapper = Mapper.of(MetaJsonField.class);
-    final Map<String, Object> fields = new LinkedHashMap<>();
+    final Map<String, FieldEntry> fields = new LinkedHashMap<>();
     final List<MetaJsonField> jsonFields = new ArrayList<>(records);
-    final User user = AuthUtils.getUser();
-
-    ScriptHelper scriptHelper = null;
 
     jsonFields.sort(
         (a, b) -> {
@@ -350,34 +406,6 @@ public final class MetaStore {
 
     for (MetaJsonField record : jsonFields) {
       final Map<String, Object> attrs = new HashMap<>();
-      final String name = record.getName();
-      boolean hasAccess = true;
-
-      // check permissions
-      if ((user != null && !AuthUtils.isAdmin(user))
-          && record.getRoles() != null
-          && !record.getRoles().isEmpty()) {
-        final Set<Role> roles = new HashSet<>();
-        if (user.getRoles() != null) {
-          roles.addAll(user.getRoles());
-        }
-        if (user.getGroup() != null && user.getGroup().getRoles() != null) {
-          roles.addAll(user.getGroup().getRoles());
-        }
-        if (Collections.disjoint(roles, record.getRoles())) {
-          hasAccess = false;
-        }
-      }
-
-      // check server condition
-      if (hasAccess && StringUtils.notBlank(record.getIncludeIf())) {
-        if (scriptHelper == null) {
-          scriptHelper = new CompositeScriptHelper(null);
-        }
-        if (!scriptHelper.test(record.getIncludeIf())) {
-          hasAccess = false;
-        }
-      }
 
       for (java.lang.reflect.Field field : declaredFields) {
         final Property prop = mapper.getProperty(field.getName());
@@ -393,18 +421,6 @@ public final class MetaStore {
           continue;
         }
         attrs.put(prop.getName(), value);
-      }
-
-      String title = record.getTitle();
-
-      // localized title
-      attrs.put("title", I18n.get(title));
-
-      // auto title
-      if (StringUtils.isBlank(title)) {
-        String last = name.substring(name.lastIndexOf('.') + 1);
-        title = I18n.get(Inflector.getInstance().humanize(last));
-        attrs.put("autoTitle", title);
       }
 
       String type = record.getType() == null ? "" : record.getType();
@@ -482,6 +498,66 @@ public final class MetaStore {
         attrs.put("jsonType", type);
       }
 
+      Set<Long> roleIds = null;
+      if (ObjectUtils.notEmpty(record.getRoles())) {
+        roleIds =
+            record.getRoles().stream().map(Role::getId).collect(Collectors.toUnmodifiableSet());
+      }
+
+      fields.put(record.getName(), new FieldEntry(attrs, roleIds, record.getIncludeIf()));
+    }
+    return fields;
+  }
+
+  /**
+   * Apply per-user (role, includeIf, permission rules) and per-locale (title translation) overlay
+   * to the cached raw field map.
+   */
+  @Nullable
+  private static Map<String, Object> applyUserContext(
+      Map<String, FieldEntry> raw, String object, String jsonField) {
+    if (ObjectUtils.isEmpty(raw)) return null;
+
+    final User user = AuthUtils.getUser();
+    final boolean roleCheckEnabled = user != null && !AuthUtils.isAdmin(user);
+    final Set<Long> userRoleIds = roleCheckEnabled ? collectUserRoleIds(user) : null;
+    final ResourceBundle bundle = I18n.getBundle();
+
+    ScriptHelper scriptHelper = null;
+    final Map<String, Object> result = new LinkedHashMap<>();
+    for (Map.Entry<String, FieldEntry> rawEntry : raw.entrySet()) {
+      final String name = rawEntry.getKey();
+      final FieldEntry entry = rawEntry.getValue();
+      final Map<String, Object> attrs = new HashMap<>(entry.attrs());
+
+      // localized title (per-locale, applied on read)
+      String rawTitle = (String) attrs.get("title");
+      if (StringUtils.notBlank(rawTitle)) {
+        attrs.put("title", bundle.getString(rawTitle));
+      } else {
+        String last = name.substring(name.lastIndexOf('.') + 1);
+        attrs.put("autoTitle", bundle.getString(Inflector.getInstance().humanize(last)));
+      }
+
+      boolean hasAccess = true;
+
+      // role check
+      if (userRoleIds != null
+          && entry.roleIds() != null
+          && Collections.disjoint(userRoleIds, entry.roleIds())) {
+        hasAccess = false;
+      }
+
+      // server condition
+      if (hasAccess && StringUtils.notBlank(entry.includeIfScript())) {
+        if (scriptHelper == null) {
+          scriptHelper = new CompositeScriptHelper(null);
+        }
+        if (!scriptHelper.test(entry.includeIfScript())) {
+          hasAccess = false;
+        }
+      }
+
       if (!hasAccess) {
         attrs.put("hidden", true);
         attrs.put("hideIf", "true");
@@ -489,9 +565,20 @@ public final class MetaStore {
         attrs.put("forceHidden", true);
       }
 
-      fields.put(record.getName(), attrs);
+      result.put(name, attrs);
     }
-    return fields;
+    return checkPermissions(result, object, jsonField);
+  }
+
+  private static Set<Long> collectUserRoleIds(User user) {
+    final Set<Long> ids = new HashSet<>();
+    if (ObjectUtils.notEmpty(user.getRoles())) {
+      user.getRoles().forEach(role -> ids.add(role.getId()));
+    }
+    if (user.getGroup() != null && ObjectUtils.notEmpty(user.getGroup().getRoles())) {
+      user.getGroup().getRoles().forEach(role -> ids.add(role.getId()));
+    }
+    return ids;
   }
 
   public static List<Selection.Option> getSelectionList(Class<?> enumType) {
@@ -671,10 +758,19 @@ public final class MetaStore {
   }
 
   public static void clear() {
-    ACTIONS.invalidateAll();
+    invalidateActions();
+    invalidateJsonFields();
   }
 
   public static void invalidate(String name) {
     ACTIONS.invalidate(name);
+  }
+
+  public static void invalidateActions() {
+    ACTIONS.invalidateAll();
+  }
+
+  public static void invalidateJsonFields() {
+    JSON_FIELDS.invalidateAll();
   }
 }

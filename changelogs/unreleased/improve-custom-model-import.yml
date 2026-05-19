@@ -1,0 +1,6 @@
+---
+title: JSON fields performance improvements
+type: change
+description: |
+  Performance improved by caching results from MetaStore#findJsonFields().
+  This improves custom model data import performance and other JSON fields operations.
