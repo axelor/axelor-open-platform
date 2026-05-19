@@ -1,0 +1,7 @@
+---
+title: Add Export as PNG to chart dashlet menu
+type: feature
+description: |
+  Charts can now be exported as a PNG image from the dashlet action menu.
+
+  Note: the existing export action has been renamed from "Export" to "Export as CSV" for clarity.

@@ -1,0 +1,10 @@
+---
+title: Improve chart rendering for large datasets
+type: change
+description: |
+  Chart rendering has been improved to handle large datasets more reliably.
+
+  - A loading spinner is shown while chart data is being fetched.
+  - Axis labels are truncated when space is limited and a tooltip reveals the full label on hover.
+  - Large mode and LTTB downsampling are applied automatically on scatter and line charts with
+    very large datasets to keep rendering fast.
