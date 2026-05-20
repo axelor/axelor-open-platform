@@ -1,8 +1,0 @@
----
-title: Fix silent failure when deleting records with shared MetaFile attachments
-type: fix
-description: |
-  Audit completion is now run as a Hibernate `BeforeTransactionCompletionProcess`,
-  so failures during attachment cleanup (e.g. FK violation when a `MetaFile` is
-  referenced by another entity) propagate to the caller instead of being silently
-  swallowed by Hibernate's interceptor callback.

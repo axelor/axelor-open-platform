@@ -1,3 +1,154 @@
+## 7.4.11 (2026-05-20)
+
+#### Change
+
+* Improve related messages endpoint performance
+
+  <details>
+  
+  The messages endpoint loaded the full related entity just to read its id and class. It now uses a
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Change Query Selector values() row shape for many-to-one fields
+
+  <details>
+  
+  As a side-effect of dropping the redundant full-entity fetch for many-to-one fields in `Selector`, the raw row shape
+  returned by `Selector.values(int, int)` has changed for any `select()` that includes an m2o field.
+  
+  Before, a single slot in each row held the fully materialized referenced entity (e.g. a `Title` instance), followed
+  by three scalar slots for `id`, `version` and the name field. Now, only the three scalars are emitted — the full-entity
+  slot is gone.
+  
+  For example, with `select("firstName", "title", "title.code")` the row layout is now:
+  
+  ```
+  [ id, version, firstName, title.id, title.version, title.name, title.code ]
+  ```
+  
+  whereas previously it was:
+  
+  ```
+  [ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+  ```
+  
+  Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read
+  the three scalars instead. Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is
+  unchanged ({`id`, `$version`, `nameField`} compact map under the reference key).
+  
+  </details>
+
+* Improve message followers endpoints performance
+
+  <details>
+  
+  The message followers endpoints loaded the full target entity just to read its id and class. They now use a 
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Exclude dotted collection paths from Query Selector
+
+  <details>
+  
+  `Query.Selector` no longer includes dotted field paths that walk through or resolve to a collection
+  (`@OneToMany`, `@ManyToMany`). These paths were silently accepted before and produced a SELECT column with an implicit
+  join, which was rarely the intended behavior and often led to ambiguous or duplicated results.
+  
+  The following inputs to `select(...)` are now silently dropped:
+  
+  * paths where any intermediate segment is a collection, e.g. `addresses.street` or `contact.addresses.street`
+  * paths whose leaf is itself a collection reached through a dotted expression, e.g. `contact.addresses`
+  
+  Single-segment collection fields like `select("addresses")` are unaffected — they keep being resolved and returned 
+  as a list of compact maps in the output.
+  
+  If your code relied on the previous behavior to flatten a sub-field of a collection into the row, switch to either
+  selecting the collection itself (`select("addresses")`) and reading the sub-field from the nested compact maps, or
+  issuing a dedicated query on the target entity.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Quartz from 2.4.0 to 2.4.1
+  - Upgrade PostgreSQL JDBC driver from 42.7.10 to 42.7.11
+  - Upgrade Resteasy from 4.7.9 to 4.7.10
+  - Upgrade Groovy from 3.0.24 to 3.0.25
+  - Upgrade Tomcat from 9.0.116 to 9.0.118
+  - Upgrade Jackson from 2.18.6 to 2.18.7
+  - Upgrade Undertow from 2.2.37 to 2.2.39
+  - Upgrade Byte Buddy from 1.15.10 to 1.15.11
+  - Upgrade Apache Tika from 2.9.2 to 2.9.4
+  - Upgrade Swagger JAXRS from 2.2.28 to 2.2.49
+  - Upgrade EclipseLink Moxy from 2.7.15 to 2.7.16
+  
+  </details>
+
+* Improve RestService download performance
+
+  <details>
+  
+  The download endpoint loaded the full entity to read a single field, which triggered an unnecessary fetch of the 
+  entire row including its associations. The field is now retrieved with a targeted projection query, reducing 
+  latency and avoiding spikes on entities with heavy relations. The permission check has also been consolidated.
+  
+  </details>
+
+#### Fix
+
+* Fix NPE in JobController cron validation with no further valid firing times
+* Fix scrollbar flash when downloading file
+* Fix silent failure when deleting records with shared MetaFile attachments
+
+  <details>
+  
+  Audit completion is now run as a Hibernate `BeforeTransactionCompletionProcess`,
+  so failures during attachment cleanup (e.g. FK violation when a `MetaFile` is
+  referenced by another entity) propagate to the caller instead of being silently
+  swallowed by Hibernate's interceptor callback.
+  
+  </details>
+
+* Avoid full m2o entity fetch in Query Selector
+
+  <details>
+  
+  When a many-to-one field like `title` was included in a `select()`, the generated JPQL contained both the bare join
+  alias (`_title`) and its `id`/`version`/`nameField` scalars. The bare alias caused Hibernate to materialize the entire
+  referenced entity — every column of the target table — even though only the compact {`id`, `$version`, `nameField`} map
+  was ever returned to callers.
+  
+  The full entity fetch is now dropped: only the three scalars are selected, which is all `fetch()` actually consumes.
+  
+  </details>
+
+* Fix theme colors not applied to panel dashlet
+
+  <details>
+  
+  Refactor dashlet widget to use the Panel component from @axelor/ui so that
+  theme color variables are correctly applied to the dashlet header and body.
+  Also fix chart views not occupying the full height of the dashlet container.
+  
+  </details>
+
+* Fix OOM in OpenAPI scanner by limiting scan to Axelor modules
+
+  <details>
+  
+  OpenAPI scanner now limits the scan to Axelor modules only, reducing memory usage and preventing OutOfMemoryError. So 
+  resources in non-Axelor JARs no longer appear in the spec.
+  
+  </details>
+
+
 ## 7.4.10 (2026-04-10)
 
 #### Change
