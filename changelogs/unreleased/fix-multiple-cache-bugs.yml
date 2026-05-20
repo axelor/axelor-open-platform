@@ -1,9 +1,0 @@
----
-title: Fix various cache issues
-type: fix
-description: |
-  Fix various issues with caches including incorrect log arguments,
-  swallowed exceptions in eviction listeners,
-  NPE in default `getAll()` method,
-  premature eviction of tenant caches in cluster environments,
-  closing underlying tenant-specific caches when closing wrapper tenant-aware cache.

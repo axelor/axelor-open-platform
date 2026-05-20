@@ -1,3 +1,0 @@
----
-title: Move CacheBuilder#weakValues/weakKeys to CaffeineCacheBuilder
-type: change

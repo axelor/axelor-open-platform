@@ -1,9 +1,0 @@
----
-title: Speed up embedded Tomcat startup with jar scan filtering
-type: change
-description: |
-  Embedded Tomcat was scanning every jar on the classpath for annotations,
-  TLDs, and web fragments. Configure StandardJarScanFilter to skip all
-  jars by default. Add `--tld-scan-jars` / `--pluggability-scan-jars` CLI 
-  options to configure TLD scanning (JSP taglibs) and Servlet 3.0 pluggability 
-  scanning (web-fragment.xml, @WebServlet / @WebFilter / @WebListener)

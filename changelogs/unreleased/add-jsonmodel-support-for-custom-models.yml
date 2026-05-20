@@ -1,8 +1,0 @@
----
-title: Add jsonModel support for custom model views
-type: feature
-description: |
-  Add jsonModel field to MetaView and MetaViewCustom to properly resolve
-  custom model views across relation widgets and view metadata APIs.
-
-  Fixes #1650

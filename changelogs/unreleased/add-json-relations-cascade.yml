@@ -1,9 +1,0 @@
----
-title: Add cascade handling for json custom field relations
-type: feature
-description: |
-  Implement cascade persist, merge, and delete for custom field
-  relationships stored as JSON (MetaJsonField). Cascade decisions
-  are driven by a central policy: json-one-to-many to MetaJsonRecord
-  is owned (persist/merge/remove + orphan removal), everything else
-  is persist/merge only with no target deletion.

@@ -1,7 +1,0 @@
----
-title: Fix date widget portal focus handling in editable grid
-type: fix
-description: |
-  Keep the date picker rendered in portal mode for grid layout stability,
-  while preventing focus-trap and blur interactions from causing repeated
-  blur loops or React update crashes when using month/year selectors.

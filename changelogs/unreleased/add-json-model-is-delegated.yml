@@ -1,6 +1,0 @@
----
-title: Add isDelegated option for custom models
-type: feature
-description: |
-  Add isDelegated boolean field to MetaJsonModel to allow custom models
-  to use manually-defined views instead of auto-generated ones.

@@ -1,6 +1,0 @@
----
-title: Fix image widget binary field to use $upload
-type: fix
-description: |
-  Image widget on binary fields now uses the $upload mechanism via the upload
-  endpoint instead of sending the file as a base64 data URL in the save payload.

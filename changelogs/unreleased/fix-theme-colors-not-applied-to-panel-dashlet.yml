@@ -1,7 +1,0 @@
----
-title: Fix theme colors not applied to panel dashlet
-type: fix
-description: |
-  Refactor dashlet widget to use the Panel component from @axelor/ui so that
-  theme color variables are correctly applied to the dashlet header and body.
-  Also fix chart views not occupying the full height of the dashlet container.

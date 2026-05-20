@@ -1,5 +1,0 @@
----
-title: Fix itemSpan not applied to custom JSON fields in form view
-type: fix
-description: |
-  `itemSpan` defined on parent container was not being applied to custom JSON fields in form view.

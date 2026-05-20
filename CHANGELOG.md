@@ -1,3 +1,723 @@
+## 8.2.0 (2026-05-20)
+
+#### Feature
+
+* Add zoomThreshold config option to charts
+
+  <details>
+  
+  A new `zoomThreshold` per-chart config option controls data zoom slider behavior.
+  Defaults to `50`.
+  
+  - **`> 0`** — zoom slider enabled only when the number of data points exceeds the value;
+    initial view shows the first N items.
+  - **`= 0`** — zoom slider always shown, fully zoomed out (all data visible); useful when you
+    want precise zoom controls regardless of series size.
+  - **`< 0`** — zoom disabled; no zoom controls are shown.
+  
+  ```xml
+  <!-- Enable zoom slider only when more than 20 data points are present -->
+  <config name="zoomThreshold" value="20" />
+  
+  <!-- Always show zoom controls, full data visible -->
+  <config name="zoomThreshold" value="0" />
+  
+  <!-- Disable zoom controls entirely -->
+  <config name="zoomThreshold" value="-1" />
+  ```
+  
+  </details>
+
+* Set number input text alignment to right in editable grid
+
+  <details>
+  
+  Number values are now right-aligned in editable grid cells. Increment/decrement controls, which remain always visible 
+  in editable grid cells while normal form fields keep their existing hover behavior.
+  
+  </details>
+
+* Allow extending the implements attribute when overriding an entity
+
+  <details>
+  
+  When an entity is overridden in another module, the `implements` attribute is now merged with the parent entity's 
+  value. New interfaces declared in the override are added to the existing list.
+  
+  Note: this is additive only — interfaces declared on the parent entity cannot be removed by an override.
+  
+  </details>
+
+* Add custom model support for all view types
+
+  <details>
+  
+  Custom models (based on `MetaJsonRecord`) can now be used across all view types:
+  kanban, calendar, tree, gantt, cards, grid, and form.
+  
+  Custom JSON fields can be used in view-level attributes such as `columnBy`,
+  `sequenceBy`, `eventStart`, `eventStop`, `colorBy`, `taskStart`, `taskParent`,
+  `parent`, etc. using dotted notation (e.g. `attrs.status`).
+  
+  Tree view nodes now support the `x-json-model` attribute to filter records by
+  their custom model. Cards and kanban views also support `x-json-model` in the
+  XML schema.
+  
+  </details>
+
+* Add jsonModel support for custom model views
+
+  <details>
+  
+  Add jsonModel field to MetaView and MetaViewCustom to properly resolve
+  custom model views across relation widgets and view metadata APIs.
+  
+  Fixes #1650
+  
+  </details>
+
+* Upgrade GraalJS to 25.0.3 and optimize JavaScript integration
+
+  <details>
+  
+  - Upgrade GraalJS from 24.2.2 to 25.0.3
+  - Add shared engine and source caching for improved performance
+  - Implement AutoCloseable on JavaScriptScriptHelper for proper context cleanup
+  - Replace allowAllAccess(true) with explicit permissions for better security
+  - Set ECMAScript version to 2024 (stable release)
+  
+  </details>
+
+* Add Load more option for tree view child nodes
+
+  <details>
+  
+  Tree view child nodes are now loaded in pages using the default page size
+  instead of all at once. When more children exist, a "Load more" row appears
+  at the end of the list. Previously loaded children are cached so
+  re-expanding a node does not trigger additional server calls. Refresh and
+  sort clear the cache.
+  
+  </details>
+
+* Make CodeEditor lighter, more usable and add auto-size / lite modes
+
+  <details>
+  
+  The CodeEditor widget was too heavy for typical form usage. It has been streamlined to be simpler, more usable, 
+  and more compact: minimap, sticky scroll, auto-completion and suggestions are disabled, scroll decoration shadow is 
+  removed, and consistent top/bottom padding is applied.
+  
+  Default `height` has been lowered from 400px to 360px.
+  
+  New features:
+  - Auto-size mode via `x-auto-size="true"`: editor grows with content up to the specified height (defaults to 360px, 
+  min 36px). Vertical scrollbar is hidden while content fits and shown only when overflowing.
+  - Lite mode via `x-lite="true"`: minimal editor with no line numbers, folding, hover, suggestions, context menu or 
+  current-line highlight — suitable for small inline fields.
+  - `placeholder` attribute is now forwarded to the editor.
+  
+  </details>
+
+* Add Export as PNG to chart dashlet menu
+
+  <details>
+  
+  Charts can now be exported as a PNG image from the dashlet action menu.
+  
+  Note: the existing export action has been renamed from "Export" to "Export as CSV" for clarity.
+  
+  </details>
+
+* Add maxSeries config option to charts to prevent excessive memory consumption
+
+  <details>
+  
+  Chart rendering for large datasets now limits excessive series output to prevent high memory
+  consumption. The new `maxSeries` per-chart config keeps only the top N series by total value.
+  Pie, donut, radar, line, area, and scatter charts aggregate the remaining series into an
+  "Others" bucket; bar and horizontal bar charts drop tail series to preserve scale accuracy.
+  Defaults to `200`; set to `0` to disable the limit.
+  
+  ```xml
+  <!-- Show only the top 20 products -->
+  <config name="maxSeries" value="20" />
+  ```
+  
+  </details>
+
+* Add cascade handling for json custom field relations
+
+  <details>
+  
+  Implement cascade persist, merge, and delete for custom field
+  relationships stored as JSON (MetaJsonField). Cascade decisions
+  are driven by a central policy: json-one-to-many to MetaJsonRecord
+  is owned (persist/merge/remove + orphan removal), everything else
+  is persist/merge only with no target deletion.
+  
+  </details>
+
+* Add active session management for users
+
+  <details>
+  
+  Users can now view and revoke their active sessions from the user form.
+  Each session displays the browser and OS, the client IP address, the 
+  sign-in time, and the last activity time. The current session is 
+  highlighted and cannot be revoked.
+  
+  Admins can view and revoke sessions for any user. Non-admin users can only
+  manage their own sessions.
+  
+  </details>
+
+* Add isDelegated option for custom models
+
+  <details>
+  
+  Add isDelegated boolean field to MetaJsonModel to allow custom models
+  to use manually-defined views instead of auto-generated ones.
+  
+  </details>
+
+* Add UUID field type support for domain entities
+
+  <details>
+  
+  Added support for UUID field type in domain entities to store uuid values more efficiently.
+  Also added a common UuidUtils to generate UUID v4 and v7.
+  
+  </details>
+
+#### Change
+
+* Change password reset token max-age unit from hours to minutes
+
+  <details>
+  
+  The `application.reset-password.max-age` configuration property now accepts a value in minutes
+  instead of hours. The default has also been reduced from 24 hours to 30 minutes. If you have 
+  customized this setting, update your configuration accordingly.
+  
+  </details>
+
+* Change encrypted fields hashing algorithm
+
+  <details>
+  
+  The legacy `$AES$` encryptor used `PBKDF2WithHmacSHA1`, which is no longer considered secure for password-based key
+  derivation. Encrypted fields now use `PBKDF2WithHmacSHA256` with 600,000 iterations. The ciphertext format is now
+  self-describing: the iteration count, salt size, and IV size are embedded directly in the payload header. Decryption is
+  therefore independent of current defaults, and future parameter changes never break existing stored values.
+  
+  The application transparently decrypts legacy `$AES$` ciphertext alongside the new formats, so existing encrypted
+  values continue to be readable without any immediate migration.
+  
+  To migrate existing `$AES$` values to the new format, run the database encryption CLI tool. No
+  `encryption.old-password` or `encryption.old-algorithm` settings are required when coming from the legacy encryptor.
+  
+  The new PBKDF2WithHmacSHA256 algorithm is significantly more CPU-intensive than the legacy `PBKDF2WithHmacSHA1`. Each
+  encrypted field uses a distinct random salt, so a separate AES key must be derived per field, and that derivation
+  dominates the processing time.
+  
+  To keep throughput acceptable on large datasets, database encryption CLI tool uses default **100,000 iterations** 
+  during migration instead of the runtime default of 600,000. This can be overridden with the `--iteration` flag : 
+  `axelor database encrypt --iteration 200000`. Values written during migration can be re-migrated to a higher count 
+  at any time thanks to the self-describing format.
+  
+  </details>
+
+* Improve related messages endpoint performance
+
+  <details>
+  
+  The messages endpoint loaded the full related entity just to read its id and class. It now uses a
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Change Query Selector values() row shape for many-to-one fields
+
+  <details>
+  
+  As a side-effect of dropping the redundant full-entity fetch for many-to-one fields in `Selector`, the raw row shape
+  returned by `Selector.values(int, int)` has changed for any `select()` that includes an m2o field.
+  
+  Before, a single slot in each row held the fully materialized referenced entity (e.g. a `Title` instance), followed
+  by three scalar slots for `id`, `version` and the name field. Now, only the three scalars are emitted — the full-entity
+  slot is gone.
+  
+  For example, with `select("firstName", "title", "title.code")` the row layout is now:
+  
+  ```
+  [ id, version, firstName, title.id, title.version, title.name, title.code ]
+  ```
+  
+  whereas previously it was:
+  
+  ```
+  [ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+  ```
+  
+  Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read
+  the three scalars instead. Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is
+  unchanged ({`id`, `$version`, `nameField`} compact map under the reference key).
+  
+  </details>
+
+* Rework user password update flow with identity verification
+
+  <details>
+  
+  The password update flow now requires identity verification before allowing changes.
+  A new "Change Password" button replaces the inline password fields on the user form.
+  
+  The `password` field on `User` is no longer required — external provider users (SSO, OAuth)
+  no longer receive a random UUID password.
+  
+  Non-admin users are now blocked from modifying restricted fields (`code`, `group`, `roles`,
+  `permissions`, `password`, etc.) via the User CRUD endpoint.
+  
+  SQL migration script:
+  
+  ```sql
+  ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+  ```
+  
+  </details>
+
+* Improve message followers endpoints performance
+
+  <details>
+  
+  The message followers endpoints loaded the full target entity just to read its id and class. They now use a 
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Exclude dotted collection paths from Query Selector
+
+  <details>
+  
+  `Query.Selector` no longer includes dotted field paths that walk through or resolve to a collection
+  (`@OneToMany`, `@ManyToMany`). These paths were silently accepted before and produced a SELECT column with an implicit
+  join, which was rarely the intended behavior and often led to ambiguous or duplicated results.
+  
+  The following inputs to `select(...)` are now silently dropped:
+  
+  * paths where any intermediate segment is a collection, e.g. `addresses.street` or `contact.addresses.street`
+  * paths whose leaf is itself a collection reached through a dotted expression, e.g. `contact.addresses`
+  
+  Single-segment collection fields like `select("addresses")` are unaffected — they keep being resolved and returned 
+  as a list of compact maps in the output.
+  
+  If your code relied on the previous behavior to flatten a sub-field of a collection into the row, switch to either
+  selecting the collection itself (`select("addresses")`) and reading the sub-field from the nested compact maps, or
+  issuing a dedicated query on the target entity.
+  
+  </details>
+
+* Remove MySQL and Oracle database support
+
+  <details>
+  
+  Both databases had only partial support that was never actively used or maintained. 
+  Removing them to reduce complexity and focus on PostgreSQL as the primary supported database.
+  
+  </details>
+
+* Speed up embedded Tomcat startup with jar scan filtering
+
+  <details>
+  
+  Embedded Tomcat was scanning every jar on the classpath for annotations,
+  TLDs, and web fragments. Configure StandardJarScanFilter to skip all
+  jars by default. Add `--tld-scan-jars` / `--pluggability-scan-jars` CLI 
+  options to configure TLD scanning (JSP taglibs) and Servlet 3.0 pluggability 
+  scanning (web-fragment.xml, @WebServlet / @WebFilter / @WebListener)
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Jackson from 2.21.0 to 2.21.3
+  - Upgrade Jsoup from 1.22.1 to 1.22.2
+  - Upgrade Swagger from 2.2.43 to 2.2.50
+  - Upgrade ByteBuddy from 1.18.5 to 1.18.8
+  - Upgrade Birt from 4.22.0 to 4.23.0
+  - Upgrade Snakeyaml from 2.5 to 2.6
+  - Upgrade Ldaptive from 2.4.2 to 2.5.0
+  - Upgrade Hibernate from 6.6.42 to 6.6.50
+  - Upgrade Redisson from 3.52.0 to 4.3.1
+  - Upgrade Junit from 5.14.3 to 6.0.3
+  - Upgrade Groovy from 4.0.30 to 4.0.32
+  - Upgrade Tomcat from 10.1.52 to 10.1.55
+  - Upgrade Slf4j from 2.0.17 to 2.0.18
+  - Upgrade Undertow from 2.3.23 to 2.3.24
+  - Upgrade Gradle from 8.14.3 to 8.14.5
+  - Upgrade PostgreSQL JDBC from 42.7.10 to 42.7.11
+  - Upgrade Caffeine from 3.2.3 to 3.2.4
+  - Upgrade Resteasy from 6.2.15 to 6.2.16
+  
+  </details>
+
+* Improve chart rendering for large datasets
+
+  <details>
+  
+  Chart rendering has been improved to handle large datasets more reliably.
+  
+  - A loading spinner is shown while chart data is being fetched.
+  - Axis labels are truncated when space is limited and a tooltip reveals the full label on hover.
+  - Large mode and LTTB downsampling are applied automatically on scatter and line charts with
+    very large datasets to keep rendering fast.
+  
+  </details>
+
+* Improve user password requirements
+
+  <details>
+  
+  The password policy system has been reworked to provide more useful, secure, and customizable built-in policies.
+  
+  **Default behavior changes:**
+  - Minimum password length increased from 4 to 8 characters (mandatory, cannot be disabled).
+  - New password must differ from the current one (mandatory, cannot be disabled).
+  - Passwords must not contain the user login code (case-insensitive substring check).
+  
+  **New opt-in policies** — each can be enabled with a single configuration property
+  (`user.password.<policy>.enabled = true`):
+  - `digits` — requires a minimum number of digit characters.
+  - `lowerCase` — requires a minimum number of lowercase characters.
+  - `upperCase` — requires a minimum number of uppercase characters.
+  - `specialChars` — requires a minimum number of special (non-alphanumeric) characters.
+  - `pattern` — requires the password to match a custom regular expression.
+  - `score` — requires a minimum strength score computed (0–4 scale).
+  
+  **Breaking changes:**
+  - The `user.password.pattern` property has been removed. Use the new `pattern` policy
+    (`user.password.pattern.enabled = true` / `user.password.pattern.value = <regex>`) or
+    combine the new built-in policies to achieve equivalent constraints.
+  - The `user.password.pattern-title` property has been removed.
+  
+  </details>
+
+* Improve RestService download performance
+
+  <details>
+  
+  The download endpoint loaded the full entity to read a single field, which triggered an unnecessary fetch of the 
+  entire row including its associations. The field is now retrieved with a targeted projection query, reducing 
+  latency and avoiding spikes on entities with heavy relations. The permission check has also been consolidated.
+  
+  </details>
+
+* Move CacheBuilder#weakValues/weakKeys to CaffeineCacheBuilder
+
+#### Fix
+
+* Avoid shutdown hook deadlock during Tomcat startup
+
+  <details>
+  
+  The shutdown hook is now registered after Tomcat has fully started instead of
+  during initialization, preventing a potential deadlock if shutdown is triggered
+  while startup is still in progress.
+  
+  </details>
+
+* Fix NPE from Mapper.toBean() with computed fields
+
+  <details>
+  
+  When mapping values to a bean, computed fields often depend on other
+  field values. By populating non-virtual fields first, we ensure that
+  dependencies are available when virtual fields are processed.
+  
+  </details>
+
+* Fix reload expanded node on tree grid refresh
+* Fix encrypted fields migration
+
+  <details>
+  
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINE`D so they are 
+  migrated by the parent class.
+  
+  Also few improvements has been done :
+  - Use JDBC batch statements instead of individual JPQL UPDATE queries : select decrypted values via JPA (so the old 
+  encryptor is applied automatically), then re-encrypt and persist via `PreparedStatement.addBatch()` / `executeBatch()`
+  for better performance and reduced DB load
+  - Add validation of migration settings (required password, known algorithms, warn on no-op rotations) before starting
+  - Infer missing old encryption settings from current values when rotating : only need to configure what actually 
+  changed. Ex : no need to set `old-password` is we rotate only the algorithm.
+  
+  </details>
+
+* Fix tree node orderBy attribute not being applied
+
+  <details>
+  
+  `orderBy` attribute defined on tree node was not being applied during the search request of the node.
+  
+  </details>
+
+* Fix itemSpan not applied to custom JSON fields in form view
+
+  <details>
+  
+  `itemSpan` defined on parent container was not being applied to custom JSON fields in form view.
+  
+  </details>
+
+* Fix translatable text/html widgets ignoring translation in readonly
+
+  <details>
+  
+  When a translation exists for the current locale, the text and html widgets
+  now display the translated value in readonly mode, matching the behavior of
+  the string widget. Previously the editable input was shown with the raw
+  stored value instead.
+  
+  </details>
+
+* Fix Tags widget readonly rendering in form and grid views
+
+  <details>
+  
+  When a Tags widget (`widget="Tags"`) was set to readonly, it rendered
+  as a plain empty text input instead of displaying tag pills. The readonly
+  Tags widget now renders tag pills directly using the same Overflow layout
+  as the grid cell renderer, with proper overflow menu support.
+  
+  </details>
+
+* Fix copy and export errors not displayed to user
+
+  <details>
+  
+  When an exception is thrown from the copy or export methods,
+  the error is now displayed in a dialog instead of being silently ignored.
+  
+  </details>
+
+* Fix view-param limit support in tree view
+
+  <details>
+  
+  The view-param limit support in tree view was not being applied to the root node.
+  
+  </details>
+
+* Fix scrollbar flash when downloading file
+* Fix translatable text/html widgets flag button position and visibility
+
+  <details>
+  
+  In the text widget, the translation flag button was not positioned correctly
+  next to the input. In the html widget, the flag button was hidden entirely
+  when a translation existed. Both widgets now show the flag button at the
+  top-right of the field, consistent with the string widget behavior.
+  
+  </details>
+
+* Avoid full m2o entity fetch in Query Selector
+
+  <details>
+  
+  When a many-to-one field like `title` was included in a `select()`, the generated JPQL contained both the bare join
+  alias (`_title`) and its `id`/`version`/`nameField` scalars. The bare alias caused Hibernate to materialize the entire
+  referenced entity — every column of the target table — even though only the compact {`id`, `$version`, `nameField`} map
+  was ever returned to callers.
+  
+  The full entity fetch is now dropped: only the three scalars are selected, which is all `fetch()` actually consumes.
+  
+  </details>
+
+* Consolidate form validation errors by priority per field
+
+  <details>
+  
+  When saving a form with multiple constraint violations on the same field,
+  all errors were shown (e.g. "Login is invalid" and "Login is too small").
+  Now only the highest-priority error per field is displayed, using this order:
+  required > min/max > pattern > custom errors > invalid.
+  
+  Also fix server-side validation errors using the raw field name (e.g. "code")
+  instead of the field title (e.g. "Login").
+  
+  </details>
+
+* Fix XSS vulnerability in download filename handling
+
+  <details>
+  
+  Use textContent instead of innerHTML when setting the download link text
+  to prevent script execution via crafted filenames.
+  
+  </details>
+
+* Fix NPE in JobController cron validation with no further valid firing times
+* Fix central logout and session timeout redirect when MFA is enabled
+
+  <details>
+  
+  MfaClient restores pending profile but overwrites its clientName.
+  Now always restore pending client name when session is marked as fully authenticated by MFA authenticator.
+  
+  </details>
+
+* Fix mail followers recipients request limit
+
+  <details>
+  
+  The mail followers recipient request limit wasn't provided, allowing related service to be called with an unbounded 
+  limit. Cap the effective limit to `api.pagination.max-per-page` so that the email search respects the configured 
+  pagination maximum and use `api.pagination.default-per-page` as the default when no limit is specified in the request.
+  
+  </details>
+
+* Fix pass selected in custom collection field context
+* Fix ConcurrentModificationException in AuditTracker on entity delete
+
+  <details>
+  
+  AuditTracker.processDelete() now iterates over a snapshot of the deleted
+  entities set, preventing ConcurrentModificationException when cascaded
+  deletes add new entries during iteration.
+  
+  </details>
+
+* Fix various cache issues
+
+  <details>
+  
+  Fix various issues with caches including incorrect log arguments,
+  swallowed exceptions in eviction listeners,
+  NPE in default `getAll()` method,
+  premature eviction of tenant caches in cluster environments,
+  closing underlying tenant-specific caches when closing wrapper tenant-aware cache.
+  
+  </details>
+
+* Fix NPE in AuditProcessor when processing computed fields
+* Fix theme colors not applied to panel dashlet
+
+  <details>
+  
+  Refactor dashlet widget to use the Panel component from @axelor/ui so that
+  theme color variables are correctly applied to the dashlet header and body.
+  Also fix chart views not occupying the full height of the dashlet container.
+  
+  </details>
+
+* Fix handle focus navigation in grid view search column
+* Fix gauge chart showing NaN% when category axis is formatted
+
+  <details>
+  
+  Gauge charts were reading the value from the category axis field (e.g. month),
+  which gets formatted into a string (e.g. "May") by the chart data pipeline.
+  Using a string as the gauge value caused ECharts to display NaN%.
+  The gauge now correctly reads the value from the series key field instead.
+  
+  </details>
+
+* Fix image widget binary field to use $upload
+
+  <details>
+  
+  Image widget on binary fields now uses the $upload mechanism via the upload
+  endpoint instead of sending the file as a base64 data URL in the save payload.
+  
+  </details>
+
+* Fix NPE in MetaFiles.upload() recovery block
+
+  <details>
+  
+  Add null check for temporary file copy to prevent masking of root persistence exceptions with NPEs during new file uploads.
+  
+  </details>
+
+* Fix calendar drag-and-drop not saving when popover is open
+
+  <details>
+  
+  Close the event popover when a drag operation starts on the calendar view.
+  Previously, if the template popover was open, dragging an event to another
+  date would not trigger a save.
+  
+  </details>
+
+* Fix OOM in OpenAPI scanner by limiting scan to Axelor modules
+
+  <details>
+  
+  OpenAPI scanner now limits the scan to Axelor modules only, reducing memory usage and preventing OutOfMemoryError. So 
+  resources in non-Axelor JARs no longer appear in the spec.
+  
+  </details>
+
+* Fix date widget portal focus handling in editable grid
+
+  <details>
+  
+  Keep the date picker rendered in portal mode for grid layout stability,
+  while preventing focus-trap and blur interactions from causing repeated
+  blur loops or React update crashes when using month/year selectors.
+  
+  </details>
+
+* Fix cache busting of JSP and HTML files
+
+  <details>
+  
+  Exclude .jsp, .html, and .htm files from static resource cache busting
+  in NoCacheFilter. These files should not receive immutable cache headers
+  as they are server-rendered or serve as application entry points.
+  
+  </details>
+
+#### Security
+
+* Upgrade Pac4j & Shiro dependencies
+
+  <details>
+  
+  Upgrade Pac4j from 6.3.1 to 6.5.1 and Shiro from 2.0.6 to 2.1.0 for security reasons
+  
+  </details>
+
+* Fix RestService upload missing file content type validation
+
+  <details>
+  
+  Only the declared file type from the request data was validated against the whitelist/blacklist, allowing a malicious 
+  user to bypass validation by sending a file with an allowed extension but different content. Now the actual file 
+  content is inspected via Apache Tika for both attachment and non-attachment uploads.
+  
+  </details>
+
+* Fix file upload content type validation to prevent extension spoofing
+
+  <details>
+  
+  MetaFiles.checkType(File) now pass null as the filename hint to Tika, ensuring detection relies solely on magic
+  bytes. Previously, the filename was used as a hint and could influence the result, allowing a malicious file 
+  disguised with an allowed extension to bypass validation.
+  
+  </details>
+
+
 ## 8.1.1 (2026-03-09)
 
 #### Change

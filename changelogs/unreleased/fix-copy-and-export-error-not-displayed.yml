@@ -1,6 +1,0 @@
----
-title: Fix copy and export errors not displayed to user
-type: fix
-description: |
-  When an exception is thrown from the copy or export methods,
-  the error is now displayed in a dialog instead of being silently ignored.

@@ -1,8 +1,0 @@
----
-title: Fix gauge chart showing NaN% when category axis is formatted
-type: fix
-description: |
-  Gauge charts were reading the value from the category axis field (e.g. month),
-  which gets formatted into a string (e.g. "May") by the chart data pipeline.
-  Using a string as the gauge value caused ECharts to display NaN%.
-  The gauge now correctly reads the value from the series key field instead.

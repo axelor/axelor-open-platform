@@ -1,8 +1,0 @@
----
-title: Allow extending the implements attribute when overriding an entity
-type: feature
-description: |
-  When an entity is overridden in another module, the `implements` attribute is now merged with the parent entity's 
-  value. New interfaces declared in the override are added to the existing list.
-
-  Note: this is additive only — interfaces declared on the parent entity cannot be removed by an override.
