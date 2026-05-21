@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import {
   ChangeEvent,
+  ClipboardEvent,
   FocusEvent,
   InputHTMLAttributes,
   useCallback,
@@ -21,6 +22,7 @@ import { AdornedInput, Box, Button, Portal, clsx } from "@axelor/ui";
 
 import { Icon } from "@/components/icon";
 import { TextLink } from "@/components/text-link";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { i18n } from "@/services/client/i18n";
 import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
@@ -29,9 +31,9 @@ import {
   DEFAULT_COUNTRIES,
   FLAGS,
   getPhoneInfo,
+  normalizePastedPhoneValue,
   useDefaultCountry,
 } from "./utils";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import "react-international-phone/style.css";
 
@@ -148,6 +150,26 @@ export function Phone({
     },
     disableDialCodeAndPrefix: noPrefix,
   });
+  const pendingInternationalPasteRef = useRef<string | null>(null);
+
+  const applyPhoneInputValue = useCallback(
+    (value: string, data: string = value, selectionStart = value.length) => {
+      handlePhoneValueChange({
+        preventDefault() {},
+        nativeEvent: { inputType: "insertFromPaste", data },
+        target: { value, selectionStart },
+      } as unknown as ChangeEvent<HTMLInputElement>);
+    },
+    [handlePhoneValueChange],
+  );
+
+  useEffect(() => {
+    if (noPrefix || !pendingInternationalPasteRef.current) return;
+
+    const pastedPhone = pendingInternationalPasteRef.current;
+    pendingInternationalPasteRef.current = null;
+    applyPhoneInputValue(pastedPhone);
+  }, [applyPhoneInputValue, noPrefix]);
 
   // If case of only dial code, set empty value instead.
   const onBlur = useCallback(() => {
@@ -250,6 +272,73 @@ export function Phone({
     );
   }, [noPrefix, value, phone]);
 
+  const applyDefaultPaste = useCallback(
+    (pastedText: string) => {
+      const input = inputRef.current;
+      const selectionStart = input?.selectionStart ?? inputValue.length;
+      const selectionEnd = input?.selectionEnd ?? selectionStart;
+      const value = `${inputValue.slice(0, selectionStart)}${pastedText}${inputValue.slice(selectionEnd)}`;
+
+      applyPhoneInputValue(
+        value,
+        pastedText,
+        selectionStart + pastedText.length,
+      );
+    },
+    [applyPhoneInputValue, inputRef, inputValue],
+  );
+
+  const handlePaste = useCallback(
+    async (event: ClipboardEvent<HTMLInputElement>) => {
+      const pastedText = event.clipboardData.getData("text");
+
+      if (noPrefix && !pastedText.trimStart().startsWith("+")) return;
+
+      event.preventDefault();
+
+      const normalized = await normalizePastedPhoneValue(
+        pastedText,
+        countryIso2,
+      );
+
+      if (!normalized) {
+        applyDefaultPaste(pastedText);
+        return;
+      }
+
+      const normalizedCountry = normalized.countryIso2;
+
+      if (
+        normalizedCountry &&
+        onlyCountries.length &&
+        !onlyCountries.includes(normalizedCountry)
+      ) {
+        applyDefaultPaste(pastedText);
+        return;
+      }
+
+      // When pasting an international number (+XX...) into a no-prefix field,
+      // bypass handlePhoneValueChange because disableDialCodeAndPrefix strips
+      // the + prefix. useInput's onChange only commits on blur, so write to
+      // the value atom directly to immediately leave no-prefix mode.
+      if (noPrefix) {
+        pendingInternationalPasteRef.current = normalized.phone;
+        setValue(normalized.phone, true);
+        return;
+      }
+
+      applyPhoneInputValue(normalized.phone);
+    },
+    [
+      applyPhoneInputValue,
+      applyDefaultPaste,
+      countryIso2,
+      noPrefix,
+      setValue,
+      onlyCountries,
+    ],
+  );
+
   return (
     <FieldControl {...props} className={styles.container}>
       <Box className={clsx(styles.phone, { [styles.readonly]: readonly })}>
@@ -336,6 +425,7 @@ export function Phone({
               required={required}
               onKeyDown={onKeyDown}
               onChange={handlePhoneValueChange}
+              onPaste={handlePaste}
               onBlur={onBlur}
               title={numberType}
               className={clsx(styles.input, {

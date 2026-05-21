@@ -65,13 +65,44 @@ export async function getPhoneInfo(phone?: string) {
   };
 }
 
-async function parse(phone: string) {
+async function parse(phone: string, country?: string) {
   const { parsePhoneNumber } = await import("libphonenumber-js/max");
+
   try {
-    return parsePhoneNumber(phone);
+    return parsePhoneNumber(
+      phone,
+      country as Parameters<typeof parsePhoneNumber>[1],
+    );
   } catch {
     return null;
   }
+}
+
+function getCountryCode(countryIso2?: string) {
+  return countryIso2?.toUpperCase();
+}
+
+export async function normalizePastedPhoneValue(
+  text: string,
+  countryIso2?: string,
+) {
+  const country = getCountryCode(countryIso2);
+  const value = text.trim();
+
+  if (!country || !value) {
+    return null;
+  }
+
+  const phoneNumber = await parse(value, country);
+
+  if (!phoneNumber?.isPossible()) {
+    return null;
+  }
+
+  return {
+    phone: phoneNumber.number,
+    countryIso2: phoneNumber.country?.toLowerCase(),
+  };
 }
 
 export function useDefaultCountry(
