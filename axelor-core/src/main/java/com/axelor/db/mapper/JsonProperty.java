@@ -7,7 +7,9 @@ package com.axelor.db.mapper;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
 import jakarta.annotation.Nullable;
@@ -24,15 +26,16 @@ import java.util.function.Predicate;
 public class JsonProperty extends Property {
 
   final Property property;
-  final Map<String, Object> jsonField;
+  final JsonReferenceFieldDTO jsonField;
   final String fieldName;
   final String subFieldName;
 
   public static final String KEY_JSON_PREFIX = "$";
+  private static final String JSON_TYPE_PREFIX = "json-";
   private static final Annotation[] EMPTY_ANNOTATIONS = {};
 
   private JsonProperty(
-      Property property, Map<String, Object> jsonField, String fieldName, String subFieldName) {
+      Property property, JsonReferenceFieldDTO jsonField, String fieldName, String subFieldName) {
     super(
         property.getEntity(),
         property.getName(),
@@ -76,15 +79,10 @@ public class JsonProperty extends Property {
         fieldName.startsWith(KEY_JSON_PREFIX)
             ? fieldName.substring(KEY_JSON_PREFIX.length())
             : fieldName;
-    final Map<String, Object> jsonFields =
-        Optional.ofNullable(
-                jsonModel != null
-                    ? MetaStore.findJsonFields(jsonModel)
-                    : MetaStore.findJsonFields(beanClass.getName(), propertyName))
-            .orElse(Collections.emptyMap());
-
-    @SuppressWarnings("unchecked")
-    final Map<String, Object> jsonField = (Map<String, Object>) jsonFields.get(subFieldName);
+    final MetaJsonField jsonField =
+        jsonModel != null
+            ? MetaStore.findJsonField(jsonModel, subFieldName)
+            : MetaStore.findJsonField(beanClass.getName(), propertyName, subFieldName);
 
     if (jsonField == null) {
       return null;
@@ -93,7 +91,8 @@ public class JsonProperty extends Property {
     final Mapper mapper = Mapper.of(beanClass);
     final Property property = mapper.getProperty(propertyName);
 
-    return new JsonProperty(property, jsonField, fieldName, subFieldName);
+    return new JsonProperty(
+        property, JsonReferenceFieldDTO.from(jsonField), fieldName, subFieldName);
   }
 
   @Override
@@ -106,17 +105,11 @@ public class JsonProperty extends Property {
       return null;
     }
 
-    return Optional.ofNullable(
-            (String) jsonField.get(getJsonType().startsWith("json-") ? "jsonTarget" : "target"))
-        .map(
-            target -> {
-              try {
-                return Class.forName(target);
-              } catch (ClassNotFoundException e) {
-                return null;
-              }
-            })
-        .orElse(null);
+    try {
+      return Class.forName(jsonField.resolveTargetModel());
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
   }
 
   @Override
@@ -197,7 +190,11 @@ public class JsonProperty extends Property {
   }
 
   private String getJsonType() {
-    return (String) jsonField.getOrDefault("type", "");
+    final String type = jsonField.type();
+    if (type == null) {
+      return "";
+    }
+    return type.startsWith(JSON_TYPE_PREFIX) ? type.substring(JSON_TYPE_PREFIX.length()) : type;
   }
 
   @Override
@@ -207,7 +204,7 @@ public class JsonProperty extends Property {
 
   @Override
   public String getTitle() {
-    return (String) jsonField.getOrDefault("title", null);
+    return jsonField.title();
   }
 
   @Override

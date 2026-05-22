@@ -331,6 +331,27 @@ public final class MetaStore {
   }
 
   @Nullable
+  public static MetaJsonField findJsonField(String modelName, String modelField, String fieldName) {
+    return Query.of(MetaJsonField.class)
+        .filter("self.model = :model AND self.modelField = :modelField AND self.name = :name")
+        .bind("model", modelName)
+        .bind("modelField", modelField)
+        .bind("name", fieldName)
+        .cacheable()
+        .fetchOne();
+  }
+
+  @Nullable
+  public static MetaJsonField findJsonField(String jsonModelName, String fieldName) {
+    return Query.of(MetaJsonField.class)
+        .filter("self.jsonModel.name = :jsonModelName AND self.name = :name")
+        .bind("jsonModelName", jsonModelName)
+        .bind("name", fieldName)
+        .cacheable()
+        .fetchOne();
+  }
+
+  @Nullable
   public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
     final Map<String, FieldEntry> raw =
         JSON_FIELDS.get(

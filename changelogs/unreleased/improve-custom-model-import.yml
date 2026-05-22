@@ -4,3 +4,5 @@ type: change
 description: |
   Performance improved by caching results from MetaStore#findJsonFields().
   This improves custom model data import performance and other JSON fields operations.
+
+  `JsonProperty.getTitle()` now returns untranslated title, to realign consistency with `Property.getTitle()`.

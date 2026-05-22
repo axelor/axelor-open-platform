@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public record JsonReferenceFieldDTO(
     String name,
+    String title,
     String type,
     String model,
     String modelField,
@@ -20,6 +21,7 @@ public record JsonReferenceFieldDTO(
   public static JsonReferenceFieldDTO from(MetaJsonField field) {
     return new JsonReferenceFieldDTO(
         field.getName(),
+        field.getTitle(),
         field.getType(),
         field.getModel(),
         field.getModelField(),
