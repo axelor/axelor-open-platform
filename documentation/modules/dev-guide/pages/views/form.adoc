@@ -298,6 +298,14 @@ The grid toolbar and menubar actions context is the dashlet context containing :
 * the main top record in `_parent`
 * if any records are selected, the selected line ids are available in `_ids`
 
+Since these actions run in the grid context, the action response behaves as follows:
+
+* `response.setReload(true)` reloads the dashlet only.
+* `response.setSignal("refresh-tab", null)` refreshes the active tab.
+* `response.setValue(...)` has no effect, as there is no record to update in the
+  grid context.
+* `response.setAttr(...)` currently has no effect.
+
 == Panel Widgets
 
 The `panel` can use the following widgets:
