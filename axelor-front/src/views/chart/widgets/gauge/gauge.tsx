@@ -27,6 +27,7 @@ export function Gauge(props: ChartProps) {
       draft.series[0].min = min;
       draft.series[0].max = max;
       draft.series[0].data[0].value = dataset[0] ? (dataset[0][valueKey!] ?? 0) : 0;
+      draft.series[0].data[0].raw = dataset[0] ? [dataset[0]] : [];
     });
   }, [data]);
 

@@ -63,6 +63,7 @@ Following chart types are supported:
 * radar
 * gauge
 * scatter
+* funnel
 
 A chart view requires following information:
 

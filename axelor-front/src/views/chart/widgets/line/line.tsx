@@ -35,8 +35,14 @@ export function Line({ data, type, ...rest }: ChartProps) {
         type: "line",
         data: line.values.map(
           xType === "time"
-            ? ({ sort, y }: any) => [sort, y]
-            : ({ y }: any) => y,
+            ? ({ sort, y, item }: any) => ({
+                value: [sort, y],
+                raw: item ? [item] : [],
+              })
+            : ({ y, item }: any) => ({
+                value: y,
+                raw: item ? [item] : [],
+              }),
         ),
         ...(type === "area" ? { areaStyle: {} } : {}),
         ...(useSampling && { sampling: "lttb" }),

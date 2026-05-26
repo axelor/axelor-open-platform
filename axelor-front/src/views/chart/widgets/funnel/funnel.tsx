@@ -58,6 +58,7 @@ export function Funnel(props: ChartProps) {
         draft.series[0].data = dataset.map((x: any) => ({
           name: x[xAxis],
           value: x[key],
+          raw: [x],
         }));
       }
       draft.series[0][isRTL ? "right" : "left"] = "10%";

@@ -95,9 +95,11 @@ export function ECharts({
       const handler = function (event: any) {
         const { seriesName, data: eData } = event || {};
         const context =
-          eData?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
+          eData?.raw?.find((r: DataRecord) => r?.[seriesBy] === seriesName) ??
           eData?.raw?.[0];
-        onClick(context?._original ?? context);
+        if (context) {
+          onClick(context._original ?? context);
+        }
       };
       instance.on("click", handler);
       return () => {
@@ -116,7 +118,6 @@ export function ECharts({
       });
     }
   }, [height, width]);
-
 
   useEffect(() => {
     if (chart.current) {

@@ -29,7 +29,10 @@ export function Scatter({ data, ...rest }: ChartProps) {
       draft.series = series.map((line: any) => ({
         name: line.key,
         type: "scatter",
-        data: line.values.map(({ y }: any) => y),
+        data: line.values.map(({ y, item }: any) => ({
+          value: y,
+          raw: item ? [item] : [],
+        })),
         ...(useLargeMode && { large: true }),
       }));
       draft.xAxis.data = types;

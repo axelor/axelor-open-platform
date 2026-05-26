@@ -75,6 +75,7 @@ export function Radar(props: ChartProps) {
           value: draft.radar.indicator.map(
             (i: { name: string; max: number }) => s[i.name] ?? 0,
           ),
+          raw: s.raw,
         });
       });
     });
