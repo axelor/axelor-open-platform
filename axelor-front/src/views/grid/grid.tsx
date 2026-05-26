@@ -224,7 +224,9 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopup =
     action.params?.["popup"] || action.params?.["dashlet.in.popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
-  const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
+  const reloadDotted = Boolean(action.params?.["reload-dotted"]);
+  const cacheDataRef = useRef(!reloadDotted);
+  const forceNextSearchRef = useRef(reloadDotted);
 
   const { treeLimit, treeField, treeFieldTitle } = view;
   const widget = toKebabCase(view.widget ?? "");
@@ -957,7 +959,10 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onGridSearch = useCallback(
     (options?: SearchOptions) => {
-      if (cacheDataRef.current) {
+      const forceReloadDotted = forceNextSearchRef.current;
+      forceNextSearchRef.current = false;
+
+      if (cacheDataRef.current && !forceReloadDotted) {
         cacheDataRef.current = false;
         if (isEqual(dataStore.options?.fields, options?.fields)) {
           const result = {
@@ -974,6 +979,7 @@ function GridInner(props: ViewProps<GridView>) {
       const currOptions = dataStore.options || {};
       // if any search options changed then only trigger search
       if (
+        !forceReloadDotted &&
         !hasOnSearchChanged &&
         options &&
         Object.entries(options).every(([k, v]) =>
