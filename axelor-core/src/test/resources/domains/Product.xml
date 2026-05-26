@@ -8,6 +8,7 @@
   <entity name="Product" table="TEST_PRODUCT" cacheable="true" repository="none">
 
     <one-to-one name="config" ref="ProductConfig" mappedBy="product"/>
+    <one-to-one name="configRequiredProduct" ref="ProductConfigRequiredProduct" mappedBy="requiredProduct"/>
 
     <extra-code><![CDATA[
     public void setConfig(ProductConfig config) {

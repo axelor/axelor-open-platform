@@ -152,6 +152,16 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
       final Property mappedBy = Mapper.of(property.getTarget()).getProperty(property.getMappedBy());
       if (mappedBy != null && mappedBy.isRequired()) {
+        // The required back-reference can't be nulled, so the child stays linked to the deleted
+        // entity. For a loaded inverse @OneToOne that link, combined with cascade=PERSIST, would
+        // re-persist the deleted entity on flush (JPA §3.2.7.1); detaching it breaks that chain so
+        // the removal proceeds and surfaces the constraint violation.
+        if (property.getType() == PropertyType.ONE_TO_ONE) {
+          final Object inverse = property.get(entity);
+          if (inverse != null) {
+            JPA.em().detach(inverse);
+          }
+        }
         continue;
       }
 
