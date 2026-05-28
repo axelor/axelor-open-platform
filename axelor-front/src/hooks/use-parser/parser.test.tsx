@@ -24,6 +24,19 @@ const context = {
 };
 
 describe("parser", () => {
+  const expectParseOrRunToThrow = (expr: string, ctx: any) => {
+    let fn;
+
+    try {
+      fn = parser.parse(expr);
+    } catch (err) {
+      expect(err).toBeDefined();
+      return;
+    }
+
+    expect(() => fn(ctx)).toThrow();
+  };
+
   it("should parse react template", async () => {
     const template = `
     <ul className={css} style={{width: 100}}>
@@ -83,8 +96,7 @@ describe("parser", () => {
     ];
 
     for (let expr of cases) {
-      let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrowError();
+      expectParseOrRunToThrow(expr, context);
     }
   });
 
@@ -97,8 +109,70 @@ describe("parser", () => {
     ];
 
     for (let expr of cases) {
-      let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrowError();
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
+  it("should allow safe global methods", () => {
+    const ctx = {
+      obj: { a: 1, b: 2, c: 3 },
+      pairs: [
+        ["x", 10],
+        ["y", 20],
+      ],
+      arr: [1, 2, 3],
+      val: "3.14",
+      jsonStr: '{"k":"v"}',
+    };
+    // Object
+    expect(parser.parse("Object.entries(obj)")(ctx)).toEqual([
+      ["a", 1],
+      ["b", 2],
+      ["c", 3],
+    ]);
+    expect(parser.parse("Object.keys(obj)")(ctx)).toEqual(["a", "b", "c"]);
+    expect(parser.parse("Object.values(obj)")(ctx)).toEqual([1, 2, 3]);
+    expect(parser.parse("Object.fromEntries(pairs)")(ctx)).toEqual({
+      x: 10,
+      y: 20,
+    });
+    // Array
+    expect(parser.parse("Array.isArray(arr)")(ctx)).toBe(true);
+    expect(parser.parse("Array.isArray(obj)")(ctx)).toBe(false);
+    expect(parser.parse("Array.from(arr)")(ctx)).toEqual([1, 2, 3]);
+    // JSON
+    expect(parser.parse("JSON.parse(jsonStr)")(ctx)).toEqual({ k: "v" });
+    expect(parser.parse("JSON.stringify(obj)")(ctx)).toBe('{"a":1,"b":2,"c":3}');
+    // Math
+    expect(parser.parse("Math.abs(-5)")(ctx)).toBe(5);
+    expect(parser.parse("Math.max(1, 2, 3)")(ctx)).toBe(3);
+    expect(parser.parse("Math.PI")(ctx)).toBe(Math.PI);
+    // Number
+    expect(parser.parse("Number.isNaN(0)")(ctx)).toBe(false);
+    expect(parser.parse("Number.isFinite(1)")(ctx)).toBe(true);
+  });
+
+  it("should allow safe global functions", () => {
+    const ctx = { val: "3.14", n: 42 };
+    expect(parser.parse("parseFloat(val)")(ctx)).toBe(3.14);
+    expect(parser.parse("parseInt(val)")(ctx)).toBe(3);
+    expect(parser.parse("isNaN(val)")(ctx)).toBe(false);
+    expect(parser.parse("isFinite(n)")(ctx)).toBe(true);
+    expect(parser.parse('Number("123")')(ctx)).toBe(123);
+    expect(parser.parse("String(n)")(ctx)).toBe("42");
+    expect(parser.parse("Boolean(n)")(ctx)).toBe(true);
+    expect(parser.parse("Boolean(0)")(ctx)).toBe(false);
+  });
+
+  it("should still block disallowed Object methods", () => {
+    const cases = [
+      `Object.assign({}, {a: 1})`,
+      `Object.create(null)`,
+      `Object.defineProperty({}, 'x', {value: 1})`,
+      `Object.getPrototypeOf({})`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
     }
   });
 
@@ -108,17 +182,7 @@ describe("parser", () => {
       `new Function('x', 'console.log(x)')(1)`,
     ];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
-    }
-  });
-
-  it("should not allow access to `eval` and `Function`", () => {
-    const cases = [
-      `eval('console.log(1)')`,
-      `new Function('x', 'console.log(x)')(1)`,
-    ];
-    for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
+      expect(() => parser.parse(expr)).toThrow();
     }
   });
 
@@ -135,14 +199,24 @@ describe("parser", () => {
        r[\`create\${x}\`]('div')`,
     ];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)(context)).toThrowError();
+      expect(() => parser.parse(expr)(context)).toThrow();
     }
   });
 
   it("should support optional chaining (elvis operator)", () => {
     expect(parser.parse("props.style.width")(context)).toEqual(100);
-    expect(() => parser.parse("props.data.id")(context)).toThrowError();
+    expect(() => parser.parse("props.data.id")(context)).toThrow();
     expect(parser.parse("props?.data?.id")(context)).toBeUndefined();
+  });
+
+  it("should support optional chaining with computed properties", () => {
+    expect(parser.parse(`props?.["data"]`)({ props: undefined })).toBeUndefined();
+    expect(
+      parser.parse(`const key = "data"; props?.[key]`)({ props: undefined })
+    ).toBeUndefined();
+    expect(
+      parser.parse(`const key = "data"; props?.[key]?.id`)({ props: undefined })
+    ).toBeUndefined();
   });
 
   it("should not allow javascript: URLs", () => {
@@ -150,32 +224,17 @@ describe("parser", () => {
     const ctx = { x: `javascript: alert(1)`, y: "some?value=1" };
     expect(() =>
       parser.parse(`<a href="javaScript: alert(1)">Test</a>`)(ctx)
-    ).toThrowError();
+    ).toThrow();
     expect(() =>
       parser.parse(`<a href="\\t\\x00javascript: alert(1)">Test</a>`)(ctx)
-    ).toThrowError();
+    ).toThrow();
     expect(() =>
       parser.parse(`<a href="some?value=1">Test</a>`)(ctx)
-    ).not.toThrowError();
-    expect(() => parser.parse(`<a href={x}>Test</a>`)(ctx)).toThrowError();
+    ).not.toThrow();
+    expect(() => parser.parse(`<a href={x}>Test</a>`)(ctx)).toThrow();
     expect(() =>
       parser.parse(`<a href={y}>Test</a> | <a href=""></a>`)(ctx)
-    ).not.toThrowError();
-  });
-
-  it("should handle expressions with class declaration", () => {
-    const fn = parser.parse(`
-    class Hello {
-      #message;
-      constructor(msg) { this.#message = msg; }
-      get message() { return this.#message;}
-      say() { return this.#message; }
-    }
-    const hello = new Hello('Hello!!!');
-    hello.say();
-    `);
-    const res = fn({});
-    expect(res).toEqual("Hello!!!");
+    ).not.toThrow();
   });
 
   it("should trap access to dom elements", async () => {
@@ -280,21 +339,69 @@ describe("parser", () => {
     expect(input).toBeDefined();
   });
 
-  it("should evaluate script in strict mode", () => {
-    const fn = parser.parse(`
+  it("should not allow access to `this`", () => {
+    const expr = `
     function test() {
       return this;
     }
     test();
-    `);
-    const res = fn(context);
-    expect(res).toBeUndefined();
+    `;
+    expect(() => parser.parse(expr)).toThrow();
+  });
+
+  it("should block `this.eval`, `this.Function`, and prototype pollution", () => {
+    const cases = [
+      `this.eval('console.log("this.eval")')`,
+      `this.Function('console.log("this.Function")')()`,
+      `({}).__proto__.polluted1 = 'yes'`,
+      `Array.prototype.polluted2 = 'yes'`,
+      `String[['prototype']].polluted3 = 'yes'`,
+      `let i = 0; class S extends String { toString() { return i++ ? 'prototype' : 'dummy' } }; String[new S()].polluted = 'yes'`,
+      `const {"__proto__": P} = {}; P.polluted = "yes"`,
+      `const {["__proto__"]: P} = {}; P.polluted = "yes"`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
   });
 
   it('should not allow re-declaring "React"', () => {
     const cases = [`function test(React) {}`, `const React = {}`];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
+      expect(() => parser.parse(expr)).toThrow();
+    }
+  });
+
+  it("should block destructuring with blocked string-literal keys", () => {
+    const cases = [
+      `const {"constructor": C} = "".sub; C("console.log(1)")()`,
+      `const {"constructor": C} = [].map; C("console.log(1)")()`,
+      `const {["constructor"]: C} = "".sub; C("console.log(1)")()`,
+      `const {\`constructor\`: C} = "".sub; C("console.log(1)")()`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
+  it("should block computed destructuring with dynamic blocked keys", () => {
+    const cases = [
+      `const key = "construct" + "or"; const {[key]: C} = "".sub; C("console.log(1)")()`,
+      `const x = "or"; const {[\`construct\${x}\`]: C} = "".sub; C("console.log(1)")()`,
+    ];
+    for (let expr of cases) {
+      expectParseOrRunToThrow(expr, context);
+    }
+  });
+
+  it("should not allow dynamic import()", () => {
+    const cases = [
+      `import('some-module')`,
+      `import('data:text/javascript,export default 1')`,
+      `const m = import('some-module')`,
+    ];
+    for (let expr of cases) {
+      expect(() => parser.parse(expr)).toThrow();
     }
   });
 });
@@ -315,7 +422,7 @@ describe("safe parser", () => {
     };
     const cases = [`some?.another.value`, `some.nested?.name.toUpperCase()`];
     for (let expr of cases) {
-      expect(() => parser.parseSafe(expr)(ctx)).toThrowError();
+      expect(() => parser.parseSafe(expr)(ctx)).toThrow();
     }
   });
   it("should not transform left hand side of assignment expressions", () => {

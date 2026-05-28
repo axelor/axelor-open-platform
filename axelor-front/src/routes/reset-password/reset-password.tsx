@@ -1,5 +1,5 @@
 import { FormEventHandler, useCallback, useMemo, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 
 import { useAsync } from "@/hooks/use-async";
 import { request } from "@/services/client/client";
@@ -18,8 +18,7 @@ export function ResetPassword() {
 
   const info = useAsync<{
     message?: string;
-    passwordPattern?: string;
-    passwordPatternTitle?: string;
+    passwordRequirements?: string[];
   }>(async () => {
     if (!token) {
       return {
@@ -93,7 +92,7 @@ export function ResetPassword() {
     return null;
   }
 
-  const { message, passwordPattern, passwordPatternTitle } = info.data || {};
+  const { message, passwordRequirements } = info.data || {};
   const infoMessage = (info.state === "hasError" && info.error) || message;
 
   if (infoMessage) {
@@ -114,8 +113,7 @@ export function ResetPassword() {
   return (
     <ChangePassword
       onSubmit={handleSubmit}
-      passwordPattern={passwordPattern}
-      passwordPatternTitle={passwordPatternTitle}
+      passwordRequirements={passwordRequirements}
       error={errorMessage}
     />
   );

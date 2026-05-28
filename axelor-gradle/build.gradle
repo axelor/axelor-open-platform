@@ -1,14 +1,21 @@
+buildscript {
+  repositories repos
+  dependencies {
+    classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:2.1.1")
+  }
+}
+
 description = 'Gradle plugin for integrating Axelor'
 
-apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradle.plugin-publish'
 
 configurations {
   tomcat
-  tomcat.transitive false
+  tomcat.transitive = false
   provided
-  provided.transitive false
+  provided.transitive = false
   database
-  database.transitive false
+  database.transitive = false
 }
 
 dependencies {
@@ -17,20 +24,24 @@ dependencies {
 
   implementation libs.guava
   implementation libs.commons_csv
-  implementation libs.plugin_license
+  implementation libs.jakarta_annotation
+  implementation libs.caffeine
 
   tomcat project(":axelor-tomcat")
 
-  provided libs.javax_servlet
+  provided libs.jakarta_servlet
 }
 
 gradlePlugin {
+  website = "https://github.com/axelor/axelor-open-platform"
+  vcsUrl = "https://github.com/axelor/axelor-open-platform.git"
   plugins {
     axelorPlugin {
       id = "com.axelor.app"
       implementationClass = "com.axelor.gradle.AxelorPlugin"
       displayName = "Axelor Gradle plugin"
       description = "Gradle plugin for integrating Axelor"
+      tags.addAll('axelor', 'java', 'platform')
     }
   }
 }
@@ -49,4 +60,8 @@ classes.doLast {
   generateLibsList "tomcat"
   generateLibsList "database"
   generateLibsList "provided"
+}
+
+checkDuplicateClasses {
+  excludes = ["gradle-api.*"]
 }

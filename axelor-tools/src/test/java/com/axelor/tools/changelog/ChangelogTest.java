@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.changelog;
 
@@ -28,7 +14,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -49,7 +34,7 @@ public class ChangelogTest {
         processor.process(getEntries(), version, header, ChangelogEntryConstants.TYPES, null);
 
     File outputFile =
-        Paths.get(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
+        Path.of(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
     String output =
         com.google.common.io.Files.asCharSource(outputFile, StandardCharsets.UTF_8).read();
 
@@ -60,7 +45,7 @@ public class ChangelogTest {
     URL changelogsUrl = ResourceUtils.getResource("changelogs/entries/");
     ChangelogEntryParser parser = new ChangelogEntryParser();
 
-    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI())).sorted()) {
+    try (Stream<Path> stream = Files.list(Path.of(changelogsUrl.toURI())).sorted()) {
       return stream
           .map(Path::toFile)
           .map(
@@ -76,8 +61,8 @@ public class ChangelogTest {
   }
 
   String getHeader(String version) {
-    return String.format(
-        "%s (%s)", version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+    return "%s (%s)"
+        .formatted(version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
   }
 
   @Test

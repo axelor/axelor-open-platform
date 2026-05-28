@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code;
 
@@ -51,13 +37,13 @@ public class TestJavaCode {
 
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import java.util.ArrayList;\n"
-            + "import java.util.List;\n"
-            + "\n"
-            + "List<String> names = new ArrayList<>()";
+        """
+        package com.example;
+
+        import java.util.ArrayList;
+        import java.util.List;
+
+        List<String> names = new ArrayList<>()""";
 
     assertEquals(expected, text);
   }
@@ -67,12 +53,13 @@ public class TestJavaCode {
     JavaCode code = new JavaCode("final var value = {0:m};", "com.some.Example.NAME");
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import com.some.Example;\n"
-            + "\n"
-            + "final var value = Example.NAME;";
+        """
+        package com.example;
+
+        import com.some.Example;
+
+        final var value = Example.NAME;\
+        """;
 
     assertEquals(expected, text);
   }
@@ -82,12 +69,13 @@ public class TestJavaCode {
     JavaCode code = new JavaCode("{0:M}({1:s});", "System.out.println", "Hello!");
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import static System.out.println;\n"
-            + "\n"
-            + "println(\"Hello!\");";
+        """
+        package com.example;
+
+        import static System.out.println;
+
+        println("Hello!");\
+        """;
     assertEquals(expected, text);
   }
 }

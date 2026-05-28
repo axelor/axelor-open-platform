@@ -15,13 +15,27 @@ import { Formatters } from "@/utils/format";
 
 import styles from "./system.module.scss";
 
+const _t = i18n.get;
+
 const formatDate = (value: number) => {
   return Formatters.datetime(new Date(value));
 };
 
-const formatNumber = (value: string) => {
-  const num = value.replace(" Kb", "");
-  return Formatters.decimal(num) + " Kb";
+const formatBytes = (value: number, options = { scale: 1, binary: true }) => {
+  const { scale, binary } = options;
+  const base = binary ? 1024 : 1000;
+  const units = [_t("bytes"), _t("kB"), _t("MB"), _t("GB"), _t("TB")];
+
+  const unitIndex = Math.min(
+    Math.floor((value > 0 ? Math.log(value) : 0) / Math.log(base)),
+    units.length - 1,
+  );
+  const unitValue = value / Math.pow(base, unitIndex);
+  const unit = units[unitIndex];
+
+  return `${Formatters.decimal(unitValue, {
+    props: { scale: unitIndex ? scale : 0, type: "DECIMAL" } as any,
+  })}\u00A0${unit}`;
 };
 
 export function System() {
@@ -67,13 +81,13 @@ export function System() {
         <Box p={2}>
           <dl className={styles.dlist}>
             <dt>{i18n.get("Total Memory")}</dt>
-            <dd>{formatNumber(sys.memTotal)}</dd>
+            <dd>{formatBytes(sys.memTotal)}</dd>
             <dt>{i18n.get("Max Memory")}</dt>
-            <dd>{formatNumber(sys.memMax)}</dd>
+            <dd>{formatBytes(sys.memMax)}</dd>
             <dt>{i18n.get("Used Memory")}</dt>
-            <dd>{formatNumber(sys.memUsed)}</dd>
+            <dd>{formatBytes(sys.memTotal - sys.memFree)}</dd>
             <dt>{i18n.get("Free Memory")}</dt>
-            <dd>{formatNumber(sys.memFree)}</dd>
+            <dd>{formatBytes(sys.memFree)}</dd>
           </dl>
         </Box>
       </Box>

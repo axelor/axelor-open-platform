@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.2.xsd">
+
+  <form title="API Keys" name="user-token-user-form" model="com.axelor.auth.db.User" onLoad="com.axelor.auth.web.UserTokenController:loadUserTokens">
+    <panel showFrame="false" itemSpan="12">
+      <field name="code" hidden="true" />
+      <label title="Generate access token for each application you use that needs access to the API." colSpan="7"/>
+      <button name="createNewUserToken" onClick="action-view-create-new-user-token" title="Create new API key" icon="key" colSpan="4"/>
+      <field name="_xActiveUserTokens" readonly="true" showTitle="false" colSpan="12" x-dirty="false">
+        <viewer>
+          <![CDATA[
+            <>
+              {_xActiveUserTokens && _xActiveUserTokens.length > 0 ? (
+                <Box d="flex" flexDirection="column" g={4}>
+                  {_xActiveUserTokens.map((userToken, i) => (
+                    <Box
+                      key={i}
+                      d="flex"
+                      flexDirection="column"
+                      g={2}
+                      p={3}
+                      border
+                      rounded
+                    >
+                      <Box d="flex" alignItems="center" justifyContent="space-between">
+                        <Box d="flex" alignItems="center" g={2}>
+                          <strong>{userToken.name}</strong>
+                          <Badge bg={userToken.isActive ? 'success' : 'danger'} rounded="pill">{userToken.isActive ? _t('Active') : _t('Expired')}</Badge>
+                        </Box>
+                        <Box d="flex" alignItems="right" g={2}>
+                          <Button variant="danger" size="sm" onClick={() => $execute("action-validate-user-revoke-user-token,action-method-revoke-token", { _userTokenId: userToken.id })}>
+                            {_t('Revoke')}
+                          </Button>
+                          {userToken.isActive ? (
+                            <Button variant="info" size="sm" onClick={() => $execute("action-validate-user-rotate-user-token,action-method-rotate-token", { _userTokenId: userToken.id })}>
+                              {_t('Rotate')}
+                            </Button>
+                          ) : null}
+                        </Box>
+                      </Box>
+                      <Box
+                        d="flex"
+                        flexDirection="column"
+                        g={1}
+                        style={{ fontSize: '0.85em' }}
+                      >
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="login" />
+                          <span>{_t('Expires on:')} {userToken.expires ? Formatters.datetime(new Date(userToken.expires), { props: { seconds: true } }) : "-"}</span>
+                          {userToken.isActive && userToken.remainingDays >= 0 ? (
+                            <Box as="span" color={userToken.remainingDays > 7 ? "primary" : "warning"}>{userToken.remainingDays} {_t('day(s) left')}</Box>
+                          ) : null}
+                        </Box>
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="schedule" />
+                          <span>{_t('Last used at:')} {userToken.lastUsed ? Formatters.datetime(new Date(userToken.lastUsed), { props: { seconds: true } }) : "-"}</span>
+                        </Box>
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="calendar_add_on" />
+                          <span>{_t('Created on:')} {userToken.createdOn ? Formatters.datetime(new Date(userToken.createdOn), { props: { seconds: true } }) : "-"}</span>
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Box d="flex" alignItems="center" justifyContent="center" p={4}>
+                  <Icon icon="devices" />
+                  <span style={{ marginLeft: '0.5em' }}>{_t('No API key')}</span>
+                </Box>
+              )}
+            </>
+          ]]>
+        </viewer>
+      </field>
+    </panel>
+  </form>
+
+  <form name="user-token-form" title="User token" model="com.axelor.auth.db.UserToken" onNew="default-user-token-record">
+    <panel name="generalInfoPanel">
+      <field name="name" readonlyIf="id" />
+      <field name="expiresAt" readonlyIf="id" validIf="$moment(expiresAt) &gt; $moment()" />
+      <button name="createTokenBtn" onClick="validate,action-method-create-token" title="Create API key" showIf="!id" />
+    </panel>
+  </form>
+
+  <form name="user-token-api-key-form" title="User token" model="com.axelor.auth.db.UserToken" onNew="action-method-show-api-key">
+    <panel name="apiKeyPanel" itemSpan="12">
+      <field name="apiKey" />
+      <help>
+        <![CDATA[
+          This is your new API key. <br> Please make sure to copy and store it securely now — you won't be able to view it again later.
+        ]]>
+      </help>
+    </panel>
+  </form>
+
+  <action-method name="action-method-create-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="createToken" />
+  </action-method>
+
+  <action-validate name="action-validate-user-revoke-user-token">
+    <alert message="Revoking this API key will permanently disable it. Any services currently using this key will immediately lose access and won’t be able to authenticate. Are you sure you want to proceed?" confirm-btn-title="Revoke" />
+  </action-validate>
+
+  <action-method name="action-method-revoke-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="revokeToken" />
+  </action-method>
+
+  <action-method name="action-method-show-api-key">
+    <call class="com.axelor.auth.web.UserTokenController" method="showApiKey" />
+  </action-method>
+
+  <action-validate name="action-validate-user-rotate-user-token">
+    <alert message="Rotating this API key will replace it with a new one. Services using the old key will lose access until updated. Do you want to proceed?" confirm-btn-title="Rotate" />
+  </action-validate>
+
+  <action-method name="action-method-rotate-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="rotateToken" />
+  </action-method>
+
+  <action-record name="default-user-token-record" model="com.axelor.auth.db.UserToken">
+    <field name="expiresAt" expr="eval: __datetime__.plusMonths(1)" />
+  </action-record>
+
+  <action-view title="New key" model="com.axelor.auth.db.UserToken" name="action-view-create-new-user-token">
+    <view type="form" name="user-token-form" />
+    <view-param name="popup" value="reload" />
+    <view-param name="popup-save" value="false" />
+    <view-param name="show-toolbar" value="false" />
+    <view-param name="show-confirm" value="false" />
+    <context name="_xUserId" expr="eval: id" />
+  </action-view>
+
+
+</object-views>

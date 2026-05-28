@@ -13,19 +13,31 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from "react";
 
-import { clsx, Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
+import {
+  Box,
+  ClickAwayListener,
+  FocusTrap,
+  clsx,
+  findAriaProp,
+  findDataProp,
+} from "@axelor/ui";
 import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { createEvalContext } from "@/hooks/use-parser/context";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
+import { executeWithoutQueue } from "@/view-containers/action";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
-import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
+import { useHandleFocus } from "@/views/form";
+import { showErrors, useGetErrors } from "@/views/form/builder/form-errors";
 import {
   FormAtom,
   Form as FormComponent,
@@ -34,21 +46,23 @@ import {
   FormWidget,
   WidgetErrors,
   WidgetProps,
+  WidgetState,
   useFormHandlers,
 } from "@/views/form/builder";
+import { fallbackFormAtom } from "@/views/form/builder/atoms";
+import { FormOverlayProvider } from "@/views/form/builder/overlay-scope";
+import { isDatePickerTarget } from "@/views/form/widgets/date/utils";
 import {
   useFormEditableScope,
   useFormScope,
   useFormValidityScope,
 } from "@/views/form/builder/scope";
+import { ExpandIcon } from "../../builder/expandable";
 import {
   useCollectionTree,
   useCollectionTreeEditable,
 } from "../../builder/scope";
-import { ExpandIcon } from "../../builder/expandable";
 import { AUTO_ADD_ROW } from "../../builder/utils";
-import { fallbackFormAtom } from "@/views/form/builder/atoms";
-import { executeWithoutQueue } from "@/view-containers/action";
 
 import styles from "./form.module.scss";
 
@@ -171,6 +185,9 @@ export const FormLayoutComponent = ({
                 minWidth: column.width,
               },
             })}
+            role="gridcell"
+            aria-colindex={ind}
+            data-testid={`column:${column.name}`}
           >
             {!item && column === expandColumn && (
               <Box d="flex" onClick={() => onExpand?.()}>
@@ -284,7 +301,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const record = useMemo(() => processGridRecord(_record), [_record]);
     const containerRef = useRef<HTMLDivElement>(null);
     const recordRef = useRef<DataRecord>({});
-    const parentRef = useRef<Element>();
+    const parentRef = useRef<Element>(null);
     const meta = useMemo(
       () => ({
         view,
@@ -296,23 +313,76 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { newItem: newItemAtom } = useCollectionTree();
 
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
+    const columnNamesRef = useRef<string[]>([]);
+    const columnNames = useMemo(() => {
+      const list = (columns ?? []).map((c) => c.name).filter(Boolean);
+      if (isEqual(list, columnNamesRef.current)) {
+        return columnNamesRef.current;
+      }
+      return (columnNamesRef.current = list);
+    }, [columns]);
+
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find(isFocusableField)?.name;
-      const editColumn = view.items?.find((c) => c.name === editColumnName);
-      const name = editColumn?.readonly
-        ? defaultColumnName
-        : editColumnName || defaultColumnName;
-      const item = view.items?.find((item) => item.name === name);
-      if (item) {
+      const viewItems = (view.items ?? []).filter((item) =>
+        columnNames.includes(item.name!),
+      );
+      const defaultColumnName = viewItems?.find(isFocusableField)?.name;
+      const editColumn = viewItems?.find((c) => c.name === editColumnName);
+
+      const columnAttrs: Record<string, WidgetState> = {};
+
+      const context = createEvalContext(record, {
+        fields,
+      });
+
+      viewItems.forEach((viewItem) => {
+        const { name, showIf, hideIf, readonlyIf } = viewItem;
+
+        if (!name) return;
+
+        const readonly = readonlyIf
+          ? Boolean(parseExpression(readonlyIf)(context))
+          : undefined;
+        let hidden = hideIf
+          ? Boolean(parseExpression(hideIf)(context))
+          : undefined;
+
+        if (!hidden && showIf) {
+          hidden = !parseExpression(showIf)(context);
+        }
+
+        if (readonly !== undefined || hidden !== undefined) {
+          columnAttrs[name] = {
+            attrs: { hidden, readonly },
+          };
+        }
+      });
+
+      const focusItemName =
+        editColumn?.readonly &&
+        columnAttrs[editColumnName!]?.attrs?.readonly !== false
+          ? defaultColumnName
+          : editColumnName || defaultColumnName;
+      const focusItem =
+        focusItemName &&
+        view.items?.find((item) => item.name === focusItemName);
+
+      if (focusItem) {
         return {
-          [item.name as string]: {
+          ...columnAttrs,
+          [focusItemName]: {
             attrs: {
+              ...columnAttrs[focusItemName],
               focus: true,
             },
           },
         };
       }
-    }, [editColumnName, view.items]);
+
+      return columnAttrs;
+      // intentionally exclude `fields`, `record`, etc. to avoid unnecessary recomputation.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editColumnName, columnNames, view.items]);
 
     const expandState = useMemo(
       () =>
@@ -330,6 +400,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       isCollectionTree && (view as Schema).widget === "tree-grid";
     const isManyToMany = (view as Schema).serverType === "MANY_TO_MANY";
     const autoAddNewRow = (view as any)[AUTO_ADD_ROW] ?? true;
+
+    const [openPickers, setOpenPickers] = useState(0);
 
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
@@ -374,7 +446,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const checkInvalid = useAtomCallback(
       useCallback(
-        (get, set, name?: string) => getErrors(get(formAtom), name),
+        (get) => getErrors(get(formAtom)),
         [formAtom, getErrors],
       ),
     );
@@ -568,6 +640,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const handleClickOutside = useCallback(
       (e: Event) => {
         if (e.defaultPrevented) return;
+        if (isDatePickerTarget(e.target)) {
+          return;
+        }
         const parent = getParent();
 
         if (parent && !parent?.contains?.(e.target as Node)) {
@@ -578,6 +653,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       },
       [getParent, handleRecordCommit],
     );
+
+    const handleDatePickerOpen = useCallback(() => {
+      setOpenPickers((count) => count + 1);
+    }, []);
+
+    const handleDatePickerClose = useCallback(() => {
+      setOpenPickers((count) => Math.max(0, count - 1));
+    }, []);
 
     const handleCellClick = useCallback(
       (e: SyntheticEvent, col: GridColumn, colIndex: number) => {
@@ -644,37 +727,55 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onInit?.();
     }, [onInit]);
 
+    const { role } = props as React.HTMLAttributes<HTMLDivElement>;
+    const testId = findDataProp(props, "data-testid");
+    const ariaRowIndex = findAriaProp(props, "aria-rowindex");
+    const ariaSelected = findAriaProp(props, "aria-selected");
+
+    const overlayValue = useMemo(
+      () => ({
+        onOpenOverlay: handleDatePickerOpen,
+        onCloseOverlay: handleDatePickerClose,
+      }),
+      [handleDatePickerOpen, handleDatePickerClose],
+    );
+    
     return (
       <>
         {!(view as Schema).serverType && (
           <MainShortcuts handleSave={handleSave} />
         )}
-
-        <FocusTrap initialFocus={false}>
-          <Box
-            ref={containerRef}
-            className={clsx(className, styles.container)}
-            d="flex"
-            onKeyDown={handleKeyDown}
-          >
-            <ClickAwayListener onClickAway={handleClickOutside}>
-              <Box d="flex">
-                <FormComponent
-                  {...({} as FormProps)}
-                  schema={view}
-                  fields={fields!}
-                  layout={CustomLayout as unknown as FormLayout}
-                  layoutProps={{ columns }}
-                  readonly={false}
-                  formAtom={formAtom}
-                  actionHandler={actionHandler}
-                  actionExecutor={actionExecutor}
-                  recordHandler={recordHandler}
-                />
-              </Box>
-            </ClickAwayListener>
-          </Box>
-        </FocusTrap>
+        <FormOverlayProvider value={overlayValue}>
+          <FocusTrap enabled={openPickers === 0} initialFocus={false}>
+            <Box
+              ref={containerRef}
+              className={clsx(className, styles.container)}
+              d="flex"
+              onKeyDown={handleKeyDown}
+              role={role}
+              aria-rowindex={ariaRowIndex}
+              aria-selected={ariaSelected}
+              data-testid={testId}
+            >
+              <ClickAwayListener onClickAway={handleClickOutside}>
+                <Box d="flex">
+                  <FormComponent
+                    {...({} as FormProps)}
+                    schema={view}
+                    fields={fields!}
+                    layout={CustomLayout as unknown as FormLayout}
+                    layoutProps={{ columns }}
+                    readonly={false}
+                    formAtom={formAtom}
+                    actionHandler={actionHandler}
+                    actionExecutor={actionExecutor}
+                    recordHandler={recordHandler}
+                  />
+                </Box>
+              </ClickAwayListener>
+            </Box>
+          </FocusTrap>
+        </FormOverlayProvider>
       </>
     );
   },

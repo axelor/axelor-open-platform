@@ -104,6 +104,15 @@ Most important config values are:
 - `fixed` : use a fixed scale for all axis. Value should be provided by `max` config.
 - `distinct` : use a distinct scale by axis, based on the series values. This is the default.
 - `unique` : use a unique scale for all axis, based on the series values.
+* `maxSeries` - maximum number of series (dimensions) to display. When the dataset produces more
+  series than this limit, only the top N series by value are shown. Pie, donut, radar, line,
+  area, and scatter charts aggregate the remaining series into an "Others" bucket; bar and
+  horizontal bar charts drop tail series to preserve scale accuracy. Defaults to `200`. Set to
+  `0` to disable the limit. This is useful for charts with large datasets to prevent excessive
+  memory consumption.
+* `zoomThreshold` - controls the data zoom slider for x-axis categories (or y-axis for horizontal
+  bar charts). Defaults to `50`. Use a positive value as a threshold, `0` to show zoom controls
+  fully zoomed out (all data visible), or a negative value to disable zoom entirely.
 * `min/max` -  used with gauge and radar chart(max support), define the minimum and maximum values.
 * `onClick` - call specified action with clicked data in context
 
@@ -133,6 +142,57 @@ each color by adjusting the brightness.
   <!-- with custom shades -->
   <config name="shades" value="10" />
 
+</chart>
+----
+
+== Series limit
+
+When a chart dataset produces a large number of series (e.g. thousands of distinct products),
+the browser may consume excessive memory. The `maxSeries` config limits the number of displayed
+series by keeping the top N by value. Pie, donut, radar, line, area, and scatter charts
+aggregate the remaining series into an "Others" bucket; bar and horizontal bar charts drop tail
+series to preserve scale accuracy.
+
+[source,xml]
+----
+<chart name="chart.sale.turnover.by.product" title="Turnover by product">
+  ...
+  <!-- Show only the top 20 products, aggregate the rest into "Others" -->
+  <config name="maxSeries" value="20" />
+</chart>
+----
+
+The default value is `200`. To disable the limit entirely, set it to `0`:
+
+[source,xml]
+----
+<config name="maxSeries" value="0" />
+----
+
+== Data zoom threshold
+
+When a chart has many x-axis categories (or y-axis categories for horizontal bar charts), a data
+zoom slider is automatically enabled to let users pan and zoom without overwhelming the view. The
+`zoomThreshold` config controls this behaviour:
+
+* *Positive value* — zoom slider is enabled only when the number of data points exceeds the value.
+  The initial view shows the first N items. Defaults to `50`.
+* *Zero* — zoom slider is always shown, fully zoomed out (all data visible). Useful when you want
+  precise zoom controls regardless of how many data points are present.
+* *Negative value* — zoom is disabled entirely; no zoom controls are rendered.
+
+[source,xml]
+----
+<chart name="chart.sale.per.day" title="Sales per day">
+  ...
+  <!-- Enable zoom slider only when more than 20 data points are present -->
+  <config name="zoomThreshold" value="20" />
+
+  <!-- Always show zoom controls, fully zoomed out -->
+  <config name="zoomThreshold" value="0" />
+
+  <!-- Disable zoom controls entirely -->
+  <config name="zoomThreshold" value="-1" />
 </chart>
 ----
 

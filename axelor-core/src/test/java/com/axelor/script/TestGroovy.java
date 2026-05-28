@@ -1,34 +1,21 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.db.EntityHelper;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.CurrencyRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -50,16 +37,6 @@ public class TestGroovy extends ScriptTest {
   // false all, to evaluate all conditions
   private static final String EXPR_CONDITION =
       "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
-
-  @Test
-  public void doJpaTest() {
-    final ScriptHelper helper = new GroovyScriptHelper(context());
-    final Object bean = helper.eval("doInJPA({ em -> em.find(Contact, id) })");
-    assertNotNull(bean);
-    assertTrue(bean instanceof Contact);
-    assertEquals(contact.getId(), ((Contact) bean).getId());
-    assertFalse(EntityHelper.isUninitialized((Contact) bean));
-  }
 
   @Test
   public void testImport() {
@@ -142,5 +119,204 @@ public class TestGroovy extends ScriptTest {
     Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
 
     assertTrue((Boolean) result);
+  }
+
+  @Test
+  void testIntersect() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("[-2, -3].intersect([1, 2], (a, b) -> a.abs() <=> b.abs())");
+
+    // Fixed in Groovy 4.0.0: https://issues.apache.org/jira/browse/GROOVY-10275
+    assertEquals(List.of(-2), result);
+  }
+
+  @Test
+  void testNegativeZero() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("def a = -0.0f, b = 0.0f; a != b");
+
+    // Fixed in Groovy 4.0.0: https://issues.apache.org/jira/browse/GROOVY-9797
+    assertTrue((Boolean) result);
+  }
+
+  @Test
+  void testReferentialTransparency() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def a = ['a', 'b'] as String[], b = ['c', 'd'] as String[]
+            def c = a + b
+            c instanceof String[]
+            """);
+
+    // Fixed in Groovy 4.0.0, 3.0.21: https://issues.apache.org/jira/browse/GROOVY-6837
+    assertTrue((Boolean) result);
+  }
+
+  @Test
+  public void testSecurity() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+
+    // classes from java.lang should be allowed
+    assertTrue((Boolean) helper.eval("Boolean.TRUE"));
+
+    // but java.lang.{System,Process,Thread} are not allowed
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval("new ProcessBuilder().command('ls', '-l').inheritIO().start().waitFor()"));
+
+    // allow models
+    assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));
+
+    // app settings not allowed
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("com.axelor.app.AppSettings.get().get('db.test.url')"));
+
+    // app settings not allowed through __config__
+    assertNull(helper.eval("__config__.get('db.test.url')"));
+
+    // only custom settings helper allowed
+    assertNull(helper.eval("__config__.get('application.mode')"));
+    assertNotNull(
+        helper.eval("__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()"));
+
+    // also keys prefixed with `context.*` (without `context.`)
+    assertNotNull(helper.eval("__config__.get('string')"));
+    assertNotNull(helper.eval("__config__.string"));
+
+    // should work with safe navigation operator
+    assertNotNull(
+        helper.eval(
+            "__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()?.length()"));
+
+    // trying to access a file
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("new java.io.File('/tmp')"));
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("java.nio.file.Paths.get('/tmp')"));
+
+    // even try with reflection
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "String.class.forName('java.io.File').getConstructor(String.class).newInstance('/some/file')"));
+
+    // GString template
+    assertEquals(
+        "dev",
+        String.valueOf(
+            helper.eval(
+                "\"${__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()}\"")),
+        "Should allow custom helper in GString");
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("\"${com.axelor.app.AppSettings.get().get('db.test.url')}\""),
+        "Should not allow unrestricted AppSettings in GString");
+
+    // Closure
+    assertEquals(
+        "dev",
+        String.valueOf(
+            helper.eval(
+                "{\"${__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()}\"}()")),
+        "Should allow custom helper in Closure");
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("{\"${com.axelor.app.AppSettings.get().get('db.test.url')}\"}()"),
+        "Should not allow unrestricted AppSettings in Closure");
+  }
+
+  @Test
+  void testGString() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("\" ${lastName} \".trim()");
+    assertEquals("NAME", result);
+  }
+
+  @Test
+  void testRange() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("(1..2).subList(0, 1).toList()");
+    assertEquals(List.of(1), result);
+  }
+
+  @Test
+  void testRangeIterator() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("(1..5).iterator().chop(2).toList()");
+    assertEquals(List.of(List.of(1, 2)), result);
+  }
+
+  @Test
+  void testTuple() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("new Tuple2(1, 2).subList(0, 1)");
+    assertEquals(List.of(1), result);
+  }
+
+  @Test
+  void testSequence() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def s = ((1..2) as Sequence)
+            s.add(3)
+            s
+            """);
+    assertEquals(List.of(1, 2, 3), result);
+  }
+
+  @Test
+  void testMapWithDefault() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def m = [:].withDefault { key -> key.toUpperCase() }
+            m.get('foo')
+            """);
+    assertEquals("FOO", result);
+  }
+
+  @Test
+  void testListWithDefault() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def l = [].withDefault { i -> i * 2 }
+            l.get(2)
+            """);
+    assertEquals(4, result);
+  }
+
+  @Test
+  void testClosure() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def first = { it.toUpperCase() }
+            def second = { it.reverse() }
+
+            second.call(first.call("abc"))
+            """);
+    assertEquals("CBA", result);
+  }
+
+  @Test
+  public void testTimeout() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context()).withTimeout(100);
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("while (true) { println('hello!') }"));
   }
 }

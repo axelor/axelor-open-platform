@@ -1,11 +1,13 @@
+import { useCallback, useMemo } from "react";
+
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { findView } from "@/services/client/meta-cache";
 import { Schema } from "@/services/client/meta.types";
-import { useCallback, useMemo } from "react";
 
 export function useCreateOnTheFly(schema: Schema) {
   const { target: model, formView } = schema;
+  const jsonModel = schema.jsonTarget || schema.jsonModel;
 
   const createNames = useMemo<string[]>(
     () => schema.create?.split(/\s*,\s*/) || [],
@@ -29,6 +31,7 @@ export function useCreateOnTheFly(schema: Schema) {
         type: "form",
         model,
         name: formView,
+        jsonModel,
       });
 
       const record: DataRecord = {};
@@ -53,6 +56,6 @@ export function useCreateOnTheFly(schema: Schema) {
       const saved = await ds.save(record);
       saved && onSelect?.(saved);
     },
-    [createNames, model, formView],
+    [createNames, model, formView, jsonModel],
   );
 }

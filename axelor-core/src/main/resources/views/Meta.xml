@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.2.xsd">
 
   <selection name="view.type.selection">
     <option value="grid">Grid</option>
@@ -72,6 +72,11 @@
     <option value="white" color="white">White</option>
   </selection>
 
+  <selection name="file.store.type.selection">
+    <option value="1">File system</option>
+    <option value="2">Object Storage</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <field name="name"/>
@@ -88,7 +93,7 @@
       <field name="application"/>
     </panel>
     <panel title="Depends On">
-      <field name="depends" widget="TagSelect" colSpan="12" showTitle="false"/>
+      <field name="depends" widget="Tags" colSpan="12" showTitle="false"/>
     </panel>
     <panel title="Description">
       <field name="description" showTitle="false" colSpan="12"/>
@@ -112,6 +117,7 @@
     <field name="title"/>
     <field name="type"/>
     <field name="model"/>
+    <field name="jsonModel"/>
     <field name="module"/>
     <field name="extension" hidden="true"/>
     <field name="computed" hidden="true"/>
@@ -142,8 +148,9 @@
       </panel>
       <panel itemSpan="12">
         <field name="model"/>
+        <field name="jsonModel"/>
         <field name="module"/>
-        <field name="groups" widget="TagSelect" x-create="code,name"/>
+        <field name="groups" widget="Tags" x-create="code,name"/>
         <panel showIf="['form', 'grid'].indexOf(type) >= 0">
           <field name="extension"/>
           <field name="computed"/>
@@ -165,7 +172,7 @@
   </grid>
 
   <form name="meta-view-custom-form" title="Personalized View" model="com.axelor.meta.db.MetaViewCustom"
-        onSave="com.axelor.meta.web.MetaController:clearCache" width="large">
+        onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large">
     <panel title="Overview">
       <field name="name"/>
       <field name="title"/>

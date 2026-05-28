@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.views;
 
@@ -25,6 +11,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,11 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("editor")
@@ -121,29 +107,29 @@ public class PanelEditor extends AbstractPanel {
 
     final Set<String> all = new HashSet<>();
 
-    if (widget instanceof SimpleWidget) {
-      String depends = ((SimpleWidget) widget).getDepends();
+    if (widget instanceof SimpleWidget simpleWidget) {
+      String depends = simpleWidget.getDepends();
       if (StringUtils.notBlank(depends)) {
         Collections.addAll(all, depends.trim().split("\\s*,\\s*"));
       }
     }
 
-    if (widget instanceof Field) {
-      all.add(((Field) widget).getName());
+    if (widget instanceof Field field) {
+      all.add(field.getName());
       // include related field for ref-select widget
-      String relatedAttr = ((Field) widget).getRelated();
+      String relatedAttr = field.getRelated();
       if (StringUtils.notBlank(relatedAttr)) {
         all.add(relatedAttr);
       }
       return all;
     }
 
-    if (widget instanceof PanelEditor) {
-      for (AbstractWidget item : ((PanelEditor) widget).getItems()) {
+    if (widget instanceof PanelEditor panelEditor) {
+      for (AbstractWidget item : panelEditor.getItems()) {
         all.addAll(findFields(item));
       }
-    } else if (widget instanceof Panel) {
-      for (AbstractWidget item : ((Panel) widget).getItems()) {
+    } else if (widget instanceof Panel panel) {
+      for (AbstractWidget item : panel.getItems()) {
         all.addAll(findFields(item));
       }
     }
@@ -180,10 +166,10 @@ public class PanelEditor extends AbstractPanel {
 
     while (!widgets.isEmpty()) {
       final AbstractWidget widget = widgets.remove();
-      if (widget instanceof PanelField) {
-        ((PanelField) widget).setFromEditor(true);
-      } else if (widget instanceof Panel) {
-        widgets.addAll(((Panel) widget).getItems());
+      if (widget instanceof PanelField panelField) {
+        panelField.setFromEditor(true);
+      } else if (widget instanceof Panel panel) {
+        widgets.addAll(panel.getItems());
       }
     }
   }

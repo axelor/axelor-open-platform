@@ -1,11 +1,11 @@
 import { useAtomValue } from "jotai";
 import padStart from "lodash/padStart";
-import { useCallback, useMemo } from "react";
+import { FocusEventHandler, useCallback, useId, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { MaskedInput } from "../date/mask-input";
+import { MaskedInput } from "@/components/masked-input";
 import { ViewerInput } from "../string/viewer";
 
 function toText(
@@ -49,66 +49,85 @@ const toNumber = (val: string | number) =>
   (isNaN(val as number) ? 0 : val) as number;
 
 function toValue(value: string) {
+  if (!value || value.includes("_")) return null;
   const [hr, min, secs = 0] = value
-    .replace(/_/g, "0")
     .split(":")
     .map((x) => toNumber(parseInt(x)));
   return hr * 60 * 60 + min * 60 + secs;
 }
 
-const isValid = (value: string) => !value.includes("_");
-
 export function Duration(props: FieldProps<string | number>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, placeholder, widgetAttrs } = schema;
+  const { placeholder, widgetAttrs } = schema;
   const { big, seconds } = widgetAttrs;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
+
+  const id = useId();
 
   const format = useCallback(
     (value?: string | number | null) => toText(value, { big, seconds }),
     [big, seconds],
   );
 
-  const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
-    validate: isValid,
-    format,
-    parse: toValue,
-    schema,
-  });
+  const { value, text, setText, onChange, onBlur, onKeyDown } = useInput(
+    valueAtom,
+    {
+      format,
+      parse: toValue,
+      schema,
+    },
+  );
+
+  const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
+    (e) => {
+      onBlur(e);
+      const val = e.target.value;
+      if (!val || val.includes("_")) {
+        setText("");
+      }
+    },
+    [onBlur, setText],
+  );
 
   const displayText = useMemo(
     () => toText(value, { big, seconds }) ?? "",
     [big, seconds, value],
   );
 
+  const mask = useMemo(
+    () => [
+      ...(big ? [/\d/] : []),
+      /\d/,
+      /\d/,
+      ":",
+      /[0-5]/,
+      /\d/,
+      ...(seconds ? [":", /[0-5]/, /\d/] : []),
+    ],
+    [big, seconds],
+  );
+
   return (
-    <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={displayText} />}
+    <FieldControl {...props} inputId={id}>
+      {readonly && <ViewerInput id={id} name={schema.name} value={displayText} />}
       {readonly || (
         <MaskedInput
           key={focus ? "focused" : "normal"}
           data-input
+          data-testid="input"
           type="text"
-          id={uid}
+          id={id}
           autoFocus={focus}
           placeholder={placeholder}
           value={text}
           invalid={invalid}
           required={required}
           onChange={onChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onKeyDown={onKeyDown}
-          mask={[
-            ...(big ? [/\d/] : []),
-            /\d/,
-            /\d/,
-            ":",
-            /[0-5]/,
-            /\d/,
-            ...(seconds ? [":", /[0-5]/, /\d/] : []),
-          ]}
+          mask={mask}
         />
       )}
     </FieldControl>

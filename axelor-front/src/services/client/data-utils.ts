@@ -1,4 +1,5 @@
 import isEqual from "lodash/isEqual";
+import getObjValue from "lodash/get";
 import setObjValue from "lodash/set";
 import { produce } from "immer";
 
@@ -153,6 +154,61 @@ function toJSON(value?: string | null) {
   return {};
 }
 
+function parseJsonField(value: unknown): Record<string, unknown> {
+  try {
+    if (typeof value === "string") return JSON.parse(value);
+    if (value && typeof value === "object")
+      return { ...value } as Record<string, unknown>;
+  } catch {
+    // ignore parse errors
+  }
+  return {};
+}
+
+export function getJsonFieldValue(
+  record: DataRecord,
+  field?: Pick<Property, "jsonField" | "jsonPath">,
+) {
+  if (!field?.jsonField || !field?.jsonPath) return undefined;
+  const json = parseJsonField(record[field.jsonField]);
+  return getObjValue(json, field.jsonPath);
+}
+
+/**
+ * Update a JSON field on a record: parses the existing value from source,
+ * applies updates, and stringifies it back onto the target record.
+ */
+export function updateJsonFieldValue(
+  record: DataRecord,
+  jsonField: string,
+  source: DataRecord,
+  updates: Record<string, unknown>,
+) {
+  const jsonValue = parseJsonField(source[jsonField]);
+  for (const [path, value] of Object.entries(updates)) {
+    setObjValue(jsonValue, path, value);
+  }
+  record[jsonField] = JSON.stringify(jsonValue);
+}
+
+/**
+ * Re-expand dotted JSON field values on a record from its JSON string.
+ * e.g. updates record["attrs.status"] from the parsed record["attrs"].
+ */
+export function expandJsonFieldValues(
+  record: DataRecord,
+  fieldNames: (string | undefined)[],
+  fields?: Record<string, Property>,
+) {
+  for (const name of fieldNames) {
+    if (!name) continue;
+    const field = fields?.[name];
+    if (field?.jsonField && field?.jsonPath) {
+      record[name] = getJsonFieldValue(record, field);
+    }
+  }
+}
+
 export function updateRecord(
   target: DataRecord,
   source: DataRecord,
@@ -191,16 +247,15 @@ export function updateRecord(
       const [jsonField, ...fieldParts] = key.split(".");
       const subField = fieldParts.join(".");
 
-      const _values =
+      const currentValue =
         jsonFieldsValue[jsonField] ??
         (jsonFieldsValue[jsonField] = toJSON(result[jsonField]));
 
-      if (!equals(_values[subField], value)) {
+      if (!equals(getObjValue(currentValue, subField), value)) {
+        const nextValue = toJSON(JSON.stringify(currentValue));
+        setObjValue(nextValue, subField, value);
         changed = true;
-        jsonFieldsValue[jsonField] = {
-          ..._values,
-          [subField]: value,
-        };
+        jsonFieldsValue[jsonField] = nextValue;
       }
       continue;
     }
@@ -220,8 +275,8 @@ export function updateRecord(
     }
 
     if (fields?.[key]?.json) {
-      delete jsonFieldsValue[key];
-      newValue = newValue && compactJson(toJSON(newValue));
+      newValue =
+        newValue && compactJson(toJSON(newValue), { forContext: false });
     }
 
     let isSelectedChanged = false;
@@ -283,7 +338,6 @@ export function updateRecord(
           (vals, key) => ({
             ...vals,
             [key]: JSON.stringify({
-              // check json field is explicitly set, then retains the value
               ...(key in source && toJSON(result[key])),
               ...jsonFieldsValue[key],
             }),

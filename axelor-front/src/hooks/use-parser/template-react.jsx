@@ -37,6 +37,7 @@ import { CUSTOM_COMPONENTS } from "@/views/custom";
 import { legacyClassNames } from "@/styles/legacy";
 import { LoadingCache } from "@/utils/cache";
 import { parseSafe } from "./parser";
+import { Formatters } from "@/utils/format.ts";
 
 const COMPONENTS = {
   Alert,
@@ -68,6 +69,7 @@ const COMPONENTS = {
   TableRow,
   Icon,
   legacyClassNames,
+  Formatters,
   ...CUSTOM_COMPONENTS,
 };
 

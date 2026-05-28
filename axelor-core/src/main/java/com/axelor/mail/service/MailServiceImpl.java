@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.mail.service;
 
@@ -22,10 +8,11 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuditableRunner;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -60,40 +47,38 @@ import com.axelor.text.Templates;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
+import jakarta.activation.DataSource;
+import jakarta.inject.Singleton;
+import jakarta.mail.FetchProfile;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Store;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.search.AndTerm;
+import jakarta.mail.search.FlagTerm;
+import jakarta.mail.search.SearchTerm;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.activation.DataSource;
-import javax.inject.Singleton;
-import javax.mail.FetchProfile;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Store;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.search.AndTerm;
-import javax.mail.search.FlagTerm;
-import javax.mail.search.SearchTerm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,8 +244,8 @@ public class MailServiceImpl implements MailService, MailConstants {
           getSubject(message.getParent() == null ? message.getRoot() : message.getParent(), entity);
     }
     // in case of message groups
-    if (subject == null && entity instanceof Team) {
-      subject = ((Team) entity).getName();
+    if (subject == null && entity instanceof Team team) {
+      subject = team.getName();
     }
     if (message.getParent() != null && subject != null) {
       subject = "Re: " + subject;
@@ -344,16 +329,16 @@ public class MailServiceImpl implements MailService, MailConstants {
     Templates templates = Beans.get(GroovyTemplates.class);
     Template tmpl =
         templates.fromText(
-            ""
-                + "<ul>"
-                + "<% for (def item : tracks) { %>"
-                + "<% if (item.containsKey('displayValue')) { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> → <span>${item.displayValue}</span></li>"
-                + "<% } else { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldValue}</span> → <span>${item.value}</span></li>"
-                + "<% } %>"
-                + "<% } %>"
-                + "</ul>");
+            """
+            <ul>\
+            <% for (def item : tracks) { %>\
+            <% if (item.containsKey('displayValue')) { %>\
+            <li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> → <span>${item.displayValue}</span></li>\
+            <% } else { %>\
+            <li><strong>${item.title}</strong>: <span>${item.oldValue}</span> → <span>${item.value}</span></li>\
+            <% } %>\
+            <% } %>\
+            </ul>""");
 
     return tmpl.make(data).render();
   }
@@ -446,7 +431,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 
   @Override
   public void send(final MailMessage message) throws MailException {
-    Preconditions.checkNotNull(message, "mail message can't be null");
+    Objects.requireNonNull(message, "mail message can't be null");
     final Model related = findEntity(message);
     final MailSender sender = getMailSender(message, related);
     if (sender == null) {
@@ -466,9 +451,8 @@ public class MailServiceImpl implements MailService, MailConstants {
     }
 
     for (MetaAttachment attachment : messages.findAttachments(message)) {
-      final Path filePath = MetaFiles.getPath(attachment.getMetaFile());
-      final File file = filePath.toFile();
-      builder.attach(file.getName(), file.toString());
+      final File filePath = MetaFiles.getPath(attachment.getMetaFile()).toFile();
+      builder.attach(attachment.getMetaFile().getFileName(), filePath.toString());
     }
 
     final MimeMessage email;
@@ -491,28 +475,19 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     // send email using a separate process to void thread blocking
     executor.submit(
-        new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            send(sender, email);
-            return true;
-          }
-        });
+        ContextAware.of()
+            .withTransaction(false)
+            .build(
+                () -> {
+                  send(sender, email);
+                  return true;
+                }));
   }
 
   @Transactional(rollbackOn = Exception.class)
   protected void send(final MailSender sender, final MimeMessage email) throws Exception {
-    final AuditableRunner runner = Beans.get(AuditableRunner.class);
-    final Callable<Boolean> job =
-        new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            sender.send(email);
-            messageSent(email);
-            return true;
-          }
-        };
-    runner.run(job);
+    sender.send(email);
+    messageSent(email);
   }
 
   /**
@@ -662,8 +637,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     int count = 0;
     for (Message message : messages) {
-      if (message instanceof MimeMessage) {
-        final MailMessage entity = messageReceived((MimeMessage) message);
+      if (message instanceof MimeMessage mimeMessage) {
+        final MailMessage entity = messageReceived(mimeMessage);
         if (entity != null) {
           repo.save(entity);
           count += 1;
@@ -685,15 +660,18 @@ public class MailServiceImpl implements MailService, MailConstants {
       if (reader == null) {
         return;
       }
-      final AuditableRunner runner = Beans.get(AuditableRunner.class);
-      runner.run(
-          () -> {
-            try {
-              fetch(reader);
-            } catch (Exception e) {
-              log.error("Unable to fetch messages", e);
-            }
-          });
+      ContextAware.of()
+          .withTransaction(false)
+          .withUser(AuthUtils.getUser("admin"))
+          .build(
+              () -> {
+                try {
+                  fetch(reader);
+                } catch (Exception e) {
+                  log.error("Unable to fetch messages", e);
+                }
+              })
+          .run();
     }
   }
 

@@ -1,29 +1,15 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.gradle;
 
+import com.axelor.gradle.support.CliSupport;
+import com.axelor.gradle.support.DuplicatedClassSupport;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
-import com.axelor.gradle.support.LicenseSupport;
 import com.axelor.gradle.support.PublishSupport;
-import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
 import com.axelor.gradle.tasks.AbstractEncryptTask;
@@ -32,7 +18,6 @@ import com.axelor.gradle.tasks.EncryptTextTask;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
-import java.io.File;
 import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -42,7 +27,7 @@ import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.jvm.tasks.Jar;
+import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 
@@ -50,15 +35,6 @@ public class AxelorPlugin implements Plugin<Project> {
 
   public static final String AXELOR_APP_GROUP = "axelor application";
   public static final String AXELOR_BUILD_GROUP = "axelor build";
-
-  public static File getClassOutputDir(Project project, String sourceType) {
-    return project
-        .getLayout()
-        .getBuildDirectory()
-        .dir("classes/" + sourceType + "/main")
-        .get()
-        .getAsFile();
-  }
 
   @Override
   public void apply(Project project) {
@@ -69,7 +45,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project.getPlugins().apply(JavaSupport.class);
     project.getPlugins().apply(PublishSupport.class);
-    project.getPlugins().apply(LicenseSupport.class);
+    project.getPlugins().apply(DuplicatedClassSupport.class);
 
     if (project.getPlugins().hasPlugin(EclipsePlugin.class)) {
       project.getPlugins().apply(EclipseSupport.class);
@@ -105,14 +81,14 @@ public class AxelorPlugin implements Plugin<Project> {
     if (!AxelorUtils.isAxelorApplication(project)) return;
 
     project.getPlugins().apply(WarSupport.class);
-    project.getPlugins().apply(ScriptsSupport.class);
     project.getPlugins().apply(TomcatSupport.class);
+    project.getPlugins().apply(CliSupport.class);
 
     // run generateCode on included builds
     AxelorUtils.findIncludedBuildProjects(project).stream()
-        .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
+        .map(included -> included.getTasks().findByName(GenerateCode.MAIN_TASK_NAME))
         .filter(Objects::nonNull)
-        .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
+        .forEach(task -> project.getTasks().getByName(GenerateCode.MAIN_TASK_NAME).dependsOn(task));
 
     // run processResources on included builds
     AxelorUtils.findIncludedBuildProjects(project).stream()
@@ -129,7 +105,7 @@ public class AxelorPlugin implements Plugin<Project> {
   private void configureCodeGeneration(Project project) {
     project
         .getTasks()
-        .create(
+        .register(
             I18nTask.TASK_NAME,
             I18nTask.class,
             task -> {
@@ -139,7 +115,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project
         .getTasks()
-        .create(
+        .register(
             UpdateVersion.TASK_NAME,
             UpdateVersion.class,
             task -> {
@@ -155,20 +131,39 @@ public class AxelorPlugin implements Plugin<Project> {
             });
 
     Task compileTask = project.getTasks().findByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+    Task compileTestTask = project.getTasks().findByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME);
     Task resourcesTask = project.getTasks().findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+
+    // generate code task for main sourceSet
     Task generateCodeTask =
         project
             .getTasks()
-            .create(
-                GenerateCode.TASK_NAME,
+            .register(
+                GenerateCode.MAIN_TASK_NAME,
                 GenerateCode.class,
                 task -> {
                   task.setDescription(GenerateCode.TASK_DESCRIPTION);
                   task.setGroup(GenerateCode.TASK_GROUP);
-                });
+                })
+            .get();
+
+    // generate code task for test sourceSet
+    Task generateTestCodeTask =
+        project
+            .getTasks()
+            .register(
+                GenerateCode.TEST_TASK_NAME,
+                GenerateCode.class,
+                task -> {
+                  task.setDescription(GenerateCode.TASK_DESCRIPTION);
+                  task.setGroup(GenerateCode.TASK_GROUP);
+                  task.setUseTestSources(Boolean.TRUE);
+                })
+            .get();
 
     // add dependencies to optimize up-to-date checks
     dependsOn(compileTask, generateCodeTask);
+    dependsOn(compileTestTask, generateTestCodeTask);
     dependsOn(resourcesTask, generateCodeTask);
     project.afterEvaluate(
         p -> {
@@ -178,26 +173,40 @@ public class AxelorPlugin implements Plugin<Project> {
                     if (d == p) {
                       return;
                     }
-                    dependsOn(generateCodeTask, d.getTasks().findByName(GenerateCode.TASK_NAME));
+                    dependsOn(
+                        generateCodeTask, d.getTasks().findByName(GenerateCode.MAIN_TASK_NAME));
+                    dependsOn(
+                        generateTestCodeTask, d.getTasks().findByName(GenerateCode.MAIN_TASK_NAME));
                     dependsOn(compileTask, d.getTasks().findByName(JavaPlugin.CLASSES_TASK_NAME));
                   });
         });
 
-    // add src-gen dirs
+    // add main src-gen dir
     project
         .getExtensions()
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getJava()
-        .srcDir(GenerateCode.getJavaOutputDir(project));
+        .srcDir(GenerateCode.getMainJavaOutputDir(project));
+
+    // add test src-gen dir
+    project
+        .getExtensions()
+        .getByType(JavaPluginExtension.class)
+        .getSourceSets()
+        .getByName(SourceSet.TEST_SOURCE_SET_NAME)
+        .getJava()
+        .srcDir(GenerateCode.getTestJavaOutputDir(project));
+
+    // add main src-gen resources dir
     project
         .getExtensions()
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getResources()
-        .srcDir(GenerateCode.getResourceOutputDir(project));
+        .srcDir(GenerateCode.getMainResourceOutputDir(project));
 
     // XXX: prepend class output directory to compile classpath (see #26420)
     // XXX: https://github.com/gradle/gradle/issues/12575
@@ -207,18 +216,17 @@ public class AxelorPlugin implements Plugin<Project> {
         .getSourceSets()
         .getByName(
             SourceSet.MAIN_SOURCE_SET_NAME,
-            sourceSet -> {
-              sourceSet.setCompileClasspath(
-                  project
-                      .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
-                      .plus(sourceSet.getCompileClasspath()));
-            });
+            sourceSet ->
+                sourceSet.setCompileClasspath(
+                    project
+                        .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
+                        .plus(sourceSet.getCompileClasspath())));
   }
 
   private void configureEncryptionSupport(Project project) {
     project
         .getTasks()
-        .create(
+        .register(
             EncryptTextTask.TASK_NAME,
             EncryptTextTask.class,
             task -> {
@@ -228,7 +236,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project
         .getTasks()
-        .create(
+        .register(
             EncryptFileTask.TASK_NAME,
             EncryptFileTask.class,
             task -> {

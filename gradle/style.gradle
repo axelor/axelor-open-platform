@@ -1,8 +1,25 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.25.0"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:8.4.0"
   }
+}
+
+def getHeaderFile = { Project p, String style ->
+  def fileName = style == null ? "header.txt" : "header-${style}.txt"
+  def paths = [
+    "src/license",
+    ".",
+    p.getRootDir().getPath() + "/gradle/license",
+    p.getRootDir().getPath()
+  ]
+  for (def path : paths) {
+    final File file = p.file(path + "/" + fileName);
+    if (file.exists()) {
+      return file;
+    }
+  }
+  return null
 }
 
 /////
@@ -12,7 +29,7 @@ buildscript {
 apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
 spotless {
-  enforceCheck false
+  enforceCheck = false
 
   java {
     target fileTree(projectDir) {
@@ -20,21 +37,35 @@ spotless {
       include 'buildSrc/src/*/java/**/*.java'
     }
     googleJavaFormat()
+    licenseHeaderFile(getHeaderFile(project, null))
+  }
+  groovyGradle {
+    target fileTree(projectDir) {
+      include '*.gradle'
+      include 'gradle/*.gradle'
+    }
+    greclipse()
+    leadingTabsToSpaces(2)
+    trimTrailingWhitespace()
+    endWithNewline()
   }
   format 'misc', {
     target fileTree(projectDir) {
       include '.gitignore'
-      include '*.gradle'
-      include 'gradle/*.gradle'
+
       include 'documentation/*.yml'
     }
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }
   format 'markdown', {
-    target '**/*.md'
-    indentWithSpaces(2)
+    target fileTree(projectDir) {
+      include '*.md'
+      include 'changelogs/*.md'
+      include 'documentation/*.md'
+    }
+    leadingTabsToSpaces(2)
     endWithNewline()
   }
 }
@@ -48,17 +79,43 @@ configure(subprojects - project(':axelor-front')) { p ->
   apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
   spotless {
-    enforceCheck false
+    enforceCheck = false
 
     java {
       target fileTree(p.projectDir) {
         include 'src/*/java/**/*.java'
       }
       googleJavaFormat()
+      licenseHeaderFile(getHeaderFile(project, null))
     }
-    format 'misc', {
-      target fileTree(p.projectDir) {
+    groovyGradle {
+      target fileTree(projectDir) {
         include '*.gradle'
+        include 'gradle/*.gradle'
+      }
+      greclipse()
+      leadingTabsToSpaces(2)
+      trimTrailingWhitespace()
+      endWithNewline()
+    }
+    format("javaInfoFiles") {
+      // separate extension due to https://github.com/diffplug/spotless/issues/532
+      target fileTree(p.projectDir) {
+        include 'src/*/java/**/module-info.java'
+        include 'src/*/java/**/package-info.java'
+      }
+
+      licenseHeaderFile(getHeaderFile(project, null), "(package|import|module|@|/\\*\\*)")
+    }
+    format('xsd') {
+      target fileTree(p.projectDir) {
+        include 'src/**/*.xsd'
+      }
+      licenseHeaderFile(getHeaderFile(project, "xml"), "<((!DOCTYPE)|[A-Za-z]+)")
+          .skipLinesMatching("^<\\?xml.*\\?>\$")
+    }
+    format('misc') {
+      target fileTree(p.projectDir) {
         include 'src/**/*.html'
         include 'src/**/*.js'
         include 'src/**/*.css'
@@ -71,12 +128,11 @@ configure(subprojects - project(':axelor-front')) { p ->
           exclude 'src/main/resources/conf/*'
         }
       }
-      indentWithSpaces(2)
+      leadingTabsToSpaces(2)
       trimTrailingWhitespace()
       endWithNewline()
     }
   }
-
 }
 
 /////
@@ -86,11 +142,8 @@ configure(subprojects - project(':axelor-front')) { p ->
 configure([rootProject] + (subprojects - project(':axelor-front'))) {
 
   tasks.register('formatCode') {
-    description "Add license and format code."
-    group "Axelor"
-    if (tasks.findByName('licenseFormat')) {
-      dependsOn 'licenseFormat'
-    }
+    description = "Add license and format code."
+    group = "Axelor"
     dependsOn'spotlessApply'
   }
 }

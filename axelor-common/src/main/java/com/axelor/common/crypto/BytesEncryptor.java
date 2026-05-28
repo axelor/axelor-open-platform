@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common.crypto;
 
@@ -32,6 +18,26 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES encryptor operating on raw byte arrays.
+ *
+ * <p>Uses PBKDF2WithHmacSHA1 for key derivation with a fixed iteration count of 1024 and an 8-byte
+ * salt that is generated once at construction time and reused for every {@link #encrypt(byte[])}
+ * call.
+ *
+ * <p>Binary payload format:
+ *
+ * <pre>
+ * CBC: | $AES$ (5 bytes) | salt (8 bytes) | encrypted_data |
+ * GCM: | $AES$ (5 bytes) | salt (8 bytes) | iv (16 bytes) | encrypted_data |
+ * </pre>
+ *
+ * @deprecated Weak key derivation (PBKDF2WithHmacSHA1, 1024 iterations) and instance-scoped salt.
+ *     Use {@link BytesEncryptorPbkdf2Sha512} (or {@link BytesEncryptorPbkdf2Sha256}) for new
+ *     encryptions, or {@link BytesEncryptorCoordinator} to handle legacy {@code $AES$}, {@code
+ *     $AESv1$}, and {@code $AESv2$} ciphertext transparently.
+ */
+@Deprecated
 public class BytesEncryptor implements Encryptor<byte[], byte[]> {
 
   private static final String AES_ALGORITHM = "AES";
@@ -58,7 +64,7 @@ public class BytesEncryptor implements Encryptor<byte[], byte[]> {
   public BytesEncryptor(OperationMode mode, PaddingScheme paddingScheme, String password) {
     this.mode = mode;
     this.password = password;
-    this.transformation = String.format("%s/%s/%s", AES_ALGORITHM, mode, paddingScheme);
+    this.transformation = "%s/%s/%s".formatted(AES_ALGORITHM, mode, paddingScheme);
     this.encryptionSalt = generateRandomBytes(SALT_SIZE);
     this.encryptionKey = newSecretKey(password, this.encryptionSalt);
     this.payloadSize =

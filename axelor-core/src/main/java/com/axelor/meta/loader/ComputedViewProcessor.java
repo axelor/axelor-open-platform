@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -28,14 +14,15 @@ import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
-import com.google.common.base.MoreObjects;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import javax.annotation.Nullable;
-import javax.xml.bind.JAXBException;
+import java.util.Objects;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -82,7 +69,7 @@ public class ComputedViewProcessor {
     Document document = processor.compute();
 
     final ObjectViews objectViews = XMLViews.unmarshal(document);
-    final AbstractView finalView = objectViews.getViews().get(0);
+    final AbstractView finalView = objectViews.getViews().getFirst();
     String finalXml = XMLViews.toXml(finalView, true);
 
     computedView.setXml(finalXml);
@@ -138,20 +125,21 @@ public class ComputedViewProcessor {
     }
 
     final MetaView computedView;
-    final Iterator<MetaView> computedViewIt =
-        computedViewQuery.order("xmlId").fetchStream().iterator();
-    if (computedViewIt.hasNext()) {
-      computedView = computedViewIt.next();
-      while (computedViewIt.hasNext()) {
-        metaViewRepo.remove(computedViewIt.next());
+    try (final Stream<MetaView> stream = computedViewQuery.order("xmlId").fetchStream()) {
+      final Iterator<MetaView> computedViewIt = stream.iterator();
+      if (computedViewIt.hasNext()) {
+        computedView = computedViewIt.next();
+        while (computedViewIt.hasNext()) {
+          metaViewRepo.remove(computedViewIt.next());
+        }
+      } else {
+        final MetaView copy = metaViewRepo.copy(baseView, false);
+        final String xmlId =
+            Objects.requireNonNullElse(baseView.getXmlId(), baseView.getName()) + "__computed__";
+        copy.setXmlId(xmlId);
+        copy.setComputed(true);
+        computedView = metaViewRepo.save(copy);
       }
-    } else {
-      final MetaView copy = metaViewRepo.copy(baseView, false);
-      final String xmlId =
-          MoreObjects.firstNonNull(baseView.getXmlId(), baseView.getName()) + "__computed__";
-      copy.setXmlId(xmlId);
-      copy.setComputed(true);
-      computedView = metaViewRepo.save(copy);
     }
 
     computedView.setPriority(baseView.getPriority() + 1);

@@ -15,7 +15,6 @@ out
 *.iml
 *.ipr
 *.iws
-*.iml
 atlassian-ide-plugin.xml
 
 # NetBeans

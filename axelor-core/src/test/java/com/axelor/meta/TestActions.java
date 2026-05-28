@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -37,8 +23,6 @@ import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -70,14 +54,14 @@ public class TestActions extends MetaTest {
     assertNotNull(views);
     assertNotNull(views.getActions());
 
-    MetaStore.resister(views);
+    MetaStore.register(views);
   }
 
   private ActionHandler createHandler(String action, Map<String, Object> context) {
 
     ActionRequest request = new ActionRequest();
 
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
     request.setData(data);
     request.setModel(Contact.class.getName());
     request.setAction(action);
@@ -192,7 +176,7 @@ public class TestActions extends MetaTest {
   public void testValidate() {
 
     Action action = MetaStore.getAction("action-contact-validate");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -208,7 +192,7 @@ public class TestActions extends MetaTest {
   public void testCondition() {
 
     Action action = MetaStore.getAction("check.dates");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("orderDate", LocalDate.parse("2012-12-10"));
     context.put("createDate", LocalDate.parse("2012-12-11"));
@@ -226,7 +210,7 @@ public class TestActions extends MetaTest {
   public void testMethod() {
 
     Action action = MetaStore.getAction("action-contact-greetings");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -237,7 +221,7 @@ public class TestActions extends MetaTest {
 
     assertNotNull(value);
     Map infoMap =
-        (Map) ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).get(0)).get(Info.KEY);
+        (Map) ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).getFirst()).get(Info.KEY);
     assertNotNull(infoMap);
     assertEquals("Hello World!!!", infoMap.get("message"));
     assertEquals("My title", infoMap.get("title"));
@@ -247,7 +231,7 @@ public class TestActions extends MetaTest {
   public void testRpc() {
 
     Action action = MetaStore.getAction("action-contact-greetings-rpc");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -279,7 +263,7 @@ public class TestActions extends MetaTest {
     FormView view = (FormView) views.getViews().get(1);
     assertNotNull(view);
 
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("firstName", "John");
     context.put("lastName", "Smith");
@@ -300,7 +284,7 @@ public class TestActions extends MetaTest {
   public void testView() {
 
     Action action = MetaStore.getAction("action-view-contact");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -315,7 +299,7 @@ public class TestActions extends MetaTest {
   @Test
   public void testGroup() {
     Action action = MetaStore.getAction("action.group.test");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -327,7 +311,7 @@ public class TestActions extends MetaTest {
     assertNotNull(value);
     assertTrue(value instanceof List);
     assertFalse(((List<?>) value).isEmpty());
-    assertNotNull(((List<?>) value).get(0));
+    assertNotNull(((List<?>) value).getFirst());
     assertFalse(value.toString().contains("pending"));
 
     handler.getContext().put("firstName", "J");
@@ -338,7 +322,7 @@ public class TestActions extends MetaTest {
     assertNotNull(value);
     assertTrue(value instanceof List);
     assertFalse(((List<?>) value).isEmpty());
-    assertNotNull(((List<?>) value).get(0));
+    assertNotNull(((List<?>) value).getFirst());
     assertTrue(value.toString().contains("pending"));
   }
 
@@ -357,8 +341,8 @@ public class TestActions extends MetaTest {
     context.put("myDateTime", LocalDateTime.now());
     context.put("myEnum", EnumStatusNumber.ONE);
     context.put("myReference", new Title());
-    context.put("myCollection", ImmutableList.of(new Address()));
-    context.put("myCollection2", ImmutableList.of(new Address()));
+    context.put("myCollection", List.of(new Address()));
+    context.put("myCollection2", List.of(new Address()));
 
     Map<String, Object> expected =
         Map.ofEntries(
@@ -426,7 +410,7 @@ public class TestActions extends MetaTest {
   @Test
   void testContextProxy() throws JsonProcessingException {
     Action action = MetaStore.getAction("action-contact-context-proxy");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("firstName", "myFirstName");
     context.put("lastName", "myLastName");
@@ -438,7 +422,7 @@ public class TestActions extends MetaTest {
 
     context.put("attrs", getObjectMapper().writeValueAsString(customFieldsCtx));
 
-    Map<String, Object> titleCtx = Maps.newHashMap();
+    Map<String, Object> titleCtx = new HashMap<>();
     titleCtx.put("code", "myTitle");
     titleCtx.put("name", "myTitle");
     titleCtx.put("_model", Title.class.getName());

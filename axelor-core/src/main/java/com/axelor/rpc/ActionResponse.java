@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -24,19 +10,25 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.validate.validator.Alert;
 import com.axelor.meta.schema.actions.validate.validator.Error;
 import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.actions.validate.validator.Notify;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -270,14 +262,80 @@ public class ActionResponse extends Response {
   }
 
   /**
-   * Set the file path relative to the data export directory.
+   * Set the file path to be exported.
    *
-   * <p>The client will initiate downloading the exported file.
+   * <p>The file path is copied to a dedicated temporary file for pending export.
    *
-   * @param path the relative path to the exported file
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
    */
   public void setExportFile(String path) {
-    set("exportFile", path);
+    setExportFile(Path.of(path));
+  }
+
+  /**
+   * Set the file path to be exported.
+   *
+   * <p>The file path is copied to a dedicated temporary file for pending export.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(String path, String fileName) {
+    setExportFile(Path.of(path), fileName);
+  }
+
+  /**
+   * Set the file path to be exported.
+   *
+   * <p>The file path is copied to a dedicated temporary file for pending export.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
+   */
+  public void setExportFile(Path path) {
+    setExportFile(path, null);
+  }
+
+  /**
+   * Set the file path to be exported.
+   *
+   * <p>The file path is copied to a dedicated temporary file for pending export.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param path the path to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(Path path, String fileName) {
+    var name = StringUtils.notBlank(fileName) ? fileName : path.getFileName().toString();
+    var fullPath = path.isAbsolute() ? path : TempFiles.getTempPath().resolve(path);
+
+    try (var stream = Files.newInputStream(fullPath)) {
+      setExportFile(stream, name);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  /**
+   * Set the file stream to be exported.
+   *
+   * <p>This creates a pending export file from the given stream.
+   *
+   * <p>The client will initiate downloading the export file.
+   *
+   * @param stream the stream to the export file
+   * @param fileName the name of the downloaded export file
+   */
+  public void setExportFile(InputStream stream, String fileName) {
+    var token = Beans.get(PendingExportService.class).add(stream);
+    set("exportFile", fileName);
+    set("exportToken", token);
   }
 
   /**

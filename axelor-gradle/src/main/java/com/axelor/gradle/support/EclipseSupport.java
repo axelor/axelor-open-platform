@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.gradle.support;
 
@@ -32,6 +18,8 @@ import org.gradle.plugins.ide.eclipse.model.EclipseClasspath;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
 import org.gradle.plugins.ide.eclipse.model.Library;
 import org.gradle.plugins.ide.eclipse.model.SourceFolder;
+import org.gradle.plugins.ide.eclipse.model.WbResource;
+import org.gradle.plugins.ide.eclipse.model.WtpComponent;
 
 public class EclipseSupport extends AbstractSupport {
 
@@ -53,7 +41,8 @@ public class EclipseSupport extends AbstractSupport {
     project.afterEvaluate(
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-            eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.MAIN_TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.TEST_TASK_NAME);
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
             // Also run eclipseJdt in included builds
@@ -76,30 +65,49 @@ public class EclipseSupport extends AbstractSupport {
             (Classpath cp) -> {
               // separate output for main & test sources
               cp.getEntries().stream()
-                  .filter(it -> it instanceof SourceFolder)
-                  .map(it -> (SourceFolder) it)
+                  .filter(SourceFolder.class::isInstance)
+                  .map(SourceFolder.class::cast)
                   .filter(
                       it ->
-                          it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
+                          it.getPath().startsWith("src/main/")
+                              || it.getPath().contains("src-gen/main/"))
                   .forEach(it -> it.setOutput("bin/main"));
 
               cp.getEntries().stream()
-                  .filter(it -> it instanceof SourceFolder)
-                  .map(it -> (SourceFolder) it)
-                  .filter(it -> it.getPath().startsWith("src/test/"))
+                  .filter(SourceFolder.class::isInstance)
+                  .map(SourceFolder.class::cast)
+                  .filter(
+                      it ->
+                          it.getPath().startsWith("src/test/")
+                              || it.getPath().contains("src-gen/test/"))
                   .forEach(it -> it.setOutput("bin/test"));
 
               // remove self-dependency
               cp.getEntries()
                   .removeIf(
                       it ->
-                          it instanceof SourceFolder
-                              && ((SourceFolder) it).getPath().contains(project.getName()));
+                          it instanceof SourceFolder sourceFolder
+                              && sourceFolder.getPath().contains(project.getName()));
               cp.getEntries()
                   .removeIf(
                       it ->
-                          it instanceof Library
-                              && ((Library) it).getPath().contains(project.getName() + "/build"));
+                          it instanceof Library l
+                              && l.getPath().contains(project.getName() + "/build"));
+            });
+
+    // exclude test sources from deployment assembly
+    eclipse
+        .getWtp()
+        .getComponent()
+        .getFile()
+        .whenMerged(
+            (WtpComponent wtp) -> {
+              wtp.getWbModuleEntries()
+                  .removeIf(
+                      it ->
+                          it instanceof WbResource wb
+                              && (wb.getSourcePath().startsWith("src/test/")
+                                  || wb.getSourcePath().startsWith("build/src-gen/test/")));
             });
 
     // finally configure wtp resources
@@ -132,7 +140,7 @@ public class EclipseSupport extends AbstractSupport {
     final File dir =
         project.getGradle().getIncludedBuilds().stream()
             .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
-            .filter(it -> it.exists())
+            .filter(File::exists)
             .findFirst()
             .orElse(null);
 

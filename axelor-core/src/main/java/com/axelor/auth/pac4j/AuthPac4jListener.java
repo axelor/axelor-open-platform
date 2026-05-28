@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
@@ -26,8 +12,8 @@ import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.LogoutEvent;
 import com.axelor.events.PostLogin;
+import jakarta.inject.Inject;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -42,19 +28,16 @@ public class AuthPac4jListener implements AuthenticationListener {
   @Inject private Event<PostLogin> postLoginEvent;
   @Inject private Event<LogoutEvent> logoutEvent;
   @Inject private AuthPac4jProfileService profileService;
-  @Inject private AxelorSessionManager sessionManager;
   @Inject private AuthSessionService sessionService;
 
   private static final String UNKNOWN_USER = "User not found: %s";
 
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
-    if (info instanceof UserAuthenticationInfo) {
-      final User user = ((UserAuthenticationInfo) info).getUser();
+    if (info instanceof UserAuthenticationInfo authenticationInfo) {
+      final User user = authenticationInfo.getUser();
 
       if (user != null) {
-        sessionManager.changeSessionId();
-        sessionService.updateLoginDate();
         firePostLoginSuccess(token, user);
         return;
       }
@@ -66,11 +49,11 @@ public class AuthPac4jListener implements AuthenticationListener {
         profile
             .map(profileService::getUserIdentifier)
             .orElseGet(() -> String.valueOf(token.getPrincipal()));
-    final String msg = String.format(UNKNOWN_USER, username);
+    final String msg = UNKNOWN_USER.formatted(username);
     final UnknownAccountException exception = new UnknownAccountException(msg);
 
     firePostLoginFailure(token, exception);
-    SecurityUtils.getSubject().logout();
+    sessionService.terminateSession(SecurityUtils.getSubject());
 
     throw exception;
   }

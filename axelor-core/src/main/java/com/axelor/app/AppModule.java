@@ -1,28 +1,15 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.app;
 
+import com.axelor.cache.CacheBuilder;
+import com.axelor.db.audit.HibernateListenerConfigurator;
 import com.axelor.event.EventModule;
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
-import com.axelor.meta.db.repo.MetaJsonReferenceUpdater;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
 import com.axelor.meta.loader.ViewWatcherObserver;
@@ -30,6 +17,7 @@ import com.axelor.meta.service.ViewProcessor;
 import com.axelor.meta.theme.MetaThemeService;
 import com.axelor.meta.theme.MetaThemeServiceImpl;
 import com.axelor.report.ReportEngineProvider;
+import com.axelor.script.ScriptPolicyConfigurator;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -59,9 +47,6 @@ public class AppModule extends AbstractModule {
     // Observe changes for views
     bind(ViewObserver.class);
 
-    // Observe updates to fix m2o names in json values
-    bind(MetaJsonReferenceUpdater.class);
-
     // Logger injection support
     install(new LoggerModule());
 
@@ -71,9 +56,8 @@ public class AppModule extends AbstractModule {
     // Init QuickMenuCreator
     Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
 
-    // View processor binder
-    final Multibinder<ViewProcessor> viewProcessorBinder =
-        Multibinder.newSetBinder(binder(), ViewProcessor.class);
+    // Hibernate listener configurator binder
+    Multibinder.newSetBinder(binder(), HibernateListenerConfigurator.class);
 
     bind(AppSettingsObserver.class);
     bind(ViewWatcherObserver.class);
@@ -85,27 +69,36 @@ public class AppModule extends AbstractModule {
             .flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
             .collect(Collectors.toList());
 
-    if (moduleClasses.isEmpty()) {
-      return;
-    }
+    if (!moduleClasses.isEmpty()) {
+      log.info("Configuring app modules...");
 
-    log.info("Configuring app modules...");
-
-    for (Class<? extends AxelorModule> module : moduleClasses) {
-      try {
-        log.debug("Configure module: {}", module.getName());
-        install(module.getDeclaredConstructor().newInstance());
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+      for (Class<? extends AxelorModule> module : moduleClasses) {
+        try {
+          log.debug("Configure module: {}", module.getName());
+          install(module.getDeclaredConstructor().newInstance());
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
       }
     }
 
     // Configure view processors
+    configureViewProcessors();
 
-    final List<Class<? extends ViewProcessor>> viewProcessorClasses =
+    // Configure script policy
+    configureScriptPolicy();
+
+    var cacheProviderInfo = CacheBuilder.getCacheProviderInfo();
+    log.info("Cache provider: {}", cacheProviderInfo.getProvider());
+  }
+
+  private void configureViewProcessors() {
+    Multibinder<ViewProcessor> viewProcessorBinder =
+        Multibinder.newSetBinder(binder(), ViewProcessor.class);
+    List<Class<? extends ViewProcessor>> viewProcessorClasses =
         ModuleManager.getResolution().stream()
             .flatMap(name -> MetaScanner.findSubTypesOf(name, ViewProcessor.class).find().stream())
-            .collect(Collectors.toList());
+            .toList();
 
     if (!viewProcessorClasses.isEmpty()) {
       log.atInfo()
@@ -113,11 +106,40 @@ public class AppModule extends AbstractModule {
           .addArgument(
               () ->
                   viewProcessorClasses.stream()
-                      .map(Class::getSimpleName)
+                      .map(Class::getName)
                       .collect(Collectors.joining(", ")))
           .log();
+
       viewProcessorClasses.forEach(
           viewProcessor -> viewProcessorBinder.addBinding().to(viewProcessor));
+    }
+  }
+
+  private void configureScriptPolicy() {
+    Multibinder<ScriptPolicyConfigurator> scriptPolicyConfiguratorBinder =
+        Multibinder.newSetBinder(binder(), ScriptPolicyConfigurator.class);
+
+    List<Class<? extends ScriptPolicyConfigurator>> configuratorClasses =
+        ModuleManager.getResolution().stream()
+            .flatMap(
+                name ->
+                    MetaScanner.findSubTypesOf(name, ScriptPolicyConfigurator.class)
+                        .find()
+                        .stream())
+            .toList();
+
+    if (!configuratorClasses.isEmpty()) {
+      log.atInfo()
+          .setMessage("Script policy configurators: {}")
+          .addArgument(
+              () ->
+                  configuratorClasses.stream()
+                      .map(Class::getName)
+                      .collect(Collectors.joining(", ")))
+          .log();
+
+      configuratorClasses.forEach(
+          configurator -> scriptPolicyConfiguratorBinder.addBinding().to(configurator));
     }
   }
 }

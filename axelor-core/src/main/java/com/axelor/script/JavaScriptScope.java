@@ -1,25 +1,10 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
 import com.axelor.common.StringUtils;
-import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
@@ -36,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import javax.management.Query;
 import javax.script.Bindings;
@@ -52,7 +36,6 @@ class JavaScriptScope implements ProxyObject {
   }
 
   private static final Class<?>[] DEFAULT_TYPES = {
-    Beans.class,
     Model.class,
     Query.class,
     Repository.class,
@@ -65,7 +48,6 @@ class JavaScriptScope implements ProxyObject {
     ArrayList.class,
     BigDecimal.class,
     MathContext.class,
-    System.class,
     Arrays.class,
   };
 
@@ -73,21 +55,26 @@ class JavaScriptScope implements ProxyObject {
 
   private final Bindings bindings;
 
-  public JavaScriptScope(Bindings bindings) {
+  private final ScriptPolicy policy;
+
+  public <T> JavaScriptScope(Bindings bindings, ScriptPolicy policy) {
     this.globals = new SimpleBindings();
     this.bindings = bindings;
+    this.policy = policy;
 
-    globals.put("__repo__", (Function<Class<? extends Model>, Object>) t -> JpaRepository.of(t));
-    globals.put("doInJPA", (Function<Function<Object[], Object>, ?>) this::doInJPA);
+    globals.put("__repo__", (Function<Class<? extends Model>, Object>) this::repo);
+    globals.put("__bean__", (Function<Class<? extends Model>, Object>) this::bean);
   }
 
-  private Object doInJPA(Function<Object[], Object> task) {
-    final AtomicReference<Object> result = new AtomicReference<>(null);
-    JPA.runInTransaction(() -> result.set(task.apply(new Object[] {JPA.em()})));
-    return result.get();
+  private <T extends Model> JpaRepository<T> repo(Class<T> type) {
+    return JpaRepository.of(type);
   }
 
-  private Class<?> findClass(String simpleName) {
+  private <T> T bean(Class<T> type) {
+    return Beans.get(policy.check(type));
+  }
+
+  private Class<?> findClass1(String simpleName) {
     if (StringUtils.isBlank(simpleName) || !Character.isUpperCase(simpleName.charAt(0))) {
       return null;
     }
@@ -105,6 +92,11 @@ class JavaScriptScope implements ProxyObject {
       found = JpaScanner.findRepository(simpleName);
     }
     return found;
+  }
+
+  private Class<?> findClass(String simpleName) {
+    Class<?> cls = findClass1(simpleName);
+    return cls == null ? null : policy.check(cls);
   }
 
   @Override

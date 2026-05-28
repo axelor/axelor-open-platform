@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type JSX } from "react";
 import {
   Box,
   Menu,
@@ -10,7 +10,7 @@ import {
   useRefs,
 } from "@axelor/ui";
 
-import { SelectionTag } from "@/views/form/widgets";
+import { Tag } from "@/components/tag";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import styles from "./overflow-menu.module.scss";
 
@@ -39,9 +39,9 @@ export function OverflowMenu<T>({
     useOverflowMenu<HTMLDivElement>();
 
   const [show, setShow] = useState(false);
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  const [targetElement, setTargetElement] = useState<HTMLDivElement | null>(null);
 
-  const iconRef = useRefs(ref, targetRef);
+  const iconRef = useRefs(ref, setTargetElement);
 
   function showMenu() {
     setShow(true);
@@ -58,7 +58,7 @@ export function OverflowMenu<T>({
   return (
     <Box onMouseLeave={hideMenu}>
       <Box ref={iconRef} onMouseEnter={showMenu}>
-        <SelectionTag
+        <Tag
           title={`+${overflowCount ?? ""}`}
           color={themeMode === "dark" ? "gray" : "white"}
           className={clsx(styles.count, styles[themeMode])}
@@ -66,7 +66,7 @@ export function OverflowMenu<T>({
       </Box>
       <Menu
         className={styles.menu}
-        target={targetRef.current}
+        target={targetElement}
         show={show}
         onHide={hideMenu}
       >

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.mail;
 
@@ -22,9 +8,26 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.activation.FileTypeMap;
+import jakarta.activation.URLDataSource;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimePart;
+import jakarta.mail.internet.PreencodedMimeBodyPart;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -36,26 +39,11 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.activation.FileTypeMap;
-import javax.activation.URLDataSource;
-import javax.mail.BodyPart;
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
-import javax.mail.internet.PreencodedMimeBodyPart;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -124,7 +112,7 @@ public final class MailBuilder {
   private MailBuilder addAll(Collection<String> to, String... recipients) {
     Preconditions.checkNotNull(recipients, "recipients can't be null");
     for (String email : recipients) {
-      Preconditions.checkNotNull(email, "email can't be null");
+      Objects.requireNonNull(email, "email can't be null");
     }
     Collections.addAll(to, recipients);
     return this;
@@ -158,7 +146,7 @@ public final class MailBuilder {
   }
 
   public MailBuilder header(String name, String value) {
-    Preconditions.checkNotNull(name, "header name can't be null");
+    Objects.requireNonNull(name, "header name can't be null");
     headers.put(name, value);
     return this;
   }
@@ -195,7 +183,7 @@ public final class MailBuilder {
   }
 
   private MailBuilder text(String text, boolean html) {
-    Preconditions.checkNotNull(text, "text can't be null");
+    Objects.requireNonNull(text, "text can't be null");
     Content content = new Content();
     content.text = text;
     content.html = html;
@@ -223,7 +211,7 @@ public final class MailBuilder {
    * @return this
    */
   public MailBuilder attach(String name, String link, String cid) {
-    Preconditions.checkNotNull(link, "link can't be null");
+    Objects.requireNonNull(link, "link can't be null");
     Content content = new Content();
     content.name = name;
     content.file = link;
@@ -247,7 +235,7 @@ public final class MailBuilder {
    * @return this
    */
   public MailBuilder inline(String name, String link) {
-    Preconditions.checkNotNull(link, "link can't be null");
+    Objects.requireNonNull(link, "link can't be null");
     Content content = new Content();
     content.name = name;
     content.file = link;
@@ -321,7 +309,7 @@ public final class MailBuilder {
 
     // simple text or html email
     if (contents.size() == 1 && (hasText || hasHtml)) {
-      contents.get(0).apply(message);
+      contents.getFirst().apply(message);
       return message;
     }
 
@@ -361,9 +349,9 @@ public final class MailBuilder {
       if (content.file != null) {
         final MimeBodyPart part = new MimeBodyPart();
         try {
-          final URL link = new URL(content.file);
+          final URL link = URI.create(content.file).toURL();
           part.setDataHandler(new DataHandler(new URLDataSource(link)));
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
           // default implementation fails to detect mime type
           final FileDataSource fds = new FileDataSource(new File(content.file));
           fds.setFileTypeMap(fileTypeMap);

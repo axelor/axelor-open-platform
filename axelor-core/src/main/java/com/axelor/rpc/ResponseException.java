@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -23,10 +9,11 @@ import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.google.common.base.Throwables;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.OptimisticLockException;
-import javax.validation.ConstraintViolationException;
 import org.hibernate.StaleObjectStateException;
 
 public class ResponseException extends RuntimeException {
@@ -77,25 +64,24 @@ public class ResponseException extends RuntimeException {
       report.put("causeString", cause.toString());
     }
 
-    if (cause instanceof OptimisticLockException) {
-      OptimisticLockException ex = (OptimisticLockException) cause;
+    if (cause instanceof OptimisticLockException ex) {
       Object entity = ex.getEntity();
-      if (entity instanceof Model) {
-        report.put("entityId", ((Model) entity).getId());
+      if (entity instanceof Model model) {
+        report.put("entityId", model.getId());
         report.put("entityName", EntityHelper.getEntityClass(entity).getName());
-      } else if (ex.getCause() instanceof StaleObjectStateException) {
-        StaleObjectStateException sx = (StaleObjectStateException) ex.getCause();
+      } else if (ex.getCause() instanceof StaleObjectStateException sx) {
         report.put("entityId", sx.getIdentifier());
         report.put("entityName", sx.getEntityName());
       }
     }
 
-    if (cause instanceof ConstraintViolationException) {
-      ConstraintViolationException ex = (ConstraintViolationException) cause;
-      Map<String, Object> errors = new HashMap<>();
-      ex.getConstraintViolations()
-          .forEach(error -> errors.put(error.getPropertyPath().toString(), error.getMessage()));
-      report.put("constraints", errors);
+    if (cause instanceof ConstraintViolationException ex) {
+      final StringBuilder sb = new StringBuilder();
+      for (ConstraintViolation<?> cv : ex.getConstraintViolations()) {
+        sb.append("    &#8226; ").append(cv.getPropertyPath()).append(" - ");
+        sb.append(cv.getMessage()).append("\n");
+      }
+      report.put("message", sb.toString());
     }
 
     return report;

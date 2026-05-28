@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -34,18 +20,16 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import java.util.Objects;
 
 @XmlType
 public class ActionGroup extends ActionResumable {
@@ -63,7 +47,7 @@ public class ActionGroup extends ActionResumable {
 
   public void addAction(String name) {
     if (this.actions == null) {
-      this.actions = Lists.newArrayList();
+      this.actions = new ArrayList<>();
     }
     ActionItem item = new ActionItem();
     item.setName(name);
@@ -79,16 +63,17 @@ public class ActionGroup extends ActionResumable {
       Action action = findAction(item.getName());
       if (action instanceof ActionReport && index < actions.size()) {
         String message =
-            String.format(
-                I18n.get("Invalid use of action-record: %s, must be the last action."),
-                action.getName());
+            I18n.get("Invalid use of action-record: %s, must be the last action.")
+                .formatted(action.getName());
         throw new IllegalStateException(message);
       }
     }
   }
 
   private String getPending(int index, String... prepend) {
-    final List<String> pending = Lists.newArrayList(prepend);
+    final List<String> pending = new ArrayList<>();
+    Collections.addAll(pending, prepend);
+
     if ((index + 1) < actions.size()) {
       String name = getName();
       if (StringUtils.isBlank(name)) { // dummy group
@@ -120,7 +105,7 @@ public class ActionGroup extends ActionResumable {
         view.setType(parts[0]);
         view.setName(parts[1]);
 
-        actionView.setViews(ImmutableList.of(view));
+        actionView.setViews(List.of(view));
         actionView.setName(actionName);
 
         if (parts.length == 3) {
@@ -158,8 +143,8 @@ public class ActionGroup extends ActionResumable {
       log.debug("continue action-validate: {}", actionName);
       log.debug("continue at: {}", index);
       Action action = MetaStore.getAction(actionName);
-      if (action instanceof ActionResumable) {
-        return ((ActionResumable) action).resumeAt(index);
+      if (action instanceof ActionResumable actionResumable) {
+        return actionResumable.resumeAt(index);
       }
       return action;
     }
@@ -184,7 +169,7 @@ public class ActionGroup extends ActionResumable {
     // validate the action group
     this.validate();
 
-    List<Object> result = Lists.newArrayList();
+    List<Object> result = new ArrayList<>();
     Iterator<ActionItem> iter = actions.iterator();
 
     if (StringUtils.notBlank(getName()) && !getName().matches("(.*)MenuTag\\((.*)\\)$")) {
@@ -209,7 +194,7 @@ public class ActionGroup extends ActionResumable {
           continue;
         }
         String pending = this.getPending(i);
-        Map<String, Object> res = Maps.newHashMap();
+        Map<String, Object> res = new HashMap<>();
         res.put(name, true);
         res.put("pending", pending);
         result.add(res);
@@ -234,8 +219,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       Object value = action.wrap(handler);
-      if (value instanceof Response) {
-        Response res = (Response) value;
+      if (value instanceof Response res) {
         // if this is the only action then return the response
         if (res.getStatus() != Response.STATUS_SUCCESS || actions.size() == 1) {
           return res;
@@ -245,7 +229,7 @@ public class ActionGroup extends ActionResumable {
 
         // if error then concat the response result with result of previous actions and quit
         if (!ObjectUtils.isEmpty(res.getErrors())) {
-          Map<String, Object> resValues = Maps.newHashMap();
+          Map<String, Object> resValues = new HashMap<>();
           resValues.put("data", res.getItem(0));
           resValues.put("errors", res.getErrors());
 
@@ -263,26 +247,26 @@ public class ActionGroup extends ActionResumable {
       }
 
       // update the context if required
-      if (value instanceof Map) {
-        updateContext(handler, (Map) value);
+      if (value instanceof Map map) {
+        updateContext(handler, map);
       }
 
-      if (action instanceof ActionGroup && value instanceof Collection) {
-        result.addAll((Collection<?>) value);
+      if (action instanceof ActionGroup && value instanceof Collection<?> collection) {
+        result.addAll(collection);
       } else {
         result.add(value);
       }
 
       // stop for reload
-      if (value instanceof Map && Objects.equal(Boolean.TRUE, ((Map) value).get("reload"))) {
+      if (value instanceof Map map && Objects.equals(Boolean.TRUE, map.get("reload"))) {
         String pending = this.getPending(i);
         log.debug("wait for 'reload', pending actions: {}", pending);
         ((Map<String, Object>) value).put("pending", pending);
         break;
       }
 
-      if (action instanceof ActionValidate && value instanceof Map) {
-        String validate = (String) ((Map) value).get("pending");
+      if (action instanceof ActionValidate && value instanceof Map map) {
+        String validate = (String) map.get("pending");
         String pending = this.getPending(i, validate);
         log.debug("wait for validation: {}, {}", name, value);
         log.debug("pending actions: {}", pending);
@@ -291,8 +275,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       if (action instanceof ActionCondition) {
-        if (Objects.equal(value, Boolean.FALSE)
-            || (value instanceof Map && hasErrors((Map) value))) {
+        if (Objects.equals(value, Boolean.FALSE) || (value instanceof Map map && hasErrors(map))) {
           break;
         }
       }
@@ -302,11 +285,11 @@ public class ActionGroup extends ActionResumable {
           && iter.hasNext()) {
         Map<String, Object> last = null;
         try {
-          last = (Map) result.get(result.size() - 1);
+          last = (Map) result.getLast();
         } catch (ClassCastException e) {
         }
         if (last == null) continue;
-        if (Objects.equal(Boolean.TRUE, last.get("reload"))
+        if (Objects.equals(Boolean.TRUE, last.get("reload"))
             || last.containsKey(Info.KEY)
             || last.containsKey(Alert.KEY)
             || last.containsKey(Error.KEY)
@@ -331,9 +314,9 @@ public class ActionGroup extends ActionResumable {
     if (ObjectUtils.isEmpty(value)) return Boolean.FALSE;
 
     Object errors = value.get("errors");
-    if (errors instanceof Map) {
-      for (Object key : ((Map) errors).keySet()) {
-        String error = (String) ((Map) errors).get(key);
+    if (errors instanceof Map map) {
+      for (Object key : map.keySet()) {
+        String error = (String) map.get(key);
         if (!StringUtils.isEmpty(error)) {
           return Boolean.TRUE;
         }
@@ -350,8 +333,8 @@ public class ActionGroup extends ActionResumable {
     Object values = value.get("values");
     final Map<String, Object> map;
 
-    if (values instanceof ContextEntity) {
-      map = ((ContextEntity) values).getContextMap();
+    if (values instanceof ContextEntity contextEntity) {
+      map = contextEntity.getContextMap();
     } else if (values instanceof Model) {
       map = Mapper.toMap(value);
     } else if (values instanceof Map) {
@@ -370,10 +353,10 @@ public class ActionGroup extends ActionResumable {
 
     values = value.get("attrs");
 
-    if (values instanceof Map) {
-      for (Object key : ((Map) values).keySet()) {
+    if (values instanceof Map valuesMap) {
+      for (Object key : valuesMap.keySet()) {
         String name = key.toString();
-        Map attrs = (Map) ((Map) values).get(key);
+        Map attrs = (Map) valuesMap.get(key);
         if (name.indexOf('$') == 0) name = name.substring(1);
         if (attrs.containsKey("value")) {
           map.put(name, attrs.get("value"));

@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { Box } from "@axelor/ui";
+import { Box, findAriaProp, findDataProp } from "@axelor/ui";
 import { GridRowProps } from "@axelor/ui/grid";
 
 import { Hilite } from "@/services/client/meta.types";
@@ -23,8 +23,13 @@ export const Row = memo(function Row(
   const { children, style, className, onDoubleClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const { context } = useViewAction();
-  const $className = useHilites(hilites)({ ...context, ...record })?.[0]
-    ?.css;
+  const $className = useHilites(hilites)({ ...context, ...record })?.[0]?.css;
+
+  const { role } = props as React.HTMLAttributes<HTMLDivElement>;
+  const testId = findDataProp(props, "data-testid");
+  const ariaRowIndex = findAriaProp(props, "aria-rowindex");
+  const ariaSelected = findAriaProp(props, "aria-selected");
+
   return (
     <Box
       {...{
@@ -35,6 +40,10 @@ export const Row = memo(function Row(
         onDoubleClick,
         children,
       }}
+      role={role}
+      aria-rowindex={ariaRowIndex}
+      aria-selected={ariaSelected}
+      data-testid={testId}
     />
   );
 });

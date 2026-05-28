@@ -26,7 +26,8 @@ export type AdvancedSearchState = {
   };
   contextField?: ContextField;
   appliedContextField?: ContextField;
-  archived?: boolean;
+  applied?: boolean;
+  archiveType: "default" | "all" | "archived";
   searchText?: string;
   searchTextLabel?: string;
   filterType?: "all" | "single";

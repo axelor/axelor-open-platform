@@ -1,35 +1,24 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.db.tenants.TenantModule;
+import com.axelor.app.leader.LeaderElectionWorker;
+import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
+import com.axelor.file.store.FileStoreFactory;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import com.axelor.report.tool.ReportExecutor;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 
 @Singleton
@@ -59,16 +48,13 @@ public class AppStartup extends HttpServlet {
 
     try {
       if (jobRunner.isEnabled()) {
-        if (TenantModule.isEnabled()) {
-          log.info("Scheduler is not supported in multi-tenant mode.");
-        } else {
-          jobRunner.start();
-        }
+        jobRunner.init();
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
 
+    LeaderElectionWorker.getInstance().start();
     startupEvent.fire(new StartupEvent());
     log.info("Ready to serve...");
   }
@@ -77,7 +63,11 @@ public class AppStartup extends HttpServlet {
   public void destroy() {
     try {
       shutdownEvent.fire(new ShutdownEvent());
-      jobRunner.stop();
+      jobRunner.shutdown();
+      LeaderElectionWorker.getInstance().stop();
+      ReportExecutor.shutdown();
+      FileStoreFactory.shutdown();
+      RedissonProvider.shutdown();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

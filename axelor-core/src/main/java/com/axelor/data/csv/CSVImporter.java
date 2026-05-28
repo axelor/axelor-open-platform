@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.csv;
 
@@ -30,8 +16,9 @@ import com.axelor.db.Model;
 import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,13 +26,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.Objects;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
@@ -60,9 +46,9 @@ public class CSVImporter implements Importer {
 
   private CSVConfig config;
 
-  private List<Listener> listeners = Lists.newArrayList();
+  private List<Listener> listeners = new ArrayList<>();
 
-  private List<String[]> valuesStack = Lists.newArrayList();
+  private List<String[]> valuesStack = new ArrayList<>();
 
   private Map<String, Object> context;
 
@@ -96,12 +82,12 @@ public class CSVImporter implements Importer {
 
     File _file = new File(config);
 
-    Preconditions.checkNotNull(_file);
+    Objects.requireNonNull(_file);
     Preconditions.checkArgument(_file.isFile());
 
     if (dataDir != null) {
       File _data = new File(dataDir);
-      Preconditions.checkNotNull(_data);
+      Objects.requireNonNull(_data);
       Preconditions.checkArgument(_data.isDirectory());
       this.dataDir = _data;
     }
@@ -124,7 +110,7 @@ public class CSVImporter implements Importer {
 
     if (dataDir != null) {
       File _data = new File(dataDir);
-      Preconditions.checkNotNull(_data);
+      Objects.requireNonNull(_data);
       Preconditions.checkArgument(_data.isDirectory());
       this.dataDir = _data;
     }
@@ -136,7 +122,7 @@ public class CSVImporter implements Importer {
   }
 
   private List<File> getFiles(String... names) {
-    List<File> all = Lists.newArrayList();
+    List<File> all = new ArrayList<>();
     for (String name : names) all.add(new File(dataDir, name));
     return all;
   }
@@ -399,7 +385,7 @@ public class CSVImporter implements Importer {
       Boolean onRollback)
       throws Exception {
     Object bean = null;
-    Map<String, Object> ctx = Maps.newHashMap(context);
+    Map<String, Object> ctx = new HashMap<>(context);
 
     bean = binder.bind(values, ctx);
 

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j.local;
 
@@ -23,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.util.Pac4jConstants;
@@ -36,10 +22,8 @@ public class JsonExtractor extends FormExtractor {
   }
 
   @Override
-  public Optional<Credentials> extract(WebContext context, SessionStore sessionStore) {
-    return AuthPac4jInfo.isXHR(context)
-        ? extractJson(context)
-        : super.extract(context, sessionStore);
+  public Optional<Credentials> extract(CallContext ctx) {
+    return AuthPac4jInfo.isXHR(ctx) ? extractJson(ctx.webContext()) : super.extract(ctx);
   }
 
   private Optional<Credentials> extractJson(WebContext context) {
@@ -53,10 +37,15 @@ public class JsonExtractor extends FormExtractor {
     final String username = (String) data.get("username");
     final String password = (String) data.get("password");
     final String newPassword = (String) data.get("newPassword");
-    if (username == null || password == null) {
+    final String mfaCode = (String) data.get("mfaCode");
+    final String mfaMethod = (String) data.get("mfaMethod");
+
+    if ((username == null || password == null) && (mfaCode == null || mfaMethod == null)) {
       return Optional.empty();
     }
-
-    return Optional.of(new AxelorFormCredentials(username, password, newPassword));
+    if (username != null && password != null) {
+      return Optional.of(new AxelorFormCredentials(username, password, newPassword, null, null));
+    }
+    return Optional.of(new AxelorFormCredentials(username, null, null, mfaCode, mfaMethod));
   }
 }

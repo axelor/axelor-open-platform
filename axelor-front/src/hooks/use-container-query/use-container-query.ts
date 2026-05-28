@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 
 type Name = "width" | "height";
 type Operator = "=" | ">" | "<";
@@ -26,7 +26,7 @@ function matches(rect: DOMRectReadOnly, query: string) {
 }
 
 export function useContainerQuery(
-  ref: MutableRefObject<HTMLElement | null>,
+  ref: RefObject<HTMLElement | null>,
   query: ContainerQuery
 ) {
   const [state, setState] = useState<boolean>(false);

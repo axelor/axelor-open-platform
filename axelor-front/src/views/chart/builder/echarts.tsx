@@ -1,12 +1,51 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTheme } from "@axelor/ui";
-import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import {
+  BarChart,
+  FunnelChart,
+  GaugeChart,
+  LineChart,
+  PieChart,
+  RadarChart,
+  ScatterChart,
+} from "echarts/charts";
+import {
+  DatasetComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+  GridComponent,
+  LegendScrollComponent,
+  RadarComponent,
+  TooltipComponent,
+  TransformComponent,
+} from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
 
 import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { DataRecord } from "@/services/client/data.types";
 import classes from "./echarts.module.scss";
+
+echarts.use([
+  BarChart,
+  FunnelChart,
+  GaugeChart,
+  LineChart,
+  PieChart,
+  RadarChart,
+  ScatterChart,
+  DatasetComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+  GridComponent,
+  LegendScrollComponent,
+  RadarComponent,
+  TooltipComponent,
+  TransformComponent,
+  CanvasRenderer,
+]);
 
 export function ECharts({
   data,
@@ -15,19 +54,16 @@ export function ECharts({
   width,
   options,
   legend = true,
-  isMerge = false,
-  lazyUpdate = false,
   onClick,
-}: Pick<ChartProps, "data" | "legend" | "onClick"> & {
+  onChartReady,
+}: Pick<ChartProps, "data" | "legend" | "onClick" | "onChartReady"> & {
   type: ChartType;
-  height: number | string;
-  width: number | string;
-  options: Partial<echarts.EChartsOption>;
-  isMerge: boolean;
-  lazyUpdate: boolean;
+  height: number;
+  width: number;
+  options: Partial<echarts.EChartsCoreOption>;
 }) {
   const divRef = useRef<HTMLDivElement>(null);
-  const chart = useRef<echarts.ECharts | null>(null);
+  const chart = useRef<echarts.ECharts>(null);
   const theme = useAppTheme();
   const isRTL = useTheme().dir === "rtl";
 
@@ -35,7 +71,7 @@ export function ECharts({
     const { series, xAxis } = data;
     const { groupBy } = series?.[0] ?? {};
     return groupBy || xAxis || "";
-  }, [data]);
+  }, [data.series, data.xAxis]);
 
   useEffect(() => {
     echarts.registerTheme(theme, prepareTheme(type));
@@ -44,36 +80,47 @@ export function ECharts({
   useEffect(() => {
     if (divRef.current !== null) {
       const $chart = (chart.current = echarts.init(divRef.current, theme));
-      return () => $chart.dispose();
+      onChartReady?.($chart);
+      return () => {
+        $chart.dispose();
+        chart.current = null;
+        onChartReady?.(null);
+      };
     }
-  }, [theme]);
+  }, [theme, onChartReady]);
 
   useEffect(() => {
     const instance = chart.current;
     if (onClick && instance) {
-      instance.on("click", function (event: any) {
-        const { seriesName, data } = event || {};
+      const handler = function (event: any) {
+        const { seriesName, data: eData } = event || {};
         const context =
-          data?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
-          data?.raw?.[0];
+          eData?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
+          eData?.raw?.[0];
         onClick(context?._original ?? context);
-      });
+      };
+      instance.on("click", handler);
+      return () => {
+        if (!instance.isDisposed()) {
+          instance.off("click", handler);
+        }
+      };
     }
   }, [seriesBy, onClick]);
 
   useEffect(() => {
-    chart.current &&
-      width &&
-      height &&
+    if (chart.current && width && height) {
       chart.current.resize({
         height,
         width,
       });
+    }
   }, [height, width]);
+
 
   useEffect(() => {
     if (chart.current) {
-      const $options = { ...options };
+      const $options = { ...options } as echarts.EChartsCoreOption;
       if (isRTL) {
         if ($options.yAxis) {
           $options.yAxis = {
@@ -88,19 +135,35 @@ export function ECharts({
           padding: [8, 32, 8, 32],
         };
       }
+
+      const legendOption =
+        $options.legend === undefined
+          ? !legend
+            ? { show: false }
+            : undefined
+          : Array.isArray($options.legend)
+            ? $options.legend.map((item) => ({
+                ...item,
+                show: legend,
+              }))
+            : {
+                ...$options.legend,
+                show: legend,
+              };
+
       chart.current.setOption(
         {
           ...$options,
-          ...(!legend && {
-            legend: undefined,
-          }),
+          ...(legendOption !== undefined && { legend: legendOption }),
           color: getColor(type, data.config?.colors, data.config?.shades),
-        } as echarts.EChartOption,
-        !isMerge,
-        lazyUpdate,
+        },
+        {
+          // Full replacement avoids stale branches when options shrink.
+          notMerge: true,
+        },
       );
     }
-  }, [isRTL, type, legend, options, isMerge, data.config, lazyUpdate]);
+  }, [isRTL, type, legend, options, data.config]);
 
   return <div className={classes.echarts} ref={divRef} />;
 }

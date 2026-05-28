@@ -1,25 +1,11 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.db.tenants.TenantResolver;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -46,8 +32,6 @@ public class ParallelTransactionExecutor {
 
   private final String tenantId;
 
-  private final String tenantHost;
-
   private final int numWorkers;
 
   private final ExecutorService workerPool;
@@ -68,10 +52,7 @@ public class ParallelTransactionExecutor {
    * processors.
    */
   public ParallelTransactionExecutor() {
-    this(
-        TenantResolver.currentTenantIdentifier(),
-        TenantResolver.currentTenantHost(),
-        DBHelper.getMaxWorkers());
+    this(TenantResolver.currentTenantIdentifier(), DBHelper.getMaxWorkers());
   }
 
   /**
@@ -80,22 +61,19 @@ public class ParallelTransactionExecutor {
    */
   /**
    * @param tenantId
-   * @param tenantHost
    */
-  public ParallelTransactionExecutor(String tenantId, String tenantHost) {
-    this(tenantId, tenantHost, DBHelper.getMaxWorkers());
+  public ParallelTransactionExecutor(String tenantId) {
+    this(tenantId, DBHelper.getMaxWorkers());
   }
 
   /**
    * Instantiates a parallel transaction executor with the specified number of workers.
    *
    * @param tenantId
-   * @param tenantHost
    * @param numWorkers
    */
-  public ParallelTransactionExecutor(String tenantId, String tenantHost, int numWorkers) {
+  public ParallelTransactionExecutor(String tenantId, int numWorkers) {
     this.tenantId = tenantId;
-    this.tenantHost = tenantHost;
     this.numWorkers = numWorkers;
     workerPool = Executors.newFixedThreadPool(numWorkers);
     workerFutures = new ArrayList<>(numWorkers);
@@ -147,8 +125,7 @@ public class ParallelTransactionExecutor {
 
     for (int i = 0; i < numWorkers; ++i) {
       workerFutures.add(
-          workerPool.submit(
-              new TenantAware(this::runCommands).tenantId(tenantId).tenantHost(tenantHost)));
+          workerPool.submit(ContextAware.of().withTenantId(tenantId).build(this::runCommands)));
     }
   }
 
@@ -166,10 +143,10 @@ public class ParallelTransactionExecutor {
 
               if (cause instanceof ErrorInAnotherWorker) {
                 return;
-              } else if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-              } else if (cause instanceof Error) {
-                throw (Error) cause;
+              } else if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+              } else if (cause instanceof Error error) {
+                throw error;
               } else {
                 // Should never happen
                 throw new IllegalStateException(cause);

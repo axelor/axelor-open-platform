@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor;
 
@@ -22,13 +8,16 @@ import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.db.JpaFixture;
+import com.axelor.db.JPA;
 import com.axelor.db.JpaSupport;
+import com.axelor.db.Model;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
+import com.axelor.test.fixture.Fixture;
 import com.google.inject.persist.Transactional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import java.io.IOException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public abstract class JpaTest extends JpaSupport {
 
-  @Inject private JpaFixture fixture;
+  @Inject private Fixture fixture;
 
   @Inject private AuthService authService;
 
@@ -49,14 +38,19 @@ public abstract class JpaTest extends JpaSupport {
 
   @BeforeEach
   @Transactional
-  public void setUp() {
+  public void setUp() throws IOException {
     if (all(Contact.class).count() == 0) {
-      fixture.load("demo-data.yml");
+      fixture("demo-data.yml");
     }
   }
 
+  @Transactional
   protected void fixture(String name) {
-    fixture.load(name);
+    try {
+      fixture.load(name, JPA::model, bean -> JPA.manage((Model) bean));
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to load fixture: " + name, e);
+    }
   }
 
   protected void login(String username, String password) {

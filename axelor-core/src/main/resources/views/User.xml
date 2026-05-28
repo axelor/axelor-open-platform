@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.2.xsd">
 
   <selection name="select.language">
     <option value="en">English</option>
@@ -16,7 +16,10 @@
     <field name="group"/>
   </grid>
 
-  <form name="user-form" title="User" model="com.axelor.auth.db.User">
+  <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="action-method-user-save">
+    <toolbar>
+      <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices"/>
+    </toolbar>
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
       <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
@@ -33,45 +36,113 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="forcePasswordChange"/>
-      <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean" x-reset-state="true" />
-      <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your current password" placeholder="your current password" help="Current password of the logged in user" widget="password" requiredIf="change || !id"  x-reset-state="true"/>
-        <panel itemSpan="12" showIf="id">
-          <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
-            onChange="action-condition-user-password" x-reset-state="true"/>
-          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"  x-reset-state="true"/>
-        </panel>
-        <panel itemSpan="12" hideIf="id">
-          <field name="newPassword" title="Password" placeholder="password" help="Password of the new user" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
-            onChange="action-condition-user-password" x-reset-state="true"/>
-          <field name="chkPassword" title="Confirm password" placeholder="confirm password" help="Confirm password of the new user (must be identical to the password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword" x-reset-state="true"/>
-        </panel>
-        <help>user.password.pattern-title</help>
-      </panel>
     </panel>
     <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
       <panel-related field="permissions" grid-view="simple-permission-grid" form-view="permission-form"/>
       <panel-related field="metaPermissions"/>
     </panel-tabs>
+    <panel sidebar="true">
+      <panel title="Password">
+        <label title="Change the password" colSpan="12"/>
+        <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" icon="password" colSpan="8" />
+      </panel>
+      <panel title="Two-factor authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Two-factor authentication (2FA) adds an extra layer of security." colSpan="12"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage 2FA" icon="person_shield" colSpan="8"/>
+      </panel>
+      <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
+        <label title="Generate access token for each application you use that needs access to the API." colSpan="12"/>
+        <button name="manageApiKeys" onClick="action-method-show-user-tokens" title="Manage API keys" icon="key" colSpan="8"/>
+      </panel>
+    </panel>
   </form>
 
-  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User">
+  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User" onSave="action-method-user-save">
     <panel title="User preferences" itemSpan="12">
-      <field name="image" showTitle="false" />
-      <field name="email" widget="Email"/>
-      <field name="language"/>
+      <panel colSpan="3" itemSpan="12">
+        <field name="image" showTitle="false"/>
+      </panel>
+      <panel colSpan="9" itemSpan="12">
+        <field name="email" widget="Email"/>
+        <field name="language"/>
+      </panel>
       <field name="theme" widget="theme-select"/>
       <field name="singleTab" widget="inline-checkbox"/>
       <field name="noHelp" widget="inline-checkbox" />
-      <field name="change" title="Change password?" widget="inline-checkbox"/>
-      <panel showIf="change" itemSpan="12">
-          <field name="oldPassword" title="Current password" placeholder="current password" help="Current password of the user" widget="password" requiredIf="change" />
-          <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change" validIf="!change || newPassword.length >= 4"
-            onChange="action-condition-user-password"/>
-          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
-          <help>user.password.pattern-title</help>
+      <panel title="Password">
+        <label title="Change the password" colSpan="7"/>
+        <button name="changePasswordBtn" title="Change password" onClick="action-method-show-user-change-password" icon="password" colSpan="5" />
       </panel>
+      <panel title="Two-factor authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Two-factor authentication (2FA) adds an extra layer of security." colSpan="7"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage 2FA" icon="person_shield" colSpan="5"/>
+      </panel>
+      <panel title="API Keys" if="__repo__(UserToken).isPermitted()">
+        <label title="Generate access token for each application you use that needs access to the API." colSpan="7"/>
+        <button name="manageApiKeys" onClick="action-method-show-user-tokens" title="Manage API keys" icon="key" colSpan="5"/>
+      </panel>
+      <panel title="Devices">
+        <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." colSpan="7"/>
+        <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices" colSpan="5" title="Devices"/>
+      </panel>
+    </panel>
+  </form>
+
+  <form name="user-change-password-form" model="com.axelor.auth.db.User" title="Change Password" onLoad="action-method-user-display-password-requirements">
+    <panel colSpan="12" itemSpan="12" showFrame="false">
+      <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" required="true" x-reset-state="true" x-dirty="false" />
+      <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" required="true" validIf="chkPassword === newPassword" x-reset-state="true" x-dirty="false" />
+      <panel hidden="true">
+        <field name="id" />
+        <field name="_passwordRequirements" x-dirty="false"/>
+      </panel>
+      <static>
+        <![CDATA[
+        <>
+          {_passwordRequirements && _passwordRequirements.length > 0 && (
+            <Box
+              mb={2}
+              rounded
+              style={{
+                backgroundColor: "var(--bs-tertiary-bg)",
+                color: "rgba(var(--bs-body-color-rgb), 0.65)",
+                padding: "0.65rem 0.75rem",
+              }}
+            >
+              <Box
+                as="p"
+                mb={1}
+                style={{ fontWeight: 600 }}
+              >
+                {_t("Your new password must")}
+              </Box>
+              <Box
+                as="ul"
+                d="flex"
+                flexDirection="column"
+                style={{ listStyle: "none", padding: 0, margin: 0, gap: "0.2rem" }}
+              >
+                {_passwordRequirements.map((requirement, i) => (
+                  <Box
+                    as="li"
+                    key={i}
+                    d="flex"
+                    alignItems="center"
+                    style={{ gap: "0.25rem" }}
+                  >
+                    <Icon icon="dot" />
+                    {requirement}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+        </>
+        ]]>
+      </static>
+      <spacer colSpan="6" />
+      <button colSpan="6" name="changePasswordBtn" title="Change password" onClick="action-method-user-change-password" readonlyIf="!chkPassword || !newPassword" />
     </panel>
   </form>
 
@@ -83,9 +154,121 @@
     <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
   </action-condition>
 
-  <action-condition name="action-condition-user-password">
-    <check error="Password doesn't match configured pattern." field="newPassword"
-      if="!com.axelor.auth.AuthService.getInstance().passwordMatchesPattern(newPassword)" />
-  </action-condition>
+  <action-method name="action-method-user-save">
+    <call class="com.axelor.auth.web.UserController" method="onSave"/>
+  </action-method>
+
+  <action-method name="action-method-show-mfa-form">
+    <call class="com.axelor.auth.web.MFAController" method="showRelatedMfa"/>
+  </action-method>
+
+  <action-method name="action-method-user-display-password-requirements">
+    <call class="com.axelor.auth.web.UserController" method="showPasswordRequirements"/>
+  </action-method>
+
+  <action-method name="action-method-show-user-change-password">
+    <call class="com.axelor.auth.web.UserController" method="showChangePassword"/>
+  </action-method>
+
+  <action-method name="action-method-user-change-password">
+    <call class="com.axelor.auth.web.UserController" method="changePassword"/>
+  </action-method>
+
+  <action-method name="action-method-show-user-tokens">
+    <call class="com.axelor.auth.web.UserTokenController" method="openUserTokens"/>
+  </action-method>
+
+  <action-view name="action-user-show-active-sessions" title="Active sessions" model="com.axelor.auth.db.User">
+    <view type="form" name="user-session-form" />
+    <view-param name="popup" value="true" />
+    <view-param name="popup-save" value="false" />
+    <view-param name="show-toolbar" value="false" />
+    <context name="_showRecord" expr="eval: id" />
+  </action-view>
+
+  <form title="Active sessions" name="user-session-form" model="com.axelor.auth.db.User" onLoad="com.axelor.auth.web.UserController:loadSessions">
+    <panel showFrame="false" itemSpan="12">
+      <field name="code" hidden="true" />
+      <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." />
+      <field name="_xActiveSessions" readonly="true" showTitle="false" colSpan="12" x-dirty="false">
+        <viewer>
+          <![CDATA[
+            <>
+              {_xActiveSessions && _xActiveSessions.length > 0 ? (
+                <Box d="flex" flexDirection="column" g={4}>
+                  {_xActiveSessions.map((session, i) => (
+                    <Box
+                      key={i}
+                      d="flex"
+                      flexDirection="column"
+                      g={2}
+                      p={3}
+                      border
+                      rounded
+                    >
+                      <Box d="flex" alignItems="center" justifyContent="space-between">
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="devices" />
+                          <strong>
+                            {session.device?.browser && session.device?.os
+                              ? `${session.device.browser} - ${session.device.os}`
+                              : _t('Unknown device')}
+                          </strong>
+                        </Box>
+                        {!session.current && (
+                          <Button variant="danger" size="sm" onClick={() => $execute("action-validate-user-revoke-session,action-user-revoke-session", { _sessionId: session.id })}>
+                            {_t('Revoke')}
+                          </Button>
+                        )}
+                      </Box>
+                      <Box
+                        d="flex"
+                        flexDirection="column"
+                        g={1}
+                        style={{ fontSize: '0.85em' }}
+                      >
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="location_on" />
+                          <span>{session.device?.remoteIp || _t('Unknown IP')}</span>
+                        </Box>
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="login" />
+                          <span>{_t('Signed in at:')} {session.loginDate ? Formatters.datetime(new Date(session.loginDate), { props: { seconds: true } }) : _t('Unknown')}</span>
+                        </Box>
+                        {session.current ? (
+                          <Box d="flex" alignItems="center" g={2}>
+                            <Icon icon="check_circle" />
+                            <span>{_t('This is your current session')}</span>
+                          </Box>
+                        ) : (
+                          <Box d="flex" alignItems="center" g={2}>
+                            <Icon icon="schedule" />
+                            <span>{_t('Last activity:')} {Formatters.datetime(new Date(session.lastAccess), { props: { seconds: true } })}</span>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Box d="flex" alignItems="center" justifyContent="center" p={4}>
+                  <Icon icon="devices" />
+                  <span style={{ marginLeft: '0.5em' }}>{_t('No active sessions')}</span>
+                </Box>
+              )}
+            </>
+          ]]>
+        </viewer>
+      </field>
+    </panel>
+  </form>
+
+  <action-validate name="action-validate-user-revoke-session">
+    <alert message="Are you sure? The device will be signed out." confirm-btn-title="Revoke" />
+  </action-validate>
+
+  <action-method name="action-user-revoke-session">
+    <call class="com.axelor.auth.web.UserController" method="terminateSession" />
+  </action-method>
 
 </object-views>

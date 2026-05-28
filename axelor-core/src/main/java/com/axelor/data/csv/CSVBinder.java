@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.csv;
 
@@ -30,19 +16,19 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import jakarta.validation.ValidationException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-import javax.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +52,7 @@ public class CSVBinder {
 
   private String searchCall;
 
-  private Map<String, DataAdapter> adapters = Maps.newHashMap();
+  private Map<String, DataAdapter> adapters = new HashMap<>();
 
   public void registerAdapter(DataAdapter adapter) {
     adapters.put(adapter.getName(), adapter);
@@ -115,7 +101,7 @@ public class CSVBinder {
       String searchCall) {
     this.beanClass = beanClass;
     this.fields = fields;
-    this.bindings = Lists.newArrayList();
+    this.bindings = new ArrayList<>();
     this.query = query;
     this.update = update;
     this.postProcess = postProcess;
@@ -128,8 +114,8 @@ public class CSVBinder {
 
   private void autoBind(String[] fields) {
 
-    Set<String> beanFields = Sets.newHashSet();
-    Map<String, Set<String>> refFields = Maps.newHashMap();
+    Set<String> beanFields = new HashSet<>();
+    Map<String, Set<String>> refFields = new HashMap<>();
     List<String> boundCols = getBoundCols(this.bindings, null);
 
     for (String field : fields) {
@@ -145,7 +131,7 @@ public class CSVBinder {
             beanFields.add(field);
             continue;
           }
-          final String fieldName = String.format("%s.%s", parts[0], parts[1]);
+          final String fieldName = "%s.%s".formatted(parts[0], parts[1]);
           final String subFieldName =
               Arrays.stream(Arrays.copyOfRange(parts, 2, parts.length))
                   .collect(Collectors.joining("."));
@@ -172,7 +158,7 @@ public class CSVBinder {
   }
 
   private List<String> getBoundCols(List<CSVBind> bindings, List<String> bounds) {
-    if (bounds == null) bounds = Lists.newArrayList();
+    if (bounds == null) bounds = new ArrayList<>();
     if (bindings != null) {
       for (CSVBind cb : bindings) {
         if (cb.getColumn() != null) bounds.add(cb.getColumn());
@@ -322,7 +308,7 @@ public class CSVBinder {
       if (newBean == false && Boolean.TRUE.equals(cb.getConditionEmpty())) {
         Object o = p.get(bean);
         if (o != null && p.isCollection()) {
-          if (o instanceof Collection<?> && !((Collection<?>) o).isEmpty()) {
+          if (o instanceof Collection<?> collection && !collection.isEmpty()) {
             LOG.trace("field is not empty");
             continue;
           }
@@ -369,8 +355,8 @@ public class CSVBinder {
 
       if (p.isCollection()) {
         if (value == null) {
-        } else if (value instanceof Collection<?>) {
-          p.addAll(bean, (Collection<?>) value);
+        } else if (value instanceof Collection<?> collection) {
+          p.addAll(bean, collection);
         } else {
           p.add(bean, value);
         }
@@ -417,10 +403,10 @@ public class CSVBinder {
   public Object bind(String[] values, Map<String, Object> localContext) {
 
     Preconditions.checkNotNull(values);
-    Preconditions.checkNotNull(localContext);
+    Objects.requireNonNull(localContext);
     Preconditions.checkArgument(values.length == fields.length);
 
-    Map<String, Object> map = Maps.newHashMap(localContext);
+    Map<String, Object> map = new HashMap<>(localContext);
     for (int i = 0; i < fields.length; i++) {
       map.put(fields[i], values[i]);
     }
@@ -438,7 +424,7 @@ public class CSVBinder {
   }
 
   private List<CSVBind> flatten(List<CSVBind> bindings) {
-    List<CSVBind> all = Lists.newArrayList();
+    List<CSVBind> all = new ArrayList<>();
     for (CSVBind cb : bindings) {
       all.add(cb);
       if (cb.getBindings() != null) {

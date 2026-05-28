@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-:url-jpql: https://docs.oracle.com/javaee/7/tutorial/persistence-querylanguage.htm
+:url-jpql: https://jakarta.ee/specifications/persistence/3.1/jakarta-persistence-spec-3.1.html#a4665
 
 The REST services strictly follows traditional rules for restful api. However,
 there are few cases which are difficult to achieve with pure REST.

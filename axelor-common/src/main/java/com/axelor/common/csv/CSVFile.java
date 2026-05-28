@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common.csv;
 
@@ -57,23 +43,23 @@ public final class CSVFile {
   }
 
   public CSVFile withDelimiter(char delimiter) {
-    return new CSVFile(format.builder().setDelimiter(delimiter).build());
+    return new CSVFile(format.builder().setDelimiter(delimiter).get());
   }
 
   public CSVFile withEscape(char escape) {
-    return new CSVFile(format.builder().setEscape(escape).build());
+    return new CSVFile(format.builder().setEscape(escape).get());
   }
 
   public CSVFile withQuoteAll() {
-    return new CSVFile(format.builder().setQuoteMode(QuoteMode.ALL).build());
+    return new CSVFile(format.builder().setQuoteMode(QuoteMode.ALL).get());
   }
 
   public CSVFile withFirstRecordAsHeader() {
-    return new CSVFile(format.builder().setHeader().setSkipHeaderRecord(true).build());
+    return new CSVFile(format.builder().setHeader().setSkipHeaderRecord(true).get());
   }
 
   public CSVFile withHeader(String... header) {
-    return new CSVFile(format.builder().setHeader(header).build());
+    return new CSVFile(format.builder().setHeader(header).get());
   }
 
   public CSVParser parse(InputStream in) throws IOException {

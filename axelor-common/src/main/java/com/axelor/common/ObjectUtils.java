@@ -1,25 +1,12 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,20 +43,20 @@ public final class ObjectUtils {
     if (value == null) {
       return true;
     }
-    if (value instanceof Optional) {
-      return !((Optional<?>) value).isPresent();
+    if (value instanceof Optional<?> optional) {
+      return optional.isEmpty();
     }
     if (value.getClass().isArray()) {
       return Array.getLength(value) == 0;
     }
-    if (value instanceof CharSequence) {
-      return ((CharSequence) value).length() == 0;
+    if (value instanceof CharSequence sequence) {
+      return sequence.length() == 0;
     }
-    if (value instanceof Collection) {
-      return ((Collection<?>) value).isEmpty();
+    if (value instanceof Collection<?> collection) {
+      return collection.isEmpty();
     }
-    if (value instanceof Map) {
-      return ((Map<?, ?>) value).isEmpty();
+    if (value instanceof Map<?, ?> map) {
+      return map.isEmpty();
     }
     return false;
   }
@@ -83,5 +70,55 @@ public final class ObjectUtils {
    */
   public static boolean notEmpty(Object value) {
     return !isEmpty(value);
+  }
+
+  /**
+   * Check whether the given map is mutable.
+   *
+   * @param map the map to check
+   * @return true if mutable false otherwise
+   */
+  public static boolean isMutable(Map<?, ?> map) {
+    if (isKnownImmutable(map)) {
+      return false;
+    }
+
+    try {
+      map.remove(new Object());
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Check whether the given collection is mutable.
+   *
+   * @param collection the collection to check
+   * @return true if mutable false otherwise
+   */
+  public static boolean isMutable(Collection<?> collection) {
+    if (isKnownImmutable(collection)) {
+      return false;
+    }
+
+    try {
+      collection.remove(new Object());
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
+    }
+  }
+
+  private static final List<String> KNOWN_IMMUTABLE_CLASS_PARTS =
+      List.of("Immutable", "Unmodifiable", "$Empty", "$Singleton");
+
+  private static boolean isKnownImmutable(Object object) {
+    if (object == null) {
+      return true;
+    }
+
+    var className = object.getClass().getName();
+    return KNOWN_IMMUTABLE_CLASS_PARTS.stream().anyMatch(className::contains);
   }
 }

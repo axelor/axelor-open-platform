@@ -1,24 +1,14 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.tenants;
 
+import com.axelor.app.internal.AppFilter;
+import com.axelor.concurrent.ContextAwareCallable;
+import com.axelor.concurrent.ContextAwareRunnable;
 import com.axelor.db.JPA;
+import java.util.Locale;
 
 /**
  * A Thread implementation that makes a thread tenant-aware by setting the tenant configuration
@@ -29,7 +19,10 @@ import com.axelor.db.JPA;
  * information during thread execution.
  *
  * <p>By default, it will run the task inside a new transaction.
+ *
+ * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
  */
+@Deprecated
 public class TenantAware extends Thread {
 
   /** The tenant identifier */
@@ -38,7 +31,13 @@ public class TenantAware extends Thread {
   /** The tenant host */
   private String tenantHost;
 
-  /** Whatever to start a new transaction */
+  /* request base url */
+  private String baseUrl;
+
+  /* request language */
+  private Locale language;
+
+  /** Whether to start a new transaction */
   private boolean withTransaction;
 
   /**
@@ -50,6 +49,10 @@ public class TenantAware extends Thread {
     super(task);
     this.tenantId = TenantResolver.currentTenantIdentifier();
     this.tenantHost = TenantResolver.currentTenantHost();
+
+    this.baseUrl = AppFilter.getBaseURL();
+    this.language = AppFilter.getLanguage();
+
     this.withTransaction = true;
   }
 
@@ -76,7 +79,7 @@ public class TenantAware extends Thread {
   }
 
   /**
-   * Whatever the task should run inside a new transaction
+   * Whether the task should run inside a new transaction
    *
    * @param withTransaction false to not open a transaction, else true
    * @return this
@@ -88,17 +91,14 @@ public class TenantAware extends Thread {
 
   @Override
   public void run() {
-    String currentId = TenantResolver.CURRENT_TENANT.get();
-    String currentHost = TenantResolver.CURRENT_HOST.get();
     TenantResolver.setCurrentTenant(tenantId, tenantHost);
-    try {
-      if (withTransaction) {
-        JPA.runInTransaction(super::run);
-      } else {
-        super.run();
-      }
-    } finally {
-      TenantResolver.setCurrentTenant(currentId, currentHost);
+    AppFilter.setBaseURL(baseUrl);
+    AppFilter.setLanguage(language);
+
+    if (withTransaction) {
+      JPA.runInTransaction(super::run);
+    } else {
+      super.run();
     }
   }
 }

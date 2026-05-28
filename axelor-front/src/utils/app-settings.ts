@@ -14,6 +14,8 @@ export const DEFAULT_MESSAGE_PAGE_SIZE = 80;
 export const DEFAULT_COMPLETION_PAGE_SIZE = 10;
 // Default polling interval in seconds
 export const DEFAULT_POLLING_INTERVAL = 10;
+// Default delay (ms) before auto-cleaning completed upload notifications
+export const DEFAULT_UPLOAD_CLEANUP_DELAY = 3000;
 
 /**
  * Checks if the application is running in a production mode
@@ -35,7 +37,7 @@ export function isDevelopment(): boolean {
  */
 export function getDefaultPageSize(): number {
   const defaultSize =
-    session.info?.api?.pagination?.defaultPerPage ?? 0 > 0
+    (session.info?.api?.pagination?.defaultPerPage ?? 0 > 0)
       ? session.info?.api?.pagination?.defaultPerPage
       : DEFAULT_PAGE_SIZE;
   if (getDefaultMaxPerPage() > 0) {

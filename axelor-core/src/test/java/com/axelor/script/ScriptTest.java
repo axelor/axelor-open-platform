@@ -1,29 +1,17 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
 import com.axelor.JpaTest;
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
@@ -36,6 +24,7 @@ import com.axelor.test.db.repo.TitleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class ScriptTest extends JpaTest {
@@ -147,9 +135,20 @@ public abstract class ScriptTest extends JpaTest {
             }
           });
 
+      loadTranslation("Customer", "Client", "fr");
+      loadTranslation("Supplier", "Fournisseur", "fr");
+
       selects.save(colors);
       selects.save(types);
     }
+  }
+
+  private void loadTranslation(String key, String message, String language) {
+    MetaTranslation obj = new MetaTranslation();
+    obj.setKey(key);
+    obj.setMessage(message);
+    obj.setLanguage(language);
+    JPA.save(obj);
   }
 
   private void prepareCustomFields() {

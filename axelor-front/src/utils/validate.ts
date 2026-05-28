@@ -1,6 +1,7 @@
 import { DataContext } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Field } from "@/services/client/meta.types";
+import { isUUID } from "@/utils/types";
 import { WidgetErrors } from "@/views/form/builder";
 
 import { toKebabCase } from "./names";
@@ -53,8 +54,8 @@ const validateRange: Validate = (value, { props }) => {
 const validateString: Validate = (value, { props, context }) => {
   return (
     validateRequired(value, { props, context }) ||
-    validatePattern(value, { props, context }) ||
-    validateRange(value?.length, { props, context })
+    validateRange(value?.length, { props, context }) ||
+    validatePattern(value, { props, context })
   );
 };
 
@@ -65,11 +66,22 @@ const validateNumber: Validate = (value, { props, context }) => {
   );
 };
 
+const validateUuid: Validate = (value, { props, context }) => {
+  return (
+    validateRequired(value, { props, context }) ||
+    (!isEmpty(value) &&
+      !isUUID(value) && {
+        invalid: i18n.get("{0} is not in proper format", props.title),
+      } || undefined)
+  );
+};
+
 export const Validators = {
   string: validateString,
   integer: validateNumber,
   long: validateNumber,
   decimal: validateNumber,
+  uuid: validateUuid,
 };
 
 export const validate: Validate = (value, { props, context }) => {
@@ -79,12 +91,12 @@ export const validate: Validate = (value, { props, context }) => {
   if (type === "enum") type = "enumeration";
   if (props?.selection) type = "selection";
 
-  let func = Validators[type as keyof typeof Validators];
+  const func = Validators[type as keyof typeof Validators];
   if (func) {
     return func(value, { props, context });
   }
 
-  let errors = validateRequired(value, { props, context });
+  const errors = validateRequired(value, { props, context });
   if (errors) {
     return errors;
   }

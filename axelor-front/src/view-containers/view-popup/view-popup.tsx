@@ -1,9 +1,17 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 
-import { clsx, Box, Button, useClassNames } from "@axelor/ui";
+import { clsx, Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import {
@@ -11,22 +19,30 @@ import {
   DialogOptions,
   ModalDialog,
   dialogs,
+  useDialogContext,
 } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { useSingleClickHandler } from "@/hooks/use-button";
 import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { DataRecord } from "@/services/client/data.types";
+import { ActionView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
 import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
-import { showErrors } from "@/views/form";
+import { showErrors } from "@/views/form/builder/form-errors";
 import { handlePopper } from "./view-popper";
 
 import styles from "./view-popup.module.scss";
 
 export type PopupProps = {
+  /**
+   * Unique identifier of the popup
+   *
+   */
+  id?: string;
+
   /**
    * View tab to show as popup
    *
@@ -100,6 +116,7 @@ export const PopupDialog = memo(function PopupDialog(props: PopupProps) {
 });
 
 const PopupDialogInner = memo(function PopupDialog({
+  id,
   tab,
   open,
   maximize,
@@ -121,6 +138,7 @@ const PopupDialogInner = memo(function PopupDialog({
 
   return (
     <ModalDialog
+      id={id}
       open={open}
       title={title || tab.title}
       size="xl"
@@ -135,6 +153,7 @@ const PopupDialogInner = memo(function PopupDialog({
       content={
         <>
           <Views tab={tab} />
+          <ViewClosure params={tab?.action?.params} />
           {handler?.()}
         </>
       }
@@ -167,8 +186,10 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   const showFooter = params["popup.show-footer"] !== false;
   const maximize = params["popup.maximized"];
 
-  const { close } = useTabs();
-  const handleClose = useCallback(() => close(id), [close, id]);
+  const { close: closeTab } = useTabs();
+  const handleClosePopupView = useCallback(() => {
+    closeTab(id);
+  }, [closeTab, id]);
 
   return (
     <PopupDialog
@@ -176,7 +197,7 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
       open={true}
       footer={({ close }) => <Footer close={close} params={action.params} />}
       buttons={[]}
-      onClose={handleClose}
+      onClose={handleClosePopupView}
       maximize={maximize}
       showHeader={showHeader}
       showFooter={showFooter}
@@ -201,7 +222,6 @@ function Header({
   setMaximized: React.Dispatch<React.SetStateAction<boolean>>;
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const classNames = useClassNames();
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
   const handleClose = useClose(handler, close, params);
@@ -219,22 +239,36 @@ function Header({
     <Box d="flex" g={2}>
       {HeaderComp && <HeaderComp close={close} />}
       <Box d="flex" g={2} alignItems="center">
-        <MaterialIcon
-          icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-          className={styles.icon}
-          onClick={() => setExpanded((prev) => !prev)}
-        />
-        <MaterialIcon
-          icon={maximized ? "fullscreen_exit" : "fullscreen"}
-          className={styles.icon}
-          onClick={() => setMaximized((prev) => !prev)}
-        />
-        <Box
-          as="button"
-          tabIndex={0}
-          className={classNames("btn-close")}
-          onClick={onClose}
-        />
+        <ButtonGroup d={"flex"} gap={8} className={styles.btnGroup}>
+          <Button
+            tabIndex={0}
+            onClick={() => setExpanded((prev) => !prev)}
+            data-testid={"btn-toggle-content"}
+            title={i18n.get("Toggle content")}
+          >
+            <MaterialIcon
+              icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            />
+          </Button>
+          <Button
+            tabIndex={0}
+            d="flex"
+            onClick={() => setMaximized((prev) => !prev)}
+            data-testid={"btn-toggle-fullscreen"}
+            title={i18n.get("Toggle fullscreen")}
+          >
+            <MaterialIcon icon={maximized ? "fullscreen_exit" : "fullscreen"} />
+          </Button>
+          <Button
+            tabIndex={0}
+            d="flex"
+            onClick={onClose}
+            data-testid={"btn-close"}
+            title={i18n.get("Close")}
+          >
+            <MaterialIcon icon={"close"} />
+          </Button>
+        </ButtonGroup>
       </Box>
     </Box>
   );
@@ -248,19 +282,10 @@ function Footer({
   params?: DataRecord;
 }) {
   const handlerAtom = usePopupHandlerAtom();
-  const [handler, setHandler] = useAtom(handlerAtom);
+  const handler = useAtomValue(handlerAtom);
   const handleClose = useClose(handler, close, params);
 
-  const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
-
-  const getHandlerState = handler.getState;
-  const handleCancel = useCallback(() => {
-    dialogs.confirmDirty(
-      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
-      async () => handleClose(),
-    );
-  }, [handleClose, getHandlerState, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
     const { getState, getErrors, commitForm, onSave } = handler;
@@ -290,7 +315,7 @@ function Footer({
           callOnRead: false,
         });
       }
-      handleClose(rec);
+      handleClose(rec, true);
     } catch {
       // TODO: show error
     }
@@ -298,23 +323,9 @@ function Footer({
 
   const handleOk = useSingleClickHandler(handleConfirm);
 
-  useEffect(() => {
-    setHandler((popup) => ({ ...popup, close: handleCancel }));
-  }, [handleCancel, setHandler]);
-
-  useEffect(() => {
-    return handler.actionHandler?.subscribe(async (data) => {
-      const { actionExecutor, getState } = handler;
-      await actionExecutor?.wait();
-      if (data.type === "close") {
-        handleClose(getState?.()?.record);
-      }
-    });
-  }, [handleClose, handler]);
-
   return (
     <Box d="flex" g={2}>
-      <Button variant="secondary" onClick={handleCancel}>
+      <Button variant="secondary" onClick={() => handler?.close?.()}>
         {i18n.get("Close")}
       </Button>
       {popupCanSave && (
@@ -324,6 +335,38 @@ function Footer({
       )}
     </Box>
   );
+}
+
+function ViewClosure({ params }: { params?: ActionView["params"] }) {
+  const handlerAtom = usePopupHandlerAtom();
+  const [handler, setHandler] = useAtom(handlerAtom);
+
+  const { close: onCloseDialog } = useDialogContext();
+  const doClose = useClose(handler, onCloseDialog, params);
+
+  const popupCanConfirm = params?.["show-confirm"] !== false;
+
+  const getHandlerState = handler.getState;
+  const handleClose = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
+      async () => doClose(),
+    );
+  }, [doClose, getHandlerState, popupCanConfirm]);
+
+  useEffect(() => {
+    setHandler((popup) => ({ ...popup, close: handleClose }));
+  }, [handleClose, setHandler]);
+
+  useEffect(() => {
+    return handler.actionHandler?.setCloseHandler(async () => {
+      const { actionExecutor, getState } = handler;
+      await actionExecutor?.wait();
+      doClose(getState?.()?.record);
+    });
+  }, [doClose, handler]);
+
+  return null;
 }
 
 function useClose(
@@ -336,17 +379,23 @@ function useClose(
     [handler.readyAtom],
   );
   const ready = useAtomValue(readyAtom);
-  const originalRef = useRef<DataRecord>();
+  const originalRef = useRef<DataRecord>(null);
   const getHandlerState = handler.getState;
+  const onPopupClose = params?.__onPopupClose;
+
+  const getFormRecord = useCallback(
+    () => getHandlerState?.().record,
+    [getHandlerState],
+  );
 
   useEffect(() => {
-    const record = getHandlerState?.().record;
+    const record = getFormRecord();
     if (originalRef.current == null && ready && record) {
       originalRef.current = { ...record };
     }
-  }, [getHandlerState, ready]);
+  }, [getFormRecord, ready]);
 
-  const parentId = useRef<string | null>(null);
+  const parentId = useRef<string>(null);
 
   useEffect(() => {
     if (!parentId.current) {
@@ -357,7 +406,7 @@ function useClose(
   const shouldReload = useCallback(
     (record?: DataRecord) => {
       if (record) return true;
-      const current = getHandlerState?.().record;
+      const current = getFormRecord();
       const original = originalRef.current;
       return (
         !current ||
@@ -366,7 +415,7 @@ function useClose(
         current?.version !== original?.version
       );
     },
-    [getHandlerState],
+    [getFormRecord],
   );
 
   const triggerReload = useCallback(() => {
@@ -384,15 +433,27 @@ function useClose(
   }, [params]);
 
   const handleClose = useCallback(
-    (record?: DataRecord) => {
+    (record?: DataRecord, isOk = false) => {
       const popupCanReload = params?.popup === "reload";
       const reload = shouldReload(record);
       if (popupCanReload && reload) {
         triggerReload();
       }
+
+      if (typeof onPopupClose === "function") {
+        onPopupClose(record ?? getFormRecord(), isOk);
+      }
+
       close(reload);
     },
-    [close, shouldReload, triggerReload, params?.popup],
+    [
+      close,
+      shouldReload,
+      triggerReload,
+      getFormRecord,
+      params?.popup,
+      onPopupClose,
+    ],
   );
 
   return handleClose;

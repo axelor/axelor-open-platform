@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
-    Axelor Business Solutions
-
-    Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+   SPDX-FileCopyrightText: Axelor <https://axelor.com>
+   SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="7.4">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="8.2">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -131,16 +115,6 @@
             <xsd:documentation>
               Comma-separated list of authorized groups.
             </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="top" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to show the menu item in top navigation menu.
-              REMOVED: Top menu support has been removed since 7.0. To ensure compatibility,
-              attribute is still present but will be removed in a future version.
-            </xsd:documentation>
-            <xsd:documentation>deprecated</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="left" type="xsd:boolean">
@@ -776,6 +750,127 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:complexType name="SummaryBar">
+    <xsd:sequence>
+      <xsd:element name="field" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Specify a field on which to perform an aggregation.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:SummaryBaseField">
+          <xsd:attribute name="aggregate" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Aggregation type.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="sum" />
+                <xsd:enumeration value="count" />
+                <xsd:enumeration value="avg" />
+                <xsd:enumeration value="max" />
+                <xsd:enumeration value="min" />
+                <xsd:enumeration value="median" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="on" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Summary on page/select.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="selection" />
+                <xsd:enumeration value="page" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="call" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+            Specify a server side summary through action call.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="field" minOccurs="1" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Specify a data value received by the action to display.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:complexContent>
+                  <xsd:extension base="tns:SummaryBaseField">
+                    <xsd:attribute name="type" type="xsd:string">
+                      <xsd:annotation>
+                        <xsd:documentation>Specify the type for the data to display.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                  </xsd:extension>
+                </xsd:complexContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="action" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Action to fetch summary values
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="hint" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Placeholder text displayed when no summary values are available (for example, when no rows are selected).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="SummaryBaseField">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Field name to summarize.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Title to show for the summary item.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+        <xsd:attribute name="align">
+          <xsd:annotation>
+            <xsd:documentation>
+              Horizontal alignment of the summary block start | end
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="start" />
+              <xsd:enumeration value="end" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+  </xsd:complexType>
+
   <xsd:complexType name="Selection">
     <xsd:sequence maxOccurs="unbounded">
       <xsd:element name="option">
@@ -950,6 +1045,11 @@
     <xsd:attribute name="x-code-theme" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Color scheme for the code editor.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-auto-size" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether the code editor should auto-size to fit content up to the given height.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-lite" type="xsd:boolean">
@@ -1375,14 +1475,14 @@
     <xsd:attribute name="x-color-field" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          Specify the color field to use with tag-select widget.
+          Specify the color field to use with `tags`/`tag` widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-image-field" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          specify the image field to use with `m2o` and `tag-select` widget.
+          specify the image field to use with `m2o` and `tags`/`tag` widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1463,6 +1563,7 @@
             <xsd:choice maxOccurs="unbounded">
               <xsd:group ref="tns:GridWidgets" />
             </xsd:choice>
+            <xsd:element name="summary-bar" type="tns:SummaryBar" minOccurs="0" />
           </xsd:sequence>
         </xsd:choice>
         <xsd:attribute name="widget" use="optional">
@@ -2219,6 +2320,14 @@
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="x-json-model" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Specify the custom model name for this node. Used when the node model
+                    is MetaJsonRecord to filter records by their custom model.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
@@ -2515,6 +2624,13 @@
         <xsd:attribute name="model" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify the model object name.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-json-model" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the custom model name of this view.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="orderBy" type="xsd:string">
@@ -4261,19 +4377,9 @@
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="output" type="xsd:string">
+        <xsd:attribute name="attachment" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>
-              Override the default output directory structure.
-              Special keywords
-              ${name}, ${date}, ${datetime} can
-              be used to organize the output directory.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="download" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>Whether to download the exported file on client.</xsd:documentation>
+            <xsd:documentation>Whether to attach the exported file to current record</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -4368,6 +4474,10 @@
               <xsd:enumeration value="html" />
               <xsd:enumeration value="doc" />
               <xsd:enumeration value="xls" />
+              <xsd:enumeration value="docx" />
+              <xsd:enumeration value="xlsx" />
+              <xsd:enumeration value="odt" />
+              <xsd:enumeration value="ods" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>

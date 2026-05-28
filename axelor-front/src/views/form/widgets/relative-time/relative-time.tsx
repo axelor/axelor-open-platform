@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { useId } from "react";
 
 import format from "@/utils/format";
 
@@ -8,6 +9,7 @@ import { ViewerInput } from "../string/viewer";
 export function RelativeTime(props: FieldProps<string>) {
   const { schema, valueAtom } = props;
 
+  const id = useId();
   const value = useAtomValue(valueAtom);
   const $value = (() => {
     try {
@@ -19,8 +21,8 @@ export function RelativeTime(props: FieldProps<string>) {
     }
   })();
   return (
-    <FieldControl {...props}>
-      <ViewerInput name={schema.name} value={$value} />
+    <FieldControl {...props} inputId={id}>
+      <ViewerInput id={id} name={schema.name} value={$value} />
     </FieldControl>
   );
 }

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -29,13 +15,13 @@ import com.axelor.script.JavaScriptScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.persist.Transactional;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 
@@ -76,8 +62,9 @@ public class ActionScript extends Action {
     if (Boolean.TRUE.equals(script.transactional)) {
       bindings.put(KEY_EM, JPA.em());
     }
+    ScriptHelper helper = getScriptHelper(bindings);
     try {
-      getScriptHelper(bindings).eval(script.code.trim(), bindings);
+      helper.eval(script.code.trim(), bindings);
     } catch (ScriptException e) {
       if ("<eval>".equals(e.getFileName())) {
         e =
@@ -89,6 +76,15 @@ public class ActionScript extends Action {
       response.setException(e);
     } catch (Exception e) {
       response.setException(e);
+    } finally {
+      // Close JavaScript context if applicable
+      if (helper instanceof AutoCloseable closeable) {
+        try {
+          closeable.close();
+        } catch (Exception ignored) {
+          // ignore close exceptions
+        }
+      }
     }
     return response;
   }

@@ -1,5 +1,7 @@
 .container {
   border-radius: var(--bs-input-border-radius, var(--bs-border-radius));
+  position: relative;
+  display: inline-flex;
 }
 
 .invalid {

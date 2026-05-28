@@ -8,6 +8,10 @@
   }
 }
 
+.disabled {
+  background-color: var(--bs-body-bg) !important;
+}
+
 .icon {
   display: inline-flex;
   align-items: center;

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.text;
 
@@ -33,7 +19,6 @@ import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.script.ScriptBindings;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.xml.XmlEscapers;
 import java.io.File;
@@ -47,6 +32,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +75,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalDate o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
@@ -99,7 +85,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalDateTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
@@ -109,7 +95,7 @@ public class StringTemplates implements Templates {
     public String toString(LocalTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : o.format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString, locale));
     }
   }
 
@@ -205,8 +191,8 @@ public class StringTemplates implements Templates {
       final Object jsonModel = context.get("jsonModel");
 
       // custom model?
-      if (jsonModel instanceof String && MetaJsonRecord.class.isAssignableFrom(klass)) {
-        final MetaJsonField field = findCustomField((String) jsonModel, key);
+      if (jsonModel instanceof String string && MetaJsonRecord.class.isAssignableFrom(klass)) {
+        final MetaJsonField field = findCustomField(string, key);
         return format(field, value);
       }
 
@@ -240,12 +226,12 @@ public class StringTemplates implements Templates {
     public synchronized Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
-      if (o instanceof Context) return handle((Context) o, propertyName);
-      if (o instanceof JsonContext) return handle((JsonContext) o, propertyName);
-      if (o instanceof MetaJsonRecord) return handle((MetaJsonRecord) o, propertyName);
-      if (o instanceof Model) return handle((Model) o, propertyName);
-      if (o instanceof Map) {
-        return mapModelAdaptor.getProperty(interp, self, (Map<?, ?>) o, property, propertyName);
+      if (o instanceof Context context) return handle(context, propertyName);
+      if (o instanceof JsonContext jsonContext) return handle(jsonContext, propertyName);
+      if (o instanceof MetaJsonRecord metaJsonRecord) return handle(metaJsonRecord, propertyName);
+      if (o instanceof Model model) return handle(model, propertyName);
+      if (o instanceof Map<?, ?> map) {
+        return mapModelAdaptor.getProperty(interp, self, map, property, propertyName);
       }
       return super.getProperty(interp, self, o, property, propertyName);
     }
@@ -296,7 +282,7 @@ public class StringTemplates implements Templates {
     }
 
     private Set<String> findAttributes() {
-      Set<String> names = Sets.newHashSet();
+      Set<String> names = new HashSet<>();
       int ip = 0;
       while (ip < template.impl.codeSize) {
         int opcode = template.impl.instrs[ip];
@@ -324,8 +310,8 @@ public class StringTemplates implements Templates {
           for (String name : names) {
             try {
               Object value = vars.get(name);
-              if (context instanceof Context) {
-                Object jsonContext = buildJsonContext((Context) context, name);
+              if (context instanceof Context ctx) {
+                Object jsonContext = buildJsonContext(ctx, name);
                 if (jsonContext != null) {
                   value = jsonContext;
                 }

@@ -1,26 +1,11 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -30,21 +15,18 @@ import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.google.inject.persist.Transactional;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AuthPac4jUserService {
-
-  @Inject private AuthService authService;
 
   @Inject private AuthPac4jProfileService profileService;
 
@@ -96,8 +78,6 @@ public class AuthPac4jUserService {
   protected void persistUser(CommonProfile profile) {
     final User user =
         new User(profileService.getUserIdentifier(profile), profileService.getName(profile));
-    user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
-
     updateUser(user, profile);
 
     if (user.getGroup() == null) {
@@ -105,7 +85,7 @@ public class AuthPac4jUserService {
     }
 
     userRepo.persist(user);
-    logger.info("User(code={}) created from {}", user.getCode(), profile);
+    logger.info("User(code={}) created from {}", user.getCode(), profile.getClientName());
   }
 
   @Transactional

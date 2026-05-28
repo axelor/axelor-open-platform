@@ -1,42 +1,22 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
-import static com.axelor.common.StringUtils.isBlank;
-
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +27,7 @@ public class ScriptBindings extends SimpleBindings {
   private static final String MODEL_KEY = "_model";
 
   private static final Set<String> META_VARS =
-      ImmutableSet.of(
+      Set.of(
           "__id__",
           "__ids__",
           "__this__",
@@ -116,10 +96,11 @@ public class ScriptBindings extends SimpleBindings {
         if (bean == null || bean.getId() == null) return null;
         return JPA.em().getReference(EntityHelper.getEntityClass(bean), bean.getId());
       case "__ref__":
-        Map values = (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).get(0);
+        Map values =
+            (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).getFirst();
         Class<?> klass = Class.forName((String) values.get("model"));
         return JPA.em()
-            .getReference(klass, Long.parseLong(((List) values.get("ids")).get(0).toString()));
+            .getReference(klass, Long.parseLong(((List) values.get("ids")).getFirst().toString()));
     }
     return null;
   }
@@ -137,7 +118,7 @@ public class ScriptBindings extends SimpleBindings {
 
   @Override
   public Set<String> keySet() {
-    Set<String> keys = Sets.newHashSet(super.keySet());
+    Set<String> keys = new HashSet<>(super.keySet());
     keys.addAll(variables.keySet());
     keys.addAll(META_VARS);
     return keys;
@@ -178,7 +159,7 @@ public class ScriptBindings extends SimpleBindings {
 
   @Override
   public void putAll(Map<? extends String, ? extends Object> toMerge) {
-    final Map<String, Object> values = Maps.newHashMap();
+    final Map<String, Object> values = new HashMap<>();
     for (String name : toMerge.keySet()) {
       Object value = toMerge.get(name);
       if (META_VARS.contains(name)) {
@@ -188,116 +169,5 @@ public class ScriptBindings extends SimpleBindings {
       }
     }
     variables.putAll(values);
-  }
-
-  @SuppressWarnings("serial")
-  static class ConfigContext extends HashMap<String, Object> {
-
-    private static Map<String, String> CONFIG;
-    private Map<String, Object> values = new HashMap<>();
-
-    public ConfigContext() {
-      if (CONFIG == null) {
-        CONFIG = new HashMap<>();
-        final Map<String, String> ctxProperties =
-            AppSettings.get().getPropertiesStartingWith("context.");
-        for (final Entry<String, String> entry : ctxProperties.entrySet()) {
-          final String name = entry.getKey();
-          final String expr = entry.getValue();
-          if (isBlank(expr)) {
-            continue;
-          }
-          CONFIG.put(name.substring(8), expr);
-        }
-      }
-    }
-
-    @Override
-    public Set<String> keySet() {
-      return CONFIG.keySet();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-      return CONFIG.containsKey(key);
-    }
-
-    @Override
-    public Object get(Object key) {
-
-      if (values.containsKey(key) || !containsKey(key)) {
-        return values.get(key);
-      }
-
-      final String name = (String) key;
-      final String expr = CONFIG.get(key);
-      final String[] parts = expr.split("\\:", 2);
-      final Object invalid = new Object();
-
-      Class<?> klass = null;
-      Object value = invalid;
-
-      try {
-        klass = Class.forName(parts[0]);
-      } catch (ClassNotFoundException e) {
-      }
-
-      if (klass == null) {
-        value = adapt(expr);
-        values.put(name, value);
-        return value;
-      }
-
-      try {
-        value = klass.getField(parts[1]).get(null);
-      } catch (Exception e) {
-      }
-      try {
-        value = klass.getMethod(parts[1]).invoke(null);
-      } catch (Exception e) {
-      }
-
-      if (value != invalid) {
-        values.put(name, value);
-        return value;
-      }
-
-      final Object instance = Beans.get(klass);
-
-      if (parts.length == 1) {
-        value = instance;
-        values.put(name, value);
-        return value;
-      }
-
-      try {
-        value = klass.getMethod(parts[1]).invoke(instance);
-      } catch (Exception e) {
-      }
-
-      if (value == invalid) {
-        throw new RuntimeException("Invalid configuration: " + name + " = " + expr);
-      }
-
-      values.put(name, value);
-      return value;
-    }
-
-    private Object adapt(String value) {
-      if (isBlank(value)) {
-        return null;
-      }
-      if ("true".equals(value.toLowerCase())) {
-        return true;
-      }
-      if ("false".equals(value.toLowerCase())) {
-        return false;
-      }
-      try {
-        return Integer.parseInt(value);
-      } catch (Exception e) {
-      }
-      return value;
-    }
   }
 }

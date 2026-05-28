@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -23,15 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.axelor.dms.db.DMSFile;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestFiles extends MetaTest {
@@ -88,15 +75,15 @@ public class TestFiles extends MetaTest {
     contact.setLastName("DMS");
     contact = contacts.save(contact);
 
-    Path tmp1 = MetaFiles.createTempFile(null, null);
-    Path tmp2 = MetaFiles.createTempFile(null, null);
+    Path tmp1 = TempFiles.createTempFile();
+    Path tmp2 = TempFiles.createTempFile();
 
     // test tmp file helpers
     assertNotNull(tmp1);
     assertNotNull(tmp2);
     assertNotEquals(tmp1, tmp2);
-    assertEquals(tmp1, MetaFiles.findTempFile(tmp1.getFileName().toString()));
-    assertEquals(tmp2, MetaFiles.findTempFile(tmp2.getFileName().toString()));
+    assertEquals(tmp1, TempFiles.findTempFile(tmp1.getFileName().toString()));
+    assertEquals(tmp2, TempFiles.findTempFile(tmp2.getFileName().toString()));
 
     Files.write(tmp1, "Hello...".getBytes());
     Files.write(tmp2, "World...".getBytes());

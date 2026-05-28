@@ -1,25 +1,17 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import org.pac4j.core.config.Config;
 import org.pac4j.jee.filter.CallbackFilter;
 
@@ -27,11 +19,26 @@ import org.pac4j.jee.filter.CallbackFilter;
 public class AxelorCallbackFilter extends CallbackFilter {
 
   @Inject
-  public AxelorCallbackFilter(
-      Config config, AxelorCallbackLogic callbackLogic, ClientListService clientListService) {
+  public AxelorCallbackFilter(Config config, ClientListService clientListService) {
     setConfig(config);
     setDefaultClient(clientListService.getDefaultClientName());
-    setCallbackLogic(callbackLogic);
     setRenewSession(false);
+  }
+
+  /**
+   * Applies session info after the callback processing, as the session does not exist yet before
+   * the user is logged in.
+   */
+  @Override
+  public void doFilter(
+      ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+      throws IOException, ServletException {
+    try {
+      super.doFilter(servletRequest, servletResponse, filterChain);
+    } finally {
+      if (servletRequest instanceof HttpServletRequest httpRequest) {
+        SessionInfoFilter.applySessionInfo(httpRequest);
+      }
+    }
   }
 }

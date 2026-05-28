@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.internal;
 
@@ -25,6 +11,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.XMLUtils;
+import jakarta.persistence.SharedCacheMode;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,7 +19,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.SharedCacheMode;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.xpath.XPath;
@@ -62,13 +48,13 @@ public class DBHelper {
   private static final String XPATH_SHARED_CACHE_MODE = "shared-cache-mode";
 
   private static final String XPATH_PERSISTENCE_DRIVER =
-      "properties/property[@name='javax.persistence.jdbc.driver']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.driver']/@value";
   private static final String XPATH_PERSISTENCE_URL =
-      "properties/property[@name='javax.persistence.jdbc.url']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.url']/@value";
   private static final String XPATH_PERSISTENCE_USER =
-      "properties/property[@name='javax.persistence.jdbc.user']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.user']/@value";
   private static final String XPATH_PERSISTENCE_PASSWORD =
-      "properties/property[@name='javax.persistence.jdbc.password']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.password']/@value";
 
   private static final String XPATH_BATCH_SIZE =
       "properties/property[@name='hibernate.jdbc.batch_size']/@value";
@@ -116,11 +102,11 @@ public class DBHelper {
         throw new RuntimeException("Invalid persistence.xml, missing persistence unit name.");
       }
 
-      final String configDataSource = String.format("db.%s.datasource", pu);
-      final String configDriver = String.format("db.%s.driver", pu);
-      final String configUrl = String.format("db.%s.url", pu);
-      final String configUser = String.format("db.%s.user", pu);
-      final String configPassword = String.format("db.%s.password", pu);
+      final String configDataSource = "db.%s.datasource".formatted(pu);
+      final String configDriver = "db.%s.driver".formatted(pu);
+      final String configUrl = "db.%s.url".formatted(pu);
+      final String configUser = "db.%s.user".formatted(pu);
+      final String configPassword = "db.%s.password".formatted(pu);
 
       jndiName = settings.get(configDataSource);
       jdbcDriver = settings.get(configDriver);
@@ -233,25 +219,16 @@ public class DBHelper {
   /**
    * Returns the shared cache mode (ie second-level cache).<br/>
    * <br/>
-   * The result of this method corresponds to the <code>javax.persistence.sharedCache.mode</code>
+   * The result of this method corresponds to the <code>jakarta.persistence.sharedCache.mode</code>
    * property in <code>axelor-config.properties<code/> if defined, else to the <code>shared-cache-mode</code>
    * element in the <code>persistence.xml</code> file.
    *
    * @return the second-level cache mode used
    */
   public static SharedCacheMode getSharedCacheMode() {
-    return SharedCacheMode.valueOf(
-        AppSettings.get().get(AvailableAppSettings.JAVAX_PERSISTENCE_SHARED_CACHE_MODE, cacheMode));
-  }
-
-  /** Whether using oracle database. */
-  public static boolean isOracle() {
-    return isEngine(TargetDatabase.ORACLE);
-  }
-
-  /** Whether using MySQL database. */
-  public static boolean isMySQL() {
-    return isEngine(TargetDatabase.MYSQL);
+    final String mode =
+        AppSettings.get().get(AvailableAppSettings.JAVAX_PERSISTENCE_SHARED_CACHE_MODE, cacheMode);
+    return StringUtils.isBlank(mode) ? SharedCacheMode.NONE : SharedCacheMode.valueOf(mode);
   }
 
   /** Whether using PostgreSQL database. */
@@ -259,8 +236,29 @@ public class DBHelper {
     return isEngine(TargetDatabase.POSTGRESQL);
   }
 
+  /** Whether using HSQL database. */
+  public static boolean isHSQL() {
+    return isEngine(TargetDatabase.HSQLDB.split("\\s+")[0]);
+  }
+
   private static boolean isEngine(String engine) {
     return jdbcDriver != null && jdbcDriver.toLowerCase().contains(engine.toLowerCase());
+  }
+
+  public static String getJdbcDriver() {
+    return jdbcDriver;
+  }
+
+  public static String getJdbcUrl() {
+    return jdbcUrl;
+  }
+
+  public static String getJdbcUser() {
+    return jdbcUser;
+  }
+
+  public static String getJdbcPassword() {
+    return jdbcPassword;
   }
 
   /**

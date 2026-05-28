@@ -1,26 +1,12 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuditInterceptor;
+import com.axelor.cache.CacheConfig;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -29,15 +15,20 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
+import com.axelor.inject.Beans;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
+import com.google.inject.persist.jpa.JpaPersistOptions;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import javax.inject.Inject;
-import org.hibernate.MultiTenancyStrategy;
+import javax.cache.spi.CachingProvider;
 import org.hibernate.cache.jcache.ConfigSettings;
+import org.hibernate.cache.jcache.internal.JCacheRegionFactory;
+import org.hibernate.cache.spi.RegionFactory;
+import org.hibernate.cfg.CacheSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
@@ -54,8 +45,6 @@ public class JpaModule extends AbstractModule {
   private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
   private static final String DEFAULT_CACHE_REGION_FACTORY = "jcache";
-  private static final String DEFAULT_JCACHE_PROVIDER =
-      "com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider";
 
   private String jpaUnit;
   private boolean autoscan;
@@ -103,6 +92,9 @@ public class JpaModule extends AbstractModule {
   protected void configure() {
     log.debug("Configuring database...");
 
+    // Initialize Beans helper
+    bind(Beans.class).asEagerSingleton();
+
     final AppSettings settings = AppSettings.get();
     final Properties properties = new Properties();
 
@@ -110,8 +102,6 @@ public class JpaModule extends AbstractModule {
       properties.put(Environment.SCANNER, JpaScanner.class.getName());
     }
 
-    properties.put(Environment.INTERCEPTOR, AuditInterceptor.class.getName());
-    properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
     properties.put(
         Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
     properties.put(
@@ -144,7 +134,9 @@ public class JpaModule extends AbstractModule {
     }
 
     install(new TenantModule());
-    install(new JpaPersistModule(jpaUnit).properties(properties));
+    JpaPersistOptions jpaPersistOpts =
+        JpaPersistOptions.builder().setAutoBeginWorkOnEntityManagerCreation(true).build();
+    install(new JpaPersistModule(jpaUnit, jpaPersistOpts).properties(properties));
     if (this.autostart) {
       bind(Initializer.class).asEagerSingleton();
     }
@@ -153,7 +145,7 @@ public class JpaModule extends AbstractModule {
 
   private void configureConnection(final AppSettings settings, final Properties properties) {
     if (DBHelper.isDataSourceUsed()) {
-      properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
+      properties.put(Environment.JAKARTA_JTA_DATASOURCE, DBHelper.getDataSourceName());
       return;
     }
 
@@ -161,14 +153,14 @@ public class JpaModule extends AbstractModule {
     final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
     keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
-    keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
-    keys.put("db.%s.url", Environment.JPA_JDBC_URL);
-    keys.put("db.%s.user", Environment.JPA_JDBC_USER);
-    keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
+    keys.put("db.%s.driver", Environment.JAKARTA_JDBC_DRIVER);
+    keys.put("db.%s.url", Environment.JAKARTA_JDBC_URL);
+    keys.put("db.%s.user", Environment.JAKARTA_JDBC_USER);
+    keys.put("db.%s.password", Environment.JAKARTA_JDBC_PASSWORD);
 
     for (String key : keys.keySet()) {
       String name = keys.get(key);
-      String value = settings.get(String.format(key, unit));
+      String value = settings.get(key.formatted(unit));
       if (!StringUtils.isBlank(value)) {
         properties.put(name, value.trim());
       }
@@ -180,30 +172,91 @@ public class JpaModule extends AbstractModule {
       return;
     }
 
-    properties.put(Environment.JPA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
-    properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
-    properties.put(Environment.USE_QUERY_CACHE, "true");
+    properties.put(CacheSettings.JAKARTA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
+    properties.put(CacheSettings.USE_SECOND_LEVEL_CACHE, "true");
+    properties.put(CacheSettings.USE_QUERY_CACHE, "true");
 
-    final String cacheRegionFactory =
-        settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
-    if (StringUtils.isBlank(cacheRegionFactory)
-        || cacheRegionFactory.equals(DEFAULT_CACHE_REGION_FACTORY)) {
-      properties.put(Environment.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
-      final String jcacheProvider =
-          settings.get(
-              AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER, DEFAULT_JCACHE_PROVIDER);
+    String cacheRegionFactory = settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
+    String cacheRegionPrefix = settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_PREFIX);
+    String jcacheProvider = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER);
+
+    final var optCacheProvider = CacheConfig.getHibernateCacheProvider();
+
+    if (optCacheProvider.isPresent()) {
+      final var cacheProvider = optCacheProvider.get();
+      final var optCacheType = cacheProvider.getCacheType();
+
+      String providerCacheRegionFactory = null;
+      String providerJcacheProvider = null;
+
+      if (optCacheType.isPresent()) {
+        // Built-in cache provider options
+        var cacheType = optCacheType.get();
+        providerCacheRegionFactory = cacheType.getCacheRegionFactory();
+
+        if (isJCacheRegionFactory(providerCacheRegionFactory)) {
+          providerJcacheProvider = cacheType.getCachingProviderClass().getName();
+        }
+      } else {
+        // Get custom cache provider from provider name
+        final var providerName = cacheProvider.getProvider();
+        Class<?> providerClass;
+        try {
+          providerClass = Class.forName(providerName);
+        } catch (ClassNotFoundException e) {
+          throw new IllegalArgumentException("Unknown cache provider: " + providerName);
+        }
+        if (CachingProvider.class.isAssignableFrom(providerClass)) {
+          providerCacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
+          providerJcacheProvider = providerName;
+        } else if (RegionFactory.class.isAssignableFrom(providerClass)) {
+          providerCacheRegionFactory = providerName;
+        } else {
+          throw new IllegalArgumentException("Unsupported cache provider type: " + providerName);
+        }
+      }
+
+      // Don't override any explicit cache region factory.
+      if (StringUtils.isBlank(cacheRegionFactory)) {
+        cacheRegionFactory = providerCacheRegionFactory;
+      }
+
+      // Don't override any explicit jcache provider.
+      if (StringUtils.isBlank(jcacheProvider)) {
+        jcacheProvider = providerJcacheProvider;
+      }
+
+      if (StringUtils.isBlank(cacheRegionPrefix)) {
+        cacheRegionPrefix = "hibernate:";
+      }
+    }
+
+    if (StringUtils.isBlank(cacheRegionFactory) || isJCacheRegionFactory(cacheRegionFactory)) {
+      properties.put(CacheSettings.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
+      if (StringUtils.isBlank(jcacheProvider)) {
+        jcacheProvider = CacheConfig.DEFAULT_JCACHE_PROVIDER;
+      }
       properties.put(ConfigSettings.PROVIDER, jcacheProvider);
       log.info("JCache provider: {}", jcacheProvider);
     } else {
-      properties.put(Environment.CACHE_REGION_FACTORY, cacheRegionFactory);
+      properties.put(CacheSettings.CACHE_REGION_FACTORY, cacheRegionFactory);
       log.info("Cache region factory: {}", cacheRegionFactory);
     }
+
+    if (StringUtils.notBlank(cacheRegionPrefix)) {
+      properties.put(CacheSettings.CACHE_REGION_PREFIX, cacheRegionPrefix);
+      log.trace("Cache region prefix: {}", cacheRegionPrefix);
+    }
+  }
+
+  private static boolean isJCacheRegionFactory(String cacheRegionFactory) {
+    return DEFAULT_CACHE_REGION_FACTORY.equals(cacheRegionFactory)
+        || JCacheRegionFactory.class.getName().equals(cacheRegionFactory);
   }
 
   private void configureMultiTenancy(final AppSettings settings, final Properties properties) {
     // multi-tenancy support
     if (TenantModule.isEnabled()) {
-      properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
       properties.put(
           Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
       properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());

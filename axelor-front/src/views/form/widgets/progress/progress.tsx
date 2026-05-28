@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 
 import { Box, LinearProgress } from "@axelor/ui";
 
@@ -50,10 +50,11 @@ export function ProgressComponent({
 export function Progress(props: FieldProps<number | string>) {
   const { schema, readonly, valueAtom } = props;
   const value = useAtomValue(valueAtom);
+  const id = useId();
   if (readonly) {
     return (
-      <FieldControl {...props}>
-        <Box className={styles.progress}>
+      <FieldControl {...props} inputId={id}>
+        <Box id={id} className={styles.progress} data-testid="input">
           <ProgressComponent value={value || 0} schema={schema} />
         </Box>
       </FieldControl>

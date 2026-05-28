@@ -8,3 +8,15 @@ export interface WidgetProps {
   record: TreeRecord["data"];
   actionExecutor?: ActionExecutor;
 }
+
+export interface LoadMoreRowData {
+  _loadMore: true;
+  _parentKey: string;
+  _loadMoreLoaded: number;
+  _loadMoreTotal: number;
+}
+
+export interface LoadMoreTreeRow extends LoadMoreRowData {
+  $key: string;
+  _children: false;
+}

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.mapper.types;
 
@@ -43,7 +29,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
   public Object adapt(
       Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
 
-    if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
+    if (value == null || (value instanceof String stringValue && "".equals(stringValue.trim()))) {
       return null;
     }
 
@@ -73,14 +59,14 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     if (value == null) {
       return null;
     }
-    if (value instanceof ZonedDateTime) {
-      return (ZonedDateTime) value;
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return zonedDateTime;
     }
-    if (value instanceof Date) {
-      return ((Date) value).toInstant().atZone(ZoneId.systemDefault());
+    if (value instanceof Date date) {
+      return date.toInstant().atZone(ZoneId.systemDefault());
     }
-    if (value instanceof Calendar) {
-      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault());
+    if (value instanceof Calendar calendar) {
+      return calendar.toInstant().atZone(ZoneId.systemDefault());
     }
     try {
       return ZonedDateTime.from(((Temporal) value));
@@ -111,17 +97,17 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     if (value == null) {
       return null;
     }
-    if (value instanceof LocalDate) {
-      return (LocalDate) value;
+    if (value instanceof LocalDate localDate) {
+      return localDate;
     }
-    if (value instanceof ZonedDateTime) {
-      return ((ZonedDateTime) value).toLocalDate();
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return zonedDateTime.toLocalDate();
     }
-    if (value instanceof Date) {
-      return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    if (value instanceof Date date) {
+      return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
-    if (value instanceof Calendar) {
-      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    if (value instanceof Calendar calendar) {
+      return calendar.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
     try {
       return LocalDate.parse(value.toString());
@@ -172,8 +158,8 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
       } catch (Exception e) {
         final ZonedDateTime dt = ZonedDateTime.now();
         final String val =
-            String.format(
-                "%d-%02d-%02dT%s", dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
+            "%d-%02d-%02dT%s"
+                .formatted(dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
         return toZonedDateTime(val).toLocalTime();
       }
     }

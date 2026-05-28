@@ -145,9 +145,7 @@
                       "help": "New password of the user",
                       "placeholder": "new password",
                       "widget": "password",
-                      "onChange": "action-condition-user-password",
-                      "requiredIf": "change || !id",
-                      "validIf": "(!change && id) || newPassword.length >= 4"
+                      "requiredIf": "change || !id"
                     },
                     {
                       "type": "field",
@@ -173,9 +171,7 @@
                       "help": "Password of the new user",
                       "placeholder": "password",
                       "widget": "password",
-                      "onChange": "action-condition-user-password",
-                      "requiredIf": "change || !id",
-                      "validIf": "(!change && id) || newPassword.length >= 4"
+                      "requiredIf": "change || !id"
                     },
                     {
                       "type": "field",

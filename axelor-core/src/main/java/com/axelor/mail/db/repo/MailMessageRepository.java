@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.mail.db.repo;
 
@@ -27,7 +13,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.MailException;
@@ -40,18 +25,19 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
-import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.inject.Inject;
-import javax.mail.internet.InternetAddress;
-import javax.persistence.PersistenceException;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,26 +57,59 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     super(MailMessage.class);
   }
 
+  private List<MailMessage> findAll(
+      String type, String relatedModel, Long relatedId, int limit, int offset) {
+    var where = new ArrayList<String>();
+    var params = new HashMap<String, Object>();
+
+    if (StringUtils.notBlank(type)) {
+      where.add("self.type = :type");
+      params.put("type", type);
+    }
+
+    if (StringUtils.notBlank(relatedModel)) {
+      where.add("self.relatedModel = :relatedModel");
+      params.put("relatedModel", relatedModel);
+    }
+
+    if (relatedId != null) {
+      where.add("self.relatedId = :relatedId");
+      params.put("relatedId", relatedId);
+    }
+
+    var builder = new StringBuilder();
+
+    builder.append("SELECT self FROM MailMessage self");
+
+    if (!where.isEmpty()) {
+      builder.append(" WHERE ").append(String.join(" AND ", where));
+    }
+
+    builder.append(" ORDER BY self.receivedOn DESC");
+
+    var queryString = builder.toString();
+    var query = JPA.em().createQuery(queryString, MailMessage.class);
+
+    for (var entry : params.entrySet()) {
+      query.setParameter(entry.getKey(), entry.getValue());
+    }
+
+    query.setFirstResult(offset);
+    query.setMaxResults(limit);
+
+    return query.getResultList();
+  }
+
   public List<MailMessage> findAll(Model related, int limit, int offset) {
-    return all()
-        .filter(
-            "self.relatedModel = ? AND self.relatedId = ?",
-            EntityHelper.getEntityClass(related).getName(),
-            related.getId())
-        .order("-createdOn")
-        .fetch(limit, offset);
+    var relatedModel = EntityHelper.getEntityClass(related).getName();
+    var relatedId = related.getId();
+    return findAll(null, relatedModel, relatedId, limit, offset);
   }
 
   public List<MailMessage> findBy(String type, Model related, int limit, int offset) {
-    if (StringUtils.isBlank(type)) return findAll(related, limit, offset);
-    return all()
-        .filter(
-            "self.relatedModel = ? AND self.relatedId = ? AND self.type = ?",
-            EntityHelper.getEntityClass(related).getName(),
-            related.getId(),
-            type)
-        .order("-createdOn")
-        .fetch(limit, offset);
+    var relatedModel = EntityHelper.getEntityClass(related).getName();
+    var relatedId = related.getId();
+    return findAll(type, relatedModel, relatedId, limit, offset);
   }
 
   public long count(Model related) {
@@ -146,7 +165,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
   }
 
   private static String mailHost;
-  private static AtomicInteger mailId = new AtomicInteger();
 
   protected String generateMessageId(MailMessage entity) {
     if (mailHost == null) {
@@ -158,8 +176,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     }
     final StringBuilder builder = new StringBuilder();
     builder.append("<");
-    builder.append(builder.hashCode()).append(".");
-    builder.append(mailId.getAndIncrement()).append(".");
+    builder.append(UUID.randomUUID()).append(".");
     builder.append(System.currentTimeMillis());
     builder.append(mailHost);
     builder.append(">");
@@ -206,6 +223,11 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     // make sure to set unique message-id
     if (entity.getMessageId() == null) {
       entity.setMessageId(generateMessageId(entity));
+    }
+
+    // set received on date
+    if (entity.getReceivedOn() == null) {
+      entity.setReceivedOn(LocalDateTime.now());
     }
 
     final MailMessage saved = super.save(entity);
@@ -300,7 +322,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     final Map<String, Object> details = Resource.toMap(message, fields);
     final List<Object> files = new ArrayList<>();
 
-    final MailFlags flags = flagsRepo.findBy(message, AuthUtils.getUser());
+    final User authUser = AuthUtils.getUser();
+    final MailFlags flags = authUser != null ? flagsRepo.findBy(message, authUser) : null;
     final List<MetaAttachment> attachments = findAttachments(message);
 
     for (MetaAttachment attachment : attachments) {
@@ -314,11 +337,14 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     }
 
     String eventType = message.getType();
-    String eventText = I18n.get("updated document");
+    String eventText = /*$$(*/ "updated document" /*)*/;
     if (MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
         || MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)) {
-      eventText = I18n.get("added comment");
-      details.put("$canDelete", Objects.equal(message.getCreatedBy(), AuthUtils.getUser()));
+      eventText = /*$$(*/ "added comment" /*)*/;
+      User createdBy = message.getCreatedBy();
+      if (createdBy != null) {
+        details.put("createdBy", Map.of("id", createdBy.getId(), "code", createdBy.getCode()));
+      }
     }
 
     final MailAddress email = message.getFrom();
@@ -350,7 +376,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     details.put("$files", files);
     details.put("$eventType", eventType);
     details.put("$eventText", eventText);
-    details.put("$eventTime", message.getCreatedOn());
+    details.put("$eventTime", message.getReceivedOn());
 
     return details;
   }

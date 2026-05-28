@@ -1,0 +1,1 @@
+export { ManyToOne as Tag } from "../many-to-one";

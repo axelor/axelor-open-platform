@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -27,8 +13,6 @@ import com.axelor.common.reflections.Reflections;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +24,13 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -105,7 +89,7 @@ public final class ViewWatcher {
                             }
                           })
                       .collect(Collectors.toSet()))
-          .orElseGet(() -> ImmutableSet.of(ENTRY_CREATE));
+          .orElseGet(() -> Set.of(ENTRY_CREATE));
 
   private ViewWatcher() {}
 
@@ -207,13 +191,13 @@ public final class ViewWatcher {
         fs = FileSystems.newFileSystem(path, (ClassLoader) null);
         propsPath = fs.getPath("META-INF", "axelor-module.properties");
       } else {
-        for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
-          final String subPathStr = Paths.get('/' + location).toString();
+        for (final String location : List.of("WEB-INF/classes", "main")) {
+          final String subPathStr = Path.of('/' + location).toString();
           final int index = pathStr.indexOf(subPathStr);
           if (index >= 0) {
             final Path current =
-                Paths.get(pathStr.substring(0, index))
-                    .resolve(Paths.get(location, "META-INF", "axelor-module.properties"));
+                Path.of(pathStr.substring(0, index))
+                    .resolve(Path.of(location, "META-INF", "axelor-module.properties"));
             if (Files.exists(current)) {
               propsPath = current;
               break;
@@ -329,14 +313,14 @@ public final class ViewWatcher {
               switch (rootResource.getProtocol()) {
                 case "file":
                   final Path path =
-                      Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
+                      Path.of(toURI(rootResource)).resolve(Path.of("..", "lib")).normalize();
                   if (path.toFile().isDirectory()) {
                     paths.add(path);
                   }
                   break;
                 case "jar":
                   final Path pathJar =
-                      Paths.get(toURI(rootResource.getPath())).getParent().getParent();
+                      Path.of(toURI(rootResource.getPath())).getParent().getParent();
                   if (Files.isDirectory(pathJar)) {
                     paths.add(pathJar);
                   }
@@ -348,7 +332,7 @@ public final class ViewWatcher {
 
     Reflections.findResources().byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$").find().stream()
         .filter(url -> url.getPath().startsWith("/"))
-        .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
+        .map(url -> Path.of(toURI(url)).resolve("..").normalize())
         .distinct()
         .forEach(paths::add);
 

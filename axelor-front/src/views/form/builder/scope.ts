@@ -125,6 +125,7 @@ export class FormActionHandler extends DefaultActionHandler {
   #saveHandler?: SaveHandler;
   #refreshHandler?: AsyncHandler;
   #validateHandler?: AsyncHandler;
+  #closeHandler?: AsyncHandler;
 
   constructor(prepareContext: ContextCreator) {
     super();
@@ -141,6 +142,10 @@ export class FormActionHandler extends DefaultActionHandler {
 
   setValidateHandler(handler: AsyncHandler) {
     this.#validateHandler = handler;
+  }
+
+  setCloseHandler(handler: AsyncHandler) {
+    this.#closeHandler = handler;
   }
 
   getContext() {
@@ -211,9 +216,7 @@ export class FormActionHandler extends DefaultActionHandler {
   }
 
   async close() {
-    this.notify({
-      type: "close",
-    });
+    this.#closeHandler?.();
   }
 }
 
@@ -487,18 +490,30 @@ function useActionAttrs({
 
             // collection field column ?
             if (targetFieldName.includes(".")) {
-              const fieldName = targetFieldName.split(".")[0];
-              const field = findViewItem(updateFormState.meta, fieldName);
+              const fieldName = targetFieldName
+                .split(".")
+                .slice(0, -1)
+                .join(".");
+
+              const refEditorName =
+                isRefScope && (formState.meta as any)?.schema?.name;
+              const fieldFromRef = refEditorName
+                ? findViewItem(formState.meta, fieldName)
+                : null;
+
+              const field =
+                fieldFromRef ?? findViewItem(updateFormState.meta, fieldName);
+
               const stateName =
                 target !== targetFieldName && jsonItem
                   ? `${jsonItem.modelField}.${fieldName}`
-                  : fieldName;
+                  : fieldFromRef
+                    ? `${refEditorName}.${fieldName}`
+                    : fieldName;
 
               if (field && isCollection(field) && !field.editor) {
                 const state = statesByName[stateName] ?? {};
-                const column = targetFieldName.substring(
-                  targetFieldName.indexOf(".") + 1,
-                );
+                const column = targetFieldName.substring(fieldName.length + 1);
                 const columns = state.columns ?? {};
                 const newState = {
                   ...state,
@@ -810,9 +825,9 @@ export function useAfterActions<Type, Args extends Array<unknown>>(
 ) {
   const { actionExecutor } = useFormScope();
 
-  const waitRef = useRef<Promise<Type>>();
-  const argsRef = useRef<Args>();
-  const funcRef = useRef<(...args: Args) => Promise<Type>>();
+  const waitRef = useRef<Promise<Type>>(undefined);
+  const argsRef = useRef<Args>(undefined);
+  const funcRef = useRef<(...args: Args) => Promise<Type>>(undefined);
 
   const reset = useCallback(() => {
     const func = funcRef.current!;
@@ -865,7 +880,7 @@ export function FormRecordUpdates({
   formAtom: FormAtom;
   recordHandler: RecordHandler;
 }) {
-  const recordRef = useRef<DataRecord | undefined | null>();
+  const recordRef = useRef<DataRecord>(null);
   const { formAtom: treeFormAtom } = useCollectionTree();
   const treeFormRecord = useAtomValue(
     useMemo(
@@ -875,6 +890,22 @@ export function FormRecordUpdates({
   );
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
+  );
+  const jsonModel = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(
+          formAtom,
+          (form) => form.model === "com.axelor.meta.db.MetaJsonRecord",
+        ),
+      [formAtom],
+    ),
+  );
+  const json = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (form) => form.meta?.view?.json),
+      [formAtom],
+    ),
   );
   const { action } = useViewTab();
 
@@ -898,7 +929,15 @@ export function FormRecordUpdates({
         {
           ...processContextValues(action.context ?? {}),
           ...treeFormRecord,
-          ...record,
+          ...(json
+            ? (() => {
+                if (jsonModel) {
+                  const { $record, ...jsonRecord } = record;
+                  return { ...$record, ...jsonRecord };
+                }
+                return record.$record;
+              })()
+            : record),
         },
         {
           fields: fields as unknown as EvalContextOptions["fields"],
@@ -906,7 +945,16 @@ export function FormRecordUpdates({
         },
       ),
     );
-  }, [action.context, treeFormRecord, fields, readonly, record, recordHandler]);
+  }, [
+    action.context,
+    treeFormRecord,
+    json,
+    jsonModel,
+    fields,
+    readonly,
+    record,
+    recordHandler,
+  ]);
 
   const notify = useAfterActions(
     useCallback(async () => {

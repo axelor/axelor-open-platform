@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -127,8 +113,8 @@ public final class EntityHelper {
   @SuppressWarnings("unchecked")
   public static <T> Class<T> getEntityClass(T entity) {
     Preconditions.checkNotNull(entity);
-    if (entity instanceof HibernateProxy) {
-      return ((HibernateProxy) entity).getHibernateLazyInitializer().getPersistentClass();
+    if (entity instanceof HibernateProxy proxy) {
+      return (Class<T>) proxy.getHibernateLazyInitializer().getPersistentClass();
     }
     Class<?> klass = entity.getClass();
     while (ContextEntity.class.isAssignableFrom(klass)) {
@@ -154,11 +140,11 @@ public final class EntityHelper {
     if (entity == null) {
       return null;
     }
-    if (entity instanceof HibernateProxy) {
-      return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+    if (entity instanceof HibernateProxy proxy) {
+      return (T) proxy.getHibernateLazyInitializer().getImplementation();
     }
-    if (entity instanceof ContextEntity) {
-      return (T) ((ContextEntity) entity).getContextEntity();
+    if (entity instanceof ContextEntity contextEntity) {
+      return (T) contextEntity.getContextEntity();
     }
     return entity;
   }
@@ -171,7 +157,7 @@ public final class EntityHelper {
    * @return true if uninitialized false otherwise
    */
   public static <T> boolean isUninitialized(T entity) {
-    return entity instanceof HibernateProxy
-        && ((HibernateProxy) entity).getHibernateLazyInitializer().isUninitialized();
+    return entity instanceof HibernateProxy proxy
+        && proxy.getHibernateLazyInitializer().isUninitialized();
   }
 }

@@ -1,17 +1,17 @@
 import react from "@vitejs/plugin-react";
-import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
-import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
+import jotaiDebugLabel from "jotai-babel/plugin-debug-label";
+import jotaiReactRefresh from "jotai-babel/plugin-react-refresh";
 import { ProxyOptions, loadEnv, mergeConfig } from "vite";
-import { UserConfig, defineConfig } from "vitest/config";
+import { ViteUserConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
-let env = loadEnv("dev", process.cwd(), "");
+const env = loadEnv("dev", process.cwd(), "");
 let base = env.VITE_PROXY_CONTEXT ?? "/";
 
 base = base.endsWith("/") ? base : `${base}/`;
 const unslashedBase = base === "/" ? base : base.slice(0, -1);
 
-const { plugins, ...conf } = viteConfig as UserConfig;
+const { plugins, ...conf } = viteConfig as ViteUserConfig;
 
 // replace react plugin
 plugins[0] = react({
@@ -25,17 +25,20 @@ const proxyAll: ProxyOptions = {
   changeOrigin: true,
   xfwd: true,
   bypass(req, res, options) {
+    // Compare pathname without any query params
+    const pathname = req.url.split("?")[0];
     if (
-      req.url === base ||
-      req.url === base + "index.html" ||
-      req.url.startsWith(base + "src/") ||
-      req.url.startsWith(base + "@fs/") ||
-      req.url === base + "@react-refresh" ||
-      req.url.startsWith(base + "@id/") ||
-      req.url.startsWith(base + "@vite/") ||
-      req.url.startsWith(base + "node_modules/") ||
-      /\/theme\/([^.]+)\.json/.test(req.url) ||
-      req.url.startsWith(base + "js/libs/monaco-editor/vs/")
+      pathname === base ||
+      pathname === base + "index.html" ||
+      pathname.startsWith(base + "src/") ||
+      pathname.startsWith(base + "@fs/") ||
+      pathname === base + "@react-refresh" ||
+      pathname.startsWith(base + "@id/") ||
+      pathname.startsWith(base + "@vite/") ||
+      pathname.startsWith(base + ".vite/") ||
+      pathname.startsWith(base + "__vite_ping") ||
+      pathname.startsWith(base + "node_modules/") ||
+      /\/theme\/([^.]+)\.json/.test(pathname)
     ) {
       return req.url;
     }

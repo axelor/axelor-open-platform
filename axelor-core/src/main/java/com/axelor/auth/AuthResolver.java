@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
@@ -22,8 +8,8 @@ import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSecurity.AccessType;
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /** This class is responsible to resolve permissions. */
@@ -72,14 +58,14 @@ final class AuthResolver {
    */
   private Set<Permission> filterPermissions(
       final Set<Permission> permissions, final String object, final AccessType type) {
-    final Set<Permission> all = Sets.newLinkedHashSet();
+    final Set<Permission> all = new LinkedHashSet<>();
     if (permissions == null || permissions.isEmpty()) {
       return all;
     }
 
     // add object permissions
     for (final Permission permission : permissions) {
-      if (Objects.equal(object, permission.getObject()) && hasAccess(permission, type)) {
+      if (Objects.equals(object, permission.getObject()) && hasAccess(permission, type)) {
         all.add(permission);
       }
     }
@@ -87,7 +73,7 @@ final class AuthResolver {
     // add wild card permissions
     final String pkg = object.substring(0, object.lastIndexOf('.')) + ".*";
     for (final Permission permission : permissions) {
-      if (Objects.equal(pkg, permission.getObject()) && hasAccess(permission, type)) {
+      if (Objects.equals(pkg, permission.getObject()) && hasAccess(permission, type)) {
         all.add(permission);
       }
     }

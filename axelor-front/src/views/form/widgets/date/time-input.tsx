@@ -3,7 +3,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { Box, ClickAwayListener, Popper, clsx } from "@axelor/ui";
@@ -35,7 +34,7 @@ function TimeSelect({
   const [popperContent, setPopperContent] = useState<HTMLDivElement | null>(
     null,
   );
-  const boxRef = useRef<HTMLDivElement | null>(null);
+  const [boxRef, setBoxRef] = useState<HTMLDivElement | null>(null);
 
   const options = useMemo(
     () =>
@@ -74,7 +73,7 @@ function TimeSelect({
   return (
     <>
       <Box
-        ref={boxRef}
+        ref={setBoxRef}
         d="flex"
         position="relative"
         className={clsx(styles.timeInputSelect, { [styles.open]: open })}
@@ -85,12 +84,13 @@ function TimeSelect({
       </Box>
       <Popper
         placement={"bottom"}
-        target={boxRef.current!}
+        target={boxRef!}
         open={open}
         disablePortal
+        role={"presentation"}
       >
         <ClickAwayListener onClickAway={closePicker}>
-          <Box ref={setPopperContent} className={styles.popperContent}>
+          <Box ref={setPopperContent} className={styles.popperContent} role={"listbox"}>
             {options.map((opt) => {
               const isSelected = selected === opt;
               return (
@@ -98,6 +98,7 @@ function TimeSelect({
                   className={styles.option}
                   key={opt.value}
                   onClick={() => handleChange(opt)}
+                  role={"option"}
                   {...(isSelected && { ["aria-selected"]: true })}
                 >
                   {isSelected && <span className={styles.tick}>✓</span>}

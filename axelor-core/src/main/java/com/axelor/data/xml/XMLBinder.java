@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.xml;
 
@@ -26,14 +12,12 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.stream.Collectors;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -179,9 +163,9 @@ public abstract class XMLBinder {
         value = relational(property, bind, value, ctx);
       } else if (property.isCollection() && value != null) {
         if (!(value instanceof List)) {
-          value = Lists.newArrayList(value);
+          value = List.of(value);
         }
-        List<Object> items = Lists.newArrayList();
+        List<Object> items = new ArrayList<>();
         for (Object item : (List<?>) value) {
           items.add(relational(property, bind, item, ctx));
         }
@@ -193,8 +177,8 @@ public abstract class XMLBinder {
 
       if (property.isCollection()) {
         if (value == null) {
-        } else if (value instanceof Collection<?>) {
-          property.addAll(bean, (Collection<?>) value);
+        } else if (value instanceof Collection<?> collection) {
+          property.addAll(bean, collection);
         } else {
           property.add(bean, value);
         }
@@ -211,8 +195,8 @@ public abstract class XMLBinder {
       Property property, XMLBind bind, Object value, Map<String, Object> ctx) {
 
     Map<String, Object> values = ctx;
-    if (value instanceof Map) {
-      values = (Map) value;
+    if (value instanceof Map map) {
+      values = map;
       // copy underscored context variables
       for (String key : ctx.keySet()) {
         if (key.startsWith("_")) {
@@ -223,11 +207,11 @@ public abstract class XMLBinder {
 
     Object result = bind(bind, property.getTarget(), values);
 
-    if (result instanceof Model
+    if (result instanceof Model model
         && (property.getType() == PropertyType.MANY_TO_ONE
             || property.getType() == PropertyType.MANY_TO_MANY)) {
       if (!JPA.em().contains(result)) {
-        result = JPA.manage((Model) result);
+        result = JPA.manage(model);
       }
     }
     return result;
@@ -246,7 +230,7 @@ public abstract class XMLBinder {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private boolean validate(XMLBind binding, Object value, Map<String, Object> values) {
-    Map<String, Object> ctx = toContext(value instanceof Map ? ((Map) value) : values);
+    Map<String, Object> ctx = toContext(value instanceof Map m ? m : values);
     if (values != null) {
       // copy underscored context variables
       for (String key : values.keySet()) {
@@ -296,29 +280,27 @@ public abstract class XMLBinder {
 
   private Object value(List<Node> nodes, final XMLBind bind) {
     List<Object> result =
-        Lists.transform(
-            nodes,
-            new Function<Node, Object>() {
-              @Override
-              public Object apply(@Nullable Node input) {
-                if (bind.getBindings() != null) {
-                  return toMap(input, bind);
-                }
-                if (input.getNodeType() == Node.ELEMENT_NODE) {
-                  Node child = input.getFirstChild();
-                  if (child == null) {
-                    return null;
+        nodes.stream()
+            .map(
+                input -> {
+                  if (bind.getBindings() != null) {
+                    return toMap(input, bind);
                   }
-                  if (child.getNodeType() == Node.TEXT_NODE) {
-                    return child.getNodeValue();
+                  if (input.getNodeType() == Node.ELEMENT_NODE) {
+                    Node child = input.getFirstChild();
+                    if (child == null) {
+                      return null;
+                    }
+                    if (child.getNodeType() == Node.TEXT_NODE) {
+                      return child.getNodeValue();
+                    }
+                    return toMap(input, bind);
                   }
-                  return toMap(input, bind);
-                }
-                return input.getNodeValue();
-              }
-            });
+                  return input.getNodeValue();
+                })
+            .collect(Collectors.toList());
     if (result.size() == 1) {
-      return result.get(0);
+      return result.getFirst();
     }
     return result.size() == 0 ? null : result;
   }
@@ -353,7 +335,7 @@ public abstract class XMLBinder {
   }
 
   private List<Node> find(Node node, XMLBind bind, String prefix) {
-    List<Node> nodes = Lists.newArrayList();
+    List<Node> nodes = new ArrayList<>();
     String name = bind.getNode();
     String path = name;
 

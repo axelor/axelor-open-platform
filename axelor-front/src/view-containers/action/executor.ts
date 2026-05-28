@@ -13,6 +13,7 @@ import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as actionRequest } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
+import { device } from "@/utils/device";
 import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
@@ -240,9 +241,38 @@ export class DefaultActionExecutor implements ActionExecutor {
       await options?.handle(data);
     }
 
+    if (data.identityCheck) {
+      const { showIdentityCheck } = await import("@/components/identity-check");
+      const verified = await showIdentityCheck();
+      if (verified && data.identityCheck.pending) {
+        return this.#execute(data.identityCheck.pending, options);
+      }
+      return Promise.reject();
+    }
+
     if (data.exportFile) {
-      const link = "ws/files/data-export";
-      await download(link, data.exportFile);
+      if (data.attached) {
+        const context = this.#handler.getContext();
+        const attachments =
+          context["$attachments"] ?? context["attachments"] ?? 0;
+        this.#handler.setValue("$attachments", attachments + 1);
+
+        const confirmed = await dialogs.confirm({
+          title: i18n.get("Download"),
+          content: i18n.get(
+            "Export attached to current object. Would you like to download?",
+          ),
+        });
+
+        if (confirmed) {
+          const url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
+          await download(url, data.attached.fileName);
+        }
+      } else if (data.exportToken) {
+        const params = new URLSearchParams({ token: data.exportToken });
+        const url = `ws/files/data-export?${params}`;
+        await download(url, data.exportFile);
+      }
     }
 
     if (data.signal === "refresh-app") {
@@ -417,7 +447,12 @@ export class DefaultActionExecutor implements ActionExecutor {
 
       if (data.reportLink) {
         const url = `ws/files/report?link=${data.reportLink}&name=${data.reportFile}`;
-        if (data.reportFormat) {
+        if (device.isMobile && data.reportFormat !== "html") {
+          download(url);
+        } else if (
+          data.reportFormat &&
+          ["pdf", "html"].indexOf(data.reportFormat) > -1
+        ) {
           await this.#openView({
             title: data.reportFile!,
             resource: url,

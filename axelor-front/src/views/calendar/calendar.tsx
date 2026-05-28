@@ -1,6 +1,6 @@
 import { useAtomCallback } from "jotai/utils";
 import deepGet from "lodash/get";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
@@ -8,6 +8,7 @@ import { dialogs } from "@/components/dialogs";
 import {
   Scheduler,
   SchedulerEvent,
+  SchedulerRef,
   SchedulerView,
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -23,7 +24,6 @@ import { findView } from "@/services/client/meta-cache";
 import { CalendarView, Field, FormView } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { DataStore } from "@/services/client/data-store";
 import {
   useViewContext,
   useViewTab,
@@ -35,9 +35,12 @@ import { useActionExecutor } from "../form/builder/scope";
 import { Picker as DatePicker } from "../form/widgets/date/picker";
 import { ViewProps } from "../types";
 import { getColor } from "./colors";
+import {
+  getJsonFieldValue,
+  updateJsonFieldValue,
+} from "@/services/client/data-utils";
 import { Filter, Filters } from "./filters";
 import { Popover } from "./popover";
-import { getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
 import eventStyles from "./event.module.scss";
@@ -57,11 +60,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
     template = "",
   } = meta.view;
 
+  const [scheduler, setScheduler] = useState<SchedulerRef | null>(null);
+
   // create clone of data store
-  const dataStore = useMemo(
-    () => new DataStore(_dataStore.model, _dataStore.options),
-    [_dataStore],
-  );
+  const dataStore = useMemo(() => _dataStore.clone(), [_dataStore]);
   const colorField = meta.fields?.[colorBy!];
   const allDayOnly = meta.fields?.[eventStart]?.type === "DATE";
 
@@ -97,8 +99,16 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const searchNames = useMemo(() => {
     const fieldNames = Object.keys(meta.fields ?? {});
     const itemNames = [eventStart, eventStop!, colorBy!].filter(Boolean);
-    return [...new Set([...fieldNames, ...itemNames])];
+    const jsonFieldNames = itemNames
+      .map((name) => meta.fields?.[name]?.jsonField)
+      .filter((name): name is string => !!name);
+    return [...new Set([...fieldNames, ...itemNames, ...jsonFieldNames])];
   }, [meta.fields, eventStart, eventStop, colorBy]);
+
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   const fetchItems = useAtomCallback(
     useCallback(
@@ -113,7 +123,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             },
             {
               fieldName: eventStart,
-              operator: "<=",
+              operator: "<",
               value: end,
             },
           ],
@@ -134,7 +144,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
                   },
                   {
                     fieldName: eventStart,
-                    operator: "<=",
+                    operator: "<",
                     value: end,
                   },
                 ],
@@ -143,18 +153,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
           };
         }
 
-        const opts: SearchOptions = {
-          limit: -1,
-          fields: searchNames,
-          filter: {
-            criteria: [criteria],
-          },
+        let filter: SearchOptions["filter"] = {
+          criteria: [criteria],
         };
 
         if (searchAtom) {
           const { query = {} } = get(searchAtom);
           if (query.criteria?.length) {
-            opts.filter = {
+            filter = {
               ...query,
               operator: "and",
               criteria: [
@@ -163,19 +169,32 @@ export function Calendar(props: ViewProps<CalendarView>) {
               ],
             };
           } else {
-            opts.filter = { ...opts.filter, ...query, criteria: [criteria] };
+            filter = { ...filter, ...query, criteria: [criteria] };
           }
         }
 
-        if (dashlet && opts.filter) {
+        if (dashlet) {
           const { _domainAction, ...formContext } = getViewContext() ?? {};
-          const { _domainContext } = opts.filter;
-          opts.filter._domainContext = {
-            ..._domainContext,
+          filter._domainContext = {
+            ...filter._domainContext,
             ...formContext,
           };
-          opts.filter._domainAction = _domainAction;
+          filter._domainAction = _domainAction;
         }
+
+        filter._domainContext = {
+          ...dataStore.options?.filter?._domainContext,
+          ...filter._domainContext,
+          _calendarViewMode: modeRef.current,
+          _calendarStartDate: start,
+          _calendarEndDate: end,
+        };
+
+        const opts: SearchOptions = {
+          limit: -1,
+          fields: searchNames,
+          filter,
+        };
 
         const { records } = await dataStore.search(opts);
         return records;
@@ -201,8 +220,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
           props: titleField,
           context: record,
         });
-        const startValue = record[eventStart];
-        const endValue = eventStop && record[eventStop];
+        const getFieldValue = (record: DataRecord, name: string) => {
+          const field = meta.fields?.[name];
+          return field?.jsonField
+            ? getJsonFieldValue(record, field)
+            : record[name];
+        };
+        const startValue = getFieldValue(record, eventStart);
+        const endValue = eventStop && getFieldValue(record, eventStop);
         const start = startValue
           ? moment(startValue).toDate()
           : moment().toDate();
@@ -268,6 +293,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     eventLength,
     eventStart,
     eventStop,
+    meta.fields,
     titleField,
     allDayOnly,
   ]);
@@ -294,7 +320,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
   });
 
   useEffect(() => {
-    const { start, end } = getTimes(date, "month");
+    if (!scheduler) return;
+
+    const { activeStart: start, activeEnd: end } = scheduler.getApi().view;
+
     if (
       moment(start).isSameOrAfter(searchStart) &&
       moment(start).isSameOrBefore(searchEnd) &&
@@ -305,7 +334,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }
     setSearchStart(start);
     setSearchEnd(end);
-  }, [date, searchEnd, searchStart]);
+  }, [date, scheduler, mode, searchEnd, searchStart]);
 
   useAsyncEffect(async () => {
     onRefresh();
@@ -364,8 +393,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
-      const { name, model = action.model ?? "" } = formView;
-      const { view } = (await findView({ type, name, model })) || {};
+      const { name, model = action.model ?? "", jsonModel } = formView;
+      const { view } = (await findView({ type, name, model, jsonModel })) || {};
       const { title = "", name: viewName } = view || {};
 
       hidePopover();
@@ -390,6 +419,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
                       close(true);
                     }
                   }}
+                  data-testid={"btn-delete"}
                 >
                   {i18n.get("Delete")}
                 </Button>
@@ -451,16 +481,47 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const onEventCreate = useCallback(
     ({ start, end }: SchedulerEvent<DataRecord>) => {
       if (canNew) {
-        const record: DataRecord = {
-          [eventStart]: start.toISOString(),
-        };
-        if (eventStop) {
+        const record: DataRecord = {};
+        // Set jsonModel for custom model records
+        const { jsonModel } = meta.view;
+        if (jsonModel) {
+          record.jsonModel = jsonModel;
+        }
+        const startField = meta.fields?.[eventStart];
+        const stopField = eventStop ? meta.fields?.[eventStop] : undefined;
+
+        if (startField?.jsonField && startField?.jsonPath) {
+          const updates: Record<string, unknown> = {
+            [startField.jsonPath]: start.toISOString(),
+          };
+          if (
+            stopField?.jsonField &&
+            stopField?.jsonPath &&
+            stopField.jsonField === startField.jsonField
+          ) {
+            updates[stopField.jsonPath] = end.toISOString();
+          }
+          updateJsonFieldValue(record, startField.jsonField, record, updates);
+        } else {
+          record[eventStart] = start.toISOString();
+        }
+
+        if (
+          stopField?.jsonField &&
+          stopField?.jsonPath &&
+          stopField.jsonField !== startField?.jsonField
+        ) {
+          updateJsonFieldValue(record, stopField.jsonField, record, {
+            [stopField.jsonPath]: end.toISOString(),
+          });
+        } else if (eventStop && !stopField?.jsonField) {
           record[eventStop] = end.toISOString();
         }
+
         showRecord(record);
       }
     },
-    [eventStart, eventStop, canNew, showRecord],
+    [eventStart, eventStop, meta.fields, canNew, showRecord],
   );
 
   const onEventChange = useAtomCallback(
@@ -475,23 +536,75 @@ export function Calendar(props: ViewProps<CalendarView>) {
         if (allDay) {
           endValue = moment(endValue).startOf("day").toDate();
         }
+        let previousStart = start;
+        let previousEnd = endValue;
+        let previousAllDay = Boolean(allDay);
+
+        // Optimistically update event position to avoid flicker
+        setEvents((prev) =>
+          prev.map((e) => {
+            if (e.data?.id !== data?.id) return e;
+
+            previousStart = e.start;
+            previousEnd = e.end;
+            previousAllDay = Boolean(e.allDay);
+
+            return { ...e, start, end: endValue, allDay };
+          }),
+        );
 
         const startStr = start.toISOString();
         const endStr = endValue.toISOString();
+        const startField = meta.fields?.[eventStart];
+        const stopField = eventStop ? meta.fields?.[eventStop] : undefined;
 
-        if (eventStart) record[eventStart] = startStr;
-        if (eventStop) record[eventStop] = endStr;
+        // Collect JSON field updates grouped by parent field
+        const jsonUpdates: Record<string, Record<string, unknown>> = {};
 
-        if (onChange) {
-          set(formAtom, (prev) => ({ ...prev, record }));
-          await actionExecutor.execute(onChange, {
-            context: { ...record },
-          });
-          record = { ...record, ...get(formAtom).record };
+        if (startField?.jsonField && startField?.jsonPath) {
+          (jsonUpdates[startField.jsonField] ??= {})[startField.jsonPath] =
+            startStr;
+        } else if (eventStart) {
+          record[eventStart] = startStr;
         }
 
-        await dataStore.save(record);
-        await onRefresh();
+        if (stopField?.jsonField && stopField?.jsonPath) {
+          (jsonUpdates[stopField.jsonField] ??= {})[stopField.jsonPath] =
+            endStr;
+        } else if (eventStop) {
+          record[eventStop] = endStr;
+        }
+
+        for (const [jsonField, updates] of Object.entries(jsonUpdates)) {
+          updateJsonFieldValue(record, jsonField, data!, updates);
+        }
+
+        try {
+          if (onChange) {
+            set(formAtom, (prev) => ({ ...prev, record }));
+            await actionExecutor.execute(onChange, {
+              context: { ...record },
+            });
+            record = { ...record, ...get(formAtom).record };
+          }
+
+          await dataStore.save(record);
+          await onRefresh();
+        } catch (error) {
+          setEvents((prev) =>
+            prev.map((e) =>
+              e.data?.id === data?.id
+                ? {
+                    ...e,
+                    start: previousStart,
+                    end: previousEnd,
+                    allDay: previousAllDay,
+                  }
+                : e,
+            ),
+          );
+          throw error;
+        }
       },
       [
         actionExecutor,
@@ -500,8 +613,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
         eventStart,
         eventStop,
         formAtom,
+        meta.fields,
         onChange,
         onRefresh,
+        setEvents,
       ],
     ),
   );
@@ -607,6 +722,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       />
       <div className={styles.wrapper}>
         <Scheduler
+          ref={setScheduler}
           className={styles.calendar}
           view={mode}
           date={date}
@@ -622,6 +738,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           onEventClick={onEventClick}
           onEventCreate={onEventCreate}
           onEventChange={onEventChange}
+          onEventDragStart={hidePopover}
         />
         <div className={styles.sidebar}>
           <DatePicker selected={date} onChange={onDateChange} inline={true} />

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -24,7 +10,6 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -178,10 +163,11 @@ public class ContextHandler<T> {
     if (property == null) {
       return value;
     }
-    if (property.isCollection() && value instanceof Collection) {
+    if (property.isCollection() && value instanceof Collection<?> collection) {
       value =
-          ((Collection<?>) value)
-              .stream().map(item -> createOrFind(property, item)).collect(Collectors.toList());
+          collection.stream()
+              .map(item -> createOrFind(property, item))
+              .collect(Collectors.toList());
     } else if (property.isReference()) {
       value = createOrFind(property, value);
     }
@@ -330,11 +316,10 @@ public class ContextHandler<T> {
 
     final Function<Object, Object> transform =
         (item) -> {
-          if (item instanceof ContextEntity) {
-            return ((ContextEntity) item).getContextMap();
+          if (item instanceof ContextEntity entity) {
+            return entity.getContextMap();
           }
-          if (item instanceof Model) {
-            Model m = (Model) item;
+          if (item instanceof Model m) {
             return m.getId() == null ? Resource.toMap(m) : Resource.toMapCompact(m);
           }
           return item;
@@ -347,8 +332,8 @@ public class ContextHandler<T> {
         .forEach(
             name -> {
               Object value = beanMapper.get(bean, name);
-              if (value instanceof Collection) {
-                value = Collections2.transform((Collection<?>) value, transform::apply);
+              if (value instanceof Collection<?> collection) {
+                value = collection.stream().map(transform).collect(Collectors.toList());
               } else {
                 value = transform.apply(value);
               }
@@ -384,8 +369,8 @@ public class ContextHandler<T> {
         .forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
 
     // make sure to have version value
-    if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
-      ((Model) bean).setVersion(((Model) managed).getVersion());
+    if (bean instanceof Model model && !values.containsKey(FIELD_VERSION)) {
+      model.setVersion(((Model) managed).getVersion());
     }
 
     return bean;

@@ -40,6 +40,7 @@ export function Barcode(props: FieldProps<string>) {
             backgroundColor={barcodeBackgroundColor}
             format={barcodeFormat}
             onInvalid={() => setIsBarcodeValid(false)}
+            data-testid="barcode"
           />
         )}
       </FieldControl>

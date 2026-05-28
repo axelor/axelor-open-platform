@@ -307,25 +307,25 @@ export const elements: ThemeElement[] = [
         props: [
           {
             name: "Font family",
-            path: "typography.fontFamily",
+            path: "typography.body.fontFamily",
             cssProperty: "font-family",
             cssVariable: "--bs-body-font-family",
           },
           {
             name: "Font size",
-            path: "typography.fontSize",
+            path: "typography.body.fontSize",
             cssProperty: "font-size",
             cssVariable: "--bs-body-font-size",
           },
           {
             name: "Font weight",
-            path: "typography.fontWeight",
+            path: "typography.body.fontWeight",
             cssProperty: "font-weight",
             cssVariable: "--bs-body-font-weight",
           },
           {
             name: "Line height",
-            path: "typography.lineHeight",
+            path: "typography.body.lineHeight",
             cssProperty: "line-height",
             cssVariable: "--bs-body-line-height",
           },
@@ -1381,7 +1381,7 @@ export const elements: ThemeElement[] = [
           },
           {
             name: "Active color",
-            path: "components.NavMenu.icon_active.bg",
+            path: "components.NavMenu.icon_active.color",
             type: "color",
           },
           {

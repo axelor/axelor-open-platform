@@ -1,43 +1,31 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.inject.Inject;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.mail.internet.InternetAddress;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -62,8 +50,13 @@ public class SearchService {
     final Response response = new Response();
     final String matching = (String) request.getData().get("search");
     final List selected = (List) request.getData().get("selected");
-    final List<InternetAddress> addresses =
-        mailService.findEmails(matching, selected, request.getLimit());
+    int limit = request.getLimit();
+    int maxPerPage =
+        AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, 500);
+    int defaultPerPage =
+        AppSettings.get().getInt(AvailableAppSettings.API_PAGINATION_DEFAULT_PER_PAGE, 40);
+    limit = limit > 0 ? Math.min(limit, maxPerPage) : defaultPerPage;
+    final List<InternetAddress> addresses = mailService.findEmails(matching, selected, limit);
     final List<Object> data = new ArrayList<>();
 
     for (InternetAddress address : addresses) {

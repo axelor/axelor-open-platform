@@ -1,37 +1,23 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.mapper.types;
 
 import com.axelor.db.mapper.TypeAdapter;
+import jakarta.persistence.Column;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import javax.persistence.Column;
 
 public class SimpleAdapter implements TypeAdapter<Object> {
 
   @Override
   public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
 
-    if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
+    if (value == null || (value instanceof String string && "".equals(string.trim()))) {
       return adaptNull(value, type, genericType, annotations);
     }
 
@@ -55,8 +41,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
       return value.toString();
     }
 
-    if (type == byte[].class && value instanceof String) {
-      return ((String) value).getBytes();
+    if (type == byte[].class && value instanceof String string) {
+      return string.getBytes();
     }
 
     if (type == Character.TYPE || type == Character.class)
@@ -67,8 +53,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
     if (type == Short.TYPE || type == Short.class) return Short.valueOf(value.toString());
 
     if (type == Integer.TYPE || type == Integer.class) {
-      if (value instanceof Number) {
-        return ((Number) value).intValue();
+      if (value instanceof Number number) {
+        return number.intValue();
       }
       return Integer.valueOf(value.toString());
     }
@@ -114,8 +100,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
     }
 
     for (Annotation annotation : annotations) {
-      if (annotation instanceof Column) {
-        return ((Column) annotation).nullable();
+      if (annotation instanceof Column column) {
+        return column.nullable();
       }
     }
 

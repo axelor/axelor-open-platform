@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.cache;
 
@@ -31,20 +17,18 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.Query;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Person;
 import com.axelor.test.db.Product;
 import com.axelor.test.db.ProductConfig;
 import com.axelor.test.db.repo.PersonRepository;
 import com.google.inject.persist.UnitOfWork;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.SharedCacheMode;
+import jakarta.validation.ValidationException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.PersistenceException;
-import javax.persistence.SharedCacheMode;
-import javax.validation.ValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.access.AccessType;
@@ -96,22 +80,20 @@ public abstract class AbstractBaseCache extends JpaTest {
   @BeforeAll
   public static void doInit() {
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                JPA.all(Person.class).remove();
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  JPA.all(Person.class).remove();
+                }));
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe");
-                aPerson.setCode("my-unique-code");
-                JPA.save(aPerson);
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe");
+                  aPerson.setCode("my-unique-code");
+                  JPA.save(aPerson);
+                }));
   }
 
   @AfterAll
@@ -133,9 +115,10 @@ public abstract class AbstractBaseCache extends JpaTest {
           assertTrue(ObjectUtils.notEmpty(secondLevelCacheRegionNames));
 
           // Should contain `default-update-timestamps-region` region
-          assertTrue(
-              Arrays.asList(secondLevelCacheRegionNames)
-                  .contains("default-update-timestamps-region"));
+          // TODO : `default-update-timestamps-region` region is created on demand
+          //          assertTrue(
+          //              Arrays.asList(secondLevelCacheRegionNames)
+          //                  .contains("default-update-timestamps-region"));
 
           // Person is annotated with `@Cacheable`
           assertTrue(
@@ -156,36 +139,23 @@ public abstract class AbstractBaseCache extends JpaTest {
 
     doInSession(this::clearStats);
 
-    // Initial query cache hit count because of audit tracker performing the query below
-    doInSession(
-        () -> {
-          Query.of(MetaJsonField.class)
-              .filter("self.model = :model AND self.tracked IS TRUE")
-              .bind("model", Person.class.getName())
-              .cacheable()
-              .autoFlush(false)
-              .fetch();
-
-          Statistics statistics =
-              JPA.em().unwrap(Session.class).getSessionFactory().getStatistics();
-          initialHitCount.set(statistics.getQueryCacheHitCount());
-        });
-
-    doInSession(this::clearStats);
-
     final AtomicLong aPersonId = new AtomicLong();
 
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe");
-                aPerson.setCode("unique-code");
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe");
+                  aPerson.setCode("unique-code");
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+
+                  // Set initial hit count
+                  Statistics statistics =
+                      JPA.em().unwrap(Session.class).getSessionFactory().getStatistics();
+                  initialHitCount.set(statistics.getQueryCacheHitCount());
+                }));
 
     // Should NOT hit query cache because this is first run
     doInSession(
@@ -218,17 +188,16 @@ public abstract class AbstractBaseCache extends JpaTest {
     final AtomicLong aPersonId = new AtomicLong();
 
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe 2");
-                aPerson.setCode("unique-code2");
-                aPerson.setContact(JPA.all(Contact.class).fetchOne());
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe 2");
+                  aPerson.setCode("unique-code2");
+                  aPerson.setContact(JPA.all(Contact.class).fetchOne());
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+                }));
 
     doInSession(
         () -> {
@@ -266,16 +235,15 @@ public abstract class AbstractBaseCache extends JpaTest {
     // try to insert an existing person (duplicated code)
     try {
       doInSession(
-          () -> {
-            JPA.runInTransaction(
-                () -> {
-                  Person aPerson = new Person();
-                  aPerson.setName("John Doe 2");
-                  aPerson.setCode("my-unique-code");
-                  JPA.save(aPerson);
-                  aPersonId.set(aPerson.getId());
-                });
-          });
+          () ->
+              JPA.runInTransaction(
+                  () -> {
+                    Person aPerson = new Person();
+                    aPerson.setName("John Doe 2");
+                    aPerson.setCode("my-unique-code");
+                    JPA.save(aPerson);
+                    aPersonId.set(aPerson.getId());
+                  }));
       fail("Should trigger ConstraintViolationException : not unique `code`");
     } catch (PersistenceException e) {
       // ignore
@@ -302,28 +270,26 @@ public abstract class AbstractBaseCache extends JpaTest {
 
     // Add a new person
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe 2");
-                aPerson.setCode("my-unique-code2");
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe 2");
+                  aPerson.setCode("my-unique-code2");
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+                }));
 
     // try update previous person with a non-unique code from repository
     try {
       doInSession(
-          () -> {
-            JPA.runInTransaction(
-                () -> {
-                  Person aPerson = JPA.find(Person.class, aPersonId.get());
-                  aPerson.setName("hello");
-                  Beans.get(PersonRepository.class).save(aPerson);
-                });
-          });
+          () ->
+              JPA.runInTransaction(
+                  () -> {
+                    Person aPerson = JPA.find(Person.class, aPersonId.get());
+                    aPerson.setName("hello");
+                    Beans.get(PersonRepository.class).save(aPerson);
+                  }));
       fail("Should trigger ValidationException : see in PersonRepository");
     } catch (ValidationException e) {
       // ignore
@@ -378,19 +344,18 @@ public abstract class AbstractBaseCache extends JpaTest {
         });
 
     doInSession(
-        () -> {
-          // Fetch and check data
-          JPA.runInTransaction(
-              () -> {
-                Product product = JPA.find(Product.class, ids.product);
-                assertNotNull(product.getConfig());
-                assertEquals(ids.config, product.getConfig().getId());
+        () ->
+            // Fetch and check data
+            JPA.runInTransaction(
+                () -> {
+                  Product product = JPA.find(Product.class, ids.product);
+                  assertNotNull(product.getConfig());
+                  assertEquals(ids.config, product.getConfig().getId());
 
-                ProductConfig config = JPA.find(ProductConfig.class, ids.config);
-                assertNotNull(config.getProduct());
-                assertEquals(ids.product, config.getProduct().getId());
-              });
-        });
+                  ProductConfig config = JPA.find(ProductConfig.class, ids.config);
+                  assertNotNull(config.getProduct());
+                  assertEquals(ids.product, config.getProduct().getId());
+                }));
   }
 
   static void doInSession(Runnable task) {

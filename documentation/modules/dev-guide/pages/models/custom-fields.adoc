@@ -8,7 +8,6 @@ dynamically at runtime.
 == Models
 
 Custom fields are implemented using `JSON` data type support from underlying database.
-All the three officially supported databases (PostgreSQL, MySQL and Oracle) are supported.
 
 A domain model (entity) can have custom fields if it has either `jsonAttr="true"`
 attribute defined or has a `string` field with `json="true"`.

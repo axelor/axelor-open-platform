@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -27,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.axelor.JpaTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
-import com.google.common.collect.ImmutableList;
+import jakarta.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import javax.persistence.EntityManager;
-import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -48,8 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 public class EqualityTest extends JpaTest {
 
-  private final List<Class<? extends Model>> modelClasses =
-      ImmutableList.of(Address.class, Contact.class);
+  private final List<Class<? extends Model>> modelClasses = List.of(Address.class, Contact.class);
 
   @Test
   public void testNewInstanceNotEquals() throws Exception {
@@ -59,8 +42,8 @@ public class EqualityTest extends JpaTest {
       assertNotEquals(
           entity1,
           entity2,
-          String.format(
-              "Two new empty instances of %s should not be equal.", modelClass.getSimpleName()));
+          "Two new empty instances of %s should not be equal."
+              .formatted(modelClass.getSimpleName()));
     }
   }
 
@@ -74,29 +57,27 @@ public class EqualityTest extends JpaTest {
       entities.add(entity2);
       assertTrue(
           entities.contains(entity1),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       assertTrue(
           entities.contains(entity2),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       entities.remove(entity1);
       assertFalse(
           entities.contains(entity1),
-          String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
+          "Set should not contain removed instance of %s.".formatted(modelClass.getSimpleName()));
       assertTrue(
           entities.contains(entity2),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       entities.remove(entity2);
       assertFalse(
           entities.contains(entity2),
-          String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
+          "Set should not contain removed instance of %s.".formatted(modelClass.getSimpleName()));
     }
   }
 
   @Test
   public void testModelMap() throws Exception {
-    for (Class<? extends Model> modelClass : ImmutableList.of(Address.class, Contact.class)) {
+    for (Class<? extends Model> modelClass : List.of(Address.class, Contact.class)) {
       Map<Model, Model> entities = new HashMap<>();
       Model entity1 = modelClass.getDeclaredConstructor().newInstance();
       Model entity2 = modelClass.getDeclaredConstructor().newInstance();
@@ -105,30 +86,25 @@ public class EqualityTest extends JpaTest {
       assertSame(
           entity1,
           entities.get(entity1),
-          String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instance of %s from map.".formatted(modelClass.getSimpleName()));
       assertSame(
           entity2,
           entities.get(entity2),
-          String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instance of %s from map.".formatted(modelClass.getSimpleName()));
       entities.remove(entity1);
       assertSame(
           null,
           entities.get(entity1),
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
+          "Should not find removed instance of %s from map.".formatted(modelClass.getSimpleName()));
       assertSame(
           entity2,
           entities.get(entity2),
-          String.format(
-              "Should retrieve same instandce of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instandce of %s from map.".formatted(modelClass.getSimpleName()));
       entities.remove(entity2);
       assertSame(
           null,
           entities.get(entity2),
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
+          "Should not find removed instance of %s from map.".formatted(modelClass.getSimpleName()));
     }
   }
 
@@ -222,8 +198,8 @@ public class EqualityTest extends JpaTest {
     Contact contact2 = new Contact();
     contact1.setUniqueName("John");
     contact2.setUniqueName("Jane");
-    contact1.setUUID(UUID.randomUUID().toString());
-    contact2.setUUID(UUID.randomUUID().toString());
+    contact1.setUUID(UUID.randomUUID());
+    contact2.setUUID(UUID.randomUUID());
 
     Set<Contact> contacts = new HashSet<>();
     contacts.add(contact1);
@@ -291,13 +267,6 @@ public class EqualityTest extends JpaTest {
           T _entity = getEntityManager().merge(entity);
           assertTrue(
               tuples.contains(_entity), "The entity is not found in the Set after it's merged.");
-        });
-
-    inTransaction(
-        () -> {
-          getEntityManager().unwrap(Session.class).update(entity);
-          assertTrue(
-              tuples.contains(entity), "The entity is not found in the Set after it's reattached.");
         });
 
     inTransaction(

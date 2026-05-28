@@ -11,25 +11,26 @@ apply plugin: 'base'
 apply plugin: 'com.github.node-gradle.node'
 
 node {
-    version = '20.15.1'
-    pnpmVersion = '9.14.4'
+    version = '24.13.1'
+    pnpmVersion = '10.33.4'
     download = true
 }
 
-task buildFront(type: PnpmTask) {
+tasks.register("buildFront", PnpmTask) {
     group = 'axelor'
     description = 'Build Front-end'
 
     outputs.dir('dist')
     inputs.files('package.json', 'pnpm-lock.yaml')
     inputs.dir('src')
-    inputs.dir('public')
 
     dependsOn 'installFrontDeps'
     args = ["run", "build"]
+
+    environment.put('NODE_OPTIONS', '--max-old-space-size=4096')
 }
 
-task installFrontDeps(type: PnpmTask) {
+tasks.register("installFrontDeps", PnpmTask) {
     group = 'axelor'
     description = 'Install Front-end dependencies'
 

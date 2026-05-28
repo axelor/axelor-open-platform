@@ -1,30 +1,15 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
 import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import java.time.LocalDateTime;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.apache.shiro.SecurityUtils;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.context.WebContext;
@@ -50,7 +35,7 @@ public class AxelorUserAuthorizer implements Authorizer {
     if (user == null) {
       return false;
     }
-    if (!isAllowed(user)) {
+    if (!AuthUtils.isActive(user)) {
       removeSession();
       return false;
     }
@@ -58,17 +43,9 @@ public class AxelorUserAuthorizer implements Authorizer {
     return true;
   }
 
-  private boolean isAllowed(User user) {
-    final LocalDateTime loginDate = authSessionService.getLoginDate();
-    return AuthUtils.isActive(user)
-        && (user.getPasswordUpdatedOn() == null
-            || loginDate == null
-            || !loginDate.isBefore(user.getPasswordUpdatedOn()));
-  }
-
   private void removeSession() {
     try {
-      SecurityUtils.getSubject().logout();
+      authSessionService.terminateSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }

@@ -1,32 +1,19 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
 import com.axelor.common.ObjectUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +24,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,8 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -74,19 +61,21 @@ public class ViewGenerator {
   private List<Long> findForCompute(Collection<String> names) {
     return JPA.em()
         .createQuery(
-            "SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                + "self.name IN :names "
-                + "AND COALESCE(self.extension, FALSE) = FALSE "
-                + "AND COALESCE(self.computed, FALSE) = FALSE "
-                + "AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) "
-                + "IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other "
-                + "LEFT JOIN other.groups otherGroup "
-                + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
-                + "GROUP BY other.name, otherGroup.id) "
-                + "GROUP BY self.id "
-                + "ORDER BY self.id",
+            """
+            SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE \
+            self.name IN :names \
+            AND COALESCE(self.extension, FALSE) = FALSE \
+            AND COALESCE(self.computed, FALSE) = FALSE \
+            AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) \
+            IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other \
+            LEFT JOIN other.groups otherGroup \
+            WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE \
+            GROUP BY other.name, otherGroup.id) \
+            GROUP BY self.id \
+            ORDER BY self.id\
+            """,
             Long.class)
-        .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
+        .setParameter("names", ObjectUtils.isEmpty(names) ? Set.of("") : names)
         .getResultList();
   }
 
@@ -147,18 +136,21 @@ public class ViewGenerator {
     select.add("self.model = :model");
     select.add("self.type = :type");
 
-    return metaViewRepo
-        .all()
-        .filter(Joiner.on(" AND ").join(select))
-        .bind("name", view.getName())
-        .bind("model", view.getModel())
-        .bind("type", view.getType())
-        .cacheable()
-        .order("-priority")
-        .order("id")
-        .fetchStream()
-        .filter(extView -> Objects.equals(extView.getGroups(), view.getGroups()))
-        .collect(Collectors.toList());
+    try (final Stream<MetaView> stream =
+        metaViewRepo
+            .all()
+            .filter(Joiner.on(" AND ").join(select))
+            .bind("name", view.getName())
+            .bind("model", view.getModel())
+            .bind("type", view.getType())
+            .cacheable()
+            .order("-priority")
+            .order("id")
+            .fetchStream()) {
+      return stream
+          .filter(extView -> Objects.equals(extView.getGroups(), view.getGroups()))
+          .collect(Collectors.toList());
+    }
   }
 
   private MetaView getOriginalView(MetaView view) {
@@ -191,7 +183,8 @@ public class ViewGenerator {
               index ->
                   futures.add(
                       executor.submit(
-                          new TenantAware(() -> counts[index] = generate(subLists.get(index))))));
+                          ContextAware.of()
+                              .build(() -> counts[index] = generate(subLists.get(index))))));
     } finally {
       executor.shutdown();
     }

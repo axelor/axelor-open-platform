@@ -5,6 +5,13 @@
 .title {
   display: flex;
   justify-content: start;
+  width: 100%;
+}
+
+.panel.hasHeader {
+  & > div:first-child > div > div {
+    min-width: 0;
+  }
 }
 
 .noFrame {

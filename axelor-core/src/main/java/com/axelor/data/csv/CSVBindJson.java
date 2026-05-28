@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.csv;
 
@@ -55,7 +41,7 @@ public class CSVBindJson extends CSVBind {
     try {
       if (StringUtils.notBlank(jsonModel)) {
         setType(MetaJsonRecord.class.getName());
-        domain = String.format("self.jsonModel = '%s'", jsonModel);
+        domain = "self.jsonModel = '%s'".formatted(jsonModel);
         return;
       }
 
@@ -94,7 +80,7 @@ public class CSVBindJson extends CSVBind {
               Optional.ofNullable(
                       parentJsonModel.isPresent()
                           ? MetaStore.findJsonFields(parentJsonModel.get())
-                          : MetaStore.findJsonFields(parentType, fieldParts.get(0)))
+                          : MetaStore.findJsonFields(parentType, fieldParts.getFirst()))
                   .map(fields -> fields.get(fieldParts.get(1)))
                   .orElse(Collections.emptyMap());
       jsonModel = (String) jsonField.get("jsonTarget");
@@ -154,7 +140,7 @@ public class CSVBindJson extends CSVBind {
     return Optional.of(
             Stream.of(search, domain)
                 .filter(StringUtils::notBlank)
-                .map(item -> String.format("(%s)", item))
+                .map("(%s)"::formatted)
                 .collect(Collectors.joining(" AND ")))
         .filter(StringUtils::notBlank)
         .orElse(null);
@@ -176,7 +162,7 @@ public class CSVBindJson extends CSVBind {
     if (jsonBindings == null) {
       final CSVBind jsonModelBinding = new CSVBind();
       jsonModelBinding.setField("jsonModel");
-      jsonModelBinding.setExpression(String.format("'%s'", getJsonModel()));
+      jsonModelBinding.setExpression("'%s'".formatted(getJsonModel()));
       jsonBindings = Collections.singletonList(jsonModelBinding);
     }
 

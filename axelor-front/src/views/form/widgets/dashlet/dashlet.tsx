@@ -5,8 +5,9 @@ import uniqueId from "lodash/uniqueId";
 import pick from "lodash/pick";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { produce } from "immer";
+import { useSchemaTestId } from "@/hooks/use-testid";
 
-import { Box, clsx } from "@axelor/ui";
+import { Box, CommandBarProps, Panel as AxPanel, clsx } from "@axelor/ui";
 
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -66,7 +67,10 @@ function DashletTitle({
   schema: Schema;
 }) {
   const { formAtom } = useFormScope();
-  const widgetAtom = useRef(createWidgetAtom({ schema, formAtom })).current;
+  const widgetAtom = useMemo(
+    () => createWidgetAtom({ schema, formAtom }),
+    [schema, formAtom],
+  );
 
   const dashlet = useAtomValue(useDashletHandlerAtom());
   const displayTitle = dashlet.title || title;
@@ -103,6 +107,8 @@ export function DashletComponent({
 }: DashletProps): any {
   const { title, action, canSearch, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
+
+  const testId = useSchemaTestId(schema, "dashlet");
 
   const load = useAfterActions(
     useCallback(async () => {
@@ -202,53 +208,74 @@ export function DashletComponent({
     }
   }, [tab, attrs?.url, setTabViewProps]);
 
-  if (state === "loading") return null;
-
   const { viewType = "" } = tab?.action ?? {};
   const hasSearch = canSearch && ["cards"].includes(viewType);
+  const toolbar = useMemo<CommandBarProps | undefined>(() => {
+    if (!tab) return;
+
+    return {
+      items: [
+        {
+          key: "dashlet-toolbar",
+          render: () => (
+            <Box d="flex" alignItems="center">
+              {hasSearch && <DashletSearch />}
+              <DashletRefresh count={attrs?.refresh ?? 0} />
+              <DashletActions
+                dashboard={dashboard}
+                viewType={viewType}
+                showBars={widgetAttrs?.showBars}
+              />
+              {viewType && onViewLoad && (
+                <DashletViewLoad
+                  schema={schema}
+                  viewId={viewId}
+                  viewType={viewType}
+                  onViewLoad={onViewLoad}
+                />
+              )}
+            </Box>
+          ),
+        },
+      ],
+    };
+  }, [
+    attrs?.refresh,
+    dashboard,
+    hasSearch,
+    onViewLoad,
+    schema,
+    tab,
+    viewId,
+    viewType,
+    widgetAttrs?.showBars,
+  ]);
+
+  if (state === "loading") return null;
 
   return (
     tab && (
       <DashletView>
-        <Box
-          d="flex"
-          flexDirection="column"
-          className={clsx(classes.container, className)}
-          border
-          roundedTop
-          style={{ height }}
-        >
-          <Box
-            className={clsx(classes.header, {
-              [classes.search]: hasSearch,
-            })}
-          >
-            <DashletTitle
-              schema={schema}
-              model={tab.action.model}
-              title={attrs?.title ?? (title || tab?.title)}
-            />
-            {hasSearch && <DashletSearch />}
-            {attrs?.refresh && <DashletRefresh count={attrs.refresh} />}
-            <DashletActions
-              dashboard={dashboard}
-              viewType={viewType}
-              showBars={widgetAttrs?.showBars}
-            />
-            {viewType && onViewLoad && (
-              <DashletViewLoad
+        <Box className={clsx(classes.container, className)} style={{ height }}>
+          <AxPanel
+            data-testid={testId}
+            header={
+              <DashletTitle
                 schema={schema}
-                viewId={viewId}
-                viewType={viewType}
-                onViewLoad={onViewLoad}
+                model={tab.action.model}
+                title={attrs?.title ?? (title || tab?.title)}
               />
-            )}
-          </Box>
-          <Box className={classes.content}>
+            }
+            toolbar={toolbar}
+            className={classes.panel}
+            headerTitleClassName={classes.panelHeaderTitle}
+            bodyClassName={classes.panelBody}
+            contentClassName={classes.panelContent}
+          >
             <ScopeProvider scope={PopupScope} value={{}}>
               {tab && <Views tab={tab} />}
             </ScopeProvider>
-          </Box>
+          </AxPanel>
         </Box>
       </DashletView>
     )
@@ -260,10 +287,19 @@ function DashletRefresh({ count }: { count: number }) {
   const doRefresh = useAfterActions(
     useCallback(async () => onRefresh?.(), [onRefresh]),
   );
+  const hasGridInitialized = Boolean(onRefresh);
+  const initDashlet = useRef(false);
 
   useAsyncEffect(async () => {
-    if (count) {
+    // Prevent unnecessary dashlet reload during initial grid setup.
+    // The grid initialization itself loads the dashlet data.
+    // Once the grid is fully initialized, mark it as ready (initDashlet = true)
+    // so that subsequent changes to `count` trigger a refresh.
+    if (initDashlet.current && count) {
       doRefresh();
+    }
+    if (hasGridInitialized) {
+      initDashlet.current = true;
     }
   }, [count, doRefresh]);
 

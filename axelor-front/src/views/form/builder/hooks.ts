@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { atom, useAtom, useSetAtom } from "jotai";
 import React, {
   useCallback,
   useEffect,
@@ -9,32 +9,26 @@ import React, {
 
 import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
-import { ValueAtom } from "./types";
+import { FormAtom, ValueAtom } from "./types";
 
 import * as WIDGETS from "../widgets";
 
-export function useWidget(schema: Schema) {
-  const compRef = useRef<React.ElementType>();
-  if (compRef.current) {
-    return compRef.current;
-  }
-
+export function useWidget(schema: Schema): React.ElementType | null {
   const name = toCamelCase(schema.widget) as keyof typeof WIDGETS;
   const editName = `${name}Edit` as keyof typeof WIDGETS;
   const type = toCamelCase(schema.serverType) as keyof typeof WIDGETS;
 
-  const Comp =
-    (schema.inGridEditor && WIDGETS[editName]) ||
-    WIDGETS[name] ||
-    WIDGETS[type];
-
-  compRef.current = Comp as React.ElementType;
-
-  if (!(name in WIDGETS)) {
-    console.log("Unknown widget:", schema.widget);
-  }
-
-  return compRef.current;
+  return useMemo(() => {
+    if (!(name in WIDGETS)) {
+      console.log("Unknown widget:", schema.widget);
+    }
+    return (
+      (schema.inGridEditor && WIDGETS[editName]) ||
+      WIDGETS[name] ||
+      WIDGETS[type] ||
+      null
+    );
+  }, [name, editName, type, schema.inGridEditor, schema.widget]);
 }
 
 const defaultFormatter = <T>(value?: T | null) =>
@@ -101,7 +95,7 @@ export function useInput<T>(
   const [changed, setChanged] = useState(false);
   const [text, setText] = useState(valueText);
 
-  const dirtyRef = useRef<boolean>();
+  const dirtyRef = useRef<boolean>(undefined);
 
   const update = useCallback(
     (text: string, fireOnChange: boolean) => {
@@ -166,4 +160,19 @@ export function useInput<T>(
     onBlur,
     onKeyDown,
   } as const;
+}
+
+export function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
+  return useSetAtom(
+    useMemo(
+      () =>
+        atom(null, (get, set, value: any) => {
+          set(formAtom, ({ record, ...rest }) => ({
+            ...rest,
+            record: { ...record, [fieldName]: value },
+          }));
+        }),
+      [formAtom, fieldName],
+    ),
+  );
 }

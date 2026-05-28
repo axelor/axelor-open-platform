@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -41,10 +27,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -52,6 +40,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +49,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -229,19 +213,19 @@ public class XMLViews {
     ObjectViews views = new ObjectViews();
     StringWriter writer = new StringWriter();
 
-    if (obj instanceof Action) {
-      views.setActions(ImmutableList.of((Action) obj));
+    if (obj instanceof Action action) {
+      views.setActions(List.of(action));
     }
-    if (obj instanceof AbstractView) {
-      views.setViews(ImmutableList.of((AbstractView) obj));
+    if (obj instanceof AbstractView view) {
+      views.setViews(List.of(view));
     }
-    if (obj instanceof List) {
-      views.setViews((List) obj);
+    if (obj instanceof List list) {
+      views.setViews(list);
     }
     try {
       marshal(views, writer);
     } catch (JAXBException e) {
-      log.error(e.getMessage(), e);
+      throw new RuntimeException(e);
     }
     String text = writer.toString();
     if (strip) {
@@ -260,14 +244,19 @@ public class XMLViews {
   }
 
   public static Map<String, Object> findViews(String model, Map<String, String> views) {
-    final Map<String, Object> result = Maps.newHashMap();
+    return findViews(model, views, null);
+  }
+
+  public static Map<String, Object> findViews(
+      String model, Map<String, String> views, String jsonModel) {
+    final Map<String, Object> result = new HashMap<>();
     if (views == null || views.isEmpty()) {
-      views = ImmutableMap.of("grid", "", "form", "");
+      views = Map.of("grid", "", "form", "");
     }
     for (Entry<String, String> entry : views.entrySet()) {
       final String type = entry.getKey();
       final String name = entry.getValue();
-      final AbstractView view = findView(name, type, model);
+      final AbstractView view = findView(name, type, model, null, jsonModel);
       try {
         result.put(type, view);
       } catch (Exception e) {
@@ -278,13 +267,14 @@ public class XMLViews {
   }
 
   private static MetaViewCustom findCustomView(
-      MetaViewCustomRepository views, String name, String type, String model) {
+      MetaViewCustomRepository views, String name, String type, String model, String jsonModel) {
     User user = AuthUtils.getUser();
     List<String> conditions = new ArrayList<>();
 
     if (StringUtils.notBlank(name)) conditions.add("self.name = :name");
     if (StringUtils.notBlank(type)) conditions.add("self.type = :type");
     if (StringUtils.notBlank(model)) conditions.add("self.model = :model");
+    if (StringUtils.notBlank(jsonModel)) conditions.add("self.jsonModel = :jsonModel");
 
     // find personal
     String filter = String.join(" AND ", conditions) + " AND self.user = :user";
@@ -296,6 +286,7 @@ public class XMLViews {
             .bind("name", name)
             .bind("type", type)
             .bind("model", model)
+            .bind("jsonModel", jsonModel)
             .bind("user", user)
             .fetchOne();
 
@@ -312,11 +303,18 @@ public class XMLViews {
         .bind("name", name)
         .bind("type", type)
         .bind("model", model)
+        .bind("jsonModel", jsonModel)
         .fetchOne();
   }
 
   private static MetaView findMetaView(
-      MetaViewRepository views, String name, String type, String model, String module, Long group) {
+      MetaViewRepository views,
+      String name,
+      String type,
+      String model,
+      String module,
+      String jsonModel,
+      Long group) {
     final List<String> select = new ArrayList<>();
     if (name != null) {
       select.add("self.name = :name");
@@ -329,6 +327,9 @@ public class XMLViews {
     }
     if (module != null) {
       select.add("self.module = :module");
+    }
+    if (jsonModel != null) {
+      select.add("self.jsonModel = :jsonModel");
     }
     if (group == null) {
       select.add("self.groups is empty");
@@ -343,6 +344,7 @@ public class XMLViews {
         .bind("type", type)
         .bind("model", model)
         .bind("module", module)
+        .bind("jsonModel", jsonModel)
         .bind("group", group)
         .cacheable()
         .order("-priority")
@@ -355,7 +357,7 @@ public class XMLViews {
       return null;
     }
     try {
-      return unmarshal(view.getXml()).getViews().get(0);
+      return unmarshal(view.getXml()).getViews().getFirst();
     } catch (JAXBException e) {
       log.error(e.getMessage(), e);
       return null;
@@ -368,7 +370,7 @@ public class XMLViews {
       return null;
     }
     try {
-      return unmarshal(view.getXml()).getViews().get(0);
+      return unmarshal(view.getXml()).getViews().getFirst();
     } catch (JAXBException e) {
       log.error(e.getMessage(), e);
       return null;
@@ -376,11 +378,15 @@ public class XMLViews {
   }
 
   public static AbstractView findView(String name, String type) {
-    return findView(name, type, null, null);
+    return findView(name, type, null, null, null);
   }
 
   public static AbstractView findView(String name, String type, String model) {
-    return findView(name, type, model, null);
+    return findView(name, type, model, null, null);
+  }
+
+  public static AbstractView findView(String name, String type, String model, String module) {
+    return findView(name, type, model, module, null);
   }
 
   public static boolean isCustomizationEnabled() {
@@ -402,9 +408,11 @@ public class XMLViews {
    * @param type find by type (name or model should be provided)
    * @param model find by model (name or type should be provided)
    * @param module (any of the other param should be provided)
-   * @return
+   * @param jsonModel find by jsonModel (for custom model views)
+   * @return the view or null if not found
    */
-  public static AbstractView findView(String name, String type, String model, String module) {
+  public static AbstractView findView(
+      String name, String type, String model, String module, String jsonModel) {
 
     final MetaViewRepository views = Beans.get(MetaViewRepository.class);
     final MetaViewCustomRepository customViews = Beans.get(MetaViewCustomRepository.class);
@@ -417,18 +425,26 @@ public class XMLViews {
 
     // find personalized view
     if (Boolean.TRUE.equals(isCustomizationEnabled()) && module == null && user != null) {
-      custom = findCustomView(customViews, name, type, model);
+      custom = findCustomView(customViews, name, type, model, jsonModel);
     }
 
     // first find by name
     if (StringUtils.notBlank(name)) {
       // with group
-      view = findMetaView(views, name, null, model, module, group);
-      view = view == null ? findMetaView(views, name, null, null, module, group) : view;
+      view = findMetaView(views, name, null, model, module, jsonModel, group);
+      view = view == null ? findMetaView(views, name, null, null, module, jsonModel, group) : view;
 
       // without group
-      view = view == null ? findMetaView(views, name, null, model, module, null) : view;
-      view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+      view = view == null ? findMetaView(views, name, null, model, module, jsonModel, null) : view;
+      view = view == null ? findMetaView(views, name, null, null, module, jsonModel, null) : view;
+
+      // fallback: try without jsonModel filter (for views not yet migrated)
+      if (view == null && jsonModel != null) {
+        view = findMetaView(views, name, null, model, module, null, group);
+        view = view == null ? findMetaView(views, name, null, null, module, null, group) : view;
+        view = view == null ? findMetaView(views, name, null, model, module, null, null) : view;
+        view = view == null ? findMetaView(views, name, null, null, module, null, null) : view;
+      }
 
       if (view == null) {
         log.error("No such view found: {}", name);
@@ -436,10 +452,18 @@ public class XMLViews {
       }
     }
 
-    // next find by type
+    // next find by type (and optionally jsonModel)
     if (type != null && model != null) {
-      view = view == null ? findMetaView(views, null, type, model, module, group) : view;
-      view = view == null ? findMetaView(views, null, type, model, module, null) : view;
+      // try with jsonModel first
+      if (jsonModel != null) {
+        view =
+            view == null ? findMetaView(views, null, type, model, module, jsonModel, group) : view;
+        view =
+            view == null ? findMetaView(views, null, type, model, module, jsonModel, null) : view;
+      }
+      // fallback without jsonModel
+      view = view == null ? findMetaView(views, null, type, model, module, null, group) : view;
+      view = view == null ? findMetaView(views, null, type, model, module, null, null) : view;
     }
 
     final AbstractView xmlView;
@@ -458,7 +482,7 @@ public class XMLViews {
       }
 
       final ObjectViews objectViews = unmarshal(xml);
-      xmlView = objectViews.getViews().get(0);
+      xmlView = objectViews.getViews().getFirst();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       return null;
@@ -480,6 +504,9 @@ public class XMLViews {
         }
       }
     }
+    if (jsonModel != null) {
+      xmlView.setJsonModel(jsonModel);
+    }
     if (custom != null) {
       xmlView.setCustomViewId(custom.getId());
       xmlView.setCustomViewShared(custom.getShared());
@@ -497,7 +524,7 @@ public class XMLViews {
     final MetaAction metaAction = Beans.get(MetaActionRepository.class).findByName(name);
     final Action action;
     try {
-      action = XMLViews.unmarshal(metaAction.getXml()).getActions().get(0);
+      action = XMLViews.unmarshal(metaAction.getXml()).getActions().getFirst();
       action.setActionId(metaAction.getId());
       return action;
     } catch (Exception e) {

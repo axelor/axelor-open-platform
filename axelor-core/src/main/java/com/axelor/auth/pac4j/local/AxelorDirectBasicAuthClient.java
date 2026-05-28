@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j.local;
 
@@ -22,9 +8,8 @@ import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.inject.Beans;
 import java.util.Optional;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.HttpConstants;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
@@ -39,25 +24,33 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
   protected void internalInit(boolean forceReinit) {
     if (credentialsHandler == null || forceReinit) {
       credentialsHandler = Beans.get(CredentialsHandler.class);
-      defaultAuthenticator(Beans.get(AuthPac4jInfo.class).getAuthenticator());
+      setAuthenticatorIfUndefined(Beans.get(AuthPac4jInfo.class).getAuthenticator());
     }
     super.internalInit(forceReinit);
   }
 
   @Override
-  protected Optional<Credentials> retrieveCredentials(
-      WebContext context, SessionStore sessionStore) {
+  public Optional<Credentials> getCredentials(CallContext ctx) {
+    final var context = ctx.webContext();
+
     if (context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER).isEmpty()) {
       return Optional.empty();
     }
 
-    final Optional<Credentials> credentials = super.retrieveCredentials(context, sessionStore);
+    return super.getCredentials(ctx);
+  }
 
-    if (credentials.isEmpty()) {
+  @Override
+  protected Optional<Credentials> internalValidateCredentials(
+      CallContext ctx, Credentials credentials) {
+    var validatedCredentials = super.internalValidateCredentials(ctx, credentials);
+
+    if (validatedCredentials.isEmpty()) {
       Optional<Credentials> credentialsOpt = Optional.empty();
       CredentialsException error;
+
       try {
-        credentialsOpt = getCredentialsExtractor().extract(context, sessionStore);
+        credentialsOpt = getCredentialsExtractor().extract(ctx);
         error = new BadCredentialsException(AxelorAuthenticator.INCORRECT_CREDENTIALS);
       } catch (CredentialsException e) {
         error = e;
@@ -70,10 +63,11 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
               .map(UsernamePasswordCredentials::getUsername)
               .orElse(null);
       credentialsHandler.handleInvalidCredentials(this, username, error);
+    } else {
+      var context = ctx.webContext();
+      context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
     }
 
-    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
-
-    return credentials;
+    return validatedCredentials;
   }
 }

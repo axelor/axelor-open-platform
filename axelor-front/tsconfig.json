@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -26,7 +26,14 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@axelor/ui/*": ["./node_modules/@axelor/ui/*", "./node_modules/@axelor/ui/src/*"]
+      "@axelor/ui/*": [
+        "./node_modules/@axelor/ui/*",
+        "./node_modules/@axelor/ui/src/*"
+      ],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime"],
+      "react/jsx-dev-runtime": ["./node_modules/@types/react/jsx-dev-runtime"]
     }
   },
   "include": ["src"],

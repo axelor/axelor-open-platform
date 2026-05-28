@@ -16,7 +16,7 @@
           "title": "Print",
           "showTitle": false,
           "showIf": "id",
-          "icon": "fa-print",
+          "icon": "printer",
           "onClick": "print.sale.order"
         }
       ],
@@ -185,7 +185,7 @@
                   "name": "btnTotalAmount",
                   "title": "Total amount",
                   "css": "btn-primary",
-                  "icon": "fa-bar-chart",
+                  "icon": "bar-chart",
                   "onClick": "check-order-dates,com.axelor.sale.web.SaleOrderController:calculate,save",
                   "widget": "info-button",
                   "widgetAttrs": {

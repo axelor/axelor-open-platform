@@ -1,33 +1,24 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
-import com.google.common.base.Preconditions;
+import com.axelor.concurrent.ContextAwareCallable;
+import com.axelor.concurrent.ContextAwareRunnable;
+import jakarta.inject.Inject;
+import java.util.Objects;
 import java.util.concurrent.Callable;
-import javax.inject.Inject;
 
-/** This class can be used to run batch jobs that requires to keep track of audit logs. */
+/**
+ * This class can be used to run batch jobs that requires to keep track of audit logs.
+ *
+ * @deprecated use {@link ContextAwareRunnable} or {@link ContextAwareCallable} instead
+ */
+@Deprecated
 public class AuditableRunner {
-
-  static ThreadLocal<User> batchUser = new ThreadLocal<>();
 
   private static final String DEFAULT_BATCH_USER = "admin";
 
@@ -39,6 +30,15 @@ public class AuditableRunner {
   }
 
   /**
+   * Get the batch user.
+   *
+   * @return current user
+   */
+  public static User batchUser() {
+    return AuthUtils.getCurrentUser();
+  }
+
+  /**
    * Run a batch job.
    *
    * @param job the job to run
@@ -46,12 +46,9 @@ public class AuditableRunner {
   public void run(final Runnable job) {
     try {
       run(
-          new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-              job.run();
-              return true;
-            }
+          () -> {
+            job.run();
+            return true;
           });
     } catch (Exception e) {
       // propagate the exception
@@ -68,19 +65,19 @@ public class AuditableRunner {
    * @throws Exception if unable to compute a result
    */
   public <T> T run(Callable<T> job) throws Exception {
-    Preconditions.checkNotNull(job);
-    Preconditions.checkNotNull(users);
+    Objects.requireNonNull(job);
+    Objects.requireNonNull(users);
 
     User user = AuthUtils.getUser();
     if (user == null) {
       user = users.findByCode(DEFAULT_BATCH_USER);
     }
 
-    batchUser.set(user);
+    AuthUtils.setCurrentUser(user);
     try {
       return job.call();
     } finally {
-      batchUser.remove();
+      AuthUtils.removeCurrentUser();
     }
   }
 }

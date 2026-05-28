@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
@@ -42,6 +28,9 @@ import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,9 +40,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class InfoService extends AbstractService {
 
@@ -335,11 +321,11 @@ public class InfoService extends AbstractService {
   }
 
   public Object getSignInLogo(String mode) {
-    final String signInlogo =
+    final String signInLogo =
         isDark(mode)
             ? SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo-dark")
             : SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo");
-    return Optional.<Object>ofNullable(signInlogo).orElseGet(() -> getLogo(mode));
+    return Optional.<Object>ofNullable(signInLogo).orElseGet(() -> getLogo(mode));
   }
 
   /**
@@ -423,24 +409,24 @@ public class InfoService extends AbstractService {
   }
 
   public String getLink(Object value) {
-    if (value instanceof String) {
-      return (String) value;
+    if (value instanceof String stringValue) {
+      return stringValue;
     }
-    if (value instanceof MetaFile) {
+    if (value instanceof MetaFile metaFile) {
       return "ws/rest/"
           + MetaFile.class.getName()
           + "/"
-          + ((MetaFile) value).getId()
+          + metaFile.getId()
           + "/content/download?v="
-          + ((MetaFile) value).getVersion();
+          + metaFile.getVersion();
     }
-    if (value instanceof User) {
+    if (value instanceof User user) {
       return "ws/rest/"
           + User.class.getName()
           + "/"
-          + ((User) value).getId()
+          + user.getId()
           + "/image/download?image=true&v="
-          + ((User) value).getVersion();
+          + user.getVersion();
     }
     return null;
   }

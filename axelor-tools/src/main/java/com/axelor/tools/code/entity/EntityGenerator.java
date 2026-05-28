@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code.entity;
 
@@ -23,12 +9,14 @@ import com.axelor.tools.code.JavaType;
 import com.axelor.tools.code.entity.model.BaseType;
 import com.axelor.tools.code.entity.model.Entity;
 import com.axelor.tools.code.entity.model.EnumType;
-import com.google.common.collect.ImmutableSet;
+import com.axelor.tools.code.entity.model.TrackField;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -36,16 +24,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +53,10 @@ public class EntityGenerator {
   private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
   private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
 
-  private static final Map<String, Entity> mergedEntities = new HashMap<>();
-  private static final Set<String> MODEL_FIELD_NAMES = ImmutableSet.of("archived");
+  private static final Map<String, Entity> mergedEntities = new ConcurrentHashMap<>();
+  private static final Set<String> MODEL_FIELD_NAMES = Set.of("archived");
   private static final Set<String> AUDITABLE_MODEL_FIELD_NAMES =
-      ImmutableSet.of("createdOn", "updatedOn", "createdBy", "updatedBy");
+      Set.of("createdOn", "updatedOn", "createdBy", "updatedBy");
 
   public EntityGenerator(File domainPath, File outputPath) {
     this(domainPath, outputPath, String -> String);
@@ -88,7 +75,7 @@ public class EntityGenerator {
     }
 
     final List<EnumType> all = new ArrayList<>(items);
-    final EnumType first = all.get(0);
+    final EnumType first = all.getFirst();
 
     final String ns = first.getPackageName();
     final String name = first.getName();
@@ -109,12 +96,11 @@ public class EntityGenerator {
     for (EnumType it : all) {
       if (!ns.equals(it.getPackageName())) {
         throw new IllegalArgumentException(
-            String.format(
-                "Invalid namespace: %s.%s != %s.%s", ns, name, it.getPackageName(), name));
+            "Invalid namespace: %s.%s != %s.%s".formatted(ns, name, it.getPackageName(), name));
       }
     }
 
-    final EnumType entity = all.remove(0);
+    final EnumType entity = all.removeFirst();
 
     for (EnumType it : all) {
       entity.merge(it);
@@ -148,7 +134,7 @@ public class EntityGenerator {
     }
 
     final List<Entity> all = new ArrayList<>(items);
-    final Entity first = all.get(0);
+    final Entity first = all.getFirst();
 
     final String ns = first.getPackageName();
     final String name = first.getName();
@@ -169,26 +155,32 @@ public class EntityGenerator {
     for (Entity it : all) {
       if (!ns.equals(it.getPackageName())) {
         throw new IllegalArgumentException(
-            String.format(
-                "Invalid namespace: %s.%s != %s.%s", ns, name, it.getPackageName(), name));
+            "Invalid namespace: %s.%s != %s.%s".formatted(ns, name, it.getPackageName(), name));
       }
     }
 
-    final Entity entity = all.remove(0);
+    final Entity entity = all.removeFirst();
     for (Entity it : all) {
       entity.merge(it);
     }
     mergedEntities.put(entity.getName(), entity);
 
-    Optional.ofNullable(entity.getTrack())
-        .ifPresent(
-            track ->
-                track.getFields().stream()
-                    .map(field -> field.getName())
-                    .filter(fieldName -> !fieldExists(entity.getName(), fieldName))
-                    .forEach(
-                        fieldName ->
-                            log.error("{}: track unknown field: {}", entity.getName(), fieldName)));
+    lookupSuperClasses(entity);
+
+    if (doLookup) {
+      Optional.ofNullable(entity.getTrack())
+          .ifPresent(
+              track ->
+                  track.getFields().stream()
+                      .map(TrackField::getName)
+                      .filter(fieldName -> !fieldExists(entity.getName(), fieldName))
+                      .forEach(
+                          fieldName ->
+                              log.error(
+                                  "{}: track unknown field: {}", entity.getName(), fieldName)));
+    }
+
+    checkSingleTableInheritance(entity);
 
     final JavaType javaType = entity.toJavaClass();
     final JavaType repoType = entity.toRepoClass();
@@ -206,9 +198,70 @@ public class EntityGenerator {
     return rendered;
   }
 
+  private void lookupSuperClasses(Entity entity) {
+    Set<String> visitedClasses = new HashSet<>();
+    String className = entity.getSimpleSuperClass();
+
+    while (className != null) {
+      if (!visitedClasses.add(className)) {
+        log.error("{}: circular inheritance with '{}'", entity.getName(), className);
+        break;
+      }
+
+      Entity mergedEntity =
+          mergedEntities.computeIfAbsent(
+              className,
+              key ->
+                  Stream.concat(
+                          entities.get(key).stream(),
+                          lookup.stream()
+                              .flatMap(
+                                  gen -> {
+                                    if (gen.definedEntities.contains(key)
+                                        && gen.entities.isEmpty()) {
+                                      try {
+                                        gen.processAll(false);
+                                      } catch (IOException e) {
+                                        throw new UncheckedIOException(e);
+                                      }
+                                    }
+                                    return gen.entities.get(key).stream();
+                                  }))
+                      .reduce(
+                          (entity1, entity2) -> {
+                            entity1.merge(entity2);
+                            return entity1;
+                          })
+                      .orElse(null));
+
+      className = mergedEntity != null ? mergedEntity.getSimpleSuperClass() : null;
+    }
+  }
+
+  private void checkSingleTableInheritance(Entity entity) {
+    if (entity.getSuperClass() == null) {
+      return;
+    }
+
+    Set<String> visitedClasses = new HashSet<>();
+    Entity parent = entity;
+
+    do {
+      parent = mergedEntities.get(parent.getSimpleSuperClass());
+    } while (parent != null
+        && parent.getSuperClass() != null
+        && visitedClasses.add(parent.getName()));
+
+    if (parent != null && (parent.getStrategy() == null || "SINGLE".equals(parent.getStrategy()))) {
+      entity.setInSingleTableHierarchy(true);
+    }
+  }
+
   private boolean fieldExists(String entityName, String fieldName) {
+    Set<String> visitedClasses = new HashSet<>();
     Entity itEntity;
     String itEntityName = entityName;
+
     do {
       itEntity = mergedEntities.get(itEntityName);
       if (itEntity == null) {
@@ -221,7 +274,8 @@ public class EntityGenerator {
       if (itEntity.findField(fieldName) != null) {
         return true;
       }
-    } while ((itEntityName = itEntity.getSuperClass()) != null);
+    } while ((itEntityName = itEntity.getSimpleSuperClass()) != null
+        && visitedClasses.add(itEntityName));
 
     return false;
   }
@@ -266,8 +320,8 @@ public class EntityGenerator {
     }
     try {
       for (BaseType<?> type : EntityParser.parse(input)) {
-        if (type instanceof Entity) entities.put(type.getName(), (Entity) type);
-        if (type instanceof EnumType) enums.put(type.getName(), (EnumType) type);
+        if (type instanceof Entity entity) entities.put(type.getName(), entity);
+        if (type instanceof EnumType enumType) enums.put(type.getName(), enumType);
       }
     } catch (JAXBException e) {
       throw new RuntimeException(e);
@@ -297,7 +351,7 @@ public class EntityGenerator {
     if (generator.definedEntities.isEmpty()) {
       generator.findAll();
     }
-    lookup.add(0, generator);
+    lookup.addFirst(generator);
   }
 
   public void clean() {
@@ -389,7 +443,8 @@ public class EntityGenerator {
       if (all == null || all.isEmpty()) {
         continue;
       }
-      if (all.size() == 1 && !all.get(0).isModelClass()) { // generate extended Model class in root
+      if (all.size() == 1
+          && !all.getFirst().isModelClass()) { // generate extended Model class in root
         continue;
       }
       Collections.reverse(all);

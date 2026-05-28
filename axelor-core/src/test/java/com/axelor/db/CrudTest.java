@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -33,11 +19,11 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.Country;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.OptimisticLockException;
 import java.util.HashSet;
-import javax.inject.Inject;
-import javax.persistence.OptimisticLockException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,7 +65,7 @@ public class CrudTest extends JpaTest {
     addr2.setCountry(country);
     addr2.setContact(contact);
 
-    contact.setAddresses(Lists.newArrayList(addr1, addr2));
+    contact.setAddresses(List.of(addr1, addr2));
     contacts.save(contact);
   }
 
@@ -108,11 +94,11 @@ public class CrudTest extends JpaTest {
     addr1.setCountry(country);
     addr1.setContact(contact);
 
-    contact.setAddresses(Lists.newArrayList(addr1));
+    contact.setAddresses(List.of(addr1));
 
     contacts.save(contact);
 
-    for (Model e : Lists.newArrayList(contact, title, addr1, country)) {
+    for (Model e : List.of(contact, title, addr1, country)) {
       assertNotNull(e.getId());
       assertNotNull(e.getVersion());
     }
@@ -191,7 +177,7 @@ public class CrudTest extends JpaTest {
     assertNotNull(c1);
 
     if (c1.getCircles() == null) {
-      c1.setCircles(new HashSet<Circle>());
+      c1.setCircles(new HashSet<>());
     }
 
     c1.getCircles().add(g1);

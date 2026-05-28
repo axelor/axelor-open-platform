@@ -36,6 +36,7 @@ export async function findView<T extends ViewType>({
   type,
   name,
   model,
+  jsonModel,
   resource,
   context,
   ...props
@@ -43,10 +44,11 @@ export async function findView<T extends ViewType>({
   type: string;
   name?: string;
   model?: string;
+  jsonModel?: string;
   resource?: string;
   context?: DataContext;
 }): Promise<ViewData<T> | null> {
-  const key = makeKey("view", model, type, name ?? resource);
+  const key = makeKey("view", model, jsonModel, type, name ?? resource);
   return cache.get(key, async () => {
     if (type === "html") {
       return Promise.resolve({ view: { name: name ?? resource, type } });
@@ -62,7 +64,13 @@ export async function findView<T extends ViewType>({
       return { model, view: { name, model, type, ...viewProps }, fields };
     }
 
-    const data = await fetchView({ type: type as any, name, model, context });
+    const data = await fetchView({
+      type: type as any,
+      name,
+      model,
+      jsonModel,
+      context,
+    });
 
     if (data.fields) {
       data.fields = processFields(data.fields);
@@ -109,8 +117,8 @@ export async function saveView(data: any) {
   if (resp.ok) {
     const { status, data } = await resp.json();
     if (status === 0) {
-      const { model, type, name } = data;
-      const key = makeKey("view", model, type, name);
+      const { model, jsonModel, type, name } = data;
+      const key = makeKey("view", model, jsonModel, type, name);
       cache.delete(key);
       return data;
     }

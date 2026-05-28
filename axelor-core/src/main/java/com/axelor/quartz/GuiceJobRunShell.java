@@ -1,28 +1,23 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.quartz;
 
+import static org.quartz.utils.Key.DEFAULT_GROUP;
+
+import com.axelor.common.StringUtils;
+import com.axelor.concurrent.ContextAware;
+import com.axelor.db.tenants.TenantConfig;
+import com.axelor.db.tenants.TenantConfigProvider;
+import com.axelor.inject.Beans;
 import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.RequestScoper;
 import com.google.inject.servlet.ServletScopes;
 import java.util.Collections;
+import java.util.Optional;
 import org.quartz.Job;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger.CompletedExecutionInstruction;
@@ -30,9 +25,14 @@ import org.quartz.core.JobRunShell;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
 import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.utils.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Custom {@link JobRunShell} to ensure {@link Job} can use {@link RequestScoped} services. */
 public class GuiceJobRunShell extends JobRunShell {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GuiceJobRunShell.class);
 
   private QuartzScheduler sched;
   private QuartzSchedulerResources resources;
@@ -49,21 +49,55 @@ public class GuiceJobRunShell extends JobRunShell {
     this.sched = sched;
   }
 
-  @Override
-  public void run() {
+  private void doRun() {
+    Optional.ofNullable(firedTriggerBundle.getJobDetail())
+        .map(JobDetail::getKey)
+        .map(Key::getGroup) // group is tenant id
+        .filter(group -> StringUtils.notBlank(group) && !DEFAULT_GROUP.equals(group))
+        .ifPresentOrElse(this::run, super::run);
+  }
+
+  private void superRun() {
     final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
     try (RequestScoper.CloseableScope ignored = scope.open()) {
+      super.run();
+    }
+  }
+
+  private void run(String tenantId) {
+    final TenantConfig config = Beans.get(TenantConfigProvider.class).find(tenantId);
+    if (config != null && Boolean.TRUE.equals(config.getActive())) {
+      // JobRunShell may re-use same thread from the pool, so run the task in a new
+      // thread to ensure the task is always run with a proper tenant id.
+      Runnable task =
+          ContextAware.of().withTransaction(false).withTenantId(tenantId).build(this::superRun);
+      Thread t = new Thread(task);
+      t.start();
       try {
-        super.initialize(this.sched);
-        super.run();
-      } catch (SchedulerException e) {
-        resources
-            .getJobStore()
-            .triggeredJobComplete(
-                this.firedTriggerBundle.getTrigger(),
-                this.firedTriggerBundle.getJobDetail(),
-                CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+        t.join();
+      } catch (InterruptedException e) {
+        handleError(e);
       }
+    }
+  }
+
+  private void handleError(Throwable e) {
+    LOG.error("Job failed with error!", e);
+    resources
+        .getJobStore()
+        .triggeredJobComplete(
+            this.firedTriggerBundle.getTrigger(),
+            this.firedTriggerBundle.getJobDetail(),
+            CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+  }
+
+  @Override
+  public void run() {
+    try {
+      super.initialize(this.sched);
+      this.doRun();
+    } catch (SchedulerException e) {
+      handleError(e);
     }
   }
 }

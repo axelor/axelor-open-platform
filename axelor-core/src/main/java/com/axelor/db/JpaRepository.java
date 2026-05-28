@@ -1,33 +1,22 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
+import com.axelor.db.json.JsonReferenceCascader;
+import com.axelor.db.json.JsonReferenceUpdater;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
+import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.EntityManager;
+import java.util.Optional;
 
 /**
  * The JPA implementation of the {@link Repository}.
@@ -38,7 +27,16 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   protected Class<T> modelClass;
 
+  private final JsonReferenceCascader jsonManager;
+  private final JsonReferenceUpdater jsonUpdater;
+
+  protected JpaRepository() {
+    this.jsonManager = Beans.get(JsonReferenceCascader.class);
+    this.jsonUpdater = Beans.get(JsonReferenceUpdater.class);
+  }
+
   protected JpaRepository(Class<T> modelClass) {
+    this();
     this.modelClass = modelClass;
   }
 
@@ -83,13 +81,31 @@ public class JpaRepository<T extends Model> implements Repository<T> {
   }
 
   @Override
+  public Optional<T> findById(Long id) {
+    return JPA.findById(modelClass, id);
+  }
+
+  @Override
+  public T getReferenceById(Long id) {
+    return JPA.getReferenceById(modelClass, id);
+  }
+
+  @Override
   public List<T> findByIds(List<Long> ids) {
     return JPA.findByIds(modelClass, ids);
   }
 
   @Override
   public T save(T entity) {
-    return JPA.save(entity);
+    try {
+      T saved = JPA.save(entity);
+      jsonManager.afterSave(saved);
+      jsonUpdater.afterSave(saved);
+      return saved;
+    } finally {
+      // Between-save JSON state cleanup for the current entity
+      jsonManager.clearSaveState(entity);
+    }
   }
 
   /**
@@ -115,6 +131,7 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
   @Override
   public void remove(T entity) {
+    jsonManager.beforeRemove(entity);
     // detach orphan o2m records
     detachChildren(entity);
     JPA.remove(entity);
@@ -143,8 +160,8 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
       if (value instanceof Collection) {
         items = (Collection<? extends Model>) value;
-      } else if (value instanceof Model) {
-        items = Collections.singletonList((Model) value);
+      } else if (value instanceof Model model) {
+        items = Collections.singletonList(model);
       } else {
         continue;
       }

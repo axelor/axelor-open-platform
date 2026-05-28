@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -28,17 +14,15 @@ import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType(propOrder = {"views", "params", "domain", "contexts"})
 public class ActionView extends Action {
@@ -161,10 +145,10 @@ public class ActionView extends Action {
 
   @Override
   public Object evaluate(ActionHandler handler) {
-    Map<String, Object> result = Maps.newHashMap();
-    Map<String, Object> context = Maps.newHashMap();
-    Map<String, Object> viewParams = Maps.newHashMap();
-    List<Object> items = Lists.newArrayList();
+    Map<String, Object> result = new HashMap<>();
+    Map<String, Object> context = new HashMap<>();
+    Map<String, Object> viewParams = new HashMap<>();
+    List<Object> items = new ArrayList<>();
 
     String viewType = null;
 
@@ -174,7 +158,7 @@ public class ActionView extends Action {
         continue;
       }
 
-      Map<String, Object> map = Maps.newHashMap();
+      Map<String, Object> map = new HashMap<>();
       map.put("name", handler.evaluate(elem.getName()));
       map.put("type", elem.getType());
 
@@ -189,27 +173,28 @@ public class ActionView extends Action {
       for (Context ctx : contexts) {
         if (ctx.test(handler)) {
           Object value = handler.evaluate(ctx.getExpression());
-          if (Boolean.TRUE.equals(ctx.getCanCopy()) && value instanceof Model) {
-            value = JPA.copy((Model) value, true);
+          if (Boolean.TRUE.equals(ctx.getCanCopy()) && value instanceof Model model) {
+            value = JPA.copy(model, true);
           }
-          if (value instanceof ContextEntity) {
-            value = ((ContextEntity) value).getContextMap();
+          if (value instanceof ContextEntity entity) {
+            value = entity.getContextMap();
           }
           if (value instanceof Model && JPA.em().contains(value)) {
             value = Resource.toMapCompact(value);
           }
-          if (value instanceof Collection) {
+          if (value instanceof Collection<?> collection) {
             value =
-                Collections2.transform(
-                    (Collection<?>) value,
-                    item -> {
-                      if (item instanceof ContextEntity) {
-                        return ((ContextEntity) item).getContextMap();
-                      }
-                      return item instanceof Model && JPA.em().contains(item)
-                          ? Resource.toMapCompact(item)
-                          : item;
-                    });
+                collection.stream()
+                    .map(
+                        item -> {
+                          if (item instanceof ContextEntity entity) {
+                            return entity.getContextMap();
+                          }
+                          return item instanceof Model && JPA.em().contains(item)
+                              ? Resource.toMapCompact(item)
+                              : item;
+                        })
+                    .toList();
           }
           context.put(ctx.getName(), value);
 
@@ -275,7 +260,7 @@ public class ActionView extends Action {
 
   @Override
   protected Object wrapper(Object value) {
-    return ImmutableMap.of("view", value);
+    return Map.of("view", value);
   }
 
   /**
@@ -296,13 +281,13 @@ public class ActionView extends Action {
   public static final class ActionViewBuilder {
 
     private ActionView view = new ActionView();
-    private Map<String, Object> context = Maps.newHashMap();
+    private Map<String, Object> context = new HashMap<>();
 
     private ActionViewBuilder(String title) {
       view.title = title;
-      view.views = Lists.newArrayList();
-      view.params = Lists.newArrayList();
-      view.contexts = Lists.newArrayList();
+      view.views = new ArrayList<>();
+      view.params = new ArrayList<>();
+      view.contexts = new ArrayList<>();
     }
 
     public ActionViewBuilder name(String name) {
@@ -339,10 +324,10 @@ public class ActionView extends Action {
 
     public ActionViewBuilder context(String key, Object value) {
       this.context.put(key, value);
-      if (value instanceof String) {
+      if (value instanceof String string) {
         Context context = new Context();
         context.setName(key);
-        context.setExpression((String) value);
+        context.setExpression(string);
         view.contexts.add(context);
       }
       return this;
@@ -371,16 +356,16 @@ public class ActionView extends Action {
      * @return a {@link Map}
      */
     public Map<String, Object> map() {
-      Map<String, Object> result = Maps.newHashMap();
-      Map<String, Object> params = Maps.newHashMap();
-      List<Object> items = Lists.newArrayList();
+      Map<String, Object> result = new HashMap<>();
+      Map<String, Object> params = new HashMap<>();
+      List<Object> items = new ArrayList<>();
       String type = null;
 
       for (View v : view.views) {
         if (type == null) {
           type = v.type;
         }
-        Map<String, Object> item = Maps.newHashMap();
+        Map<String, Object> item = new HashMap<>();
         item.put("type", v.getType());
         item.put("name", v.getName());
         items.add(item);
@@ -388,8 +373,8 @@ public class ActionView extends Action {
 
       if (type == null) {
         type = "grid";
-        items.add(ImmutableMap.of("type", "grid"));
-        items.add(ImmutableMap.of("type", "form"));
+        items.add(Map.of("type", "grid"));
+        items.add(Map.of("type", "form"));
       }
 
       for (Param param : view.params) {

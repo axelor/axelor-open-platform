@@ -1,31 +1,28 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
+import com.axelor.auth.password.PasswordPolicy;
+import com.axelor.auth.password.policy.DigitsPasswordPolicy;
+import com.axelor.auth.password.policy.LengthPasswordPolicy;
+import com.axelor.auth.password.policy.LowerCasePasswordPolicy;
+import com.axelor.auth.password.policy.NotCodePasswordPolicy;
+import com.axelor.auth.password.policy.NotSamePasswordPolicy;
+import com.axelor.auth.password.policy.PatternPasswordPolicy;
+import com.axelor.auth.password.policy.ScorePasswordPolicy;
+import com.axelor.auth.password.policy.SpecialCharsPasswordPolicy;
+import com.axelor.auth.password.policy.UpperCasePasswordPolicy;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
+import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.mgt.SecurityManager;
@@ -45,6 +42,18 @@ public class AuthModule extends AbstractModule {
 
     // bind security service
     bind(JpaSecurity.class).toProvider(AuthSecurity.class);
+
+    // bind password policies
+    final var policies = Multibinder.newSetBinder(binder(), PasswordPolicy.class);
+    policies.addBinding().to(NotSamePasswordPolicy.class);
+    policies.addBinding().to(LengthPasswordPolicy.class);
+    policies.addBinding().to(NotCodePasswordPolicy.class);
+    policies.addBinding().to(DigitsPasswordPolicy.class);
+    policies.addBinding().to(LowerCasePasswordPolicy.class);
+    policies.addBinding().to(UpperCasePasswordPolicy.class);
+    policies.addBinding().to(SpecialCharsPasswordPolicy.class);
+    policies.addBinding().to(PatternPasswordPolicy.class);
+    policies.addBinding().to(ScorePasswordPolicy.class);
 
     // non-web environment (cli or unit tests)
     if (context == null) {

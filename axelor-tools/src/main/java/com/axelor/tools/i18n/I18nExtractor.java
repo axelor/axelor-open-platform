@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.i18n;
 
@@ -26,7 +12,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import java.io.File;
 import java.io.FileReader;
@@ -35,19 +20,18 @@ import java.io.Reader;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.SAXParser;
 import org.apache.commons.csv.CSVParser;
@@ -78,40 +62,43 @@ public class I18nExtractor {
   private static final Set<String> JS_FILE_EXTENSIONS = Set.of(".js", ".jsx", ".ts", ".tsx");
 
   private static final Set<String> VIEW_TYPES =
-      Sets.newHashSet(
-          "form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom");
+      new HashSet<>(
+          Arrays.asList(
+              "form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom"));
 
   private static final Set<String> FIELD_NODES =
-      Sets.newHashSet(
-          "string",
-          "boolean",
-          "integer",
-          "long",
-          "decimal",
-          "date",
-          "time",
-          "datetime",
-          "binary",
-          "enum",
-          "one-to-one",
-          "many-to-one",
-          "one-to-many",
-          "many-to-many");
+      new HashSet<>(
+          Arrays.asList(
+              "string",
+              "boolean",
+              "integer",
+              "long",
+              "decimal",
+              "date",
+              "time",
+              "datetime",
+              "binary",
+              "enum",
+              "one-to-one",
+              "many-to-one",
+              "one-to-many",
+              "many-to-many"));
 
   private static final Set<String> TEXT_ATTRS =
-      Sets.newHashSet(
-          "tag",
-          "prompt",
-          "placeholder",
-          "x-true-text",
-          "x-false-text",
-          "data-description",
-          "confirm-btn-title",
-          "cancel-btn-title",
-          "x-tree-field-title");
+      new HashSet<>(
+          Arrays.asList(
+              "tag",
+              "prompt",
+              "placeholder",
+              "x-true-text",
+              "x-false-text",
+              "data-description",
+              "confirm-btn-title",
+              "cancel-btn-title",
+              "x-tree-field-title"));
 
   private static final Set<String> TEXT_NODES =
-      Sets.newHashSet("option", "message", "static", "help");
+      new HashSet<>(Arrays.asList("option", "message", "static", "help"));
 
   private static class I18nItem {
 
@@ -245,6 +232,10 @@ public class I18nExtractor {
             public void endElement(String uri, String localName, String qName) throws SAXException {
               if (TEXT_NODES.contains(qName)) {
                 String text = StringUtils.stripIndent(readTextLines.toString());
+                // Match unmarshalled text for static and help
+                if (List.of("static", "help").contains(qName)) {
+                  text = text.trim();
+                }
                 accept(new I18nItem(text, file, locator.getLineNumber()));
                 readText = false;
                 readTextLines.setLength(0);
@@ -377,7 +368,7 @@ public class I18nExtractor {
   }
 
   public void extract(final Path base, boolean update, boolean withContext) {
-    Path src = base.resolve(Paths.get("src", "main"));
+    Path src = base.resolve(Path.of("src", "main"));
     Path dest = src.resolve("resources");
     extract(src, dest, update, withContext);
   }
@@ -462,7 +453,7 @@ public class I18nExtractor {
       throws IOException {
 
     // first save the template
-    Path template = destPath.resolve(Paths.get("i18n", "messages.csv"));
+    Path template = destPath.resolve(Path.of("i18n", "messages.csv"));
 
     log.info("generating: " + template);
 
@@ -492,9 +483,7 @@ public class I18nExtractor {
 
     // Generate initial templates for specified languages.
     final List<String> langs =
-        Stream.concat(Stream.of("en", "fr"), languages.stream())
-            .distinct()
-            .collect(Collectors.toUnmodifiableList());
+        Stream.concat(Stream.of("en", "fr"), languages.stream()).distinct().toList();
 
     for (String lang : langs) {
       Path target = template.resolveSibling("messages_" + lang + ".csv");
@@ -547,6 +536,9 @@ public class I18nExtractor {
         for (int i = 0; i < line.length; i++) {
           if (StringUtils.isBlank(line[i])) {
             line[i] = null;
+          } else {
+            // Use CRLF also for cell content
+            line[i] = line[i].replaceAll("(?<!\r)\n", "\r\n");
           }
         }
       }

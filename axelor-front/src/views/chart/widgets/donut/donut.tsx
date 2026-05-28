@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo } from "react";
 import { produce } from "immer";
 import { ChartProps, ECharts } from "../../builder";
 import { PlusData } from "../../builder/utils";
@@ -37,21 +37,18 @@ const defaultOption = {
 
 export function Donut(props: ChartProps) {
   const { data } = props;
-  const [options, setOptions] = React.useState(defaultOption);
 
-  React.useEffect(() => {
+  const options = useMemo(() => {
     const { types: dimensions, data: source, formatter } = PlusData(data);
-    setOptions(
-      produce((draft: any) => {
-        draft.legend.data = dimensions;
-        draft.series[0].data = source.map(({ x, y, ...rest }) => ({
-          ...rest,
-          name: x,
-          value: y,
-        }));
-        draft.tooltip.valueFormatter = formatter;
-      })
-    );
+    return produce(defaultOption, (draft: any) => {
+      draft.legend.data = dimensions;
+      draft.series[0].data = source.map(({ x, y, ...rest }) => ({
+        ...rest,
+        name: x,
+        value: y,
+      }));
+      draft.tooltip.valueFormatter = formatter;
+    });
   }, [data]);
 
   return <ECharts options={options} {...(props as any)} />;

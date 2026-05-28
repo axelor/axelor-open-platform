@@ -45,6 +45,7 @@ export const SERVER_TYPES: string[] = [
   "text",
   "binary",
   "enum",
+  "uuid",
   "one-to-one",
   "many-to-one",
   "one-to-many",
@@ -62,8 +63,8 @@ const FIELD_WIDGETS: Record<string, string[]> = {
   integer: ["Duration", "Progress", "Rating"],
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
-  "many-to-one": ["BinaryLink", "Image", "SuggestBox", "Drawing"],
-  "many-to-many": ["TagSelect"],
+  "many-to-one": ["BinaryLink", "Image", "SuggestBox", "Drawing", "Tag"],
+  "many-to-many": ["Tags", "TagSelect"],
 };
 
 function getDefaultServerType(schema: Schema): string {
@@ -188,15 +189,16 @@ export function defaultAttrs(schema: Schema): Attrs {
 export function processContextValues(
   context: DataContext,
   meta?: FormState["meta"],
+  { forContext = true } = {},
 ) {
   const IGNORE = [
-    "$attachments",
     "$processInstanceId",
     "_dirty",
     "_fetched",
     "_showRecord",
     "__check_version",
     "_showSingle",
+    ...(!forContext ? ["$attachments"] : []),
   ];
 
   function process(_value: DataContext) {
@@ -252,6 +254,7 @@ export function processContextValues(
         }
         values[fieldName] = value
           ? compactJson(value, {
+              forContext,
               findItem: (jsonPath: string) => {
                 function findTargetNames(schema: Schema): string[] {
                   const items =
@@ -292,13 +295,45 @@ export function processContextValues(
 }
 
 export function processSaveValues(record: DataRecord, meta: FormState["meta"]) {
-  return processContextValues(record, meta);
+  return processContextValues(record, meta, { forContext: false });
 }
 
 export function compactJson(
   record: DataRecord,
-  { findItem }: { findItem?: (name: string) => Schema } = {},
+  {
+    findItem,
+    forContext = true,
+  }: { findItem?: (name: string) => Schema; forContext?: boolean } = {},
 ) {
+  function flattenUnsavedAttrs(x: DataRecord): DataRecord {
+    if (x.attrs && typeof x.attrs === "string") {
+      try {
+        return JSON.parse(x.attrs);
+      } catch {
+        return x;
+      }
+    }
+    return x;
+  }
+
+  function withSelected(x: DataRecord, orig: DataRecord): DataRecord {
+    return forContext && !isUndefined(orig.selected)
+      ? { ...x, selected: orig.selected }
+      : x;
+  }
+
+  function isJsonModelField(field?: Schema): boolean {
+    return Boolean(field?.jsonModel || field?.jsonTarget);
+  }
+
+  function compactSavedItem(x: DataRecord, field?: Schema): DataRecord {
+    if (isJsonModelField(field)) {
+      const { selected, id: _id, ...data } = flattenUnsavedAttrs(x);
+      return { id: x.id, ...data };
+    }
+    return { id: x.id };
+  }
+
   const rec: DataRecord = {};
   Object.entries(record).forEach(([k, v]) => {
     const field = findItem?.(k);
@@ -306,22 +341,32 @@ export function compactJson(
     if (typeof v === "string" && v.trim() === "") return;
     if (Array.isArray(v)) {
       if (v.length === 0) return;
-      v = v.map(function (x) {
-        return x.id ? { id: x.id } : x;
-      });
+      v = v.map((x) =>
+        x.id > 0
+          ? withSelected(compactSavedItem(x, field), x)
+          : withSelected(flattenUnsavedAttrs(x), x),
+      );
     } else if (v && typeof v === "object" && field && isReferenceField(field)) {
-      const { targetNames = [] } = field;
-      v = {
-        id: v.id,
-        $version: v.version ?? v.$version,
-        ...(targetNames as string[]).reduce(
-          (vals, name) => ({
-            ...vals,
-            [name]: v[name],
-          }),
-          {},
-        ),
-      };
+      if (v.id > 0) {
+        if (isJsonModelField(field)) {
+          v = withSelected(compactSavedItem(v, field), v);
+        } else {
+          const { targetNames = [] } = field;
+          v = {
+            id: v.id,
+            $version: v.version ?? v.$version,
+            ...(targetNames as string[]).reduce(
+              (vals, name) => ({
+                ...vals,
+                [name]: v[name],
+              }),
+              {},
+            ),
+          };
+        }
+      } else {
+        v = withSelected(flattenUnsavedAttrs(v), v);
+      }
     }
     rec[k] = v;
   });
@@ -583,7 +628,7 @@ export function createContextParams(
     const _view = _views?.find((x) => x.type === _viewType);
     const _viewName = _view ? (_view.name ?? name) : name;
 
-      // ignore special context names
+    // ignore special context names
     const IGNORE = ["_showRecord", "_showSingle", "__check_version"];
 
     return {

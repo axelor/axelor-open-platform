@@ -20,6 +20,10 @@ export type SearchOptions = {
   };
 };
 
+export type SearchInit = {
+  signal?: AbortSignal;
+};
+
 export type SearchPage = {
   offset?: number;
   limit?: number;
@@ -40,7 +44,7 @@ export type ReadOptions = {
   related?: {
     [K: string]: string[];
   };
-  select?: SelectOptions
+  select?: SelectOptions;
 };
 
 export type SaveOptions<T extends DataRecord | DataRecord[]> = ReadOptions & {
@@ -62,6 +66,13 @@ export type ExportResult = {
 
 export type AccessType = "read" | "write" | "create" | "remove" | "export";
 
+export type UploadItem = {
+  field: string;
+  file: File;
+};
+
+export type UploadValue = UploadItem | UploadItem[];
+
 export class DataSource {
   #model;
 
@@ -73,10 +84,14 @@ export class DataSource {
     return this.#model;
   }
 
-  async search(options: SearchOptions): Promise<SearchResult> {
+  async search(
+    options: SearchOptions,
+    init?: SearchInit,
+  ): Promise<SearchResult> {
     const url = `ws/rest/${this.model}/search`;
     const { filter: data, limit, ...rest } = options ?? {};
     const resp = await request({
+      ...init,
       url,
       method: "POST",
       body: {
@@ -133,29 +148,31 @@ export class DataSource {
     data: T,
     options?: SaveOptions<T>,
   ): Promise<SaveResult<T>> {
-    const { onError } = options ?? {};
+    const { onError, ...saveOptions } = options ?? {};
+    const isRecords = Array.isArray(data);
 
-    if (!Array.isArray(data) && data?.$upload) {
-      const upload = data.$upload;
-      return this.upload(data, upload.field, upload.file) as Promise<
-        SaveResult<T>
-      >;
+    let resp: Response;
+    if (!isRecords && data?.$upload) {
+      const uploads = Array.isArray(data.$upload)
+        ? data.$upload
+        : [data.$upload];
+      resp = await this.upload(data, uploads, saveOptions);
+    } else {
+      resp = await request({
+        url: `ws/rest/${this.model}`,
+        method: "POST",
+        body: isRecords
+          ? { records: data, ...saveOptions }
+          : { data, ...saveOptions },
+      });
     }
 
-    const isRecords = Array.isArray(data);
-    const url = `ws/rest/${this.model}`;
-    const resp = await request({
-      url,
-      method: "POST",
-      body: isRecords ? { records: data, ...options } : { data, ...options },
-    });
-
     if (resp.ok) {
-      const { status, data } = await resp.json();
+      const { status, data: respData } = await resp.json();
       if (status === 0) {
-        return isRecords ? data : data[0];
+        return isRecords ? respData : respData[0];
       }
-      return onError ? onError(data).catch(reject) : reject(data);
+      return onError ? onError(respData).catch(reject) : reject(respData);
     }
 
     return Promise.reject(resp.status);
@@ -189,7 +206,7 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data[0] : Promise.reject(500);
+      return status === 0 ? data[0] : reject(data);
     }
 
     return Promise.reject(resp.status);
@@ -209,7 +226,7 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data : Promise.reject(500);
+      return status === 0 ? data : reject(data);
     }
 
     return Promise.reject(resp.status);
@@ -233,19 +250,33 @@ export class DataSource {
 
   async upload(
     data: DataRecord,
-    field: string | Blob,
-    file: File,
+    uploads: UploadItem[],
+    options?: ReadOptions,
     onProgress?: (complete?: number) => void,
-  ): Promise<DataRecord> {
+  ): Promise<Response> {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
     const url = `ws/rest/${this.model}/upload`;
 
-    formData.append("file", file);
-    formData.append("field", field);
-    formData.append("request", JSON.stringify({ data }));
+    const { $upload: _upload, ...requestData } = data;
 
-    return new Promise<DataRecord>(function (resolve, reject) {
+    for (const upload of uploads) {
+      let fileToUpload = upload.file;
+      if (upload.file.type === "message/rfc822") {
+        fileToUpload = new File([upload.file], upload.file.name, {
+          type: "application/octet-stream",
+        });
+      }
+      formData.append("file", fileToUpload);
+      formData.append("field", upload.field);
+    }
+
+    formData.append(
+      "request",
+      JSON.stringify({ data: requestData, ...options }),
+    );
+
+    return new Promise<Response>(function (resolve, rejectPromise) {
       if (onProgress) {
         xhr.upload.addEventListener(
           "progress",
@@ -257,31 +288,36 @@ export class DataSource {
         );
       }
 
-      xhr.onerror = reject;
-      xhr.onabort = reject;
+      xhr.onerror = rejectPromise;
+      xhr.onabort = rejectPromise;
 
       xhr.onload = function () {
-        let data: any = {};
-        try {
-          data = JSON.parse(xhr.response || xhr.responseText);
-        } catch {
-          // ignore
-        }
+        const headers = new Headers();
+        xhr
+          .getAllResponseHeaders()
+          .trim()
+          .split(/[\r\n]+/)
+          .forEach((line) => {
+            const idx = line.indexOf(":");
+            if (idx > 0) {
+              headers.append(
+                line.slice(0, idx).trim(),
+                line.slice(idx + 1).trim(),
+              );
+            }
+          });
 
-        const response = {
-          data,
+        const response = new Response(xhr.response ?? xhr.responseText, {
           status: xhr.status,
-        };
+          statusText: xhr.statusText,
+          headers,
+        });
+        Object.defineProperties(response, {
+          url: { value: xhr.responseURL },
+          redirected: { value: xhr.responseURL !== new URL(url, location.href).href },
+        });
 
-        if (xhr.status === 200) {
-          if (data?.status === 0) {
-            resolve(data?.data[0]);
-          } else {
-            reject(500);
-          }
-        } else {
-          reject(response.status);
-        }
+        resolve(response);
       };
 
       xhr.open("POST", url, true);

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -68,8 +54,8 @@ public class QueryJsonTest extends ScriptTest {
             .select("id", "email")
             .fetch(0, 0);
 
-    assertNotNull(list.get(0));
-    assertEquals("jsmith@gmail.com", list.get(0).get("email"));
+    assertNotNull(list.getFirst());
+    assertEquals("jsmith@gmail.com", list.getFirst().get("email"));
 
     list =
         JPA.all(Contact.class)
@@ -78,8 +64,8 @@ public class QueryJsonTest extends ScriptTest {
             .select("id", "email")
             .fetch(0, 0);
 
-    assertNotNull(list.get(0));
-    assertEquals("jsmith@gmail.com", list.get(0).get("email"));
+    assertNotNull(list.getFirst());
+    assertEquals("jsmith@gmail.com", list.getFirst().get("email"));
 
     // select custom field
     list =
@@ -88,7 +74,7 @@ public class QueryJsonTest extends ScriptTest {
             .select("id", "anotherAttrs.guardian.id")
             .fetch(0, 0);
 
-    assertEquals("1", list.get(0).get("anotherAttrs.guardian.id"));
+    assertEquals("1", list.getFirst().get("anotherAttrs.guardian.id"));
 
     // cast column value
     list =
@@ -98,7 +84,7 @@ public class QueryJsonTest extends ScriptTest {
             .select("anotherAttrs.guardian.id::integer")
             .fetch(0, 0);
 
-    assertEquals(1, list.get(0).get("anotherAttrs.guardian.id"));
+    assertEquals(1, list.getFirst().get("anotherAttrs.guardian.id"));
   }
 
   @Test
@@ -112,8 +98,8 @@ public class QueryJsonTest extends ScriptTest {
             .select("id", "street")
             .fetch(0, 0);
 
-    assertNotNull(list.get(0));
-    assertEquals("my street", list.get(0).get("street"));
+    assertNotNull(list.getFirst());
+    assertEquals("my street", list.getFirst().get("street"));
 
     list =
         JPA.all(Address.class)
@@ -122,8 +108,8 @@ public class QueryJsonTest extends ScriptTest {
             .select("id", "street")
             .fetch(0, 0);
 
-    assertNotNull(list.get(0));
-    assertEquals("my street", list.get(0).get("street"));
+    assertNotNull(list.getFirst());
+    assertEquals("my street", list.getFirst().get("street"));
 
     // select on a custom field with level >= 1 isn't supported
     list =
@@ -132,6 +118,6 @@ public class QueryJsonTest extends ScriptTest {
             .select("contact.anotherAttrs.guardian.id")
             .fetch(0, 0);
 
-    assertNull(list.get(0).get("contact.anotherAttrs.guardian.id"));
+    assertNull(list.getFirst().get("contact.anotherAttrs.guardian.id"));
   }
 }

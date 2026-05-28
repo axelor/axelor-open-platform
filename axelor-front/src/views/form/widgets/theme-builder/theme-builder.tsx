@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -11,6 +11,7 @@ import { CodeEditorComponent } from "../code-editor";
 
 export function ThemeBuilder(props: FieldProps<string>) {
   const { readonly, schema, valueAtom, widgetAtom } = props;
+  const id = useId();
 
   const [jsonMode, setJsonMode] = useState<boolean>(false);
   const [value, setValue] = useAtom(valueAtom);
@@ -54,12 +55,13 @@ export function ThemeBuilder(props: FieldProps<string>) {
   );
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box px={2} d="flex" alignItems="center" justifyContent="flex-end">
         <Button
           variant="link"
           d={"inline-flex"}
           gap={3}
+          data-testid="btn-toggle"
           onClick={() => setJsonMode(!jsonMode)}
         >
           {jsonMode ? (

@@ -6,7 +6,8 @@ import {
   molecule,
   useMolecule,
 } from "bunshi/react";
-import { atomFamily, useAtomCallback } from "jotai/utils";
+import { useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
 import {
   Dispatch,
   createContext,
@@ -15,6 +16,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  type JSX,
 } from "react";
 import isEqual from "lodash/isEqual";
 import uniq from "lodash/uniq";
@@ -73,14 +75,19 @@ export function useGridColumnNames({
             if ((item as JsonField).jsonField) {
               return [...names, (item as JsonField).jsonField as string];
             } else if (field) {
+              const schema = item as Schema;
+              const hasToOne = field.type?.endsWith("TO_ONE");
               return [
                 ...names,
                 field.name,
-                ...(field.type?.endsWith("TO_ONE") &&
-                (item as Schema).target &&
-                (item as Schema).targetName &&
-                (item as Schema).targetName !== field.targetName
-                  ? [`${field.name}.${(item as Schema).targetName}`]
+                ...(hasToOne &&
+                schema.target &&
+                schema.targetName &&
+                schema.targetName !== field.targetName
+                  ? [`${field.name}.${schema.targetName}`]
+                  : []),
+                ...(hasToOne && schema.colorField
+                  ? [`${field.name}.${schema.colorField}`]
                   : []),
               ];
             }
@@ -298,30 +305,35 @@ function CollectionRoot({
           item.model === model &&
           (item.record?.cid === id || item.record?.id === id),
       );
-    return atomFamily(({ id, model }: { id: number; model: string }) =>
-      atom(
-        (get) => {
-          const items = get(itemsAtom);
-          return findItem(items, id, model);
-        },
-        (get, set, update: SetStateAction<ItemState>) => {
-          const items = get(itemsAtom);
-          const item = findItem(items, id, model);
-          const state =
-            typeof update === "function"
-              ? update(item ?? { record: { id }, model })
-              : update;
+    return atomFamily(
+      ({ id, model }: { id: number; model: string }) =>
+        atom(
+          (get) => {
+            const items = get(itemsAtom);
+            return findItem(items, id, model);
+          },
+          (get, set, update: SetStateAction<ItemState>) => {
+            const items = get(itemsAtom);
+            const item = findItem(items, id, model);
+            const state =
+              typeof update === "function"
+                ? update(item ?? { record: { id }, model })
+                : update;
 
-          if (item) {
-            set(
-              itemsAtom,
-              items.map((_item) => (_item === item ? state : _item)),
-            );
-          } else {
-            set(itemsAtom, [...items, state]);
-          }
-        },
-      ),
+            if (item) {
+              set(
+                itemsAtom,
+                items.map((_item) => (_item === item ? state : _item)),
+              );
+            } else {
+              set(itemsAtom, [...items, state]);
+            }
+          },
+        ),
+      (
+        a: { id: number; model: string },
+        b: { id: number; model: string },
+      ) => a.id === b.id && a.model === b.model,
     );
   }, [itemsAtom]);
 

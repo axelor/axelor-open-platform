@@ -1,26 +1,11 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +38,7 @@ public class TestModuleResolver {
     add("axelor-project", "axelor-sale");
 
     List<String> expected =
-        Lists.newArrayList(
+        List.of(
             "axelor-core",
             "axelor-auth",
             "axelor-data",
@@ -72,7 +57,7 @@ public class TestModuleResolver {
 
     List<String> all = resolver.names();
 
-    assertEquals("axelor-core", all.get(0));
-    assertEquals("axelor-project", all.get(all.size() - 1));
+    assertEquals("axelor-core", all.getFirst());
+    assertEquals("axelor-project", all.getLast());
   }
 }

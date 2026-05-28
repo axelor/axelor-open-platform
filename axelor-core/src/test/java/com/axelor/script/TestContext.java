@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
@@ -29,13 +15,13 @@ import com.axelor.rpc.ContextEntity;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+@ScriptAllowed
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestContext extends ScriptTest {
 
@@ -69,7 +55,7 @@ public class TestContext extends ScriptTest {
     proxy.setFirstName("Some");
     assertEquals("Mrs. Some NAME", proxy.getFullName());
 
-    context.putAll(ImmutableMap.of("firstName", "Some1"));
+    context.putAll(Map.of("firstName", "Some1"));
     assertEquals("Mrs. Some1 NAME", proxy.getFullName());
 
     assertEquals("Mr. John Smith", managed.getFullName());
@@ -87,7 +73,7 @@ public class TestContext extends ScriptTest {
 
     assertNotNull(proxy.getCircles());
     assertTrue(proxy.getCircles().size() > 0);
-    assertFalse(proxy.getCircle(0) instanceof ContextEntity);
+    assertFalse(proxy.getCircles().iterator().next() instanceof ContextEntity);
 
     assertTrue(proxy instanceof ContextEntity);
     assertNotNull(((ContextEntity) proxy).getContextEntity());

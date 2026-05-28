@@ -1,34 +1,47 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j.local;
 
-import org.pac4j.core.exception.CredentialsException;
+import com.axelor.auth.password.policy.InvalidPolicy;
+import com.axelor.i18n.I18n;
+import com.axelor.rpc.ResponseException;
+import java.text.MessageFormat;
 
-public class ChangePasswordException extends CredentialsException {
+/**
+ * Thrown when a password change attempt fails due to a policy violation or other constraint.
+ *
+ * <p>When constructed with an {@link InvalidPolicy}, {@link #getMessage()} returns a translated,
+ * user-facing message combining a generic title with the policy violation detail.
+ */
+public class ChangePasswordException extends ResponseException {
 
   private static final long serialVersionUID = -1514519555256616172L;
 
+  private static final String TITLE = /*$$(*/ "Error changing password" /*)*/;
+  private static final String BODY_TITLE = /*$$(*/ "Invalid password" /*)*/;
+
+  private InvalidPolicy error = null;
+
   public ChangePasswordException() {
-    super("");
+    this("");
   }
 
   public ChangePasswordException(String message) {
-    super(message);
+    super(message, I18n.get(TITLE), null);
+  }
+
+  public ChangePasswordException(InvalidPolicy error) {
+    super(error.getMessage(), I18n.get(TITLE), null);
+    this.error = error;
+  }
+
+  @Override
+  public String getMessage() {
+    if (error != null) {
+      return MessageFormat.format("{0} : {1}", I18n.get(BODY_TITLE), error.getTranslatedMessage());
+    }
+    return super.getMessage();
   }
 }

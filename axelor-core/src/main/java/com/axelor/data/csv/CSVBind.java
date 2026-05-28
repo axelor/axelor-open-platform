@@ -1,39 +1,23 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.csv;
 
 import com.axelor.data.DataScriptHelper;
 import com.axelor.inject.Beans;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 @XStreamAlias("bind")
@@ -203,24 +187,15 @@ public class CSVBind {
     }
 
     for (String col : cols) {
-      if (cb.bindings == null) cb.bindings = Lists.newArrayList();
+      if (cb.bindings == null) cb.bindings = new ArrayList<>();
       cb.bindings.add(CSVBind.getBinding(field + "." + col, col, null));
     }
 
     cb.update = true;
     cb.search =
-        Joiner.on(" AND ")
-            .join(
-                Collections2.transform(
-                    cols,
-                    new Function<String, String>() {
-
-                      @Override
-                      public String apply(String input) {
-                        return String.format(
-                            "self.%s = :%s_%s_", input, field.replace('.', '_'), input);
-                      }
-                    }));
+        cols.stream()
+            .map(input -> "self.%s = :%s_%s_".formatted(input, field.replace('.', '_'), input))
+            .collect(Collectors.joining(" AND "));
 
     return cb;
   }

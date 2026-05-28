@@ -1,57 +1,132 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
-import java.time.LocalDateTime;
-import javax.annotation.Nullable;
-import org.apache.shiro.session.InvalidSessionException;
+import com.axelor.auth.UserSession.Device;
+import com.axelor.auth.db.User;
+import com.axelor.inject.Beans;
+import jakarta.inject.Inject;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 
 /** Manages session attributes. */
 public class AuthSessionService {
-  private static final String LOGIN_DATE = "com.axelor.internal.loginDate";
 
-  public void updateLoginDate() {
-    updateLoginDate(AuthUtils.getSubject().getSession(false));
+  public static final String REMOTE_IP = "com.axelor.internal.remoteIp";
+  public static final String USER_AGENT = "com.axelor.internal.userAgent";
+
+  @Inject private UserAgentParser userAgentParser;
+
+  public Collection<Session> getActiveSessions() {
+    return Beans.get(SessionDAO.class).getActiveSessions();
   }
 
-  public void updateLoginDate(Session session) {
-    if (session != null) {
-      session.setAttribute(LOGIN_DATE, LocalDateTime.now());
-    }
+  /**
+   * Returns all active sessions belonging to the given user.
+   *
+   * @param user the user whose sessions to retrieve
+   * @return collection of active sessions for the user
+   */
+  public Collection<Session> getActiveSessions(User user) {
+    return getActiveSessions().stream()
+        .filter(
+            session -> {
+              Object principals =
+                  session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+              if (principals instanceof PrincipalCollection principalCollection) {
+                return user.getCode().equals(principalCollection.getPrimaryPrincipal().toString());
+              }
+              return false;
+            })
+        .collect(Collectors.toList());
   }
 
-  @Nullable
-  public LocalDateTime getLoginDate() {
-    return getLoginDate(AuthUtils.getSubject().getSession(false));
+  /**
+   * Revokes the session identified by the given session ID.
+   *
+   * @param sessionId the ID of the session to revoke
+   */
+  public void terminateSession(String sessionId) {
+    terminateSession(
+        new Subject.Builder(SecurityUtils.getSecurityManager())
+            .sessionId(sessionId)
+            .buildSubject());
   }
 
-  @Nullable
-  public LocalDateTime getLoginDate(Session session) {
-    try {
-      if (session != null) {
-        return (LocalDateTime) session.getAttribute(LOGIN_DATE);
+  /**
+   * Revokes the given Shiro session.
+   *
+   * @param session the session to revoke
+   */
+  public void terminateSession(Session session) {
+    terminateSession(session.getId().toString());
+  }
+
+  /**
+   * Logs out the given subject, effectively revoking its session and firing logout events.
+   *
+   * @param subject the subject to log out
+   */
+  public void terminateSession(Subject subject) {
+    subject.logout();
+  }
+
+  /**
+   * Revokes all active sessions for the given user.
+   *
+   * @param user the user whose sessions to revoke
+   * @param includeCurrentSession whether to also revoke the caller's current session
+   */
+  public void terminateSessions(User user, boolean includeCurrentSession) {
+    Subject subject = AuthUtils.getSubject();
+    Session current = subject != null ? subject.getSession(false) : null;
+
+    for (Session session : getActiveSessions(user)) {
+      if (!includeCurrentSession && current != null && session.getId().equals(current.getId())) {
+        continue;
       }
-    } catch (InvalidSessionException e) {
-      // Fall through
+      terminateSession(session);
     }
+  }
 
-    return null;
+  /**
+   * Returns the list of active sessions for the given user, formatted for front-end consumption.
+   *
+   * <p>Each {@link UserSession} includes device info, timestamps as epoch milliseconds, and a flag
+   * indicating whether it is the caller's current session.
+   *
+   * @param user the user whose sessions to retrieve
+   * @return list of {@link UserSession} objects
+   */
+  public List<UserSession> getSessionsData(User user) {
+    Subject subject = AuthUtils.getSubject();
+    Session current = subject != null ? subject.getSession(false) : null;
+    return getActiveSessions(user).stream()
+        .map(session -> toUserSession(session, current))
+        .toList();
+  }
+
+  private UserSession toUserSession(Session session, Session current) {
+    String remoteIp = (String) session.getAttribute(REMOTE_IP);
+    String rawUa = (String) session.getAttribute(USER_AGENT);
+
+    UserAgentParser.UserAgentInfo ua = userAgentParser.parse(rawUa);
+    Device device = ua != null ? Device.of(remoteIp, ua) : Device.ofIpOnly(remoteIp);
+
+    return new UserSession(
+        session.getId().toString(),
+        session.getStartTimestamp().toInstant().toEpochMilli(),
+        session.getLastAccessTime().toInstant().toEpochMilli(),
+        current != null && session.getId().equals(current.getId()),
+        device);
   }
 }

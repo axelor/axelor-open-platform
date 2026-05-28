@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.converters;
 
@@ -22,19 +8,14 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.common.crypto.Encryptor;
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 public abstract class AbstractEncryptedConverter<T, R> implements AttributeConverter<T, R> {
 
-  private static final String ENCRYPTION_ALGORITHM =
+  private final String encryptionAlgorithm =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
-  private static final String ENCRYPTION_PASSWORD =
+  private final String encryptionPassword =
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
-
-  private static final String OLD_ENCRYPTION_ALGORITHM =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
-  private static final String OLD_ENCRYPTION_PASSWORD =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
 
   private Encryptor<T, R> encryptor;
   private Encryptor<T, R> oldEncryptor;
@@ -42,15 +23,25 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   protected abstract Encryptor<T, R> getEncryptor(String algorithm, String password);
 
   protected final Encryptor<T, R> encryptor() {
-    if (encryptor == null && StringUtils.notBlank(ENCRYPTION_PASSWORD)) {
-      encryptor = getEncryptor(ENCRYPTION_ALGORITHM, ENCRYPTION_PASSWORD);
+    if (encryptor == null && StringUtils.notBlank(encryptionPassword)) {
+      encryptor = getEncryptor(encryptionAlgorithm, encryptionPassword);
     }
     return encryptor;
   }
 
   protected final Encryptor<T, R> oldEncryptor() {
-    if (oldEncryptor == null && StringUtils.notBlank(OLD_ENCRYPTION_PASSWORD)) {
-      oldEncryptor = getEncryptor(OLD_ENCRYPTION_ALGORITHM, OLD_ENCRYPTION_PASSWORD);
+    if (oldEncryptor == null && isMigrating()) {
+      String oldAlgorithm =
+          StringUtils.notBlank(AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM))
+              ? AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM)
+              : encryptionAlgorithm;
+      String oldPassword =
+          StringUtils.notBlank(AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD))
+              ? AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD)
+              : encryptionPassword;
+      if (StringUtils.notBlank(oldPassword)) {
+        oldEncryptor = getEncryptor(oldAlgorithm, oldPassword);
+      }
     }
     return oldEncryptor;
   }

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.mapper;
 
@@ -24,6 +10,7 @@ import com.axelor.db.Model;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
+import jakarta.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 
 public class JsonProperty extends Property {
 
@@ -84,7 +70,7 @@ public class JsonProperty extends Property {
       return null;
     }
 
-    final String fieldName = fieldParts.get(0);
+    final String fieldName = fieldParts.getFirst();
     final String subFieldName = fieldParts.get(1);
     final String propertyName =
         fieldName.startsWith(KEY_JSON_PREFIX)
@@ -184,13 +170,12 @@ public class JsonProperty extends Property {
   }
 
   private Object persist(Object value) {
-    if (value instanceof Model) {
-      final Model bean = (Model) value;
+    if (value instanceof Model bean) {
       if (Optional.ofNullable(bean.getId()).orElse(0L) <= 0L) {
         JPA.em().persist(bean);
       }
-    } else if (value instanceof Collection) {
-      ((Collection<?>) value).forEach(this::persist);
+    } else if (value instanceof Collection<?> collection) {
+      collection.forEach(this::persist);
     }
     return value;
   }
@@ -217,7 +202,7 @@ public class JsonProperty extends Property {
 
   @Override
   public String getName() {
-    return String.format("%s.%s", fieldName, subFieldName);
+    return "%s.%s".formatted(fieldName, subFieldName);
   }
 
   @Override

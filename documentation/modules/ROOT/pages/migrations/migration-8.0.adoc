@@ -1,0 +1,1193 @@
+= 8.0 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md
+:gradle-8: https://docs.gradle.org/current/userguide/upgrading_version_8.html
+
+:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/21/migrate/index.html
+:url-jdk-features: https://www.oracle.com/java/technologies/javase/21-relnote-issues.html
+
+:url-jakarta-ee: https://jakarta.ee/specifications/platform/10/jakarta-platform-spec-10.0
+:eclipse-transformer: https://github.com/eclipse/transformer
+
+:url-hibernate-migration-6: https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html
+:url-hibernate-migration-6-1: https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html
+:url-hibernate-migration-6-2: https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html
+:url-hibernate-migration-6-3: https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html
+:url-hibernate-migration-6-4: https://docs.jboss.org/hibernate/orm/6.4/migration-guide/migration-guide.html
+:url-hibernate-migration-6-5: https://docs.jboss.org/hibernate/orm/6.5/migration-guide/migration-guide.html
+:url-hibernate-migration-6-6: https://docs.jboss.org/hibernate/orm/6.6/migration-guide/migration-guide.html
+
+:url-tomcat-10: https://tomcat.apache.org/migration-10.html
+:url-tomcat-10-1: https://tomcat.apache.org/migration-10.1.html
+
+In this document, we will see the major steps to migrate from 7.x to 8.0.
+
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md[changelog] for a detailed list of fixes, changes, and improvements introduced in 8.0.
+
+== Dependencies upgrade
+
+Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.
+
+Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
+improvements: `./gradlew wrapper --gradle-version=8.14.3 && ./gradlew wrapper`.
+
+Check Gradle migration to update your builds: {gradle-8}[Upgrading your build from Gradle 8.x to the latest]
+
+== Java 11 to Java 21
+
+Java 21 (LTS) is now our minimal version to build and run applications.
+
+Install Java 21 and then increase the Java version number in the `build.gradle` file:
+
+.build.gradle
+[source,gradle]
+----
+allprojects {
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(21)
+    }
+  }
+
+}
+----
+
+Also, make sure to use JDK 21 in the IDE as well as in your terminal (if needed).
+
+See the {url-jdk-upgrade}[JDK 21 migration guide] and {url-jdk-features}[JDK 21 release notes] for details.
+
+== Java EE to Jakarta EE
+
+With version 8.0, we are migrating to Jakarta EE 10+, which involves a significant namespace change from `javax.\*` to `jakarta.*`  and an upgrade of all the dependencies to be compliant with the new Jakarta EE namespace. This change affects the entire application and requires careful attention during the migration process.
+
+To migrate your application, you first need to change references in class imports, configuration files, etc.
+For an automated process, one option is to use the {eclipse-transformer}[Eclipse Transformer].
+The most laborious process will then be to update your application to work with the new versions of the dependencies.
+
+See the {url-jakarta-ee}[Jakarta EE Platform Specification] for details.
+
+The following links talk more about the Jakarta EE transition: https://jakarta.ee/blogs/javax-jakartaee-namespace-ecosystem-progress/[Jarkata EE blog post], https://blogs.oracle.com/javamagazine/post/transition-from-java-ee-to-jakarta-ee[Oracle blog post].
+
+== Hibernate 5.6 to Hibernate 6.6
+
+Hibernate 6.6 is compliant with Jakarta Persistence 3.1 and is a major part of the Jakarta EE migration. This will require the most careful attention during the migration process of your application. Here are some of the major changes:
+
+=== Schema Changes
+
+==== Column Types (on PostgreSQL)
+
+- *binary*: `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
+binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
+headaches and should only be used for specific "streaming" use cases.
++
+*Impact:* Critical for schema validation. Requires converting existing `oid` to `bytea`.
++
+*Optional:* If you still want to use `oid` database type, use `large="true"` attribute on fields.
++
+*Migration:*
++
+[source,sql]
+----
+CREATE OR REPLACE FUNCTION safe_lo_get(oid_value oid)
+RETURNS bytea AS $$
+BEGIN
+    IF oid_value IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM pg_largeobject_metadata WHERE oid = oid_value) THEN
+        RETURN lo_get(oid_value);
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE my_table ALTER COLUMN my_binary TYPE bytea USING safe_lo_get(my_binary);
+----
++
+*Cleanup:* You will have orphaned large objects in `pg_largeobject` that are no longer referenced by anything. PostgreSQL provides
+the `vacuumlo` utility to clean them up.
+
+- *decimal*: `decimal` fields declared in domains without a custom `scale` and `precison`, now default to precision
+`38` (previously often 19) to better align with SQL standards.
++
+*Impact:* Critical for schema validation. Requires converting to new precision.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_amount TYPE numeric(38, 2);
+----
++
+
+- *datetime*: `datetime` fields declared in domains now map to `timestamp(6) without time zone` (6 digits of fractional
+seconds, i.e., microseconds) instead of `timestamp without time zone` (with no params).
++
+*Impact:* Minimal. Postgres `timestamp` defaults to microsecond precision (6) anyway. Only aligned with Hibernate 6's
+expectations.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_date TYPE timestamp(6) without time zone;
+----
++
+
+- *datetime (tz)*: same as `datetime` for the microsecond precision but also map to `with time zone` instead of
+`without time zone`. It shifts data from being "Wall Clock Time" (what a clock on the wall says) to "Absolute Time"
+(a specific moment in the universe).
++
+*Impact:* Critical for schema validation. Requires converting "wall clock" time to "absolute" time.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table
+ALTER COLUMN my_zoned_date TYPE timestamp(6) with time zone
+USING my_zoned_date AT TIME ZONE 'Europe/Paris'; -- check your timezone
+----
++
+WARNING: Replace `Europe/Paris` with your specific database instance time zone (mostly JVM/server timezone). Verify migration
+on a staging database before.
+
+- *time*: same as `datatime`, `time` fields declared in domains now map to `time(6) without time zone` (6 digits of fractional
+seconds, i.e., microseconds) instead of `time without time zone` (with no params).
++
+*Impact:* Minimal. Postgres `time` defaults to microsecond precision (6) anyway. Only aligned with Hibernate 6's
+expectations.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ALTER COLUMN my_time TYPE time(6) without time zone;
+----
++
+
+- *Logical @OneToOne UNIQUE constraint*: Hibernate now always generates a UNIQUE constraint on the foreign key column
+for `@OneToOne` associations.
++
+*Impact:* Critical for schema validation. Requires adding the unique constraint.
++
+*Migration:*
++
+[source,sql]
+----
+ALTER TABLE my_table ADD CONSTRAINT uk_my_fk UNIQUE (my_fk_column);
+----
++
+WARNING: You cannot add a UNIQUE constraint if you already have "bad data" (duplicates) where multiple rows refer to
+the same foreign ID. You must clean that up first.
+
+TIP: Create a fresh database and let Hibernate generate the schema from scratch. Compare it with your existing
+production schema to identify all differences. Run migration SQL scripts on a local / staging environment first and
+verify data integrity.
+
+==== Non sequential sequences support
+
+Hibernate 6.x changed the default ID generation strategy to use one sequence per entity hierarchy instead of a single
+shared sequence `hibernate_sequence`.
+
+The `sequential` attribute on `<entity>` XML definitions is no longer supported and will be ignored (attribute still
+exists in XSD but will be removed in a further version).
+
+*Previous behavior:*
+
+- `sequential="true"` (default): Entity uses its own dedicated sequence (`<entity_name>_seq`)
+- `sequential="false"`: Entity shares the global `hibernate_sequence`
+
+*New behavior:*
+
+- All entities now use their own dedicated sequence (`<entity_name>_seq`)
+- The sequential `attribute` is deprecated and has no effect
+- The shared `hibernate_sequence` is no longer used
+
+For the migration, identify all entities that were configured with `sequential="false"`. These entities were previously
+using the shared `hibernate_sequence`. For each entity concerned, create a dedicated sequence initialized with a safe
+starting value and remove the sequential attribute in XML definition.
+
+[source,sql]
+----
+-- Create sequences for tables specified in `tables` array
+DO $$
+DECLARE
+    tbl TEXT;
+    max_id BIGINT;
+    tables TEXT[] := ARRAY['my_entity'];
+BEGIN
+    FOREACH tbl IN ARRAY tables
+    LOOP
+        EXECUTE format('SELECT MAX(id) FROM %I', tbl) INTO max_id;
+        EXECUTE format('CREATE SEQUENCE IF NOT EXISTS %I', tbl || '_seq');
+        IF max_id IS NOT NULL THEN
+            EXECUTE format('SELECT setval(%L, %s)', tbl || '_seq', max_id);
+        END IF;
+        RAISE NOTICE 'Created %_seq with last_value=%', tbl, COALESCE(max_id, 1);
+    END LOOP;
+END $$;
+
+-- Drop unused shared sequence
+drop sequence hibernate_sequence;
+----
+
+AOP has one built-in entity `MetaSequence` concerned by this change. Here is the associated migration script :
+[source,sql]
+----
+CREATE SEQUENCE IF NOT EXISTS meta_sequence_seq;
+SELECT setval('meta_sequence_seq', (SELECT MAX(id) FROM meta_sequence))
+----
+
+=== Query Changes
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-pseudo-attr[Special properties on plural attributes have been replaced by function syntax]
+
+.Before
+[source,jpql]
+----
+SELECT p FROM Person p WHERE p.addresses.size > 2
+----
+
+.After
+[source,jpql]
+----
+SELECT p FROM Person p WHERE size(p.addresses) > 2
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-distinct[`DISTINCT` is always passed to the SQL query to filter out parent entity duplicates]
+
+.Before
+[source,jpql]
+----
+SELECT DISTINCT p FROM Person p JOIN FETCH p.addresses
+----
+
+.After
+[source,jpql]
+----
+SELECT p FROM Person p JOIN FETCH p.addresses
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-path-comparison[Comparing an entity directly to a literal is no longer allowed]
+
+.Before
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e = 123
+----
+
+.After
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.id = 123
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-update-from[The `FROM` token is disallowed in `UPDATE` statements]
+
+.Before
+[source,jpql]
+----
+UPDATE FROM MyEntity e SET e.attr = null
+----
+
+.After
+[source,jpql]
+----
+UPDATE MyEntity e SET e.attr = null
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html#hql-null-literal-comparison[`NULL` comparisons using `=` and `<>`/`!=` have been removed]
+
+.Before
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.attr = NULL
+----
+
+.After
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.attr IS NULL
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-ordinal-param[Native query ordinal parameter binding is 1-based instead of 0-based]
+
+.Before
+[source,java]
+----
+s.createQuery("select p from Parent p where id in ?0", Parent.class);
+query.setParameter(0, Arrays.asList(0, 1, 2, 3));
+----
+
+.After
+[source,java]
+----
+s.createQuery("select p from Parent p where id in ?1", Parent.class);
+query.setParameter(1, Arrays.asList(0, 1, 2, 3));
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-stream[Query streams need to be explicitly closed]
+
+.Before
+[source,java]
+----
+Stream<MyEntity> stream = query.stream();
+// Use stream...
+// Stream automatically closed
+----
+
+.After
+[source,java]
+----
+try (Stream<MyEntity> stream = query.stream()) {
+    // Use stream...
+}
+// Stream automatically closed after try block
+----
+
+==== Stricter type checking for literals in field comparisons
+
+.Before
+[source,jpql]
+----
+-- Literal type could be coerced for the comparison
+SELECT e FROM MyEntity e WHERE e.id = '123'
+----
+
+.After
+[source,jpql]
+----
+-- Use the correct type for the literal
+SELECT e FROM MyEntity e WHERE e.id = 123
+
+-- Or use a parameter
+SELECT e FROM MyEntity e WHERE e.id = :entityId
+----
+
+==== Stricter parameter type binding
+
+A consequence of strict type binding is that the query parser will not assign different parameter types to the same named parameter.
+For example, using a single named parameter for both `IS NULL` check and an `IN` clause causes a type mismatch and falls back to column type:
+
+.Before
+[source,jpql]
+----
+SELECT e FROM MyEntity e WHERE :names IS NULL OR e.name IN :names
+----
+[source,java]
+----
+var names = List.of("a", "b");
+// IllegalArgumentException since Hibernate 6
+// Trying to coerce names to String instead of Collection<String>
+query.setParameter("names", ObjectUtils.isEmpty(names) ? null : names);
+----
+
+.After
+[source,jpql]
+----
+SELECT e FROM MyEntity e WHERE :isNamesEmpty = TRUE OR e.name IN :names
+----
+[source,java]
+----
+var names = List.of("a", "b");
+// Use separate parameters
+query.setParameter("isNamesEmpty", ObjectUtils.isEmpty(names));
+query.setParameter("names", names);
+----
+
+=== Other Notable Changes
+
+==== Hibernate 6 supports automatic coercion of single-value parameters
+
+[source,java]
+----
+// `credit` is a decimal field.
+var qlString = "SELECT self FROM Contact self WHERE self.credit = :credit";
+var credit = "2.5";
+var query = JPA.em().createQuery(qlString, Contact.class);
+// Hibernate 5 throws IllegalArgumentException.
+// Hibernate 6 can coerce single value.
+query.setParameter("credit", credit);
+// Hibernate 6 will return results.
+var result = query.getResultList();
+----
+
+==== Hibernate 6 changes behavior for multi-value parameter coercion
+
+[source,java]
+----
+// `credit` is a decimal field.
+var qlString = "SELECT self FROM Contact self WHERE self.credit IN :credits";
+var credits = new ArrayList<String>();
+credits.add(null);
+credits.add("");
+credits.add("2.5");
+var query = JPA.em().createQuery(qlString, Contact.class);
+// Hibernate 5 throws IllegalArgumentException.
+// Hibernate 6 cannot coerce multi value and does not throw IllegalArgumentException.
+query.setParameter("credits", credits);
+// Hibernate 6 throws NumberFormatException.
+var result = query.getResultList();
+----
+
+==== Hibernate 6 changes behavior when handling null values in collections for cached queries
+
+[source,java]
+----
+var qlString = "SELECT self FROM Contact self WHERE self.id IN :ids";
+var ids = new ArrayList<Long>();
+ids.add(null);
+ids.add(1L);
+ids.add(2L);
+var query = JPA.em().createQuery(qlString, Contact.class);
+query.setHint(AvailableHints.HINT_CACHEABLE, true);
+query.setParameter("ids", ids);
+// Hibernate 5 doesn't fail because of null in collection.
+// Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
+var result = query.getResultList();
+----
+
+=== Hibernate Migration Guides
+See all the Hibernate 6.x migration guides for detailed information about the migration process:
+
+* {url-hibernate-migration-6}[Hibernate 6.0 Migration Guide]
+* {url-hibernate-migration-6-1}[Hibernate 6.1 Migration Guide]
+* {url-hibernate-migration-6-2}[Hibernate 6.2 Migration Guide]
+* {url-hibernate-migration-6-3}[Hibernate 6.3 Migration Guide]
+* {url-hibernate-migration-6-4}[Hibernate 6.4 Migration Guide]
+* {url-hibernate-migration-6-5}[Hibernate 6.5 Migration Guide]
+* {url-hibernate-migration-6-6}[Hibernate 6.6 Migration Guide]
+
+== Hibernate Event Listeners
+
+As part of the upgrade to Hibernate 6.6, we have migrated audit support from **Hibernate Interceptor** to **Hibernate Event Listeners**. This change addresses issues with accessing the current transaction's session, which was problematic in scenarios where the session was created outside of the dependency injection context. Using Event Listeners allows access to the current session from the event source, ensuring more reliable operation across different contexts.
+
+Additionally, a new feature has been introduced that allows developers to register their own custom Hibernate event listeners.
+If you were using a custom Hibernate interceptor, we encourage you to migrate to event listeners as well, in order to address these issues.
+For details, refer to xref:dev-guide:modules/hibernate-listeners.adoc[Hibernate Event Listeners Documentation].
+
+== Guice 5.1 to Guice 7.0
+
+Guice 7.0 supports the Jakarta EE namespace and is part of the Jakarta EE migration. Compared to previous versions, it has completely dropped support for the `javax.*` namespace.
+
+See the https://github.com/google/guice/wiki/Guice700[Guice 7.0.0 release notes] for details.
+
+== RESTEasy 4.7 to RESTEasy 6.2
+
+RESTEasy 6.2 is compliant with Jakarta RESTful Web Services 3.1 and is part of the Jakarta EE migration.
+
+See the https://docs.resteasy.dev/6.2/userguide/[RESTEasy 6.2 user guide] for details.
+
+== Tomcat 9 to Tomcat 10.1
+
+Apache Tomcat 10.1 is compliant with Jakarta Servlet 6.0 and is part of the Jakarta EE migration. Apache Tomcat version 9 is no longer supported.
+
+See the {url-tomcat-10}[Apache Tomcat 10 migration guide] and {url-tomcat-10-1}[Apache Tomcat 10.1 migration guide] for details.
+
+== Shiro 1.13 to Shiro 2.0
+
+=== Password Hashing Changes
+
+As part of the upgrade to Apache Shiro 2, we have transitioned from the SHA-512 hashing algorithm to the new default, Argon2id. Argon2id is a state-of-the-art password hashing algorithm that offers enhanced protection against modern attack vectors.
+
+Argon2id hashing will be used for new users and for existing users when they change their password. Users with SHA-512 hashes will continue to be able to log in. However, to ensure all user passwords are secured with Argon2id, you may want to enforce a password change for users with legacy hashes:
+
+[source,sql]
+----
+UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
+----
+
+This will prompt affected users to change their password upon their next login.
+Argon2id hashing will automatically be applied to their new password.
+
+=== Session Management Changes
+
+We have switched from servlet-container sessions to Shiro native sessions. This change enables the use of Redis/Valkey server as a session store and simplifies the overall architecture by leveraging Shiro's `SessionDAO`.
+
+Key changes to be aware of:
+
+* Migration from `HttpSession` to Shiro's native `org.apache.shiro.session.Session`: if you are using `HttpServletRequest.getSession()`, you need to update your code to use `SecurityUtils.getSubject().getSession()` instead.
+* By default, the session manager now uses in-memory Caffeine cache. This means that sessions are not persisted between application restarts.
+* `HttpSessionListener` is no longer used. Instead, you can access active sessions via `AuthSessionService.getActiveSessions()` which uses the `SessionDAO`.
+
+For more details about Shiro's session management, see the https://shiro.apache.org/session-management.html[Shiro Session Management documentation].
+
+== API key authentication
+
+API key authentication allows clients to authenticate API requests without maintaining a session. This is particularly
+useful for server-to-server communication and automated scripts. See usage xref:dev-guide:web-services/auth.adoc[here].
+
+Run the following SQL script to create the table :
+
+[source,sql]
+----
+create sequence auth_user_token_seq;
+create table auth_user_token (
+    id           bigint not null primary key,
+    archived     boolean,
+    version      integer,
+    created_on   timestamp(6),
+    updated_on   timestamp(6),
+    expires_at   timestamp(6) not null,
+    last_used_at timestamp(6),
+    name         varchar(255) not null,
+    token_digest varchar(255) not null,
+    token_key    varchar(255) not null constraint uk_2yewhucjnwii7ljwbnt3bj3ll unique,
+    created_by   bigint constraint fk_o7822fne5ugastp3rtdqom43v references auth_user,
+    updated_by   bigint constraint fk_3yyw8xkkmkygcjayajg21jfvr references auth_user,
+    owner        bigint       not null constraint fk_3nsst639s8kn304497trbed5q references auth_user
+);
+
+create index auth_user_token_owner_idx on auth_user_token (owner);
+----
+
+
+To make API key authentication available for users, permissions must be set on `com.axelor.auth.db.UserToken` object
+with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, write, and remove accesses.
+
+== Multi-factor authentication
+
+A new `com.axelor.auth.db.MFA` entity is used to store multi-factor authentication configuration for a user.
+
+Run the following SQL script to create the table:
+
+[source,sql]
+----
+CREATE SEQUENCE auth_mfa_seq;
+CREATE TABLE auth_mfa (
+	id bigint NOT NULL,
+	archived bool NULL,
+	"version" integer NULL,
+	created_on timestamp(6) NULL,
+	updated_on timestamp(6) NULL,
+	default_method integer NULL,
+	email varchar(255) NULL,
+	email_code varchar(255) NULL,
+	email_code_expires_at timestamp(6) NULL,
+	enabled bool NULL,
+	is_email_validated bool NULL,
+	is_totp_validated bool NULL,
+	recovery_codes text NULL,
+	totp_secret varchar(255) NULL,
+	created_by bigint NULL,
+	updated_by bigint NULL,
+	"owner" bigint NOT NULL,
+	CONSTRAINT auth_mfa_pkey PRIMARY KEY (id),
+	CONSTRAINT uk_qlaks9iymof66mwqotodtpyg2 UNIQUE (owner),
+	CONSTRAINT fk_2yt0vnr9h8h8sxg1co544m64q FOREIGN KEY (created_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_o5nfu3rveqcse0hmkd54r5m4p FOREIGN KEY (updated_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_qlaks9iymof66mwqotodtpyg2 FOREIGN KEY ("owner") REFERENCES auth_user(id)
+);
+CREATE INDEX auth_mfa_owner_idx ON auth_mfa USING btree (owner);
+----
+
+To make multi-factor authentication available for users, permissions must be set on `com.axelor.auth.db.MFA` object
+with domain `self.owner = ?` and domain parameter `\\__user__`, with at least create, read, and write accesses.
+
+== S3-Compatible Object Storage
+
+We now support an S3-compatible object storage service for storing uploaded files.
+
+The default implementation uses disk storage using the existing `data.upload.dir` property.
+Object storage can be activated by configuring the `data.object-storage.*` properties.
+
+Make sure you use `com.axelor.meta.MetaFiles` service and the new `com.axelor.file.store.FileStoreFactory`
+instead of assuming disk storage and directly working with the file system.
+
+Example:
+
+[source,java]
+----
+// ❌ Old code directly working with the file system.
+
+String filePath = metaFile.getFilePath();
+Path inputPath = MetaFiles.getPath(filePath);
+
+if (Files.exists(inputPath)) {
+  try (InputStream inputStream = Files.newInputStream(inputPath)) {
+    // ...
+  }
+}
+----
+
+[source,java]
+----
+// ✅ New code using `com.axelor.file.store.FileStoreFactory`.
+
+Store store = FileStoreFactory.getStore();
+
+// File path can be either on file system or in object storage.
+String filePath = metaFile.getFilePath();
+
+// Use store method to check if the file exists.
+if (store.hasFile(filePath)) {
+  // Use store method to get the file stream.
+  try (InputStream inputStream = store.getStream(filePath)) {
+    // ...
+  }
+}
+----
+
+WARNING: As explained, switching the storage type in the configuration does not automatically make existing code
+compatible with object storage. The application should not access files directly using system APIs. Instead, always
+use the provided storage APIs (`MetaFiles`/`FileStoreFactory`) to manage files. These APIs ensure compatibility with
+both file system and object storage backends. If you are using BIRT reports (or any other report templates) that were
+originally designed for the local file system, you may need to adapt them to use the storage abstraction layer instead of
+relying on local file paths. More details xref:dev-guide:modules/reports.adoc[here].
+
+Run the following SQL script to update the `meta_file` table :
+
+[source,sql]
+----
+ALTER TABLE meta_file ADD store_type integer;
+UPDATE meta_file SET store_type = 1;
+ALTER TABLE meta_file ALTER COLUMN store_type SET NOT NULL;
+----
+
+Temporary file management was moved from `com.axelor.meta.MetaFiles` to `com.axelor.file.temp.TempFiles`
+and will use the new `data.upload.temp-dir` property:
+
+[source,java]
+----
+// Was: Path tempFile = MetaFiles.createTempFile(prefix, suffix);
+Path tempFile = TempFiles.createTempFile(prefix, suffix)
+
+// Was: Path tempFile = Files.createTempDirectory(prefix);
+Path tempFile = TempFiles.createTempDir(prefix);
+----
+
+For detailed information on configuring and using file storage, refer to xref:dev-guide:application/file-storage.adoc[File Storage Documentation].
+
+== `data.export.dir` removed
+
+Another consequence of supporting multiple storage providers is the removal of export directory setting `data.export.dir`. Related `ActionExport#getExportPath` is also removed.
+
+If you used data export dir, you need to migrate your code to create temporary files or directories, then download or attach the files somewhere for the users to access.
+
+In the case of `ActionResponse.setExportFile`, it is no longer necessary to specify a file path relative to export directory.
+Now, the specified file path (either `String`, `Path`, or `InputStream`) will be copied to a dedicated temporary file for pending export.
+
+[source,java]
+----
+// ❌ Old code using `data.export.dir`
+String exportPath = AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
+Path file = Path.of(exportPath, name);
+// Write to file
+// (...)
+// Set export file to be downloaded
+response.setExportFile(name); // file name must be relative to export path
+----
+
+[source,java]
+----
+// ✅ New code using a file, either temporary or not
+Path path = TempFiles.createTempFile();
+// Write to file
+// (...)
+// Set export file to be downloaded
+response.setExportFile(path, name); // path is copied to a dedicated temporary file, and optional name is used as download file name
+----
+
+[source,java]
+----
+// ✅ New code using an input stream
+try (InputStream inputStream = /* any input stream source */) {
+  // Set export file to be downloaded
+  response.setExportFile(inputStream, name); // stream is read into a temporary file, and name is used as download file name
+}
+----
+
+The removal of `data.export.dir` also affects `action-export` and i18n exports.
+
+=== `action-export` file storage
+
+Exported files generated by `action-export` actions are now created as temporary files, instead of being saved to `data.export.dir` directory.
+
+It used to be possible to disable downloading and have exported files only accessible in `data.export.dir` directory. This is no longer the case: the export files have to be either downloaded or attached to the current record.
+
+Because of the temporary file approach and the removal of `data.export.dir`,
+the `output` and `download` attributes on `action-export` action have now been _removed_:
+
+[source,xml]
+----
+  <!-- ❌ Attributes 'output' and 'download' are not valid anymore -->
+  <action-export name="export.sale.order" output="${name}/${date}${time}" download="true">
+    <export name="${name}.xml" template="data-export/export-sale-order.st" />
+  </action-export>
+----
+
+[source,xml]
+----
+  <!-- ✅ Export file will be directly downloaded by default -->
+  <action-export name="export.sale.order">
+    <export name="${name}.xml" template="data-export/export-sale-order.st" />
+  </action-export>
+----
+
+You can choose to attach the export file to the current record using the new `attachment` attribute.
+
+Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] for details.
+
+=== i18n exports
+
+i18n exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
+
+== New context propagation system
+
+The new context propagation system is used to propagate context across threads and tasks submission. This is an
+all-in-one system combining `TenantAware` and `AuditableRunner` behaviors.
+
+The main issue is to propagate in threads and tasks all information's coming from HTTP requests (only available in
+servlet environments). Are concerned: the current user, tenant, locale, language, and base URL. Some can be
+determined by application properties, some logic can be dependent from the request. The system is now able to propagate
+all current context information in threads and tasks. It also allows manually defining them in (case of scheduling /
+batching).
+
+`ContextAwareRunnable` or `ContextAwareCallable` can be used to propagate context
+information. This should be used over deprecated `TenantAware` and `AuditableRunner`.
+
+Migrate from `TenantAware` :
+
+[source,java]
+----
+// ❌ Old code
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(new TenantAware(() -> {
+  // work with database
+})
+.tenantId("some-tenant"));
+
+// ✅ New code
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(ContextAware.of().withTenantId("some-tenant")).build(
+  () -> {
+    // work with database
+  }
+);
+----
+
+Migrate from `AuditableRunner` :
+
+[source,java]
+----
+// ❌ Old code
+final AuditableRunner runner = Beans.get(AuditableRunner.class);
+final Callable<Boolean> job = () -> {
+  // process
+};
+runner.run(job);
+
+// ✅ New code
+final Callable<Boolean> job = () -> {
+  // process
+};
+ContextAware.of().withTransaction(false).withUser(AuthUtils.getUser("admin")).build(job).call();
+----
+
+IMPORTANT: The `AuditableRunner` first tries to set current authenticated user as audit user but if not found it will
+set admin user as the audit user. Also, it doesn't run the task inside a new transaction. With the new implementation,
+it no more sets the admin user as the audit user by default. In a non-servlet environment, you may have to provide the
+user you want the process to run with. Also, it opens a new transaction by default. This can be disabled with
+`.withTransaction(false)`.
+
+See more details xref:dev-guide:application/multi-tenancy.adoc[here]
+
+== Scripting Policy
+
+A scripting policy has been introduced to control which Java classes are accessible from scripts (Groovy, Expression Language, JavaScript). By default, access to most application classes is now restricted.
+
+If your application uses scripts that call custom services or other classes, you will need to explicitly allow them. You can do this in two ways:
+
+*  Add the `@com.axelor.script.ScriptAllowed` annotation to your service interfaces or classes.
+*  Implement the `com.axelor.script.ScriptPolicyConfigurator` interface to programmatically define allowed/denied packages and classes.
+
+Additionally, a script execution timeout has been introduced to prevent infinite loops, which defaults to 5 minutes. This can be configured globally or per script execution.
+
+`doInJpa` helper has been removed, as it allowed unrestricted database access.
+To get a bean instance with policy check, `\\__bean__(Class<T>)` helper has been introduced to replace unrestricted `com.axelor.inject.Beans.get(Class<T>)` usage.
+
+Some migration examples:
+
+[source,groovy]
+----
+// ❌ Old code
+doInJPA({ em -> em.find(Contact, id) }) // unrestricted database access
+com.axelor.inject.Beans.get(SaleOrderService).validate(order) // unrestricted instanciation of all services
+com.axelor.app.AppSettings.get().get('application.mode') != 'prod' // unrestricted access to all app settings
+
+// ✅ New code
+__repo__(Contact).find(id) // repositories are allowed by default
+__bean__(SaleOrderService).validate(order) // checks scripting policy
+__bean__(com.axelor.app.script.ScriptAppSettings).getApplicationMode() != 'prod' // you need to write your own script-allowed app settings helper
+----
+
+Note that the scripting policy is also applied to Groovy template engines by using the same class scanner
+and compiler configuration as for Groovy scripts. A side effect is that Groovy templates now use the same JPA class scanner.
+Unqualified classes are resolved and you can't override them in context:
+
+[source,java]
+----
+// ❌ Old code putting "Invoice" in Groovy template context
+var templates = new GroovyTemplates();
+templates.fromText("${Invoice.printingSettings?.addressPositionSelect}").make(Map.of("Invoice", invoice))).render()
+
+// ✅ New code putting "invoice" (lowercase) in Groovy template context
+// "Invoice" would resolve as the entity class, i.e. `com.axelor.apps.account.db.Invoice`
+var templates = new GroovyTemplates();
+templates.fromText("${invoice.printingSettings?.addressPositionSelect}").make(Map.of("invoice", invoice))).render()
+----
+
+For a detailed explanation of the new policy, default rules, and configuration options, please refer to the xref:dev-guide:application/scripting-policy.adoc[Scripting Policy Documentation].
+
+== BIRT 4.4.2 to BIRT 4.21.0
+
+http://www.eclipse.org/birt[BIRT] reporting engine 4.21.0 includes _numerous_ improvements/changes.
+That means that many of your existing reports will likely have rendering changes or may even be broken and will need to be manually fixed.
+
+`IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but is enabled by default.
+
+BIRT has a transitive dependency to **Apache POI**, upgraded from 3.9 to 5.4.x, that includes https://poi.apache.org/changes.html[**breaking changes**].
+
+Some examples of Apache POI change (non-exhaustive):
+
+- `Cell.CELL_TYPE_<NUMERIC|STRING|...>` (int) -> `CellType.<NUMERIC|STRING|...>` (enum)
+- `cell.setCellType(Cell.CELL_TYPE_BLANK)` -> `cell.setBlank()`
+- `font.setBoldweight(Font.BOLDWEIGHT_BOLD)` -> `font.setBold(true);`
+
+Also, the XML parser in BIRT has become stricter. Most notably, in your `fontsConfig.xml`,
+you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
+Otherwise, your font configuration file will fail validation and will be ignored.
+
+Before:
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE font>
+<font>
+  <font-aliases>
+    <mapping name="serif" font-family="DejaVu Serif" />
+    <mapping name="sans-serif" font-family="DejaVu Sans" />
+    <mapping name="monospace" font-family="DejaVu Sans Mono" />
+  </font-aliases>
+  <font-paths>
+    <path path="C:/windows/fonts" />
+    <path path="/usr/share/fonts/truetype" />
+    <path path="/usr/share/fonts/TTF" />
+  </font-paths>
+</font>
+----
+
+After:
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<font>
+  <font-aliases>
+    <mapping name="serif" font-family="DejaVu Serif" />
+    <mapping name="sans-serif" font-family="DejaVu Sans" />
+    <mapping name="monospace" font-family="DejaVu Sans Mono" />
+  </font-aliases>
+  <font-paths>
+    <path path="C:/windows/fonts" />
+    <path path="/usr/share/fonts/truetype" />
+    <path path="/usr/share/fonts/TTF" />
+  </font-paths>
+</font>
+----
+
+== Groovy 3 to Groovy 4
+
+Groovy 4 brings improvements in performance, Java compatibility, and language features. Beware of a few breaking changes mentioned in the https://groovy-lang.org/releasenotes/groovy-4.0.html[Groovy 4 release notes].
+
+== Dropped `name` field on MetaFilter
+
+The `name` field on `MetaFilter` has been removed, and different users can now create filters with the same title.
+
+For the migration, you need to alter the table `meta_filter` with the following SQL statement:
+
+[source,sql]
+----
+DROP INDEX IF EXISTS meta_filter_name_idx;
+ALTER TABLE meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
+ALTER TABLE meta_filter DROP COLUMN name;
+CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+----
+
+== `TagSelect` widget deprecated in favor of `Tags`
+
+`TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it's just a renaming of the widget name
+for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage will be
+removed in a next version.
+
+== Remove Junit4 support
+
+JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support
+for JUnit Jupiter (JUnit 5) was introduced in v6.0. It is time to drop support for JUnit 4. Migrate your Junit tests
+to Junit5.
+
+== Remove Gradle support for database management
+
+Gradle support for database management, `./gradlew database (init|update|...)`, is removed in favor of
+xref:dev-guide:application/cli.adoc[new CLI].
+
+== Remove license header support
+
+As part of the AxelorPlugin, we historically provided built-in support to manage license headers. This support has been
+removed and `licenseFormat`, `licenseCheck` and related tasks no longer exist. If `license` extension has been
+customized, it can be removed as no more used.
+
+The plugin on which support was provided is no longer maintained. This is now application or module responsibility to provide it.
+
+There are many Gradle plugins that can do the job. https://plugins.gradle.org/search?term=license+header[List] is
+available on the Gradle plugin portal. The awesome https://plugins.gradle.org/plugin/com.diffplug.gradle.spotless[Spotless] formatting plugin provides support for adding license headers.
+
+== Deprecate Angular support
+
+To easily migrate from previous versions, v7 was built with legacy Angular evaluations and templates support. This
+compatibility layer was intended as a temporary bridge to help move from Angular to React. Since React is now fully
+stable and supported, we encourage completing migration to React.
+
+What this means:
+
+- Legacy Angular support will be removed in an upcoming major release.
+- Any remaining Angular-based templates or evaluations will stop working once this removal takes place.
+- To ensure a smooth upgrade path, please migrate your codebase to React as soon as possible.
+
+== Remove `$record` support for custom field expression like showIf/hideIf
+
+Previously, for custom fields we used the `$record` prefix to access form fields (e.g., `$record.name`) in `showIf`/`hideIf` expressions.
+Now, form fields are directly accessible without the prefix, as `$record` support has been removed.
+
+Also, scoped fields are not directly accessible. For example, if you have a custom field named `test` inside `attrs` and want to use it in an expression for another field within the `attrs` scope,
+you need to reference it as `$attrs.test`.
+
+**Before:**
+
+[source,jsx]
+----
+<field name="attrs.test" showIf="$record.id && $record.name" />
+<field name="attrs.testFrom" showIf="test" /> // showIf attrs.test is set
+----
+
+**Now:**
+
+[source,jsx]
+----
+<field name="attrs.test" showIf="id && name" />
+<field name="attrs.testFrom" showIf="$attrs.test" />
+----
+
+**Key changes:**
+
+* Removed support for the `$record` prefix usage in custom field expression.
+* Expressions are now unified and work consistently across both form fields and custom fields.
+
+== Dropped deprecated features
+
+Some features that were marked as deprecated in previous versions are now dropped :
+
+* Help widget `css` support is removed, use `variant` instead.
+See xref:migrations/migration-7.3.adoc#help-widget-variant-support[7.3 migration guide]
+* Remove deprecated `ws/files/report/{link:.\*}` and `ws/files/data-export/{fileName:.*}` web services in favor of their
+equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
+* Remove `MetaPermissions#isCollectionReadable` method.
+* Remove support of Font Awesome icons. Use either Material Symbols and Bootstrap Icons.
+* Remove `top` attribute in `menuitem`. Top menu support has been removed since 7.0. To ensure compatibility, the
+attribute was still present in xsd.
+* Remove `record.` prefix support in expressions/templates/EvalRefSelect. Added for backward compatibility, accessing
+fields now no longer need `record.` prefix. Update your js expressions, templates, and EvalRefSelect `x-eval-*`
+attributes according.
+* Remove method `JPA#withTransaction(Supplier)` in favor of `JPA#callInTransaction(Supplier)`
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+-- MetaSequence
+CREATE SEQUENCE IF NOT EXISTS meta_sequence_seq;
+SELECT setval('meta_sequence_seq', (SELECT MAX(id) FROM meta_sequence))
+
+-- MFA
+
+CREATE SEQUENCE auth_mfa_seq;
+CREATE TABLE auth_mfa (
+	id bigint NOT NULL,
+	archived bool NULL,
+	"version" integer NULL,
+	created_on timestamp(6) NULL,
+	updated_on timestamp(6) NULL,
+	default_method integer NULL,
+	email varchar(255) NULL,
+	email_code varchar(255) NULL,
+	email_code_expires_at timestamp(6) NULL,
+	enabled bool NULL,
+	is_email_validated bool NULL,
+	is_totp_validated bool NULL,
+	recovery_codes text NULL,
+	totp_secret varchar(255) NULL,
+	created_by bigint NULL,
+	updated_by bigint NULL,
+	"owner" bigint NOT NULL,
+	CONSTRAINT auth_mfa_pkey PRIMARY KEY (id),
+	CONSTRAINT uk_qlaks9iymof66mwqotodtpyg2 UNIQUE (owner),
+	CONSTRAINT fk_2yt0vnr9h8h8sxg1co544m64q FOREIGN KEY (created_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_o5nfu3rveqcse0hmkd54r5m4p FOREIGN KEY (updated_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_qlaks9iymof66mwqotodtpyg2 FOREIGN KEY ("owner") REFERENCES auth_user(id)
+);
+CREATE INDEX auth_mfa_owner_idx ON auth_mfa USING btree (owner);
+
+-- UserToken
+
+create sequence auth_user_token_seq;
+create table auth_user_token (
+    id           bigint not null primary key,
+    archived     boolean,
+    version      integer,
+    created_on   timestamp(6),
+    updated_on   timestamp(6),
+    expires_at   timestamp(6) not null,
+    last_used_at timestamp(6),
+    name         varchar(255) not null,
+    token_digest varchar(255) not null,
+    token_key    varchar(255) not null constraint uk_2yewhucjnwii7ljwbnt3bj3ll unique,
+    created_by   bigint constraint fk_o7822fne5ugastp3rtdqom43v references auth_user,
+    updated_by   bigint constraint fk_3yyw8xkkmkygcjayajg21jfvr references auth_user,
+    owner        bigint       not null constraint fk_3nsst639s8kn304497trbed5q references auth_user
+);
+
+create index auth_user_token_owner_idx on auth_user_token (owner);
+
+-- binary fields
+
+CREATE OR REPLACE FUNCTION safe_lo_get(oid_value oid)
+RETURNS bytea AS $$
+BEGIN
+    IF oid_value IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM pg_largeobject_metadata WHERE oid = oid_value) THEN
+        RETURN lo_get(oid_value);
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE team_team
+    ALTER COLUMN image TYPE bytea
+        USING safe_lo_get(image);
+
+ALTER TABLE auth_user
+    ALTER COLUMN image TYPE bytea
+        USING safe_lo_get(image);
+
+-- MetaFile change
+
+ALTER TABLE meta_file ADD store_type integer;
+UPDATE meta_file SET store_type = 1;
+ALTER TABLE meta_file ALTER COLUMN store_type SET NOT NULL;
+
+-- MetaFilter change
+
+DROP INDEX IF EXISTS meta_filter_name_idx;
+ALTER TABLE meta_filter DROP CONSTRAINT IF EXISTS uk_ms83n8hubmvq1mhv3a49ra1e3;
+ALTER TABLE meta_filter DROP COLUMN name;
+CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+
+-- datetime change
+
+alter table team_task alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_task alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table team_team alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_team alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table team_topic alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table team_topic alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_group alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_group alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_password_reset_token alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_password_reset_token alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_password_reset_token alter column expire_at type timestamp(6) using expire_at::timestamp(6);
+alter table auth_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_role alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_role alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_user alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table auth_user alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table auth_user alter column activate_on type timestamp(6) using activate_on::timestamp(6);
+alter table auth_user alter column expires_on type timestamp(6) using expires_on::timestamp(6);
+alter table auth_user alter column password_updated_on type timestamp(6) using password_updated_on::timestamp(6);
+alter table dms_file alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_file alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table dms_file_tag alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_file_tag alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table dms_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table dms_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_address alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_address alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_flags alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_flags alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_follower alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_follower alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table mail_message alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table mail_message alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_action alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_action alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_action_menu alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_action_menu alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_attachment alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_attachment alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_enum alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_enum alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_field alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_field alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_file alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_file alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_filter alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_filter alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_field alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_field alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_model alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_model alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_json_record alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_json_record alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_menu alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_menu alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_model alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_model alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_module alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_module alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_permission alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_permission alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_permission_rule alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_permission_rule alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_schedule alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_schedule alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_schedule_param alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_schedule_param alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_select alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_select alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_select_item alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_select_item alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_sequence alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_sequence alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_theme alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_theme alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_view alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_view alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+alter table meta_view_custom alter column created_on type timestamp(6) using created_on::timestamp(6);
+alter table meta_view_custom alter column updated_on type timestamp(6) using updated_on::timestamp(6);
+
+-- drop shared sequence and function (only used for migration)
+
+drop sequence hibernate_sequence;
+DROP FUNCTION safe_lo_get(oid);
+----

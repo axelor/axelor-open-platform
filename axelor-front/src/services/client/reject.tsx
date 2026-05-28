@@ -1,6 +1,7 @@
 import { dialogs } from "@/components/dialogs";
 
 import { alerts } from "@/components/alerts";
+import { ErrorBoxFooter } from "@/components/error-box";
 import { Box, Button } from "@axelor/ui";
 import { i18n } from "./i18n";
 import { session } from "./session";
@@ -13,7 +14,6 @@ export type ErrorReport = {
   causeStack?: string;
   entityId?: number;
   entityName?: string;
-  constraints?: Record<string, string>;
 };
 
 export type RejectType = number | string | ErrorReport | null;
@@ -82,6 +82,7 @@ const showDialog = ({
                 size: "xl",
                 yesNo: false,
                 padding: "0",
+                footer: () => <ErrorBoxFooter error={new Error(stacktrace)} />,
               })
             }
           >

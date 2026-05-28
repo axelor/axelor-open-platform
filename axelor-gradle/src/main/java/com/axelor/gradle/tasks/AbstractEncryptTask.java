@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.gradle.tasks;
 
@@ -24,7 +10,6 @@ import com.axelor.common.YamlUtils;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.encryption.StringEncryption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,14 +190,14 @@ public abstract class AbstractEncryptTask extends DefaultTask {
         return YamlUtils.getFlattenedMap(YamlUtils.loadYaml(path));
       }
     } catch (Exception e) {
-      getLogger().error(String.format("Unable to open configuration file %s", path));
+      getLogger().error("Unable to open configuration file %s".formatted(path));
     }
     return new HashMap<>();
   }
 
   @Internal
   protected Path getConfigurationFile() {
-    Path rootPath = Paths.get(getProject().getRootDir().toURI());
+    Path rootPath = Path.of(getProject().getRootDir().toURI());
     for (String fileName : CONFIGS_FILES) {
       Path filePath = rootPath.resolve(CONFIGS_FILES_PATH).resolve(fileName);
       if (filePath.toFile().exists()) {
@@ -251,16 +236,16 @@ public abstract class AbstractEncryptTask extends DefaultTask {
     log("");
     getLogger()
         .lifecycle(
-            String.format(
-                "WARNING : Do not add property `%s.%s` with the password in your configuration file.\n"
-                    + "Use a reference to an external file : `file:<path_to_file>` as password value.",
-                CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
+            ("""
+            WARNING : Do not add property `%s.%s` with the password in your configuration file.
+            Use a reference to an external file : `file:<path_to_file>` as password value.""")
+                .formatted(CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
   }
 
   private void printConfig(String value, String key) {
     if (StringUtils.isBlank(value)) {
       return;
     }
-    log(String.format("%s.%s = %s", CONFIG_ENCRYPTOR_PREFIX, key, value));
+    log("%s.%s = %s".formatted(CONFIG_ENCRYPTOR_PREFIX, key, value));
   }
 }

@@ -3,6 +3,7 @@ import { atom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import {
+  Ref,
   RefObject,
   forwardRef,
   useCallback,
@@ -37,6 +38,7 @@ import {
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData, ViewData } from "@/services/client/meta";
+import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
   Field,
@@ -45,13 +47,13 @@ import {
   JsonField,
   Perms,
   Property,
+  Schema,
 } from "@/services/client/meta.types";
 import { getFieldValue } from "@/utils/data-record";
 import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
-import { findView } from "@/services/client/meta-cache";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
 import {
@@ -62,13 +64,14 @@ import {
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
+import { ExpandIcon, ExpandableFormView } from "./expandable";
 import {
   GridContext,
   GridHandler as GridContextType,
   useCollectionTreeEditable,
   useGridColumnNames,
 } from "./scope";
-import { ExpandIcon, ExpandableFormView } from "./expandable";
+import { SummaryBarHandler, SummaryBar } from "./summary-bar";
 
 import styles from "../grid.module.scss";
 
@@ -102,10 +105,17 @@ const getLabels: () => Record<GridLabel, string> = () =>
     "Sort Descending": i18n.get("Sort Descending"),
     "Group by": i18n.get("Group by"),
     "Customize...": i18n.get("Customize..."),
+    "Expand row": i18n.get("Expand row"),
+    "Collapse row": i18n.get("Collapse row"),
+    "Expand group": i18n.get("Expand group"),
+    "Collapse group": i18n.get("Collapse group"),
+    "Column options": i18n.get("Column options"),
+    "Select row": i18n.get("Select row"),
+    "Select all rows": i18n.get("Select all rows"),
   });
 
 export type GridHandler = {
-  form?: RefObject<GridFormHandler>;
+  form?: RefObject<GridFormHandler | null>;
   onAdd?: () => void;
   onSave?: () => void;
   commit?: () => void;
@@ -131,6 +141,7 @@ export const Grid = forwardRef<
     columnAttrs?: Record<string, Partial<Attrs>>;
     columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
+    summaryBarHandler?: Ref<SummaryBarHandler>;
     gridContext?: GridContextType;
     onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
@@ -166,6 +177,7 @@ export const Grid = forwardRef<
     readonly,
     columnAttrs,
     columnFormatter,
+    summaryBarHandler,
     records,
     state,
     setState,
@@ -243,7 +255,7 @@ export const Grid = forwardRef<
       .map((item) => {
         const field = fields?.[item.name!];
         const title = item.title ?? item.autoTitle;
-        const attrs = item.widgetAttrs;
+        const attrs = { ...field?.widgetAttrs, ...item.widgetAttrs };
         const serverType = (item as Field).serverType || field?.type;
         const columnProps: Partial<GridColumn> = {};
         const extraAttrs = columnAttrs?.[item.name!];
@@ -263,7 +275,11 @@ export const Grid = forwardRef<
           columnProps.computed = true;
         }
 
-        if (item.type === "button" || item.widget === "icon") {
+        if (
+          widget === "button" ||
+          item.type === "button" ||
+          item.widget === "icon"
+        ) {
           columnProps.sortable = false;
           columnProps.searchable = false;
           columnProps.editable = false;
@@ -397,9 +413,10 @@ export const Grid = forwardRef<
             type: "form",
             name: expandableView,
             model,
+            jsonModel: view.jsonModel,
           });
     }
-  }, [expandable, model, fields, expandableView]);
+  }, [expandable, model, fields, expandableView, view.jsonModel]);
 
   useAsyncEffect(async () => {
     await onSearch?.({ ...searchOptions, fields: names });
@@ -588,26 +605,27 @@ export const Grid = forwardRef<
     [],
   );
 
-  const RowDetailsRenderer = useMemo(() => {
-    return ({
-      data,
-      onClose,
-    }: GridRowProps & {
-      onClose?: () => void;
-    }) =>
-      expandViewMeta ? (
-        <ExpandableFormView
-          gridView={view}
-          meta={expandViewMeta}
-          record={data.record!}
-          onUpdate={onUpdate}
-          onSave={onSave}
-          onDiscard={handleRecordDiscard}
-          onClose={onClose}
-        />
-      ) : null;
-    // eslint-disable-next-line
-  }, [view, onSave, onUpdate, expandViewMeta]);
+  const RowDetailsRenderer = useMemo(
+    () =>
+      ({
+        data,
+        onClose,
+      }: GridRowProps & {
+        onClose?: () => void;
+      }) =>
+        expandViewMeta ? (
+          <ExpandableFormView
+            gridView={view}
+            meta={expandViewMeta}
+            record={data.record!}
+            onUpdate={onUpdate}
+            onSave={onSave}
+            onDiscard={handleRecordDiscard}
+            onClose={onClose}
+          />
+        ) : null,
+    [view, onSave, onUpdate, expandViewMeta, handleRecordDiscard],
+  );
 
   useImperativeHandle(
     ref,
@@ -653,53 +671,66 @@ export const Grid = forwardRef<
     [editable, readonly, _gridContext],
   );
 
+  const isCollectionGrid = (view as Schema).serverType?.endsWith("TO_MANY");
+
   return (
-    <AxGridProvider>
-      <GridContext.Provider value={gridContext}>
-        <AxGrid
-          ref={gridRef}
-          labels={getLabels()}
-          cellRenderer={CustomCellRenderer}
-          rowRenderer={CustomRowRenderer}
-          allowColumnResize
-          allowGrouping={!canMove}
-          allowSorting={!canMove}
-          allowSelection
-          allowCellSelection
-          allowColumnHide
-          allowColumnOptions
-          allowColumnCustomize
-          allowCheckboxSelection={allowCheckboxSelection}
-          allowRowReorder={canMove}
-          allowRowExpand={expandable}
-          sortType="state"
-          selectionType="multiple"
-          {...(editable &&
-            !isMobile && {
-              editable,
-              editRowRenderer: CustomFormRenderer,
-              onRecordSave: handleRecordSave,
-              onRecordAdd: handleRecordAdd,
-              onRecordEdit: handleRecordEdit,
-              onRecordDiscard: handleRecordDiscard,
+    <>
+      <AxGridProvider>
+        <GridContext.Provider value={gridContext}>
+          <AxGrid
+            ref={gridRef}
+            labels={getLabels()}
+            cellRenderer={CustomCellRenderer}
+            rowRenderer={CustomRowRenderer}
+            allowColumnResize
+            allowGrouping={!canMove}
+            allowSorting={!canMove}
+            allowSelection
+            allowCellSelection
+            allowColumnHide
+            allowColumnOptions
+            allowColumnCustomize
+            allowCheckboxSelection={allowCheckboxSelection}
+            allowRowReorder={canMove}
+            allowRowExpand={expandable}
+            sortType="state"
+            selectionType="multiple"
+            {...(editable &&
+              !isMobile && {
+                editable,
+                editRowRenderer: CustomFormRenderer,
+                onRecordSave: handleRecordSave,
+                onRecordAdd: handleRecordAdd,
+                onRecordEdit: handleRecordEdit,
+                onRecordDiscard: handleRecordDiscard,
+              })}
+            {...(expandable && {
+              rowDetailsRenderer: RowDetailsRenderer,
+              ...detailsProps,
             })}
-          {...(expandable && {
-            rowDetailsRenderer: RowDetailsRenderer,
-            ...detailsProps,
-          })}
-          onCellClick={handleCellClick}
-          onRowDoubleClick={handleRowDoubleClick}
-          sortHandler={sortHandler}
-          state={state!}
-          setState={setState!}
-          records={records!}
-          rowHeight={Math.max(view.rowHeight ?? 35, 35)}
-          {...gridProps}
-          {...(initData && { noRecordsText })}
-          columns={columns}
-          className={clsx(className, styles.grid)}
+            onCellClick={handleCellClick}
+            onRowDoubleClick={handleRowDoubleClick}
+            sortHandler={sortHandler}
+            state={state!}
+            setState={setState!}
+            records={records!}
+            rowHeight={Math.max(view.rowHeight ?? 35, 35)}
+            {...gridProps}
+            {...(initData && { noRecordsText })}
+            columns={columns}
+            className={clsx(className, styles.grid)}
+          />
+        </GridContext.Provider>
+      </AxGridProvider>
+      {state && view.summaryBar && (
+        <SummaryBar
+          state={state}
+          data={view.summaryBar}
+          handler={summaryBarHandler}
+          actionExecutor={actionExecutor}
+          callAction={!isCollectionGrid}
         />
-      </GridContext.Provider>
-    </AxGridProvider>
+      )}
+    </>
   );
 });

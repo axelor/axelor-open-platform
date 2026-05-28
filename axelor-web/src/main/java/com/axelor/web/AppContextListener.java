@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web;
 
@@ -26,15 +12,15 @@ import com.google.inject.Binding;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
+import dev.resteasy.guice.GuiceResourceFactory;
+import dev.resteasy.guice.ModuleProcessor;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.SessionCookieConfig;
 import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.SessionCookieConfig;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
 import org.jboss.resteasy.core.ResteasyContext;
 import org.jboss.resteasy.core.SynchronousDispatcher;
-import org.jboss.resteasy.plugins.guice.GuiceResourceFactory;
-import org.jboss.resteasy.plugins.guice.ModuleProcessor;
 import org.jboss.resteasy.plugins.server.servlet.ListenerBootstrap;
 import org.jboss.resteasy.spi.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
@@ -95,8 +81,13 @@ public class AppContextListener extends GuiceServletContextListener {
     final ServletContext context = servletContextEvent.getServletContext();
     final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
     cookieConfig.setHttpOnly(true);
-    cookieConfig.setSecure(
-        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
+    final boolean sessionCookieSecure =
+        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false);
+
+    if (sessionCookieSecure) {
+      cookieConfig.setSecure(sessionCookieSecure);
+      cookieConfig.setAttribute("SameSite", "None");
+    }
   }
 
   private void beforeStart(ServletContextEvent servletContextEvent) {

@@ -1,8 +1,7 @@
-import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { ScopeProvider } from "bunshi/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
-  MutableRefObject,
   RefObject,
   SyntheticEvent,
   memo,
@@ -12,15 +11,15 @@ import {
   useRef,
   useState,
 } from "react";
-import uniq from "lodash/uniq";
 
-import { clsx, Block, Box, CommandItemProps } from "@axelor/ui";
+import { Block, Box, CommandItemProps, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useSingleClickHandler } from "@/hooks/use-button";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
@@ -36,6 +35,7 @@ import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
+import { toCamelCase } from "@/utils/names";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
@@ -52,9 +52,8 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { useSingleClickHandler } from "@/hooks/use-button";
-import { toCamelCase } from "@/utils/names";
 
+import { isBoolean, isNil, isUndefined } from "@/utils/types";
 import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
 import {
@@ -65,16 +64,15 @@ import {
   FormState,
   FormWidget,
   RecordHandler,
-  WidgetErrors,
-  WidgetState,
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { FormReadyScope, useAfterActions } from "./builder/scope";
+import { showErrors, useGetErrors } from "./builder/form-errors";
 import {
   FormWidgetProviders,
   FormWidgetsHandler,
 } from "./builder/form-providers";
+import { FormReadyScope, useAfterActions } from "./builder/scope";
 import {
   getDefaultValues,
   processOriginal,
@@ -82,7 +80,6 @@ import {
   resetFormDummyFieldsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
-import { isUndefined, isBoolean, isNil } from "@/utils/types";
 
 import styles from "./form.module.scss";
 
@@ -97,64 +94,15 @@ export const fetchRecord = async (
     const related = meta.related;
     return dataStore.read(+id, { fields, related, select });
   }
-  return getDefaultValues(meta.fields, meta.view.items);
-};
+  const defaults = getDefaultValues(meta.fields, meta.view.items);
 
-export const showErrors = (errors: WidgetErrors[]) => {
-  const titles = uniq(
-    Object.values(errors).flatMap((e) =>
-      Object.values(e)
-        .filter(Boolean)
-        .flatMap((v) => (typeof v === "object" ? Object.values(v) : v)),
-    ),
-  );
-  titles.length &&
-    alerts.error({
-      message: (
-        <ul>
-          {titles.map((title, i) => (
-            <li key={i}>{title}</li>
-          ))}
-        </ul>
-      ),
-    });
-};
+  // Set jsonModel default value for custom models
+  const { model, jsonModel } = meta.view;
+  if (model === "com.axelor.meta.db.MetaJsonRecord" && jsonModel) {
+    defaults.jsonModel = jsonModel;
+  }
 
-export const useGetErrors = () => {
-  const store = useStore();
-  return useCallback(
-    (formState: FormState, fieldName?: string) => {
-      const { states, statesByName = {} } = formState;
-      const isHidden = function isHidden(s: WidgetState): boolean {
-        return Boolean(
-          s.attrs.hidden ||
-            (s.name && statesByName[s.name]?.attrs?.hidden) ||
-            (s.parent && isHidden(store.get(s.parent))),
-        );
-      };
-
-      const serverErrors = Object.keys(statesByName)
-        .filter((k) => statesByName[k].errors?.error)
-        .filter((v) => Object.values(states).some((w) => w.name === v))
-        .map((o) => Object.values(states).find((w) => w.name === o))
-        .filter((s) => !isHidden(s!))
-        .map((w) => {
-          const error = i18n.get(`{0} is invalid`, w?.attrs?.title || w?.name);
-          return { error } as WidgetErrors;
-        });
-
-      const errors = Object.values(states)
-        .filter((s) => fieldName === undefined || s.name === fieldName)
-        .filter((s) => !isHidden(s))
-        .filter(
-          (s) => Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
-        )
-        .map((s) => s.errors ?? {})
-        .concat(serverErrors);
-      return errors.length ? errors : null;
-    },
-    [store],
-  );
+  return defaults;
 };
 
 export const usePrepareSaveRecord = (
@@ -246,7 +194,9 @@ export const restoreSelectedStateWithSavedRecord = (
   return formState;
 };
 
-export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
+export const useHandleFocus = (
+  containerRef: RefObject<HTMLDivElement | null>,
+) => {
   const handleFocus = useCallback(() => {
     const elem = containerRef.current;
     if (elem) {
@@ -352,7 +302,7 @@ export function Form(props: ViewProps<FormView>) {
 
   const { id } = useViewRoute();
   const { action } = useViewTab();
-  const recordRef = useRef<DataRecord | null>(null);
+  const recordRef = useRef<DataRecord>(null);
 
   const { params } = action;
   const recordId = String(id || "");
@@ -376,12 +326,15 @@ export function Form(props: ViewProps<FormView>) {
           ...(popupRecord._dirty ? { ...res, ...popupRecord } : res),
         };
       } else {
-        return popupRecord?.id == null
-          ? {
-              ...getDefaultValues(meta.fields, meta.view.items),
-              ...popupRecord,
-            }
-          : popupRecord;
+        if (popupRecord?.id == null) {
+          const defaults = getDefaultValues(meta.fields, meta.view.items);
+          const { model, jsonModel } = meta.view;
+          if (model === "com.axelor.meta.db.MetaJsonRecord" && jsonModel) {
+            defaults.jsonModel = jsonModel;
+          }
+          return { ...defaults, ...popupRecord };
+        }
+        return popupRecord;
       }
     }
     return await fetchRecord(meta, dataStore, recordId);
@@ -422,7 +375,7 @@ const FormContainer = memo(function FormContainer({
   perms,
 }: ViewProps<FormView> & {
   record: DataRecord;
-  recordRef: MutableRefObject<DataRecord | null>;
+  recordRef: RefObject<DataRecord | null>;
   isLoading?: boolean;
   perms?: Perms;
 }) {
@@ -448,9 +401,7 @@ const FormContainer = memo(function FormContainer({
   const dataStoreViewProp = useViewProp<DataStore>("dataStore");
 
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
-    useFormHandlers(meta, defaultRecord, {
-      context: action?.context,
-    });
+    useFormHandlers(meta, defaultRecord);
   const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
 
   const showConfirmDirty = useViewConfirmDirty();
@@ -542,7 +493,7 @@ const FormContainer = memo(function FormContainer({
   );
 
   const copyRecordRef = useRef(false);
-  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
+  const widgetHandler = useRef<FormWidgetsHandler>(null);
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
@@ -1473,10 +1424,15 @@ const FormContainer = memo(function FormContainer({
           </Block>
         </ViewToolBar>
       )}
-      <div className={styles.formViewScroller} ref={containerRef}>
+      <div
+        className={styles.formViewScroller}
+        ref={containerRef}
+        data-testid="form"
+      >
         <ScopeProvider scope={FormReadyScope} value={readyAtom}>
           <FormWidgetProviders ref={widgetHandler}>
             <FormComponent
+              data-testid="form"
               className={styles.formView}
               readonly={readonly}
               schema={meta.view}
@@ -1579,7 +1535,7 @@ export const Layout: FormLayout = ({
   className,
   readonly,
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const isSmall = useContainerQuery(ref, "width < 768px");
 
   const { main, side, small } = useMemo(() => {

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.service;
 
@@ -24,10 +10,10 @@ import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.repo.MetaFilterRepository;
-import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.util.List;
-import javax.inject.Inject;
+import java.util.Objects;
 import org.apache.shiro.authz.AuthorizationException;
 
 public class MetaFilterService {
@@ -37,14 +23,19 @@ public class MetaFilterService {
   @Transactional
   public MetaFilter saveFilter(MetaFilter ctx) {
     User user = AuthUtils.getUser();
-    String query =
-        "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-    MetaFilter filter =
-        filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+    Long id = ctx.getId();
+    MetaFilter filter;
 
-    if (filter == null) {
+    if (id != null) {
+      filter = filters.find(id);
+      if (filter == null) {
+        throw new IllegalArgumentException(I18n.get("Filter not found"));
+      }
+      if (!Objects.equals(filter.getUser(), user) && !Boolean.TRUE.equals(filter.getShared())) {
+        throw new AuthorizationException(I18n.get("You are not allowed to update this filter."));
+      }
+    } else {
       filter = new MetaFilter();
-      filter.setName(ctx.getName());
       filter.setUser(user);
       filter.setFilterView(ctx.getFilterView());
     }
@@ -53,7 +44,7 @@ public class MetaFilterService {
     filter.setFilters(ctx.getFilters());
     filter.setFilterCustom(ctx.getFilterCustom());
 
-    if (Objects.equal(filter.getUser(), user)) {
+    if (Objects.equals(filter.getUser(), user)) {
       filter.setShared(ctx.getShared());
     }
 
@@ -63,18 +54,21 @@ public class MetaFilterService {
   @Transactional
   public MetaFilter removeFilter(MetaFilter ctx) {
     User user = AuthUtils.getUser();
-    String query =
-        "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-    MetaFilter filter =
-        filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+    Long id = ctx.getId();
 
-    if (filter != null) {
-      if (!Objects.equal(filter.getUser(), user)) {
-        throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
-      }
+    Objects.requireNonNull(id);
 
-      filters.remove(filter);
+    MetaFilter filter = filters.find(id);
+
+    if (filter == null) {
+      throw new IllegalArgumentException(I18n.get("Filter not found"));
     }
+
+    if (!Objects.equals(filter.getUser(), user)) {
+      throw new AuthorizationException(I18n.get("You are not allowed to remove this filter."));
+    }
+
+    filters.remove(filter);
 
     return ctx;
   }

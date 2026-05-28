@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -30,6 +16,9 @@ import com.axelor.meta.MetaFiles;
 import com.axelor.report.ReportGenerator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,9 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.eclipse.birt.core.exception.BirtException;
 
@@ -150,7 +136,7 @@ public class ActionReport extends Action {
             .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")))
             .replace("${name}", getName());
 
-    final String fileName = String.format("%s.%s", outputName, format);
+    final String fileName = "%s.%s".formatted(outputName, format);
     final File output = generator.generate(designName, format, params, AppFilter.getLocale());
 
     result.put("report", getName());

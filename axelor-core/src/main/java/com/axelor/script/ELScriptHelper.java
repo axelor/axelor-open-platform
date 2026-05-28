@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
@@ -22,17 +8,18 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
 import com.axelor.db.ValueEnum;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
-import com.axelor.shading.javax.el.BeanELResolver;
-import com.axelor.shading.javax.el.ELClass;
-import com.axelor.shading.javax.el.ELContext;
-import com.axelor.shading.javax.el.ELException;
-import com.axelor.shading.javax.el.ELProcessor;
-import com.axelor.shading.javax.el.ImportHandler;
-import com.axelor.shading.javax.el.MapELResolver;
-import com.axelor.shading.javax.el.MethodNotFoundException;
 import com.google.common.primitives.Ints;
+import jakarta.el.BeanELResolver;
+import jakarta.el.ELClass;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELProcessor;
+import jakarta.el.ImportHandler;
+import jakarta.el.MapELResolver;
+import jakarta.el.MethodNotFoundException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import javax.script.Bindings;
@@ -40,6 +27,8 @@ import javax.script.Bindings;
 public class ELScriptHelper extends AbstractScriptHelper {
 
   private ELProcessor processor;
+
+  private static final ScriptPolicy SCRIPT_POLICY = ScriptPolicy.getInstance();
 
   class ClassResolver extends MapELResolver {
 
@@ -52,9 +41,11 @@ public class ELScriptHelper extends AbstractScriptHelper {
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
-      if (base instanceof ELClass && FIELD_CLASS.equals(property)) {
+      if (base instanceof ELClass elClass && FIELD_CLASS.equals(property)) {
+        Class<?> cls = elClass.getKlass();
+        SCRIPT_POLICY.check(cls);
         context.setPropertyResolved(true);
-        return ((ELClass) base).getKlass();
+        return cls;
       }
 
       if (base != null) {
@@ -73,7 +64,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
         return null;
       }
 
+      SCRIPT_POLICY.check(cls);
       context.setPropertyResolved(true);
+
       return cls;
     }
 
@@ -98,6 +91,8 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
       final ImportHandler handler = context.getImportHandler();
       Object value = handler.resolveClass(name);
+
+      if (value instanceof Class) SCRIPT_POLICY.check((Class<?>) value);
       if (value == null) {
         value = handler.resolveStatic(name);
       }
@@ -111,16 +106,43 @@ public class ELScriptHelper extends AbstractScriptHelper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-      if (base instanceof Map<?, ?>
+      if (base instanceof Map<?, ?> map
           && !(base instanceof ContextEntity)
-          && ((Map<?, ?>) base).containsKey(property)) {
+          && map.containsKey(property)) {
         context.setPropertyResolved(true);
-        return ((Map<?, ?>) base).get(property);
+        return map.get(property);
       }
-      if (base instanceof Class<?> && ((Class<?>) base).isEnum()) {
-        context.setPropertyResolved(true);
-        return ValueEnum.of((Class) base, property);
+
+      if (base instanceof Class<?> cls) {
+        // is value enum?
+        if (ValueEnum.class.isAssignableFrom(cls)) {
+          context.setPropertyResolved(true);
+          return ValueEnum.of((Class) base, property);
+        }
+
+        // access static member
+        if (property instanceof String propName) {
+          try {
+            Object value = SCRIPT_POLICY.check(cls).getField(propName).get(cls);
+            context.setPropertyResolved(true);
+            return value;
+          } catch (Exception e) {
+            return null;
+          }
+        }
       }
+
+      // access instance member
+      if (base != null && property instanceof String propName) {
+        try {
+          Object value = SCRIPT_POLICY.check(base.getClass()).getField(propName).get(base);
+          context.setPropertyResolved(true);
+          return value;
+        } catch (Exception e) {
+          return null;
+        }
+      }
+
       return null;
     }
 
@@ -131,8 +153,8 @@ public class ELScriptHelper extends AbstractScriptHelper {
         Object method,
         Class<?>[] paramTypes,
         Object[] params) {
-      if (base instanceof Class) {
-        final Class<?> klass = (Class<?>) base;
+      if (base instanceof Class<?> clazz) {
+        final Class<?> klass = SCRIPT_POLICY.check(clazz);
         try {
           final Method staticMethod = klass.getMethod(method.toString(), paramTypes);
           context.setPropertyResolved(true);
@@ -151,55 +173,63 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
   public static final class Helpers {
 
-    private static Class<?> typeClass(Object type) {
-      if (type instanceof Class<?>) return (Class<?>) type;
+    private static Class<?> typeClass1(Object type) {
+      if (type instanceof Class<?> klass) return klass;
       if (type instanceof String)
         try {
           return Class.forName(type.toString());
         } catch (ClassNotFoundException e) {
           throw new IllegalArgumentException(e);
         }
-      if (type instanceof ELClass) return ((ELClass) type).getKlass();
+      if (type instanceof ELClass elClass) return elClass.getKlass();
       throw new IllegalArgumentException("Invalid type: " + type);
+    }
+
+    private static Class<?> typeClass(Object type) {
+      return SCRIPT_POLICY.check(typeClass1(type));
     }
 
     public static Object as(Object base, Object type) {
       final Class<?> klass = typeClass(type);
-      if (base instanceof Context) {
-        return ((Context) base).asType(klass);
+      if (base instanceof Context context) {
+        return context.asType(klass);
       }
       return klass.cast(base);
     }
 
     public static Object is(Object base, Object type) {
       final Class<?> klass = typeClass(type);
-      if (base instanceof Context) {
-        return klass.isAssignableFrom(((Context) base).getContextClass());
+      if (base instanceof Context context) {
+        return klass.isAssignableFrom(context.getContextClass());
       }
       return klass.isInstance(base);
     }
 
     public static Class<?> importClass(String name) {
       try {
-        return Class.forName(name);
+        return SCRIPT_POLICY.check(Class.forName(name));
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(e);
       }
     }
 
     public static <T extends Model> JpaRepository<T> repo(Class<T> model) {
-      return JpaRepository.of(model);
+      return JpaRepository.of(SCRIPT_POLICY.check(model));
+    }
+
+    public static <T> T bean(Class<T> type) {
+      return Beans.get(SCRIPT_POLICY.check(type));
     }
 
     public static Integer toInt(Object value) {
       if (value == null) {
         return null;
       }
-      if (value instanceof Integer) {
-        return (Integer) value;
+      if (value instanceof Integer integer) {
+        return integer;
       }
-      if (value instanceof Long) {
-        return Ints.checkedCast((Long) value);
+      if (value instanceof Long longValue) {
+        return Ints.checkedCast(longValue);
       }
       return Integer.valueOf(value.toString());
     }
@@ -211,9 +241,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
     public static String formatText(String format, Object... args) {
       if (args == null) {
-        return String.format(format, args);
+        return format.formatted(args);
       }
-      return String.format(format, args);
+      return format.formatted(args);
     }
   }
 
@@ -234,16 +264,13 @@ public class ELScriptHelper extends AbstractScriptHelper {
       this.processor.defineFunction("", "imp", className, "importClass");
       this.processor.defineFunction("", "T", className, "importClass");
       this.processor.defineFunction("", "__repo__", className, "repo");
+      this.processor.defineFunction("", "__bean__", className, "bean");
       this.processor.defineFunction("fmt", "text", className, "formatText");
     } catch (Exception e) {
     }
 
     final String[] packages = {
-      "java.util",
-      "java.time",
-      "com.axelor.common",
-      "com.axelor.script.util",
-      "com.axelor.apps.tool"
+      "java.util", "java.time",
     };
 
     for (String pkg : packages) {

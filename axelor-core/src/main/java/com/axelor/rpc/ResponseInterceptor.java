@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -26,15 +12,14 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Throwables;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Arrays;
 import java.util.Optional;
 import javax.crypto.BadPaddingException;
-import javax.persistence.EntityTransaction;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolationException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -47,7 +32,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
   private final Logger log = LoggerFactory.getLogger(ResponseInterceptor.class);
 
-  private final ThreadLocal<Boolean> running = new ThreadLocal<Boolean>();
+  private final ThreadLocal<Boolean> running = new ThreadLocal<>();
 
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -72,6 +57,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
         try {
           txn.begin();
         } catch (Exception ex) {
+          // ignore
         }
       }
       try {
@@ -95,27 +81,23 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     final Throwable cause = throwable.getCause();
     final Throwable root = Throwables.getRootCause(throwable);
     for (Throwable ex : Arrays.asList(throwable, cause, root)) {
-      if (ex instanceof AuthorizationException) {
-        return onAuthorizationException((AuthorizationException) ex, response);
+      if (ex instanceof AuthorizationException exception) {
+        return onAuthorizationException(exception, response);
       }
-      if (ex instanceof AuthSecurityException) {
-        return onAuthSecurityException((AuthSecurityException) ex, response);
+      if (ex instanceof AuthSecurityException exception) {
+        return onAuthSecurityException(exception, response);
       }
-      if (ex instanceof OptimisticLockException) {
-        return onOptimisticLockException((OptimisticLockException) ex, response);
+      if (ex instanceof OptimisticLockException exception) {
+        return onOptimisticLockException(exception, response);
       }
-      if (ex instanceof ConstraintViolationException) {
-        return onConstraintViolationException((ConstraintViolationException) ex, response);
+      if (ex instanceof ConstraintViolationException exception) {
+        return onConstraintViolationException(exception, response);
       }
-      if (ex instanceof SQLIntegrityConstraintViolationException) {
-        return onSQLIntegrityConstraintViolationException(
-            (SQLIntegrityConstraintViolationException) ex, response);
+      if (ex instanceof SQLException exception) {
+        return onSQLException(exception, response);
       }
-      if (ex instanceof SQLException) {
-        return onSQLException((SQLException) ex, response);
-      }
-      if (ex instanceof EncryptorException) {
-        return onEncryptorException((EncryptorException) ex, response);
+      if (ex instanceof EncryptorException exception) {
+        return onEncryptorException(exception, response);
       }
     }
     response.setException(throwable);
@@ -196,50 +178,29 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     return response;
   }
 
-  static final String REFERENCE_ERROR_TTILE = /*$$(*/ "Reference error" /*)*/;
+  static final String REFERENCE_ERROR_TITLE = /*$$(*/ "Reference error" /*)*/;
   static final String REFERENCE_ERROR_MESSAGE = /*$$(*/
       "The record(s) are referenced by other records. Please remove all the references first." /*)*/;
 
-  static final String UNIQUE_VIOLATION_ERROR_TTILE = /*$$(*/ "Unique constraint violation" /*)*/;
+  static final String UNIQUE_VIOLATION_ERROR_TITLE = /*$$(*/ "Unique constraint violation" /*)*/;
   static final String UNIQUE_VIOLATION_ERROR_MESSAGE = /*$$(*/
       "The record(s) can't be updated as it violates unique constraint." /*)*/;
 
-  static final String DEFAULT_ERROR_TTILE = /*$$(*/ "SQL error" /*)*/;
+  static final String TOO_LONG_ERROR_TITLE = /*$$(*/ "Value too long" /*)*/;
+  static final String TOO_LONG_ERROR_MESSAGE = /*$$(*/
+      "The value you entered exceeds the maximum allowed length. Please use fewer characters." /*)*/;
+
+  static final String CHECK_VIOLATION_ERROR_TITLE = /*$$(*/ "Check constraint violation" /*)*/;
+  static final String CHECK_VIOLATION_ERROR_MESSAGE = /*$$(*/
+      "The value you entered doesn't meet the required constraint." /*)*/;
+
+  static final String NOT_NULL_ERROR_TITLE = /*$$(*/ "Required field violation" /*)*/;
+  static final String NOT_NULL_ERROR_MESSAGE = /*$$(*/
+      "A field is required. Please provide a value." /*)*/;
+
+  static final String DEFAULT_ERROR_TITLE = /*$$(*/ "SQL error" /*)*/;
   static final String DEFAULT_ERROR_MESSAGE = /*$$(*/
       "Unexpected database error occurred on the server." /*)*/;
-
-  private Response onSQLIntegrityConstraintViolationException(
-      SQLIntegrityConstraintViolationException e, Response response) {
-    int errorNumber = e.getErrorCode();
-
-    String title = null;
-    String message = null;
-
-    // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
-    switch (errorNumber) {
-      case 1217:
-        // fall through
-      case 1451: // foreign key violation
-        title = I18n.get(REFERENCE_ERROR_TTILE);
-        message = I18n.get(REFERENCE_ERROR_MESSAGE);
-        break;
-      case 1062: // unique constraint violation
-        title = I18n.get(UNIQUE_VIOLATION_ERROR_TTILE);
-        message = I18n.get(UNIQUE_VIOLATION_ERROR_MESSAGE);
-        break;
-      default:
-        title = I18n.get(DEFAULT_ERROR_TTILE);
-        message = I18n.get(DEFAULT_ERROR_MESSAGE);
-        break;
-    }
-
-    log.error("MySQL Error: {}", e.getMessage());
-
-    ResponseException error = new ResponseException(message, title, e);
-    response.setException(error);
-
-    return response;
-  }
 
   private Response onSQLException(SQLException e, Response response) {
 
@@ -259,15 +220,27 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     // https://www.postgresql.org/docs/current/errcodes-appendix.html
     switch (state) {
       case "23503": // foreign key violation
-        title = I18n.get(REFERENCE_ERROR_TTILE);
+        title = I18n.get(REFERENCE_ERROR_TITLE);
         message = I18n.get(REFERENCE_ERROR_MESSAGE);
         break;
       case "23505": // unique constraint violation
-        title = I18n.get(UNIQUE_VIOLATION_ERROR_TTILE);
+        title = I18n.get(UNIQUE_VIOLATION_ERROR_TITLE);
         message = I18n.get(UNIQUE_VIOLATION_ERROR_MESSAGE);
         break;
+      case "22001": // exceeds the maximum length
+        title = I18n.get(TOO_LONG_ERROR_TITLE);
+        message = I18n.get(TOO_LONG_ERROR_MESSAGE);
+        break;
+      case "23514": // check violation
+        title = I18n.get(CHECK_VIOLATION_ERROR_TITLE);
+        message = I18n.get(CHECK_VIOLATION_ERROR_MESSAGE);
+        break;
+      case "23502": // not null violation
+        title = I18n.get(NOT_NULL_ERROR_TITLE);
+        message = I18n.get(NOT_NULL_ERROR_MESSAGE);
+        break;
       default:
-        title = I18n.get(DEFAULT_ERROR_TTILE);
+        title = I18n.get(DEFAULT_ERROR_TITLE);
         message = I18n.get(DEFAULT_ERROR_MESSAGE);
         break;
     }

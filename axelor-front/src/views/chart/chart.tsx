@@ -1,5 +1,6 @@
+import type * as echarts from "echarts/core";
 import { Box, useTheme } from "@axelor/ui";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import unique from "lodash/uniq";
@@ -19,13 +20,13 @@ import {
 } from "@/view-containers/views/scope";
 import { ViewData, chart as fetchChart } from "@/services/client/meta";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { download } from "@/utils/download";
+import { download, saveAs } from "@/utils/download";
 
 import { Form, FormAtom, useFormHandlers } from "../form/builder";
 import { ChartDataRecord, Chart as ChartComponent } from "./builder";
 import { getChartData, getScale } from "./builder/utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useGetErrors } from "../form";
+import { useGetErrors } from "../form/builder/form-errors";
 import { FormActionHandler } from "../form/builder/scope";
 import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import { DataContext } from "@/services/client/data.types";
@@ -41,8 +42,8 @@ export function Chart(props: ViewProps<ChartView>) {
   const [view, setView] = useState<ChartView>();
 
   useAsyncEffect(async () => {
-    const view = await fetchChart<ChartView>(chartName, getContext());
-    setView(view);
+    const fetchView = await fetchChart<ChartView>(chartName, getContext());
+    setView(fetchView);
   }, [chartName, getContext]);
 
   return view ? <ChartInner {...props} view={view} /> : null;
@@ -58,7 +59,9 @@ function ChartRefreshOnFormChanged({
   const { record } = useAtomValue(formAtom);
 
   useAsyncEffect(async () => {
-    record && Object.keys(record).length > 0 && onRefresh();
+    if (record && Object.keys(record).length > 0) {
+      onRefresh();
+    }
   }, [record, onRefresh]);
 
   return null;
@@ -68,17 +71,18 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const { meta, view } = props;
   const chartName = meta.view.name!;
   const { dashlet } = useViewTab();
-  const [records, setRecords] = useState<ChartDataRecord[]>([]);
+  const [records, setRecords] = useState<ChartDataRecord[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(null);
   const [legend, showLegend] = useState(
     () => String(view.config?.hideLegend) !== "true",
   );
-  const fetched = useRef(false);
   const isRTL = useTheme().dir === "rtl";
 
   const formMeta = useMemo(() => {
     const model = "com.axelor.script.ScriptBindings";
     const fields: Record<string, Property> = (view.search || []).reduce(
-      (fields, _item) => {
+      (_fields, _item) => {
         const item = { ..._item };
         processSelection(item, true);
         processWidget(item);
@@ -92,7 +96,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           item.canEdit = "false";
         }
         return {
-          ...fields,
+          ..._fields,
           [item.name]: {
             ...item,
             ...item.widgetAttrs,
@@ -102,7 +106,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       },
       {},
     );
-    const meta = {
+    return {
       view: {
         type: "form",
         model,
@@ -121,7 +125,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
                   type: "field",
                   ...(item.multiple && (item.target || item.selection)
                     ? {
-                        widget: item.target ? "tag-select" : "multi-select",
+                        widget: item.target ? "tags" : "multi-select",
                       }
                     : {}),
                 })),
@@ -131,14 +135,11 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       },
       model,
       fields,
-    };
-    return meta as unknown as ViewData<FormView>;
+    } as unknown as ViewData<FormView>;
   }, [view]);
 
-  const { formAtom, ...formProps } = useFormHandlers(
-    formMeta,
-    useRef({}).current,
-  );
+  const defaultRecord = useMemo(() => ({}), []);
+  const { formAtom, ...formProps } = useFormHandlers(formMeta, defaultRecord);
 
   const getContext = useViewContext();
   const getErrors = useGetErrors();
@@ -166,18 +167,18 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
             context: getContext(true),
           });
           // collect values from action result
-          const values = res?.reduce?.(
+          const recordValues = res?.reduce?.(
             (obj, { values, attrs }) => ({
               ...obj,
               ...values,
-              ...Object.keys(attrs || {}).reduce((values, key) => {
+              ...Object.keys(attrs || {}).reduce((_values, key) => {
                 const { value } = attrs?.[key] || {};
                 return value !== undefined
                   ? {
-                      ...values,
+                      ..._values,
                       [key]: value,
                     }
-                  : values;
+                  : _values;
               }, {}),
             }),
             {},
@@ -185,9 +186,9 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           const formState = get(formAtom);
           set(formAtom, {
             ...formState,
-            record: { ...formState.record, ...values },
+            record: { ...formState.record, ...recordValues },
           });
-          return formMeta && Object.values(values || {}).length > 0;
+          return formMeta && Object.values(recordValues || {}).length > 0;
         }
         return false;
       },
@@ -222,13 +223,17 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           }
         });
 
-        const records = await fetchChart<ChartDataRecord[]>(
-          chartName,
-          context,
-          true,
-        );
-        fetched.current = true;
-        setRecords(records);
+        setLoading(true);
+        try {
+          const fetchRecords = await fetchChart<ChartDataRecord[]>(
+            chartName,
+            context,
+            true,
+          );
+          setRecords(fetchRecords);
+        } finally {
+          setLoading(false);
+        }
       },
       [chartName, view, formMeta, formAtom, getErrors, getContext],
     ),
@@ -237,7 +242,6 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const onExport = useCallback(async () => {
     if (!view || !records) return;
 
-    const name = (view.title || "export").toLowerCase().replace(/ /g, "_");
     const header = records.reduce(
       (list, row) => unique([...(list as []), ...Object.keys(row)]),
       [],
@@ -245,7 +249,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     let content = "data:text/csv;charset=utf-8," + header.join(";") + "\n";
 
     records.forEach((item) => {
-      let row = header.map((key: string) => {
+      const row = header.map((key: string) => {
         let val = item[key];
         if (val === undefined || val === null) {
           val = "";
@@ -255,8 +259,14 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       content += row.join(";") + "\n";
     });
 
-    download(encodeURI(content), `${name}.csv`);
+    download(encodeURI(content), `${view.title || "export"}.csv`);
   }, [view, records]);
+
+  const onExportPNG = useCallback(() => {
+    if (!chartInstance) return;
+    const url = chartInstance.getDataURL({ type: "png", pixelRatio: 2 });
+    saveAs(url, `${view?.title || "chart"}.png`);
+  }, [chartInstance, view]);
 
   const onAction = useCallback(
     async (action: string, options?: ActionOptions) => {
@@ -287,22 +297,26 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
 
   useAsyncEffect(async () => {
     const initialized = await onDataInit();
-    !initialized && (await onRefresh());
+    if (!initialized) {
+      await onRefresh();
+    }
   }, [onDataInit, onRefresh]);
 
   const chartOptions = useMemo(() => {
     if (view) {
       const { config, series: [{ type }] = [] } = view;
-      if (type && (records?.length || ["gauge"].includes(type))) {
-        const scale = getScale(view, records);
+      const $records = records ?? [];
+      if (type && (loading || $records?.length || ["gauge"].includes(type))) {
+        const scale = getScale(view, $records);
         return {
           type,
+          loading,
           data: {
             ...view,
             scale,
             dataset: getChartData(
               view,
-              isRTL ? [...records].reverse() : records,
+              isRTL ? [...$records].reverse() : $records,
               {
                 ...config,
                 scale,
@@ -313,7 +327,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       }
     }
     return null;
-  }, [isRTL, view, records]);
+  }, [isRTL, view, records, loading]);
 
   useEffect(() => {
     if (view && dashlet) {
@@ -324,14 +338,17 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         onAction: onDatasetAction,
         onRefresh,
         onExport,
+        ...(chartInstance && { onExportPNG }),
       });
     }
-  }, [dashlet, view, onDatasetAction, onRefresh, onExport, setDashletHandlers]);
+  }, [dashlet, view, onDatasetAction, onRefresh, onExport, onExportPNG, chartInstance, setDashletHandlers]);
 
   // register tab:refresh
   useViewTabRefresh("chart", onRefresh);
 
   const hasAction = view?.config?.onClick;
+  const hasRecordsFetched = records != null;
+
   return (
     <Box className={classes.chart} borderTop={dashlet}>
       {view && (formMeta?.view?.items?.length ?? 0) > 0 && (
@@ -354,9 +371,11 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           legend={legend}
           {...chartOptions}
           {...(hasAction && { onClick: onClickAction })}
+          onChartReady={setChartInstance}
         />
       ) : (
-        fetched.current && (
+        !loading &&
+        hasRecordsFetched && (
           <Box
             d="flex"
             flex={1}

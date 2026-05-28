@@ -1,39 +1,27 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
-import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.AuthService;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.cache.DistributedFactory;
 import com.axelor.common.ObjectUtils;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -41,9 +29,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +57,6 @@ public class ModuleManager {
   private static long lastRestored;
   private final Set<Path> pathsToRestore = new HashSet<>();
 
-  private static final AtomicBoolean BUSY = new AtomicBoolean(false);
-
   @Inject
   public ModuleManager(
       AuthService authService,
@@ -86,10 +71,12 @@ public class ModuleManager {
     this.viewLoader = viewLoader;
     this.dataLoader = dataLoader;
     this.demoLoader = demoLoader;
-    metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
+    metaLoaders = List.of(modelLoader, viewLoader, i18nLoader);
   }
 
   public void initialize(final boolean update, final boolean withDemo) {
+    var lock = DistributedFactory.getLockIfDistributed("initialize");
+    lock.lock();
     try {
       createDefault();
       resolve(update);
@@ -98,9 +85,24 @@ public class ModuleManager {
               .peek(m -> log.info("Loading package {}...", m.getName()))
               .filter(Module::isPending)
               .collect(Collectors.toList());
+      if (ObjectUtils.notEmpty(moduleList)) {
+        evictAllCacheRegions();
+      }
       loadModules(moduleList, update, withDemo);
     } finally {
       doCleanUp();
+      lock.unlock();
+    }
+  }
+
+  // When using distributed cache, it may contain incompatible data.
+  // Need to clear it before loading new modules.
+  private void evictAllCacheRegions() {
+    try {
+      var sessionFactory = JPA.em().unwrap(Session.class).getSessionFactory();
+      sessionFactory.getCache().evictAllRegions();
+    } catch (Exception e) {
+      log.error("Failed to evict regions", e);
     }
   }
 
@@ -141,8 +143,9 @@ public class ModuleManager {
   }
 
   public void restoreMeta() {
+    var busy = DistributedFactory.getAtomicLong("busy");
     try {
-      if (!BUSY.compareAndSet(false, true)) {
+      if (!busy.compareAndSet(0, 1)) {
         throw new IllegalStateException(
             I18n.get(
                 "A views restoring is already in progress. Please wait until it ends and try again."));
@@ -150,7 +153,7 @@ public class ModuleManager {
       loadData = false;
       update(false);
     } finally {
-      BUSY.set(false);
+      busy.set(0);
       loadData = true;
     }
   }
@@ -158,12 +161,15 @@ public class ModuleManager {
   private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
     viewLoader.initialize();
     try {
-      Beans.get(AuditableRunner.class)
-          .run(
+      ContextAware.of()
+          .withTransaction(false)
+          .withUser(AuthUtils.getUser("admin"))
+          .build(
               () -> {
                 moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
                 moduleList.forEach(m -> viewLoader.doLast(m, update));
-              });
+              })
+          .run();
     } finally {
       viewLoader.terminate();
     }

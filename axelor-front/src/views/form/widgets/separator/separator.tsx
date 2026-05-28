@@ -6,7 +6,7 @@ export function Separator({ schema, widgetAtom }: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
   return (
-    <Box>
+    <Box data-testid="separator">
       {title && <Box fontWeight="bold">{title}</Box>}
       <Box as="hr" my={2} />
     </Box>

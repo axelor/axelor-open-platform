@@ -1,26 +1,12 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,16 +39,17 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 
     Object result = eval(expr);
     if (result == null) return false;
-    if (result instanceof Boolean) return (Boolean) result;
-    if (result instanceof Number) return Double.compare(((Number) result).doubleValue(), 0) != 0;
+    if (result instanceof Boolean booleanResult) return booleanResult;
+    if (result instanceof Number numberResult)
+      return Double.compare(numberResult.doubleValue(), 0) != 0;
 
     return ObjectUtils.notEmpty(result);
   }
 
   @Override
   public Object call(Object obj, String methodCall) {
-    Preconditions.checkNotNull(obj);
-    Preconditions.checkNotNull(methodCall);
+    Objects.requireNonNull(obj);
+    Objects.requireNonNull(methodCall);
 
     Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
     Matcher m = p.matcher(methodCall);
@@ -90,15 +77,18 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
     try {
       return eval(expr, getBindings());
     } catch (NoSuchFieldException e) {
-      log.warn("No such field in: {} -- ({})", expr, e.getMessage());
-      return null;
+      return handleNoSuchFieldException(expr, e);
     } catch (Exception e) {
-      if (e.getCause() instanceof NoSuchFieldException) {
-        log.warn("No such field in: {} -- ({})", expr, e.getMessage());
-        return null;
+      if (e.getCause() instanceof NoSuchFieldException nsfe) {
+        return handleNoSuchFieldException(expr, nsfe);
       }
       log.error("Script error: {}", expr, e);
       throw new IllegalArgumentException(e);
     }
+  }
+
+  private Object handleNoSuchFieldException(String expr, Exception e) {
+    log.warn("No such field in: {} -- ({})", expr, e.getMessage());
+    return null;
   }
 }

@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router";
 
 import { clsx, Box } from "@axelor/ui";
 
@@ -26,7 +26,7 @@ import { useSidebar } from "./nav-drawer/hook";
 
 export function Layout() {
   const { loading } = useMenu();
-  const { show, sidebar, setSidebar } = useSidebar();
+  const { sidebar, setSidebar } = useSidebar();
   const { xs } = useResponsive();
   const { isMobile } = useDevice();
   const { pathname } = useLocation();

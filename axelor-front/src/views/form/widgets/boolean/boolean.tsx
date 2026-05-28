@@ -7,26 +7,28 @@ import { toKebabCase } from "@/utils/names";
 import { FieldControl, FieldProps } from "../../builder";
 
 import styles from "./boolean.module.scss";
+import { useId } from "react";
 
 export function Boolean(props: FieldProps<boolean>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, name, widget } = schema;
+  const { name, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const {
     attrs: { focus },
   } = useAtomValue(widgetAtom);
 
+  const id = useId();
   const inline = toKebabCase(widget) === "inline-checkbox";
   const className = inline ? styles.inline : styles.checkbox;
 
   return (
-    <FieldControl {...props} className={className}>
+    <FieldControl {...props} inputId={id} className={className}>
       <Input
         key={focus ? "focused" : "normal"}
         data-input
         autoFocus={focus}
         m={0}
-        id={uid}
+        id={id}
         invalid={invalid}
         type="checkbox"
         className={styles.input}
@@ -36,6 +38,7 @@ export function Boolean(props: FieldProps<boolean>) {
         }}
         value={name}
         disabled={readonly}
+        data-testid="checkbox"
       />
     </FieldControl>
   );

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -28,14 +14,12 @@ import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class RequestTest extends RpcTest {
@@ -124,13 +108,13 @@ public class RequestTest extends RpcTest {
     Contact p = contacts.edit(data);
 
     assertEquals(Title.class, p.getTitle().getClass());
-    assertEquals(Address.class, p.getAddresses().get(0).getClass());
-    assertEquals(Circle.class, p.getCircle(0).getClass());
+    assertEquals(Address.class, p.getAddresses().getFirst().getClass());
+    assertEquals(Circle.class, p.getCircles().iterator().next().getClass());
     assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
     assertEquals("mr", p.getTitle().getCode());
-    assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-    assertEquals("family", p.getCircle(0).getCode());
+    assertEquals("France", p.getAddresses().getFirst().getCountry().getName());
+    assertEquals("family", p.getCircles().iterator().next().getCode());
     assertEquals("1977-05-01", p.getDateOfBirth().toString());
 
     contacts.manage(p);
@@ -141,14 +125,14 @@ public class RequestTest extends RpcTest {
   public void testUpdate() {
 
     Contact c = contacts.all().fetchOne();
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
 
     data.put("id", c.getId());
     data.put("version", c.getVersion());
     data.put("firstName", "Some");
     data.put("lastName", "thing");
 
-    String json = toJson(ImmutableMap.of("data", data));
+    String json = toJson(Map.of("data", data));
     Request req = fromJson(json, Request.class);
 
     assertTrue(req.getData() instanceof Map);
@@ -165,26 +149,26 @@ public class RequestTest extends RpcTest {
 
   @Test
   public void testEdit() {
-    Map<String, Object> janeValues = ImmutableMap.of("firstName", "Jane", "lastName", "Doe");
-    Map<String, Object> babyValues = ImmutableMap.of("firstName", "Baby", "lastName", "Doe");
+    Map<String, Object> janeValues = Map.of("firstName", "Jane", "lastName", "Doe");
+    Map<String, Object> babyValues = Map.of("firstName", "Baby", "lastName", "Doe");
     Map<String, Object> johnValues =
-        ImmutableMap.of(
+        Map.of(
             "firstName",
             "John",
             "lastName",
             "Doe",
             "relatedContacts",
-            ImmutableList.of(janeValues, babyValues));
+            List.of(janeValues, babyValues));
     Contact john = contacts.edit(johnValues);
     assertNotNull(
-        String.format("Entity instance should contain field passed to JPA#edit.", john),
-        john.getFirstName());
+        john.getFirstName(),
+        "Entity instance should contain field passed to JPA#edit: %s".formatted(john));
     john.getRelatedContacts().stream()
         .forEach(
             relatedContact ->
                 assertNotNull(
-                    String.format(
-                        "Child entity instance should contain field passed to JPA#edit.", john),
-                    relatedContact.getFirstName()));
+                    relatedContact.getFirstName(),
+                    "Child entity instance should contain field passed to JPA#edit: %s"
+                        .formatted(john)));
   }
 }

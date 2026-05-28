@@ -1,5 +1,6 @@
 import { alerts } from "@/components/alerts";
 import { i18n } from "@/services/client/i18n";
+import { sanitizeFilename } from "@/utils/sanitize";
 
 // Gets filename from Content-Disposition
 function getFilename(disposition: string | null) {
@@ -14,6 +15,48 @@ function getFilename(disposition: string | null) {
     return results[1].replace(/^"(.+(?="$))"$/, "$1");
   }
   return null;
+}
+
+/**
+ * Triggers a browser file download for the given URL.
+ *
+ * The filename is sanitized before use to strip characters that are illegal
+ * in filenames across platforms (e.g. `\ / : * ? " < > |`).
+ */
+export function saveAs(url: string, fileName: string) {
+  const dotIndex = fileName.lastIndexOf(".");
+  const ext = dotIndex > 0 ? fileName.slice(dotIndex) : "";
+  const base = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName;
+  const name = sanitizeFilename(base) + ext;
+  const link = document.createElement("a");
+  
+  link.textContent = name || "File";
+  link.download = name || "download";
+  link.href = url;
+
+  Object.assign(link.style, {
+    position: "fixed",
+    top: "-9999px",
+    left: "-9999px",
+  });
+
+  document.body.appendChild(link);
+
+  link.onclick = (e) => {
+    setTimeout(() => {
+      if (e.target) {
+        document.body.removeChild(e.target as any);
+      }
+    }, 300);
+  };
+
+  setTimeout(() => link.click(), 100);
+
+  const message = name
+    ? i18n.get("Downloading {0}…", name)
+    : i18n.get("Downloading file…");
+
+  alerts.info({ message });
 }
 
 export async function download(url: string, fileName?: string) {
@@ -35,36 +78,8 @@ export async function download(url: string, fileName?: string) {
   }
 
   if (res.ok) {
-    const link = document.createElement("a");
     const disposition = res.headers.get("Content-Disposition");
     const name = getFilename(disposition) || fileName || "";
-
-    link.innerHTML = name || "File";
-    link.download = name || "download";
-    link.href = url;
-
-    Object.assign(link.style, {
-      position: "absolute",
-      visibility: "hidden",
-      zIndex: 1000000000,
-    });
-
-    document.body.appendChild(link);
-
-    link.onclick = (e) => {
-      setTimeout(() => {
-        if (e.target) {
-          document.body.removeChild(e.target as any);
-        }
-      }, 300);
-    };
-
-    setTimeout(() => link.click(), 100);
-
-    const message = name
-      ? i18n.get("Downloading {0}…", name)
-      : i18n.get("Downloading file…");
-
-    alerts.info({ message });
+    saveAs(url, name);
   }
 }

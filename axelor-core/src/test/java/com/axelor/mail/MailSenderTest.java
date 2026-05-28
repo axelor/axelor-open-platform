@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.mail;
 
@@ -23,17 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.ResourceUtils;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Date;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import org.junit.jupiter.api.Test;
 
 public class MailSenderTest extends AbstractMailTest {
@@ -47,23 +33,25 @@ public class MailSenderTest extends AbstractMailTest {
   private static final String SEND_TO = "my.name@gmail.com";
 
   private static final String HTML =
-      ""
-          + "<strong>Hello world...</strong>"
-          + "<hr>"
-          + "<p>This is a testing email and not a <strong><span style='color: red;'>spam...</span></strong></p>"
-          + "<p>This is logo1...</p>"
-          + "<img src='cid:logo1.png'></img>" // show logo1.png as inline image
-          + "<br>"
-          + "---"
-          + "<span style='color: blue;'><i>John Smith</i></span>";
+      """
+      <strong>Hello world...</strong>\
+      <hr>\
+      <p>This is a testing email and not a <strong><span style='color: red;'>spam...</span></strong></p>\
+      <p>This is logo1...</p>\
+      <img src='cid:logo1.png'></img>\
+      <br>\
+      ---\
+      <span style='color: blue;'><i>John Smith</i></span>""";
 
   private static final String TEXT =
-      ""
-          + "Hello world...\n"
-          + "--------------\n\n"
-          + "This is a testing email and not a *spam...*\n\n"
-          + "---\n"
-          + "John Smith";
+      """
+      Hello world...
+      --------------
+
+      This is a testing email and not a *spam...*
+
+      ---
+      John Smith""";
 
   private void send(MailAccount account, Date sentOn) throws MessagingException, IOException {
 
@@ -73,7 +61,7 @@ public class MailSenderTest extends AbstractMailTest {
     final String image = ResourceUtils.getResource("com/axelor/mail/test-image.png").getFile();
     final String imageData =
         "data:image/png;base64,"
-            + Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image)));
+            + Base64.getEncoder().encodeToString(Files.readAllBytes(Path.of(image)));
     final String html = HTML + "<br><img src='" + imageData + "' title='test-image.png'>";
 
     sender

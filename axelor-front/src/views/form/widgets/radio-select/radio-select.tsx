@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { useAtom } from "jotai";
 
 import { clsx, Box } from "@axelor/ui";
@@ -20,6 +20,8 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
   const { schema, readonly, widgetAtom, valueAtom } = props;
   const { direction, nullable, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
+
+  const id = useId();
 
   const values = useMemo(
     () => (value != null ? getMultiValues(value).filter((x) => x) : []),
@@ -52,8 +54,9 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
   const vertical = direction === "vertical";
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box
+        id={id}
         ps={1}
         pt={1}
         m={0}
@@ -65,6 +68,8 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
           [styles.radio]: isRadio,
           [styles.vertical]: vertical,
         })}
+        role="group"
+        data-testid="input"
       >
         {selectionList.map((option) => {
           const $values = Array.isArray(values) ? values : `${values ?? ""}`;
@@ -74,6 +79,9 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
               key={option.value}
               onClick={() => handleClick(option, checked)}
               mb={1}
+              role={isRadio ? "radio" : "checkbox"}
+              aria-checked={checked}
+              data-testid={`option-${option.value}`}
             >
               <Box
                 d="flex"

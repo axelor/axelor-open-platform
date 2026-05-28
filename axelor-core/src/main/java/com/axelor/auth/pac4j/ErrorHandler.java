@@ -1,27 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
 import com.axelor.common.UriBuilder;
+import jakarta.inject.Singleton;
 import java.lang.invoke.MethodHandles;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
@@ -36,13 +22,6 @@ public class ErrorHandler {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final AuthPac4jInfo pac4jInfo;
-
-  @Inject
-  public ErrorHandler(AuthPac4jInfo pac4jInfo) {
-    this.pac4jInfo = pac4jInfo;
-  }
-
   public Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
     if (logger.isDebugEnabled()) {
@@ -55,14 +34,13 @@ public class ErrorHandler {
       throw runtimeException(e);
     }
 
-    if (e instanceof HttpAction) {
-      final var action = (HttpAction) e;
+    if (e instanceof HttpAction action) {
       logger.debug("extra HTTP action required in security: {}", action.getCode());
       return httpActionAdapter.adapt(action, context);
     }
 
     final var errorUriBuilder =
-        UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null);
+        UriBuilder.from(AppSettings.get().getBaseURL()).addQueryParam("error", null);
     context
         .getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
         .ifPresent(
@@ -76,8 +54,8 @@ public class ErrorHandler {
   }
 
   protected RuntimeException runtimeException(final Exception exception) {
-    if (exception instanceof RuntimeException) {
-      throw (RuntimeException) exception;
+    if (exception instanceof RuntimeException runtimeException) {
+      throw runtimeException;
     } else {
       throw new RuntimeException(exception);
     }

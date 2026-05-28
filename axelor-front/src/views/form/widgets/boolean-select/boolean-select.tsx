@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { Select, SelectValue } from "@/components/select";
 import { i18n } from "@/services/client/i18n";
@@ -26,6 +26,8 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
     attrs: { focus, required },
   } = useAtomValue(widgetAtom);
 
+  const id = useId();
+
   const handleOnChange = useCallback(
     (option: SelectValue<SelectOption, false>) => {
       setValue(nullable && option?.value === null ? null : option?.value, true);
@@ -45,8 +47,9 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
   const selected = options.find((option) => option.value === value);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Select
+        id={id}
         autoComplete={false}
         autoFocus={focus}
         required={required}

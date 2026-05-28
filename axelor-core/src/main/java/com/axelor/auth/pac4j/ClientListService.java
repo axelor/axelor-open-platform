@@ -1,25 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.pac4j.local.AxelorApiKeyClient;
+import com.axelor.auth.pac4j.local.MfaClient;
 import com.axelor.inject.Beans;
 import com.google.inject.ImplementedBy;
 import com.google.inject.Provider;
@@ -57,6 +45,12 @@ public abstract class ClientListService implements Provider<List<Client>> {
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   protected void init() {
+    // API key auth
+    clients.add(Beans.get(AxelorApiKeyClient.class));
+
+    // MFA client
+    clients.add(Beans.get(MfaClient.class));
+
     // Basic auth
 
     settings
@@ -96,7 +90,11 @@ public abstract class ClientListService implements Provider<List<Client>> {
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 
     if (!indirectClientNames.isEmpty()) {
-      logger.info("Indirect clients: {}", indirectClientNames);
+      logger
+          .atInfo()
+          .setMessage("Indirect clients: {}")
+          .addArgument(() -> indirectClientNames.stream().collect(Collectors.joining(", ")))
+          .log();
     }
 
     directClientNames =
@@ -107,7 +105,11 @@ public abstract class ClientListService implements Provider<List<Client>> {
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 
     if (!directClientNames.isEmpty()) {
-      logger.info("Direct clients: {}", directClientNames);
+      logger
+          .atInfo()
+          .setMessage("Direct clients: {}")
+          .addArgument(() -> directClientNames.stream().collect(Collectors.joining(", ")))
+          .log();
     }
 
     // LDAP

@@ -1,27 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.axelor.common.StringUtils;
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 /** This class provides some methods to deal with Content-Disposition as defined in RFC 6266 */
 public class ContentDisposition {
@@ -62,14 +48,14 @@ public class ContentDisposition {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ContentDisposition that = (ContentDisposition) o;
-    return Objects.equal(type, that.type)
-        && Objects.equal(name, that.name)
-        && Objects.equal(filename, that.filename);
+    return Objects.equals(type, that.type)
+        && Objects.equals(name, that.name)
+        && Objects.equals(filename, that.filename);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(type, name, filename);
+    return Objects.hash(type, name, filename);
   }
 
   /** Return the header value for this content disposition as defined in RFC 6266. */

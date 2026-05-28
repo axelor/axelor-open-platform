@@ -7,8 +7,6 @@ axelor {
   description = project.description
 }
 
-apply from: "${rootDir}/gradle/tomcat-el.gradle"
-
 dependencies {
   implementation libs.asm
 
@@ -29,11 +27,12 @@ dependencies {
 
   testImplementation libs.jdbc_hsqldb
   implementation libs.jdbc_postgres
-  implementation libs.jdbc_mysql
 
   api libs.hibernate
 
   implementation libs.caffeine
+  implementation libs.redisson
+
   implementation libs.flywaydb
 
   api libs.resteasy
@@ -45,10 +44,13 @@ dependencies {
   api libs.xstream
   api libs.commons_csv
 
-  api libs.javax_servlet
-  api libs.javax_mail
-  api libs.javax_jaxb
+  api libs.jakarta_servlet
+  api libs.jakarta_mail
+  api libs.jakarta_jaxb
   api libs.graal_js
+  api libs.jakarta_annotation
+
+  implementation libs.tomcat_jakarta_el
 
   implementation libs.jsoup
 
@@ -66,25 +68,31 @@ dependencies {
 
   implementation libs.jasypt
 
+  implementation libs.minio
+
+  implementation libs.picocli
+
+  implementation libs.totp
+  implementation libs.zxcvbn4j
+  implementation libs.ua_parser
+
   testImplementation libs.greenmail
   testImplementation libs.unboundid_ldapsdk
 
   testImplementation libs.hazelcast
   testImplementation libs.infinispan
   testImplementation libs.ehcache
-  testImplementation libs.redisson
   // Embedded Redis server for Redis test
-  testImplementation("it.ozimov:embedded-redis:0.7.3") {
-    exclude group: 'org.slf4j', module: 'slf4j-simple'
-  }
+  testImplementation "org.signal:embedded-redis:0.9.1"
+  testImplementation 'org.awaitility:awaitility:4.3.0'
 }
 
 test {
   // Avoid Warnings for Reflective Access in `AppSettingsTest`
-  jvmArgs = ["--add-opens", "java.base/java.util=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED"]
-}
-
-license {
-  include "**/*.xsd"
-  excludePatterns.removeAll(['**/resources/**'] as Object[])
+  jvmArgs = [
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED"
+  ]
 }

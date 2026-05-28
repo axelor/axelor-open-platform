@@ -1,24 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
@@ -132,5 +121,40 @@ public class TestEL extends ScriptTest {
     Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
 
     assertTrue((Boolean) result);
+  }
+
+  @Test
+  public void testSecurity() {
+    ScriptHelper helper = new ELScriptHelper(context());
+
+    // classes from java.lang should be allowed
+    assertTrue((Boolean) helper.eval("Boolean.TRUE"));
+
+    // but java.lang.{System,Process,Thread} are not allowed
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+
+    // allow models
+    assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));
+
+    // app settings not allowed
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("imp('com.axelor.app.AppSettings').get().get('db.test.url')"));
+
+    // app settings not allowed through __config__
+    assertNull(helper.eval("__config__.get('db.test.url')"));
+
+    // only custom settings helper allowed
+    assertNull(helper.eval("__config__.get('application.mode')"));
+    assertNotNull(
+        helper.eval(
+            "__bean__(T('com.axelor.script.policy.ScriptAppSettings')).getApplicationMode()"));
+
+    // trying to access a file
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("T('java.nio.file.Paths').get('/tmp')"));
   }
 }

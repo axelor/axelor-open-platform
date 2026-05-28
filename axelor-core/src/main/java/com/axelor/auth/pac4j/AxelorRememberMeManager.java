@@ -1,32 +1,12 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
-import java.util.function.Supplier;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.subject.PrincipalCollection;
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.SubjectContext;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
@@ -41,6 +21,7 @@ import org.apache.shiro.web.util.WebUtils;
  */
 @Singleton
 public class AxelorRememberMeManager extends CookieRememberMeManager {
+
   private final Cookie secureCookie;
   private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
@@ -51,58 +32,30 @@ public class AxelorRememberMeManager extends CookieRememberMeManager {
   }
 
   @Override
-  public PrincipalCollection getRememberedPrincipals(SubjectContext subjectContext) {
-    return withRequest(subjectContext, () -> super.getRememberedPrincipals(subjectContext));
-  }
-
-  @Override
-  public void forgetIdentity(SubjectContext subjectContext) {
-    withRequest(subjectContext, () -> super.forgetIdentity(subjectContext));
-  }
-
-  @Override
-  public void onSuccessfulLogin(
-      Subject subject, AuthenticationToken token, AuthenticationInfo info) {
-    withRequest(subject, () -> super.onSuccessfulLogin(subject, token, info));
-  }
-
-  @Override
-  public void onFailedLogin(
-      Subject subject, AuthenticationToken token, AuthenticationException ae) {
-    withRequest(subject, () -> super.onFailedLogin(subject, token, ae));
-  }
-
-  @Override
-  public void onLogout(Subject subject) {
-    withRequest(subject, () -> super.onLogout(subject));
-  }
-
-  @Override
-  public Cookie getCookie() {
-    final HttpServletRequest request = getRequest();
-    return request != null && request.isSecure() ? secureCookie : super.getCookie();
-  }
-
-  protected HttpServletRequest getRequest() {
-    return currentRequest.get();
-  }
-
-  protected <T> T withRequest(Object requestPairSource, Supplier<T> task) {
-    final HttpServletRequest request = WebUtils.getHttpRequest(requestPairSource);
-    currentRequest.set(request);
+  protected void rememberSerializedIdentity(Subject subject, byte[] serialized) {
+    currentRequest.set(WebUtils.getHttpRequest(subject));
     try {
-      return task.get();
+      super.rememberSerializedIdentity(subject, serialized);
     } finally {
       currentRequest.remove();
     }
   }
 
-  protected void withRequest(Object requestPairSource, Runnable task) {
-    withRequest(
-        requestPairSource,
-        () -> {
-          task.run();
-          return null;
-        });
+  @Override
+  public Cookie getCookie() {
+    final var request = currentRequest.get();
+
+    if (request == null) {
+      return super.getCookie();
+    }
+
+    var cookie = request.isSecure() ? secureCookie : super.getCookie();
+
+    if (request.getContextPath().isEmpty()) {
+      cookie = new SimpleCookie(cookie);
+      cookie.setPath("/");
+    }
+
+    return cookie;
   }
 }

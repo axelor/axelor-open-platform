@@ -41,7 +41,7 @@ async function processActionResult(data: ActionResult) {
       yesNo: false,
     });
   }
-  
+
   if (data.info) {
     await dialogs.box({
       title: data.info.title,
@@ -145,7 +145,7 @@ export async function removeFilter(filter: SavedFilter) {
     method: "POST",
     body: {
       data: {
-        context: { name: filter.name, filterView: filter.filterView },
+        context: { id: filter.id, filterView: filter.filterView },
         model,
       },
       model,
@@ -217,6 +217,7 @@ export async function fields(
 
 export async function viewFields(
   model: string,
+  jsonModel?: string,
   fields?: string[],
 ): Promise<MetaData> {
   const resp = await request({
@@ -225,6 +226,7 @@ export async function viewFields(
     body: {
       fields,
       model,
+      jsonModel,
     },
   });
 
@@ -252,9 +254,10 @@ export async function view<
   type: T;
   name?: string;
   model?: string;
+  jsonModel?: string;
   context?: Record<string, any>;
 }): Promise<ViewData<V>> {
-  const { type, name, model, context } = options;
+  const { type, name, model, jsonModel, context } = options;
   const resp = await request({
     url: "ws/meta/view",
     method: "POST",
@@ -263,6 +266,7 @@ export async function view<
       data: {
         name,
         type,
+        jsonModel,
         context,
       },
     },
@@ -339,7 +343,11 @@ export type ActionOptions = {
 
 export type ActionResult = {
   pending?: string;
+  identityCheck?: {
+    pending: string;
+  };
   exportFile?: string;
+  exportToken?: string;
   signal?: string;
   signalData?: any;
   info?: {

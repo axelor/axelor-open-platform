@@ -2,23 +2,18 @@ import {
   FormEventHandler,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 
-import {
-  AdornedInput,
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  InputLabel,
-} from "@axelor/ui";
+import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { AppSignInLogo } from "@/components/app-logo/app-logo";
+import { LoadingButton } from "@/components/loading-button";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -30,13 +25,11 @@ import styles from "./change-password.module.scss";
 export function ChangePassword({
   onSubmit,
   error: propsErrorMessage,
-  passwordPattern: propsPasswordPattern,
-  passwordPatternTitle: propsPasswordPatternTitle,
+  passwordRequirements: propsPasswordRequirements,
 }: {
   onSubmit?: FormEventHandler<HTMLFormElement>;
   error?: string;
-  passwordPattern?: string;
-  passwordPatternTitle?: string;
+  passwordRequirements?: string[];
 }) {
   const session = useSession();
   const { copyright } = useAppSettings();
@@ -49,8 +42,7 @@ export function ChangePassword({
   const {
     username,
     error,
-    passwordPattern = propsPasswordPattern,
-    passwordPatternTitle = propsPasswordPatternTitle,
+    passwordRequirements = propsPasswordRequirements,
   } = route ?? {};
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -126,7 +118,6 @@ export function ChangePassword({
         setIsSubmitting(false);
       }
 
-
       setErrorMessage(
         i18n.get("Sorry, something went wrong. Please try again later."),
       );
@@ -143,29 +134,17 @@ export function ChangePassword({
     ],
   );
 
-  const passwordPatternExp = useMemo(
-    () => new RegExp(passwordPattern),
-    [passwordPattern],
-  );
-
   const getNewPasswordValidity = useCallback(
     (value: string) => {
       let validity = "";
       if (value) {
         if (requireCurrentPassword && value === currentPassword) {
           validity = i18n.get("New password must be different.");
-        } else if (!passwordPatternExp.test(value)) {
-          validity = passwordPatternTitle;
         }
       }
       return validity;
     },
-    [
-      currentPassword,
-      passwordPatternExp,
-      passwordPatternTitle,
-      requireCurrentPassword,
-    ],
+    [currentPassword, requireCurrentPassword],
   );
 
   const newPasswordValidity = useMemo(() => {
@@ -189,6 +168,10 @@ export function ChangePassword({
   const newPasswordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
 
+  const errorId = useId();
+  const newPasswordHelpId = useId();
+  const confirmPasswordHelpId = useId();
+
   useEffect(() => {
     newPasswordInputRef.current?.setCustomValidity(newPasswordValidity);
   }, [newPasswordValidity]);
@@ -202,7 +185,14 @@ export function ChangePassword({
   }
 
   return (
-    <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>
+    <Box
+      as="main"
+      mt={5}
+      ms="auto"
+      me="auto"
+      className={styles.main}
+      data-testid="change-password-page"
+    >
       <Box className={styles.container}>
         <Box
           className={styles.paper}
@@ -212,8 +202,8 @@ export function ChangePassword({
           alignItems="center"
           p={3}
         >
-          <AppSignInLogo className={styles.logo} />
-          <Box as="legend" style={{ textWrap: "balance" }}>
+          <AppSignInLogo className={styles.logo} data-testid="logo" />
+          <Box as="legend" style={{ textWrap: "balance" }} data-testid="title">
             {i18n.get("Change your password")}
           </Box>
           <Box
@@ -221,10 +211,14 @@ export function ChangePassword({
             w={100}
             onSubmit={handleSubmit}
             onInput={() => setErrorMessage("")}
+            data-testid="form"
           >
             {requireCurrentPassword && (
-              <Box className={styles.inputContainer}>
-                <InputLabel htmlFor="password">
+              <Box
+                className={styles.inputContainer}
+                data-testid="field-current-password"
+              >
+                <InputLabel htmlFor="password" data-testid="label">
                   {i18n.get("Current password")}
                 </InputLabel>
                 <AdornedInput
@@ -237,26 +231,39 @@ export function ChangePassword({
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   spellCheck="false"
+                  aria-required="true"
+                  aria-describedby={errorMessage ? errorId : undefined}
+                  data-testid="input"
                   endAdornment={
                     <Button
                       as="span"
                       onClick={() => setShowCurrentPassword((value) => !value)}
                       title={
-                        showPassword
+                        showCurrentPassword
                           ? i18n.get("Hide password")
                           : i18n.get("Show password")
                       }
+                      aria-label={
+                        showCurrentPassword
+                          ? i18n.get("Hide password")
+                          : i18n.get("Show password")
+                      }
+                      data-testid="btn-toggle-current-password"
                     >
                       <BootstrapIcon
-                        icon={showPassword ? "eye-slash" : "eye"}
+                        icon={showCurrentPassword ? "eye-slash" : "eye"}
+                        aria-hidden="true"
                       />
                     </Button>
                   }
                 />
               </Box>
             )}
-            <Box className={styles.inputContainer}>
-              <InputLabel htmlFor="newPassword">
+            <Box
+              className={styles.inputContainer}
+              data-testid="field-new-password"
+            >
+              <InputLabel htmlFor="newPassword" data-testid="label">
                 {i18n.get("New password")}
               </InputLabel>
               <AdornedInput
@@ -269,6 +276,16 @@ export function ChangePassword({
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 spellCheck="false"
+                aria-required="true"
+                aria-invalid={!!newPasswordValidity}
+                aria-describedby={
+                  newPasswordValidity
+                    ? newPasswordHelpId
+                    : errorMessage
+                      ? errorId
+                      : undefined
+                }
+                data-testid="input"
                 endAdornment={
                   <Button
                     as="span"
@@ -278,18 +295,37 @@ export function ChangePassword({
                         ? i18n.get("Hide password")
                         : i18n.get("Show password")
                     }
+                    aria-label={
+                      showPassword
+                        ? i18n.get("Hide password")
+                        : i18n.get("Show password")
+                    }
+                    data-testid="btn-toggle-password"
                   >
-                    <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                    <BootstrapIcon
+                      icon={showPassword ? "eye-slash" : "eye"}
+                      aria-hidden="true"
+                    />
                   </Button>
                 }
               />
               {newPasswordValidity && (
-                <Box className={styles.validity}>{newPasswordValidity}</Box>
+                <Box
+                  className={styles.validity}
+                  id={newPasswordHelpId}
+                  role="alert"
+                  data-testid="help"
+                >
+                  {newPasswordValidity}
+                </Box>
               )}
             </Box>
 
-            <Box className={styles.inputContainer}>
-              <InputLabel htmlFor="confirmPassword">
+            <Box
+              className={styles.inputContainer}
+              data-testid="field-confirm-password"
+            >
+              <InputLabel htmlFor="confirmPassword" data-testid="label">
                 {i18n.get("Confirm new password")}
               </InputLabel>
               <AdornedInput
@@ -301,6 +337,16 @@ export function ChangePassword({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 spellCheck="false"
+                aria-required="true"
+                aria-invalid={!!confirmPasswordValidity}
+                aria-describedby={
+                  confirmPasswordValidity
+                    ? confirmPasswordHelpId
+                    : errorMessage
+                      ? errorId
+                      : undefined
+                }
+                data-testid="input"
                 endAdornment={
                   <Button
                     as="span"
@@ -310,26 +356,97 @@ export function ChangePassword({
                         ? i18n.get("Hide password")
                         : i18n.get("Show password")
                     }
+                    aria-label={
+                      showConfirmPassword
+                        ? i18n.get("Hide password")
+                        : i18n.get("Show password")
+                    }
+                    data-testid="btn-toggle-confirm-password"
                   >
                     <BootstrapIcon
                       icon={showConfirmPassword ? "eye-slash" : "eye"}
+                      aria-hidden="true"
                     />
                   </Button>
                 }
               />
 
               {confirmPasswordValidity && (
-                <Box className={styles.validity}>{confirmPasswordValidity}</Box>
+                <Box
+                  className={styles.validity}
+                  id={confirmPasswordHelpId}
+                  role="alert"
+                  data-testid="help"
+                >
+                  {confirmPasswordValidity}
+                </Box>
               )}
             </Box>
 
             {errorMessage && (
-              <Alert mb={1} p={2} variant="danger" className={styles.error}>
+              <Alert
+                mb={1}
+                p={2}
+                variant="danger"
+                className={styles.error}
+                id={errorId}
+                role="alert"
+                data-testid="error"
+              >
                 {errorMessage}
               </Alert>
             )}
 
-            <Button
+            {passwordRequirements && passwordRequirements.length > 0 && (
+              <Box
+                mb={2}
+                rounded
+                style={{
+                  backgroundColor: "var(--bs-tertiary-bg)",
+                  color: "rgba(var(--bs-body-color-rgb), 0.65)",
+                  padding: "0.65rem 0.75rem",
+                  fontSize: "0.85rem",
+                }}
+              >
+                <Box
+                  as="p"
+                  mb={1}
+                  style={{
+                    fontWeight: 600,
+                  }}
+                >
+                  {i18n.get("Your new password must")}
+                </Box>
+                <Box
+                  as="ul"
+                  d="flex"
+                  flexDirection="column"
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                    gap: "0.2rem",
+                  }}
+                >
+                  {passwordRequirements.map(
+                    (requirement: string, i: number) => (
+                      <Box
+                        as="li"
+                        key={i}
+                        d="flex"
+                        alignItems="center"
+                        style={{ gap: "0.25rem" }}
+                      >
+                        <BootstrapIcon icon="dot" aria-hidden="true" />
+                        {requirement}
+                      </Box>
+                    ),
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            <LoadingButton
               type="submit"
               variant="primary"
               d="flex"
@@ -337,16 +454,17 @@ export function ChangePassword({
               gap={4}
               mt={3}
               w={100}
+              loading={isSubmitting}
               disabled={
                 (requireCurrentPassword && !currentPassword) ||
                 !newPassword ||
-                !confirmPassword ||
-                isSubmitting
+                !confirmPassword
               }
+              data-testid="btn-change-password"
+              aria-label={i18n.get("Change password")}
             >
-              {isSubmitting && <CircularProgress size={16} indeterminate />}
               {i18n.get("Change password")}
-            </Button>
+            </LoadingButton>
           </Box>
         </Box>
         <Box as="p" textAlign="center">

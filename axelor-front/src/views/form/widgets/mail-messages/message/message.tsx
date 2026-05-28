@@ -44,7 +44,7 @@ function MessageEvent({ data }: { data: TYPES.Message }) {
   return (
     <>
       {" "}
-      {$eventText} {" - "}
+      {$eventText && i18n.get($eventText)} {" - "}
       <Box as="a" title={moment($eventTime).format("L LT")}>
         {moment($eventTime).fromNow()}
       </Box>
@@ -129,16 +129,15 @@ export const Message = React.memo(function Message(props: MessageProps) {
   } = data;
 
   const body = useMemo<TYPES.MessageBody | null>(() => {
-    let body: string | null = data.body || "{}";
     try {
-      body = JSON.parse(data.body || "");
-      if (typeof body !== "object") {
-        body = null;
+      const parsedBody = JSON.parse(data.body || "{}");
+      if (typeof parsedBody !== "object") {
+        return null;
       }
+      return parsedBody;
     } catch (e) {
-      body = null;
+      return null;
     }
-    return body;
   }, [data.body]);
 
   const $title = body?.title || subject;
@@ -196,8 +195,9 @@ export const Message = React.memo(function Message(props: MessageProps) {
       position="relative"
       d="flex"
       className={clsx(styles["message-container"], "message")}
+      data-testid={"thread-message"}
     >
-      <Box as="span" className={styles.avatar}>
+      <Box as="span" className={styles.avatar} data-testid={"avatar"}>
         <Avatar user={getUser(data)!} image={$avatar} />
       </Box>
       <MessageMenu
@@ -206,7 +206,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
         onAction={doAction}
         onRemove={doRemove}
       />
-      <Box d="flex" flex={1} flexDirection="column">
+      <Box d="flex" flex={1} flexDirection="column" data-testid={"content"}>
         <Box w={100} border rounded bgColor="body">
           <Box
             as="span"
@@ -224,6 +224,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
               flex={1}
               p={2}
               borderBottom
+              data-testid={"header"}
             >
               <Box as="p" mb={0}>
                 {$thread ? (
@@ -256,7 +257,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
               )}
             </Box>
           )}
-          <Box pt={1} ps={4} pe={4}>
+          <Box pt={1} ps={4} pe={4} data-testid={"body"}>
             {body?.tracks && (
               <MessageTracks
                 fields={fields}
@@ -275,7 +276,13 @@ export const Message = React.memo(function Message(props: MessageProps) {
             {body?.files && <MessageFiles data={body.files} />}
             {$files && <MessageFiles data={$files} />}
           </Box>
-          <Box p={1} ps={4} pe={4} style={{ fontSize: "smaller" }}>
+          <Box
+            p={1}
+            ps={4}
+            pe={4}
+            style={{ fontSize: "smaller" }}
+            data-testid={"footer"}
+          >
             {$numReplies > 0 && (
               <span className={styles["pull-right"]}>
                 <Box
@@ -284,6 +291,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
                   mb={0}
                   onClick={fetchReplies}
                   className={styles["pull-right"]}
+                  data-testid="btn-message-fetch-reply"
                 >
                   {i18n.get(
                     "replies ({0} of {1})",
@@ -327,7 +335,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
 
 export function MessageBox({
   isMail,
-  inputProps: MessageInputProps,
+  inputProps: messageInputProps,
   data,
   fields,
   jsonFields,
@@ -356,9 +364,9 @@ export function MessageBox({
 
   const filters = useMemo(
     () => [
-      { title: i18n.get("All"), value: undefined },
-      { title: i18n.get("Comments"), value: "comment" },
-      { title: i18n.get("Notifications"), value: "notification" },
+      { title: i18n.get("All"), value: undefined, key: "all" },
+      { title: i18n.get("Comments"), value: "comment", key: "comment" },
+      { title: i18n.get("Notifications"), value: "notification", key: "notification" },
     ],
     [],
   );
@@ -369,17 +377,19 @@ export function MessageBox({
         [styles.rtl]: rtl,
         [styles["mail-box"]]: isMail,
       })}
+      data-testid={"mail-messages"}
     >
       {!isMail && (
         <Box d="flex" flexDirection="column" g={2} mb={3}>
           <Box d="flex" flexDirection={{ base: "column", md: "row" }} g={2}>
-            {filters.map(({ title, value }, ind) => (
+            {filters.map(({ title, value, key }, ind) => (
               <Button
-                key={ind}
+                key={key}
                 variant="primary"
                 outline={filter !== value}
                 onClick={() => onFilterChange?.(value)}
                 flexGrow={{ base: 1, md: 0 }}
+                data-testid={`btn-filter-${key}`}
               >
                 {title}
               </Button>
@@ -389,7 +399,7 @@ export function MessageBox({
             <MessageInput
               focus={false}
               onSave={onComment}
-              {...MessageInputProps}
+              {...messageInputProps}
             />
           )}
         </Box>
@@ -420,6 +430,7 @@ export function MessageBox({
             ms={1}
             me={1}
             mb={3}
+            data-testid={'btn-load-more'}
           >
             <Box d="flex" as="span" ms={1}>
               {i18n.get("load more")}

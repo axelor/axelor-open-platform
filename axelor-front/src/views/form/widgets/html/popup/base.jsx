@@ -18,11 +18,10 @@ function Popup({ data, ...rest }) {
       target={target}
       placement="bottom-start"
       shadow
+      role={"dialog"}
     >
       <ClickAwayListener onClickAway={commands.closePopup}>
-        <div>
-          {component && renderComponent(component, data?.props)}
-        </div>
+        <div>{component && renderComponent(component, data?.props)}</div>
       </ClickAwayListener>
     </Popper>
   );

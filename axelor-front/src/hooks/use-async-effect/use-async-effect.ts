@@ -9,7 +9,7 @@ export function useAsyncEffect(
   effect: AsyncEffectCallback,
   deps?: DependencyList,
 ) {
-  const abortRef = useRef<AbortController>();
+  const abortRef = useRef<AbortController>(undefined);
 
   useEffect(() => {
     abortRef.current = new AbortController();

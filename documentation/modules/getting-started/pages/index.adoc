@@ -16,3 +16,5 @@ xref:eclipse.adoc[Eclipse]::
   Describes how to configure Eclipse IDE.
 xref:idea.adoc[IntelliJ IDEA]::
   Describes how to configure IntelliJ IDEA.
+xref:vscode.adoc[VSCode]::
+  Describes how to configure VSCode.

@@ -1,10 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import { Box, Button, Popper } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 import { i18n } from "@/services/client/i18n";
 import { axelor } from "@/utils/globals";
+import { alerts } from "../alerts";
 
 import styles from "./errorbox.module.scss";
+import passwordStyles from "@/views/form/widgets/password/password.module.scss";
 
 export type ErrorProxProps = {
   status: number;
@@ -19,7 +21,7 @@ export function ErrorBox({
   status,
   statusText,
   error,
-  detailsTitle = i18n.get("Details"),
+  detailsTitle = i18n.get("Details..."),
   resetTitle = i18n.get("Reset"),
   onReset,
 }: ErrorProxProps) {
@@ -49,7 +51,7 @@ export function ErrorBox({
       <Box textAlign="center">
         <Box as="p" fontSize={5}>
           <Box as="span" color="danger">
-            {i18n.get("Opps!")}
+            {i18n.get("Oops!")}
           </Box>{" "}
           {message}
         </Box>
@@ -90,8 +92,8 @@ export function ErrorBox({
   );
 }
 
-function ErrorBoxFooter({ error }: { error: Error }) {
-  const divRef = useRef<HTMLInputElement>(null);
+export function ErrorBoxFooter({ error }: { error: Error }) {
+  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [copied, setCopied] = useState(false);
 
   const copyStackTrace = useCallback(async () => {
@@ -103,29 +105,37 @@ function ErrorBoxFooter({ error }: { error: Error }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
-      // ignore
+      alerts.error({
+        message: i18n.get("Failed to copy"),
+      });
+      console.error(e);
     }
   }, [error]);
 
   return (
-    <Box d="flex" flex={1}>
-      <Button outline variant="primary" onClick={copyStackTrace}>
-        <Box d="flex" as="span" ref={divRef}>
-          <MaterialIcon icon="content_copy" />
-          {i18n.get("Copy to clipboard")}
-        </Box>
-      </Button>
-      <Popper
-        placement="bottom"
-        open={copied}
-        target={divRef.current}
-        offset={[0, 4]}
-        shadow
-        arrow
-        rounded
-      >
-        <Box className={styles.copyToClipboard}>{i18n.get("Copied")}</Box>
-      </Popper>
-    </Box>
+    navigator.clipboard && (
+      <Box d="flex" flex={1}>
+        <Button outline variant="primary" onClick={copyStackTrace}>
+          <Box d="flex" as="span" ref={setTargetElement}>
+            <BootstrapIcon icon={copied ? "check-lg" : "copy"} />
+            {i18n.get("Copy to clipboard")}
+          </Box>
+        </Button>
+        <Popper
+          placement="bottom"
+          open={copied}
+          target={targetElement}
+          offset={[0, 4]}
+          shadow
+          arrow
+          rounded
+          role={"status"}
+        >
+          <Box className={passwordStyles.copyToClipboard}>
+            {i18n.get("Copied")}
+          </Box>
+        </Popper>
+      </Box>
+    )
   );
 }

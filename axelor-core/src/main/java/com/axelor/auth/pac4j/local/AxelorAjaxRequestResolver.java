@@ -1,28 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j.local;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import jakarta.inject.Singleton;
 import java.util.Optional;
-import javax.inject.Singleton;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.UnauthorizedAction;
 import org.pac4j.core.exception.http.WithLocationAction;
@@ -33,30 +18,26 @@ import org.pac4j.core.redirect.RedirectionActionBuilder;
 public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
 
   @Override
-  public boolean isAjax(WebContext context, SessionStore sessionStore) {
-    return super.isAjax(context, sessionStore) || AuthPac4jInfo.isXHR(context);
+  public boolean isAjax(CallContext ctx) {
+    return super.isAjax(ctx) || AuthPac4jInfo.isXHR(ctx);
   }
 
   @Override
   public HttpAction buildAjaxResponse(
-      WebContext context,
-      SessionStore sessionStore,
-      RedirectionActionBuilder redirectionActionBuilder) {
-    if (isAjax(context, sessionStore)
-        && getUrl(context, sessionStore, redirectionActionBuilder)
+      CallContext ctx, RedirectionActionBuilder redirectionActionBuilder) {
+    if (isAjax(ctx)
+        && getUrl(ctx, redirectionActionBuilder)
             .filter(url -> url.endsWith(AxelorFormClient.LOGIN_URL))
             .isPresent()) {
       return new UnauthorizedAction();
     }
-    return super.buildAjaxResponse(context, sessionStore, redirectionActionBuilder);
+    return super.buildAjaxResponse(ctx, redirectionActionBuilder);
   }
 
   protected Optional<String> getUrl(
-      WebContext context,
-      SessionStore sessionStore,
-      RedirectionActionBuilder redirectionActionBuilder) {
+      CallContext ctx, RedirectionActionBuilder redirectionActionBuilder) {
     return redirectionActionBuilder
-        .getRedirectionAction(context, sessionStore)
+        .getRedirectionAction(ctx)
         .filter(WithLocationAction.class::isInstance)
         .map(action -> ((WithLocationAction) action).getLocation());
   }

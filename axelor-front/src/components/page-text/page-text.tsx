@@ -11,6 +11,7 @@ import { Button, Input } from "@axelor/ui";
 import { alerts } from "@/components/alerts";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
+import { SearchResult } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
 import { getDefaultMaxPerPage } from "@/utils/app-settings.ts";
 
@@ -18,10 +19,10 @@ import styles from "./page-text.module.scss";
 
 export function PageText({
   dataStore,
-  count = 0,
+  onResult,
 }: {
-  count?: number;
   dataStore: DataStore;
+  onResult?: (result: SearchResult) => void;
 }) {
   const page = useDataStore(dataStore, (state) => state.page);
   const maxLimit = getDefaultMaxPerPage();
@@ -53,15 +54,17 @@ export function PageText({
           message: i18n.get("Page size limited to {0} records", size),
         });
       }
-      dataStore.search({
-        limit: size,
-        ...(currentPage && {
-          offset: (currentPage - 1) * size,
-        }),
-      });
+      dataStore
+        .search({
+          limit: size,
+          ...(currentPage && {
+            offset: (currentPage - 1) * size,
+          }),
+        })
+        .then(onResult);
       setShowEditor(false);
     },
-    [dataStore, currentPage, userPageSize],
+    [dataStore, currentPage, onResult, userPageSize],
   );
 
   const handleKeyDown = useCallback(
@@ -77,10 +80,9 @@ export function PageText({
 
   const onShow = useCallback(() => setShowEditor(true), []);
 
-  const to =
-    (limit > 0 ? Math.min(offset + limit, totalCount) : totalCount) + count;
+  const to = limit > 0 ? Math.min(offset + limit, totalCount) : totalCount;
   const start = to === 0 ? 0 : offset + 1;
-  const text = i18n.get("{0} to {1} of {2}", start, to, totalCount + count);
+  const text = i18n.get("{0} to {1} of {2}", start, to, totalCount);
 
   if (showEditor) {
     return (
@@ -88,6 +90,7 @@ export function PageText({
         className={styles.editor}
         onSubmit={onApply}
         onKeyDown={handleKeyDown}
+        data-testid={"page-limit-form"}
       >
         <Input
           name="limit"
@@ -97,8 +100,9 @@ export function PageText({
           onFocus={(e) => e.target.select()}
           autoFocus
           style={{ width: "5rem" }}
+          data-testid={"page-limit"}
         />
-        <Button variant="secondary" type="submit">
+        <Button variant="secondary" type="submit" data-testid={"btn-apply"}>
           {i18n.get("Apply")}
         </Button>
       </form>

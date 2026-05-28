@@ -1,30 +1,18 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.web;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
@@ -38,6 +26,7 @@ import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaAttrsRepository;
 import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
@@ -45,7 +34,6 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
-import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
@@ -54,24 +42,28 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.script.ScriptHelper;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.xml.bind.JAXBException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
@@ -104,9 +96,9 @@ public class MetaController {
     MetaAction meta = request.getContext().asType(MetaAction.class);
 
     Action action = XMLViews.findAction(meta.getName());
-    Map<String, Map<String, String>> data = Maps.newHashMap();
+    Map<String, Map<String, String>> data = new HashMap<>();
 
-    response.setData(ImmutableList.of(data));
+    response.setData(List.of(data));
 
     ObjectViews views;
     try {
@@ -118,7 +110,7 @@ public class MetaController {
       return;
     }
 
-    Action current = views.getActions().get(0);
+    Action current = views.getActions().getFirst();
     if (action != null && !action.getName().equals(current.getName())) {
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR)
@@ -129,18 +121,21 @@ public class MetaController {
   }
 
   public void validateView(ActionRequest request, ActionResponse response) {
-    MetaView meta = request.getContext().asType(MetaView.class);
-    Map<String, Object> data = Maps.newHashMap();
+    String xml =
+        MetaViewCustom.class.isAssignableFrom(request.getBeanClass())
+            ? request.getContext().asType(MetaViewCustom.class).getXml()
+            : request.getContext().asType(MetaView.class).getXml();
+    Map<String, Object> data = new HashMap<>();
 
     try {
-      validateXML(meta.getXml());
+      validateXML(xml);
     } catch (Exception e) {
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
       data.putAll(validateBuilder.build());
     }
 
-    response.setData(ImmutableList.of(data));
+    response.setData(List.of(data));
   }
 
   private List<MetaAttrs> findAttrs(String model, String view) {
@@ -247,9 +242,8 @@ public class MetaController {
     MetaField metaField = request.getContext().asType(MetaField.class);
 
     String domain =
-        String.format(
-            "self.packageName = '%s' AND self.name = '%s'",
-            metaField.getPackageName(), metaField.getTypeName());
+        "self.packageName = '%s' AND self.name = '%s'"
+            .formatted(metaField.getPackageName(), metaField.getTypeName());
     response.setView(
         ActionView.define(metaField.getTypeName())
             .model(MetaModel.class.getName())
@@ -268,7 +262,7 @@ public class MetaController {
       final String durationTime =
           LocalTime.MIN.plusSeconds(duration.getSeconds()).format(DateTimeFormatter.ISO_LOCAL_TIME);
       response.setNotify(
-          String.format(I18n.get("All views have been restored (%s)."), durationTime)
+          I18n.get("All views have been restored (%s).").formatted(durationTime)
               + "<br>"
               + I18n.get("Please refresh your browser to see updated views."));
       log.info("Restore meta time: {}", durationTime);
@@ -277,16 +271,15 @@ public class MetaController {
     }
   }
 
-  private void exportI18n(String module, URL file) throws IOException {
+  private void exportI18n(String module, URL file, Path path) throws IOException {
 
-    String name = Paths.get(file.getFile()).getFileName().toString();
+    String name = Path.of(file.getFile()).getFileName().toString();
     if (!name.startsWith("messages_")) {
       return;
     }
 
-    Path path = ActionExport.getExportPath().toPath().resolve("i18n");
     String lang = StringUtils.normalizeLanguageTag(name.substring(9, name.length() - 4));
-    Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
+    Path target = path.resolve(Path.of(module, "src/main/resources/i18n", name));
 
     final List<String[]> items = new ArrayList<>();
     final CSVFile csv = CSVFile.DEFAULT.withFirstRecordAsHeader();
@@ -324,17 +317,63 @@ public class MetaController {
     }
   }
 
+  private InputStream zipDirectory(Path sourceDir) {
+    var input = new PipedInputStream();
+
+    Thread.ofVirtual()
+        .start(
+            () -> {
+              try (var output = new PipedOutputStream(input);
+                  var zos = new ZipOutputStream(output);
+                  var files = java.nio.file.Files.walk(sourceDir)) {
+                files
+                    .filter(file -> !java.nio.file.Files.isDirectory(file))
+                    .forEach(
+                        file -> {
+                          var zipEntry = new ZipEntry(sourceDir.relativize(file).toString());
+                          try {
+                            zos.putNextEntry(zipEntry);
+                            java.nio.file.Files.copy(file, zos);
+                            zos.closeEntry();
+                          } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                          }
+                        });
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+            });
+
+    return input;
+  }
+
   public void exportI18n(ActionRequest request, ActionResponse response) {
-    for (String module : ModuleManager.getResolution()) {
-      for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
-        try {
-          exportI18n(module, file);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
+    Path outputDir = null;
+
+    try {
+      outputDir = TempFiles.createTempDir("export-i18n-out-");
+
+      for (String module : ModuleManager.getResolution()) {
+        for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
+          exportI18n(module, file, outputDir);
         }
       }
+
+      String fileName = "i18n.zip";
+      try (InputStream stream = zipDirectory(outputDir)) {
+        response.setExportFile(stream, fileName);
+      }
+    } catch (Exception e) {
+      response.setError(e.getMessage());
+    } finally {
+      try {
+        if (outputDir != null && java.nio.file.Files.exists(outputDir)) {
+          FileUtils.deleteDirectory(outputDir);
+        }
+      } catch (IOException e) {
+        log.error("Failed to clean up temporary i18n export directory.", e);
+      }
     }
-    response.setInfo(I18n.get("Export complete."));
   }
 
   public void setThemeSelectable(ActionRequest request, ActionResponse response) {

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common.crypto;
 
@@ -22,7 +8,19 @@ import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 import java.nio.charset.StandardCharsets;
 
-/** The {@link StringEncryptor} can be used to encrypt/decrypt {@link String} values. */
+/**
+ * AES encryptor operating on {@link String} values.
+ *
+ * <p>Encrypts and decrypts strings by delegating to a {@link BytesEncryptor} and encoding the
+ * resulting bytes as Base64.
+ *
+ * @deprecated Backed by {@link BytesEncryptor}, which uses weak key derivation (PBKDF2WithHmacSHA1,
+ *     1024 iterations) and an instance-scoped salt. Use {@link StringEncryptorPbkdf2Sha512} (or
+ *     {@link StringEncryptorPbkdf2Sha256}) for new encryptions, or {@link
+ *     StringEncryptorCoordinator} to handle legacy {@code $AES$}, {@code $AESv1$}, and {@code
+ *     $AESv2$} ciphertext transparently.
+ */
+@Deprecated
 public class StringEncryptor implements Encryptor<String, String> {
 
   private final BaseEncoding encoder;

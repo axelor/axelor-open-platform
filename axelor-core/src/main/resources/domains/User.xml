@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
 
   <module name="auth" package="com.axelor.auth.db"/>
 
@@ -12,10 +12,9 @@
 
     <string name="code" required="true" unique="true" min="2" title="Login"/>
     <string name="name" required="true" min="2"/>
-    <string name="password" password="true" required="true" min="4"/>
+    <string name="password" password="true" min="4"/>
     <datetime name="passwordUpdatedOn" title="Last password update date"/>
     <boolean name="forcePasswordChange" help="Force the user to change their password at next login."/>
-
     <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
     <string name="email" unique="true"/>
     <string name="language" selection="select.language"/>

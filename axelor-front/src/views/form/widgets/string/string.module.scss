@@ -9,4 +9,8 @@
 button.viewer {
   outline: none;
   user-select: auto;
+
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
 }

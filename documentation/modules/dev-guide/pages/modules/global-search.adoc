@@ -1,0 +1,402 @@
+= Global Search
+:toc:
+:toc-title:
+
+> 🏷️ Available in Axelor Enterprise edition
+
+The Global Search feature provides a powerful, system-wide full-text search capability, allowing users to quickly find information across different types of records in the application. It is built on top of https://hibernate.org/search/[Hibernate Search] and backed by https://www.elastic.co/elasticsearch/[Elasticsearch] or https://opensearch.org/[OpenSearch].
+
+TIP: For detailed information about Hibernate Search capabilities, see the https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/[Hibernate Search Reference Documentation].
+
+NOTE: Both Elasticsearch and OpenSearch are supported as backend search engines. This documentation uses "Elasticsearch" for simplicity, but all features apply to OpenSearch as well.
+
+== Configuration
+
+To enable and configure the Global Search feature, you need to set several properties in your `axelor-config.properties` file.
+
+=== Enabling Global Search
+
+Global Search is enabled by setting the Hibernate Search backend to Elasticsearch. The same configuration works for both Elasticsearch and OpenSearch.
+
+.axelor-config.properties
+[source,properties]
+----
+# Enable Elasticsearch backend for Hibernate Search
+# Works for both Elasticsearch and OpenSearch
+hibernate.search.backend.type = elasticsearch
+
+# Backend host configuration
+# For Elasticsearch: default port 9200
+# For OpenSearch: default port 9200
+hibernate.search.backend.hosts = localhost:9200
+----
+
+IMPORTANT: The `elasticsearch` backend type is used for both Elasticsearch and OpenSearch. Hibernate Search's Elasticsearch backend is compatible with OpenSearch.
+
+=== Backend Connection Settings
+
+Configure connection parameters for the Elasticsearch/OpenSearch backend.
+
+[source,properties]
+----
+# Protocol (http or https)
+hibernate.search.backend.protocol = https
+
+# Authentication
+hibernate.search.backend.username = elastic
+hibernate.search.backend.password = changeme
+
+# Connection timeout in milliseconds
+hibernate.search.backend.connection_timeout = 3000
+
+# Read timeout in milliseconds
+hibernate.search.backend.read_timeout = 60000
+
+# Request timeout in milliseconds (for index/search operations)
+hibernate.search.backend.request_timeout = 60000
+----
+
+NOTE: For production deployments, use HTTPS and proper authentication credentials.
+
+For additional configuration options including schema management, automatic indexing strategies, and performance tuning, see the https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#configuration[Hibernate Search Configuration Reference].
+
+=== Version Compatibility
+
+Hibernate Search 7.2 supports the following backend versions:
+
+* **Elasticsearch**: 7.10 - 8.18
+* **OpenSearch**: 1.3 - 2.16
+
+NOTE: Using versions outside this range may result in compatibility issues or unsupported features. For the latest compatibility information, see https://hibernate.org/search/releases/7.2/[Hibernate Search 7.2 Release Notes].
+
+For more configuration options, refer to:
+
+* https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch[Hibernate Search - Elasticsearch Backend Configuration]
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html[Elasticsearch Settings Reference]
+* https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/[OpenSearch Configuration Guide]
+
+=== Indexing Configuration
+
+The indexing process can be tuned for performance.
+
+[source,properties]
+----
+# Number of entities to fetch and process in each batch during mass indexing.
+global-search.indexer.batch-size = 100
+
+# Number of parallel threads to use for loading entities from the database.
+global-search.indexer.threads = 4
+
+# Transaction timeout in seconds for the mass indexer.
+global-search.indexer.timeout = 600
+----
+
+=== File Indexing
+
+The content of attached files can also be indexed. You can configure the maximum file size and the types of files to be indexed.
+
+[source,properties]
+----
+# Maximum size of files (in MB) to be considered for content indexing.
+global-search.file.max-size = 5
+
+# Comma-separated list of additional MIME types to be indexed.
+# By default, common document types (pdf, doc, xls, etc.) are supported.
+global-search.file.type.custom = application/json,application/javascript
+----
+
+== Indexing
+
+Before you can use the search, you need to build the search index.
+
+=== Mass Indexing
+
+The initial index for all entities is created using a mass indexer. This process can be started via the command-line interface.
+
+.CLI Command
+[source,sh]
+----
+$ ./bin/axelor search index
+----
+
+This command will find all entities configured for indexing and process them.
+
+You can use the following options:
+
+* `--drop`: Drops the existing index and schema before starting.
+* `--tenant <tenant_id>`: If multi-tenancy is enabled, you can specify which tenant to index.
+
+[source,sh]
+----
+# Re-index everything from scratch
+$ ./bin/axelor search index --drop
+
+# Index a specific tenant
+$ ./bin/axelor search index --tenant my_tenant
+----
+
+=== Automatic Indexing
+
+Once the initial index is created, Hibernate Search automatically keeps the index synchronized with database changes. Any creation, update, or deletion of an indexed entity will trigger a corresponding update in the search index.
+
+== Mapping Configuration
+
+You define which entities and fields should be indexed in a YAML configuration file. By default, the application looks for a file named `axelor-search.yaml` in the classpath. You can specify a different file using the `global-search.mapping-file` property.
+
+.axelor-config.properties
+[source,properties]
+----
+global-search.mapping-file = /path/to/my-search-mapping.yaml
+----
+
+=== YAML Mapping Example
+
+Here is an example configuration for indexing different types of entities.
+
+.axelor-search.yaml
+[source,yaml]
+----
+indexes:
+  - entity: com.axelor.contact.db.Country
+    fields:
+      - field: code
+      - field: name
+  - entity: com.axelor.contact.db.Address
+    fields:
+      - field: street
+      - field: area
+      - field: city
+      - field: zip
+      - field: country
+        depth: 2        <1>
+        include:        <2>
+          - name
+          - code
+  - entity: com.axelor.contact.db.Contact
+    index: Contact      <3>
+    fields:
+      - field: fullName
+      - field: addresses
+        depth: 2
+      - field: title
+        depth: 1
+  - entity: com.axelor.sale.db.Product
+    fields:
+      - field: name
+      - field: code
+      - field: attrs    <4>
+  - entity: com.axelor.meta.db.MetaJsonRecord
+    fields:
+      - field: jsonModel
+      - field: name
+      - field: attrs
+----
+<1> Index related entity fields up to depth 2
+<2> Only include specific paths from the related entity
+<3> Optional custom index name - makes this entity directly searchable
+<4> JSON field - content indexed automatically
+
+**Configuration Options:**
+
+*   `entity`: The fully qualified name of the entity to configure
+*   `index`: (Optional) Index name - when specified, the entity becomes directly searchable. When omitted, the entity's field configuration is used only when it's embedded in other indexed entities
+*   `fields`: List of fields to be indexed
+    *   `field`: The name of the property in the entity
+    *   `depth`: (For related entities) How deep to index the related entity's fields
+    *   `include`/`exclude`: (For related entities) Explicitly include or exclude specific paths
+
+**Special Field Types:**
+
+* **Translatable fields**: Translatable values are automatically indexed in all available languages
+* **File fields**: File content is automatically extracted and indexed
+* **Custom fields**: Custom fields are automatically indexed
+
+== Search Usage
+
+The global search feature provides a simple yet powerful interface for finding information across your entire application.
+
+=== Accessing Global Search
+
+There are two ways to access the global search:
+
+1. **Click the search icon** in the top navigation bar:
++
+image::global-search-icon.png[Global search icon in navigation bar]
+
+2. **Use the keyboard shortcut**: Press kbd:[Ctrl+/] from anywhere in the application
+
+=== Using the Search Interface
+
+Once activated, the search interface provides:
+
+* A search input field where you can type your query
+* An optional filter dropdown (labeled "All...") to narrow results to specific entity types
+* A results area displaying matching records with highlighted search terms
+
+image::global-search.png[Global search interface showing search results]
+
+Search results display:
+
+* **Entity type badge**: Shows the type of record (e.g., "Product")
+* **Record details**: Key fields from the matching record
+* **Highlighted matches**: Search terms are highlighted in yellow to show where matches occurred
+
+Click on any search result to open the corresponding record.
+
+=== Search Syntax
+
+The search supports a rich query syntax:
+
+*   **Multiple keywords**: Use `|` to search for multiple terms. Example: `invoice|customer`
+*   **Phrase search**: Use double quotes to search for an exact phrase. Example: `"blue shirt"`
+*   **Wildcard search**: Use `*` at the end of a word for prefix queries. Example: `comp*` will match `computer` and `company`.
+*   **Fuzzy search**: Use `~` followed by a number (1, 2, or 3) to find similar words. `1` is the most similar. Example: `fast~1` might match `fact`.
+
+The search syntax is based on the https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html[Simple Query String] query (also supported in https://opensearch.org/docs/latest/query-dsl/full-text/simple-query-string/[OpenSearch]).
+
+IMPORTANT: Wildcard queries (`*`) can be slow on large datasets. Use them sparingly for better performance.
+
+== Multi-Language Search
+
+Global Search automatically supports translatable fields, allowing users to search content in their preferred language.
+
+=== How It Works
+
+When a field is marked as translatable, its translations are automatically indexed alongside the original value.
+
+.Example Entity
+[source,xml]
+----
+<entity name="Product">
+  ...
+  <string name="description" translatable="true"/>
+</entity>
+----
+
+When this product is indexed with description "Red Laptop" and translations exist in the `MetaTranslation`:
+
+* Original: "Red Laptop"
+* French: "Ordinateur Rouge"
+* German: "Roter Laptop"
+
+All these values are automatically indexed and searchable.
+
+=== Language-Specific Search
+
+Search queries automatically filter results based on the user's current language preference:
+
+* Searches both original field values and translations for the user's language
+* Original values are always searched regardless of user language
+
+.Example
+[source]
+----
+User language: French
+Search query: "ordinateur"
+Result: Finds "Red Laptop" product via its French translation
+----
+
+== Performance Best Practices
+
+=== Indexing Performance
+
+* **Batch size**: Adjust `global-search.indexer.batch-size` based on available memory (default: 100)
+* **Thread count**: Set `global-search.indexer.threads` based on CPU cores (default: 4)
+* **Schedule mass indexing**: Run during off-peak hours for large datasets
+
+See https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapper-orm-indexing-massindexer[Hibernate Search Mass Indexer documentation] for advanced tuning.
+
+=== Search Performance
+
+* Avoid wildcard queries at the beginning of terms (e.g., `*term`)
+* Use phrase queries sparingly
+* Consider adding specific fields to search instead of searching all fields
+* Monitor cluster health via https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html[Elasticsearch Cluster Health API] or https://opensearch.org/docs/latest/api-reference/cluster-health/[OpenSearch Cluster Health API]
+
+=== Cluster Sizing
+
+For production deployments, consider:
+
+* **Heap size**: Set to 50% of available RAM (max 32GB)
+* **Sharding**: Start with 1 shard per index, adjust based on data size
+* **Replicas**: Use at least 1 replica for high availability
+
+For sizing guidance, see:
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/size-your-shards.html[Elasticsearch Shard Sizing Guide]
+* https://opensearch.org/docs/latest/tuning-your-cluster/[OpenSearch Cluster Tuning]
+
+== Troubleshooting
+
+=== Translations Not Appearing in Search
+
+If translated values are not being found:
+
+1. **Check META_TRANSLATION table**: Ensure translations exist with key format `value:OriginalValue`
+2. **Verify field is translatable**: Check that `@Widget(translatable=true)` is set on the entity field
+3. **Reindex after adding translations**: Run `./bin/axelor search index --drop` to rebuild the index
+4. **Check indexed data**: Query Elasticsearch directly to verify translations are present in the index
+5. **Verify user language**: Ensure the user's language preference matches available translations
+
+=== Connection Issues
+
+If search is not working at all:
+
+1. **Verify backend is running**: Check `http://localhost:9200/_cluster/health`
+2. **Check configuration**: Verify `hibernate.search.backend.type` and `hibernate.search.backend.hosts` in `axelor-config.properties`
+3. **Review logs**: Check both application and backend logs
+4. **Network**: Ensure firewall allows connection to backend port
+
+For more troubleshooting tips, see:
+
+* https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#troubleshooting[Hibernate Search Troubleshooting]
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/troubleshooting.html[Elasticsearch Troubleshooting Guide]
+* https://opensearch.org/docs/latest/troubleshoot/[OpenSearch Troubleshooting]
+
+=== Index Corruption
+
+If you encounter index corruption or inconsistencies:
+
+[source,sh]
+----
+# Drop and recreate the entire index
+$ ./bin/axelor search index --drop
+
+# For specific tenant
+$ ./bin/axelor search index --drop --tenant my_tenant
+----
+
+WARNING: Dropping the index will require rebuilding it completely, which can take significant time for large datasets.
+
+== Additional Resources
+
+=== Documentation
+
+* https://hibernate.org/search/documentation/[Hibernate Search Documentation]
+* https://hibernate.org/search/releases/7.2/[Hibernate Search 7.2 Compatibility] - Version requirements and supported backends
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch Reference Documentation]
+* https://opensearch.org/docs/latest/[OpenSearch Documentation]
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html[Elasticsearch Query DSL]
+* https://opensearch.org/docs/latest/query-dsl/[OpenSearch Query DSL]
+
+=== Tools
+
+**Elasticsearch:**
+
+* https://www.elastic.co/kibana[Kibana] - Elasticsearch management and visualization
+* https://elasticvue.com/[ElasticVue] - Browser extension for Elasticsearch
+
+**OpenSearch:**
+
+* https://opensearch.org/docs/latest/dashboards/[OpenSearch Dashboards] - OpenSearch management and visualization
+* https://opensearch.org/docs/latest/clients/[OpenSearch Clients] - Various client libraries
+
+**Multi-Backend:**
+
+* https://github.com/cars10/elasticvue[ElasticVue Desktop] - Desktop application supporting both Elasticsearch and OpenSearch
+
+=== Community
+
+* https://discourse.hibernate.org/c/hibernate-search/[Hibernate Search Forum]
+* https://discuss.elastic.co/[Elastic Community Forum]
+* https://forum.opensearch.org/[OpenSearch Community Forum]

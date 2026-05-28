@@ -1,25 +1,12 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
@@ -30,6 +17,8 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
@@ -39,20 +28,33 @@ import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptHelper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,25 +68,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.eclipse.persistence.annotations.Transformation;
 
 @RequestScoped
@@ -94,12 +80,9 @@ import org.eclipse.persistence.annotations.Transformation;
 @Tag(name = "DMS")
 public class DmsService {
 
-  @Context private HttpServletRequest httpRequest;
-
   @Inject private DMSFileRepository repository;
 
-  private static final Map<String, String> EXTS =
-      ImmutableMap.of("html", ".html", "spreadsheet", ".csv");
+  private static final Map<String, String> EXTS = Map.of("html", ".html", "spreadsheet", ".csv");
 
   @GET
   @Path("files")
@@ -189,8 +172,8 @@ public class DmsService {
     for (Object item : request.getRecords()) {
       @SuppressWarnings("rawtypes")
       Object fileRecord = filesRepo.find(Longs.tryParse(((Map) item).get("id").toString()));
-      if (fileRecord instanceof MetaFile) {
-        items.add((MetaFile) fileRecord);
+      if (fileRecord instanceof MetaFile metaFile) {
+        items.add(metaFile);
       } else {
         throw new IllegalArgumentException("Invalid list of attachment records.");
       }
@@ -280,14 +263,19 @@ public class DmsService {
     return response;
   }
 
+  /**
+   * Check if the associated metaFile or content of the given DMSFile exists
+   *
+   * @param file the dmsFile to check
+   * @return true if the file exists, otherwise false
+   */
   private boolean hasFile(DMSFile file) {
     if (file == null) {
       return false;
     }
 
     if (file.getMetaFile() != null) {
-      final var path = MetaFiles.getPath(file.getMetaFile());
-      return Files.exists(path);
+      return FileStoreFactory.getStore().hasFile(file.getMetaFile().getFilePath());
     }
 
     return file.getContent() != null;
@@ -296,31 +284,28 @@ public class DmsService {
   @HEAD
   @Path("offline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
+  public jakarta.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
     final DMSFile file = repository.find(id);
     return !hasFile(file)
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+        ? jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+        : jakarta.ws.rs.core.Response.ok().build();
   }
 
   @GET
   @Path("offline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
+  public jakarta.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
     final DMSFile file = repository.find(id);
-    final File path = getFile(file);
-    if (path == null) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    if (!hasFile(file)) {
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final StreamingOutput so =
-        new StreamingOutput() {
-          @Override
-          public void write(OutputStream output) throws IOException, WebApplicationException {
-            try (InputStream input = new FileInputStream(path)) {
-              writeTo(output, input);
-            }
+        output -> {
+          try (InputStream input =
+              FileStoreFactory.getStore().getStream(file.getMetaFile().getFilePath())) {
+            writeTo(output, input);
           }
         };
 
@@ -330,24 +315,25 @@ public class DmsService {
   @POST
   @Path("download/batch")
   @Hidden
-  public javax.ws.rs.core.Response onDownload(Request request) {
+  public jakarta.ws.rs.core.Response onDownload(Request request) {
 
     final List<Object> ids = request.getRecords();
 
     if (ids == null || ids.isEmpty()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final List<DMSFile> records =
         repository.all().filter("self.id in :ids").bind("ids", ids).fetch();
 
     if (records.size() != ids.size()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
+    // Check if all files exist
     if (records.stream()
         .anyMatch(dmsFile -> !Boolean.TRUE.equals(dmsFile.getIsDirectory()) && !hasFile(dmsFile))) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final String batchId = UUID.randomUUID().toString();
@@ -355,27 +341,27 @@ public class DmsService {
 
     String batchName = "documents-" + LocalDate.now() + ".zip";
     if (records.size() == 1) {
-      batchName = records.get(0).getFileName();
+      batchName = records.getFirst().getFileName();
     }
 
     data.put("batchId", batchId);
     data.put("batchName", batchName);
 
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     if (session != null) {
       session.setAttribute(batchId, ids);
     }
 
-    return javax.ws.rs.core.Response.ok(data).build();
+    return jakarta.ws.rs.core.Response.ok(data).build();
   }
 
   private boolean hasBatchIds(String batchIds) {
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     return session != null && ObjectUtils.notEmpty((List<?>) session.getAttribute(batchIds));
   }
 
   private List<?> findBatchIds(String batchOrId) {
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     List<?> ids = session != null ? (List<?>) session.getAttribute(batchOrId) : null;
     if (ids == null) {
       Long id = Longs.tryParse(batchOrId);
@@ -393,13 +379,13 @@ public class DmsService {
   @Operation(
       summary = "Check file existence",
       description = "Check that the specified DMS file exists.")
-  public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
     if (!hasBatchIds(batchOrId) && !hasFile(repository.find(Longs.tryParse(batchOrId)))) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
     return findBatchIds(batchOrId) == null
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+        ? jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+        : jakarta.ws.rs.core.Response.ok().build();
   }
 
   @GET
@@ -409,60 +395,55 @@ public class DmsService {
       summary = "File download",
       description =
           "This service can be used to download a file. It should be used as normal http request.")
-  public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, false);
   }
 
   @GET
   @Path("inline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, true);
   }
 
-  private javax.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
+  private jakarta.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
     final List<?> ids = findBatchIds(batchOrId);
     if (ids == null) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final Long[] idArray =
         ids.stream()
-            .map(
-                id ->
-                    id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString()))
+            .map(id -> id instanceof Number n ? n.longValue() : Long.valueOf(id.toString()))
             .toArray(Long[]::new);
 
     if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {
-      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+      return jakarta.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
     final List<DMSFile> records =
         repository.all().filter("self.id in :ids").bind("ids", ids).fetch();
 
     if (records.size() != ids.size()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     // if file
-    final DMSFile record = records.get(0);
+    final DMSFile record = records.getFirst();
     if (records.size() == 1 && !record.getIsDirectory()) {
       File file = getFile(record);
-      if (file != null && Files.exists(file.toPath())) {
+      if (file != null && hasFile(record)) {
         return stream(file, getFileName(record), inline);
       } else {
-        return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+        return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
       }
     }
 
     final StreamingOutput so =
-        new StreamingOutput() {
-          @Override
-          public void write(OutputStream output) throws IOException, WebApplicationException {
-            try (final ZipOutputStream zos = new ZipOutputStream(output)) {
-              for (DMSFile file : records) {
-                writeToZip(zos, file);
-              }
+        output -> {
+          try (final ZipOutputStream zos = new ZipOutputStream(output)) {
+            for (DMSFile file : records) {
+              writeToZip(zos, file);
             }
           }
         };
@@ -471,7 +452,7 @@ public class DmsService {
     try {
       return stream(so, batchName, inline);
     } catch (Exception e) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
   }
 
@@ -489,7 +470,7 @@ public class DmsService {
       switch (record.getContentType()) {
         case "html":
           {
-            final java.nio.file.Path path = MetaFiles.createTempFile(record.getFileName(), ".html");
+            final java.nio.file.Path path = TempFiles.createTempFile(record.getFileName(), ".html");
             final File file = path.toFile();
             if (StringUtils.notBlank(record.getContent())) {
               try (final FileWriter writer = new FileWriter(file)) {
@@ -500,7 +481,7 @@ public class DmsService {
           }
         case "spreadsheet":
           {
-            final java.nio.file.Path path = MetaFiles.createTempFile(record.getFileName(), ".csv");
+            final java.nio.file.Path path = TempFiles.createTempFile(record.getFileName(), ".csv");
             final File file = path.toFile();
 
             if (StringUtils.isBlank(record.getContent())) {
@@ -534,11 +515,24 @@ public class DmsService {
     }
   }
 
-  private String getFileName(DMSFile record) {
-    return record.getFileName() + EXTS.getOrDefault(record.getContentType(), "");
+  private InputStream getStream(DMSFile dmsFile) {
+    if (dmsFile.getMetaFile() != null) {
+      return FileStoreFactory.getStore().getStream(dmsFile.getMetaFile().getFilePath());
+    }
+    try {
+      return new FileInputStream(getFile(dmsFile));
+    } catch (FileNotFoundException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
-  private Map<String, File> findFiles(DMSFile file, String base) {
+  private String getFileName(DMSFile record) {
+    String contentType = record.getContentType();
+    String ext = contentType != null ? EXTS.get(contentType) : null;
+    return record.getFileName() + (ext != null ? ext : "");
+  }
+
+  private Map<String, DMSFile> findFiles(DMSFile file, String base) {
     final User user = AuthUtils.getUser();
 
     if (user == null) {
@@ -554,42 +548,41 @@ public class DmsService {
     return findFiles(file, base, childrenQlString, user);
   }
 
-  private Map<String, File> findFiles(
-      DMSFile file, String base, String childrenQlString, User user) {
-    final Map<String, File> files = new LinkedHashMap<>();
-    if (Boolean.TRUE.equals(file.getIsDirectory())) {
+  private Map<String, DMSFile> findFiles(
+      DMSFile dmsFile, String base, String childrenQlString, User user) {
+    final Map<String, DMSFile> files = new LinkedHashMap<>();
+    if (Boolean.TRUE.equals(dmsFile.getIsDirectory())) {
       final List<DMSFile> children =
           repository
               .all()
-              .filter(childrenQlString, file, user, user.getGroup())
-              .bind("parent", file)
+              .filter(childrenQlString, dmsFile, user, user.getGroup())
+              .bind("parent", dmsFile)
               .bind("user", user)
               .bind("group", user.getGroup())
               .fetch();
-      final String path = base + "/" + file.getFileName();
+      final String path = base + "/" + dmsFile.getFileName();
       files.put(path + "/", null);
       for (DMSFile child : children) {
         files.putAll(findFiles(child, path, childrenQlString, user));
       }
       return files;
     }
-    final File relatedFile = getFile(file);
-    if (relatedFile != null && relatedFile.exists()) {
-      files.put(base + "/" + getFileName(file), relatedFile);
+    if (isDownloadable(dmsFile)) {
+      files.put(base + "/" + getFileName(dmsFile), dmsFile);
     }
     return files;
   }
 
   private void writeToZip(ZipOutputStream zos, DMSFile dmsFile) throws IOException {
-    final Map<String, File> files = findFiles(dmsFile, "");
+    final Map<String, DMSFile> files = findFiles(dmsFile, "");
     for (final String entry : files.keySet()) {
-      File file = files.get(entry);
+      DMSFile file = files.get(entry);
       zos.putNextEntry(new ZipEntry(entry.charAt(0) == '/' ? entry.substring(1) : entry));
       if (file == null) {
         zos.closeEntry();
         continue;
       }
-      final FileInputStream fis = new FileInputStream(file);
+      final InputStream fis = getStream(file);
       try {
         writeTo(zos, fis);
       } finally {
@@ -597,6 +590,17 @@ public class DmsService {
         zos.closeEntry();
       }
     }
+  }
+
+  private boolean isDownloadable(DMSFile dmsFile) {
+    if (hasFile(dmsFile)) {
+      return true;
+    }
+    if (StringUtils.isBlank(dmsFile.getContentType())) {
+      return false;
+    }
+    return "html".equals(dmsFile.getContentType())
+        || "spreadsheet".equals(dmsFile.getContentType());
   }
 
   private void writeTo(OutputStream os, InputStream is) throws IOException {
@@ -607,23 +611,11 @@ public class DmsService {
     }
   }
 
-  private javax.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
-    MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+  private jakarta.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
+    final MediaType type = MediaType.valueOf(MimeTypesUtils.getContentType(fileName));
+    final ResponseBuilder builder = jakarta.ws.rs.core.Response.ok(content, type);
 
-    if (inline) {
-      if (fileName.endsWith(".pdf")) type = new MediaType("application", "pdf");
-      if (fileName.endsWith(".html")) type = new MediaType("text", "html");
-      if (fileName.endsWith(".png")) type = new MediaType("image", "png");
-      if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
-      if (fileName.endsWith(".jpeg")) type = new MediaType("image", "jpg");
-      if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
-      if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
-      if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");
-    }
-
-    final ResponseBuilder builder = javax.ws.rs.core.Response.ok(content, type);
-
-    if (inline && type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+    if (inline && MetaFiles.isBrowserPreviewCompatible(type)) {
       return builder
           .header(
               "Content-Disposition",

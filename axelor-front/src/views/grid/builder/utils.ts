@@ -62,6 +62,22 @@ export function getSortBy(orderBy?: GridSortColumn[] | null) {
   );
 }
 
+export function useGridSortBy(state: GridState) {
+  const { groupBy = null, orderBy = null } = state;
+  return useMemo(() => {
+    const groupSortBy = (groupBy || []).map((col) => ({
+      name: col.name,
+      order: orderBy?.find((c) => c.name === col.name)?.order ?? "asc",
+    })) as GridSortColumn[];
+
+    const _orderBy = (orderBy ?? []).filter(
+      (col) => !groupBy?.some((c) => c.name === col.name),
+    );
+
+    return getSortBy([...groupSortBy, ..._orderBy]);
+  }, [groupBy, orderBy]);
+}
+
 export function getWidget(item: any, field: any): string {
   let widget = item.widget;
 
@@ -82,11 +98,11 @@ export function getWidget(item: any, field: any): string {
 }
 
 export function isValidSequence(field: Property) {
-  const { type, name } = field;
+  const { type, name, jsonField } = field;
   return (
-    ["INTEGER", "LONG"].includes(type) &&
+    ["INTEGER", "LONG"].includes(type?.toUpperCase()) &&
     !["id", "version"].includes(name) &&
-    !name.includes(".")
+    (!name.includes(".") || !!jsonField)
   );
 }
 

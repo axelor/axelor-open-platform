@@ -1,4 +1,4 @@
-import React, {useMemo} from "react";
+import React, { useId, useMemo } from "react";
 import { Box, Input, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -11,7 +11,7 @@ interface FilterListProps {
   disabled?: boolean;
   onFilterCheck?: (
     filter: SavedFilter | SearchFilter,
-    type?: "click" | "change"
+    type?: "click" | "change",
   ) => void;
 }
 
@@ -27,7 +27,7 @@ const FilterListItem = React.memo(function FilterListItem({
   const { title, checked } = filter;
 
   return (
-    <Box d="flex" alignItems="center">
+    <Box d="flex" alignItems="center" data-selected={checked ?? false}>
       <Input
         type="checkbox"
         checked={checked ?? false}
@@ -49,32 +49,41 @@ const FilterListItem = React.memo(function FilterListItem({
   );
 });
 
-export function FilterList({
-  title,
-  items = [],
-  disabled,
-  onFilterCheck,
-}: FilterListProps) {
+export function FilterList(props: FilterListProps) {
+  const { title, disabled, onFilterCheck, items = [] } = props;
+  const titleId = useId();
 
   const displayTitle = useMemo(() => {
     let counter = "";
     const activeFilterNbr = items?.filter((f) => f.checked).length;
     if (activeFilterNbr > 0) {
-      counter = ` (${activeFilterNbr})`
+      counter = ` (${activeFilterNbr})`;
     }
-    return `${title}${counter}`
+    return `${title}${counter}`;
   }, [title, items]);
-  
+
   return (
-    <Box flexDirection="column" alignItems="baseline" w={100}>
+    <Box
+      flexDirection="column"
+      alignItems="baseline"
+      w={100}
+      role="group"
+      data-orientation="vertical"
+      aria-labelledby={titleId}
+    >
       <Box d="flex" alignItems="center">
         <MaterialIcon icon="filter_list" />
-        <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+        <Box as="p" mb={0} p={1} flex={1} fontWeight="bold" id={titleId}>
           {displayTitle}
         </Box>
       </Box>
       <Box
-        style={{ width: "fit-content", maxHeight: 300, overflow: "hidden", overflowY: "scroll" }}
+        style={{
+          width: "fit-content",
+          maxHeight: 300,
+          overflow: "hidden",
+          overflowY: "scroll",
+        }}
         px={1}
         d="flex"
         flexDirection="column"

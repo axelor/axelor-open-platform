@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code.entity.model;
 
@@ -27,6 +13,10 @@ import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaField;
 import com.axelor.tools.code.JavaMethod;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -45,10 +35,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 @XmlType
 public abstract class Property {
@@ -305,7 +291,7 @@ public abstract class Property {
                   return PropertyAttribute.of(
                       attributeName, descriptors.get(fieldName), checkOverride);
                 })
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
     return attributes;
   }
@@ -351,11 +337,12 @@ public abstract class Property {
     if (type == PropertyType.DATETIME && isTrue(tz)) return "java.time.ZonedDateTime";
     if (type == PropertyType.DATETIME) return "java.time.LocalDateTime";
     if (type == PropertyType.BINARY) return "byte[]";
+    if (type == PropertyType.UUID) return "java.util.UUID";
     if (type == PropertyType.ENUM) return target;
     if (type == PropertyType.ONE_TO_ONE) return target;
     if (type == PropertyType.MANY_TO_ONE) return target;
-    if (type == PropertyType.ONE_TO_MANY) return String.format("java.util.List<%s>", target);
-    if (type == PropertyType.MANY_TO_MANY) return String.format("java.util.Set<%s>", target);
+    if (type == PropertyType.ONE_TO_MANY) return "java.util.List<%s>".formatted(target);
+    if (type == PropertyType.MANY_TO_MANY) return "java.util.Set<%s>".formatted(target);
     return null;
   }
 
@@ -865,7 +852,7 @@ public abstract class Property {
             $orderBy(),
             $sequence(),
             $converter())
-        .flatMap(x -> x instanceof Collection ? ((Collection<?>) x).stream() : Stream.of(x))
+        .flatMap(x -> x instanceof Collection<?> c ? c.stream() : Stream.of(x))
         .filter(Objects::nonNull)
         .map(JavaAnnotation.class::cast)
         .forEach(field::annotation);
@@ -890,24 +877,22 @@ public abstract class Property {
       return null;
     }
 
-    if (isFalse(entity.getSequential()) || isTrue(entity.getMappedSuperClass())) {
+    if (isTrue(entity.getMappedSuperClass())) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Id"),
-          new JavaAnnotation("javax.persistence.GeneratedValue")
-              .param("strategy", "{0:m}", "javax.persistence.GenerationType.AUTO"));
+          new JavaAnnotation("jakarta.persistence.Id"),
+          new JavaAnnotation("jakarta.persistence.GeneratedValue")
+              .param("strategy", "{0:m}", "jakarta.persistence.GenerationType.AUTO"));
     }
 
     String name = entity.getTable() + "_SEQ";
+    JavaAnnotation entitySequenceAnnotation =
+        new JavaAnnotation("com.axelor.db.hibernate.sequence.EntitySequence")
+            .param("name", "{0:s}", name);
+    if (entity.getAllocationSize() > 0) {
+      entitySequenceAnnotation.param("allocationSize", String.valueOf(entity.getAllocationSize()));
+    }
 
-    return List.of(
-        new JavaAnnotation("javax.persistence.Id"),
-        new JavaAnnotation("javax.persistence.GeneratedValue")
-            .param("strategy", "{0:m}", "javax.persistence.GenerationType.SEQUENCE")
-            .param("generator", "{0:s}", name),
-        new JavaAnnotation("javax.persistence.SequenceGenerator")
-            .param("name", "{0:s}", name)
-            .param("sequenceName", "{0:s}", name)
-            .param("allocationSize", "{0:l}", 1));
+    return List.of(new JavaAnnotation("jakarta.persistence.Id"), entitySequenceAnnotation);
   }
 
   private JavaAnnotation $equalsInclude(Entity entity) {
@@ -966,36 +951,40 @@ public abstract class Property {
     if (isTrue(json) && type == PropertyType.STRING) {
       if (isTrue(encrypted)) {
         throw new IllegalArgumentException(
-            String.format(
-                "Encryption is not supported on json field: %s.%s", entity.getName(), name));
+            "Encryption is not supported on json field: %s.%s".formatted(entity.getName(), name));
       }
       return List.of(
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"),
-          new JavaAnnotation("org.hibernate.annotations.Type").param("type", "{0:s}", "json"));
+          new JavaAnnotation("jakarta.persistence.Basic")
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
+          new JavaAnnotation("org.hibernate.annotations.Type")
+              .param("value", "{0:m}", "com.axelor.db.hibernate.type.JsonType.class"));
     }
 
     if (type == PropertyType.ENUM) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Basic"),
+          new JavaAnnotation("jakarta.persistence.Basic"),
           new JavaAnnotation("org.hibernate.annotations.Type")
-              .param("type", "{0:s}", "com.axelor.db.hibernate.type.ValueEnumType"));
+              .param("value", "{0:m}", "com.axelor.db.hibernate.type.ValueEnumType.class"));
     }
 
     if (isTrue(large) && type == PropertyType.STRING) {
-      return List.of(
-          new JavaAnnotation("javax.persistence.Lob"),
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"),
-          new JavaAnnotation("org.hibernate.annotations.Type")
-              .param("type", "{0:s}", isTrue(encrypted) ? "encrypted_text" : "text"));
+      List<JavaAnnotation> annotations = new ArrayList<>();
+      annotations.add(
+          new JavaAnnotation("jakarta.persistence.Basic")
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
+
+      if (isTrue(encrypted)) {
+        annotations.add(
+            new JavaAnnotation("org.hibernate.annotations.Type")
+                .param("value", "{0:m}", "com.axelor.db.hibernate.type.EncryptedTextType.class"));
+      }
+      return annotations;
     }
 
-    if (isTrue(large) || type == PropertyType.BINARY) {
+    if (isTrue(large) && type == PropertyType.BINARY) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Lob"),
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"));
+          new JavaAnnotation("org.hibernate.annotations.JdbcTypeCode")
+              .param("value", "{0:m}", "java.sql.Types.BLOB"));
     }
 
     return null;
@@ -1040,15 +1029,15 @@ public abstract class Property {
               .param("value", "{0:l}", text));
     } else {
       all.add(
-          new JavaAnnotation("javax.persistence.Access")
-              .param("value", "{0:m}", "javax.persistence.AccessType.PROPERTY"));
+          new JavaAnnotation("jakarta.persistence.Access")
+              .param("value", "{0:m}", "jakarta.persistence.AccessType.PROPERTY"));
     }
 
     return all;
   }
 
   private JavaAnnotation $required() {
-    return isTrue(required) ? new JavaAnnotation("javax.validation.constraints.NotNull") : null;
+    return isTrue(required) ? new JavaAnnotation("jakarta.validation.constraints.NotNull") : null;
   }
 
   private List<JavaAnnotation> $size() {
@@ -1062,11 +1051,11 @@ public abstract class Property {
     if (type == PropertyType.DECIMAL) {
       if (notBlank(min))
         all.add(
-            new JavaAnnotation("javax.validation.constraints.DecimalMin")
+            new JavaAnnotation("jakarta.validation.constraints.DecimalMin")
                 .param("value", "{0:s}", min));
       if (notBlank(max))
         all.add(
-            new JavaAnnotation("javax.validation.constraints.DecimalMax")
+            new JavaAnnotation("jakarta.validation.constraints.DecimalMax")
                 .param("value", "{0:s}", max));
       return all;
     }
@@ -1076,16 +1065,16 @@ public abstract class Property {
         throw new IllegalArgumentException("Encrypted field size should be more than 255.");
       }
       all.add(
-          new JavaAnnotation("javax.validation.constraints.Size")
+          new JavaAnnotation("jakarta.validation.constraints.Size")
               .param("min", min)
               .param("max", max));
       return all;
     }
 
     if (notBlank(min))
-      all.add(new JavaAnnotation("javax.validation.constraints.Min").param("value", min));
+      all.add(new JavaAnnotation("jakarta.validation.constraints.Min").param("value", min));
     if (notBlank(max))
-      all.add(new JavaAnnotation("javax.validation.constraints.Max").param("value", max));
+      all.add(new JavaAnnotation("jakarta.validation.constraints.Max").param("value", max));
 
     return all;
   }
@@ -1111,13 +1100,13 @@ public abstract class Property {
           "Invalid 'scale' value, should be less than 'precision' on field: " + name);
     }
 
-    return new JavaAnnotation("javax.validation.constraints.Digits")
+    return new JavaAnnotation("jakarta.validation.constraints.Digits")
         .param("integer", "{0:l}", precision - scale)
         .param("fraction", "{0:l}", scale);
   }
 
   private JavaAnnotation $transient() {
-    return isTrue(getTransient()) ? new JavaAnnotation("javax.persistence.Transient") : null;
+    return isTrue(getTransient()) ? new JavaAnnotation("jakarta.persistence.Transient") : null;
   }
 
   private JavaAnnotation $column() {
@@ -1134,17 +1123,9 @@ public abstract class Property {
       throw new IllegalArgumentException("Invalid use of an SQL keyword: " + col);
     }
 
-    if (column == null
-        && unique == null
-        && nullable == null
-        && insertable == null
-        && updatable == null) {
-      return null;
-    }
-
     JavaAnnotation res =
         new JavaAnnotation(
-            isReference() ? "javax.persistence.JoinColumn" : "javax.persistence.Column");
+            isReference() ? "jakarta.persistence.JoinColumn" : "jakarta.persistence.Column");
 
     if (column != null) {
       res.param("name", "{0:s}", column);
@@ -1166,27 +1147,32 @@ public abstract class Property {
       res.param("updatable", "{0:l}", updatable);
     }
 
-    return res;
+    if (isTrue(large) && type == PropertyType.STRING) {
+      res.param("length", "{0:m}", "org.hibernate.Length.LONG32");
+    }
+
+    return res.hasParams() ? res : null;
   }
 
   private JavaAnnotation $one2one() {
     if (type != PropertyType.ONE_TO_ONE) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.OneToOne")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.OneToOne")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
     }
 
     if (isTrue(getOrphanRemoval())) {
-      annotation.param("cascade", "{0:m}", "javax.persistence.CascadeType.ALL");
+      annotation.param("cascade", "{0:m}", "jakarta.persistence.CascadeType.ALL");
       annotation.param("orphanRemoval", "true");
     } else {
       annotation.param(
           "cascade",
-          List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+          List.of(
+              "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
     return annotation;
@@ -1195,11 +1181,12 @@ public abstract class Property {
   private JavaAnnotation $many2one() {
     if (type != PropertyType.MANY_TO_ONE) return null;
 
-    return new JavaAnnotation("javax.persistence.ManyToOne")
-        .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY")
+    return new JavaAnnotation("jakarta.persistence.ManyToOne")
+        .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY")
         .param(
             "cascade",
-            List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+            List.of(
+                "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
             t -> new JavaCode("{0:m}", t));
   }
 
@@ -1207,20 +1194,21 @@ public abstract class Property {
     if (type != PropertyType.ONE_TO_MANY) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.OneToMany")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.OneToMany")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
     }
 
     if (isTrue(getOrphanRemoval())) {
-      annotation.param("cascade", "{0:m}", "javax.persistence.CascadeType.ALL");
+      annotation.param("cascade", "{0:m}", "jakarta.persistence.CascadeType.ALL");
       annotation.param("orphanRemoval", "true");
     } else {
       annotation.param(
           "cascade",
-          List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+          List.of(
+              "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
 
@@ -1231,8 +1219,8 @@ public abstract class Property {
     if (type != PropertyType.MANY_TO_MANY) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.ManyToMany")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.ManyToMany")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
@@ -1240,7 +1228,7 @@ public abstract class Property {
 
     annotation.param(
         "cascade",
-        List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+        List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
         t -> new JavaCode("{0:m}", t));
 
     return annotation;
@@ -1257,18 +1245,18 @@ public abstract class Property {
     }
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.JoinTable").param("name", "{0:s}", joinTable);
+        new JavaAnnotation("jakarta.persistence.JoinTable").param("name", "{0:s}", joinTable);
 
     if (fk1 != null) {
       annotation.param(
           "joinColumns",
-          new JavaAnnotation("javax.persistence.JoinColumn").param("name", "{0:s}", fk1));
+          new JavaAnnotation("jakarta.persistence.JoinColumn").param("name", "{0:s}", fk1));
     }
 
     if (fk2 != null) {
       annotation.param(
           "inverseJoinColumns",
-          new JavaAnnotation("javax.persistence.JoinColumn").param("name", "{0:s}", fk2));
+          new JavaAnnotation("jakarta.persistence.JoinColumn").param("name", "{0:s}", fk2));
     }
 
     return annotation;
@@ -1277,7 +1265,7 @@ public abstract class Property {
   private JavaAnnotation $orderBy() {
     if (isBlank(orderBy)) return null;
 
-    return new JavaAnnotation("javax.persistence.OrderBy")
+    return new JavaAnnotation("jakarta.persistence.OrderBy")
         .param("value", "{0:s}", orderBy.replaceAll("-\\s*(\\w+)", "$1 DESC"));
   }
 
@@ -1295,7 +1283,7 @@ public abstract class Property {
         isBinary()
             ? "com.axelor.db.converters.EncryptedBytesConverter"
             : "com.axelor.db.converters.EncryptedStringConverter";
-    return new JavaAnnotation("javax.persistence.Convert")
+    return new JavaAnnotation("jakarta.persistence.Convert")
         .param("converter", "{0:t}.class", converter);
   }
 
@@ -1469,7 +1457,7 @@ public abstract class Property {
       doc.line("</p>");
       doc.line("<p>");
       doc.line("If you have to query {@link {0:t}} records in same transaction, make", target);
-      doc.line("sure to call {@link javax.persistence.EntityManager#flush() } to avoid");
+      doc.line("sure to call {@link jakarta.persistence.EntityManager#flush() } to avoid");
       doc.line("unexpected errors.");
       doc.line("</p>");
     }
@@ -1506,6 +1494,9 @@ public abstract class Property {
 
   @XmlType(name = "enum")
   static class EnumProperty extends Property {}
+
+  @XmlType(name = "uuid")
+  static class UUIDProperty extends Property {}
 
   @XmlType(name = "one-to-one")
   static class OneToOneProperty extends Property {}

@@ -1,5 +1,5 @@
 import uniqueId from "lodash/uniqueId";
-import { useCallback, useMemo } from "react";
+import { useCallback, useId, useMemo } from "react";
 
 import { Box, Button, clsx, OverflowList } from "@axelor/ui";
 
@@ -26,6 +26,8 @@ export function Stepper(
 ) {
   const { schema, readonly, widgetAtom, formAtom, valueAtom } = props;
   const { widgetAttrs } = schema;
+  
+  const id = useId();
   const {
     stepperCompleted = true,
     stepperType = "numeric",
@@ -111,7 +113,7 @@ export function Stepper(
   );
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       {hiddenWidgetAtom && (
         <ManyToOne
           schema={schema}
@@ -120,7 +122,7 @@ export function Stepper(
           formAtom={formAtom}
         />
       )}
-      <Box ref={ref} d="flex" flexDirection="row">
+      <Box ref={ref} id={id} data-testid="input" d="flex" flexDirection="row">
         {stepWidth === STEP_MIN_WIDTH ? (
           <OverflowList
             items={items}

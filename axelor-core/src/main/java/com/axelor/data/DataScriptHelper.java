@@ -1,34 +1,19 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data;
 
 import com.axelor.db.JpaScanner;
-import com.axelor.script.GroovyScriptHelper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.axelor.script.GroovyScriptSupport;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -58,7 +43,7 @@ public final class DataScriptHelper {
     final ImportCustomizer importCustomizer = new ImportCustomizer();
 
     importCustomizer.addStaticImport(
-        "__repo__", GroovyScriptHelper.Helpers.class.getName(), "repoOf");
+        "__repo__", GroovyScriptSupport.Helpers.class.getName(), "getRepo");
 
     configIndy.getOptimizationOptions().put("indy", true);
     configIndy.getOptimizationOptions().put("int", false);
@@ -73,18 +58,13 @@ public final class DataScriptHelper {
   private int expireTime = DEFAULT_EXPIRE_TIME;
 
   private LoadingCache<String, Script> cache =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .maximumSize(cacheSize)
           .expireAfterAccess(expireTime, TimeUnit.MINUTES)
           .build(
-              new CacheLoader<String, Script>() {
-
-                @Override
-                public Script load(String expr) throws Exception {
-                  final CompilerConfiguration cfg = indy ? configIndy : config;
-                  return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg)
-                      .parse(expr);
-                }
+              expr -> {
+                final CompilerConfiguration cfg = indy ? configIndy : config;
+                return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg).parse(expr);
               });
 
   /**
@@ -140,7 +120,7 @@ public final class DataScriptHelper {
     Script script;
     try {
       script = cache.get(expression);
-    } catch (ExecutionException e) {
+    } catch (CompletionException e) {
       log.warn("Invalid script: {}", expression);
       return null;
     }

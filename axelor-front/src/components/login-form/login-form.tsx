@@ -1,12 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router";
 
 import {
   AdornedInput,
   Alert,
   Box,
   Button,
-  CircularProgress,
   InputLabel,
   Select,
 } from "@axelor/ui";
@@ -21,32 +20,37 @@ import {
   requestLogin,
 } from "@/routes/login";
 import { i18n } from "@/services/client/i18n";
+import { mfaSession } from "@/services/client/mfa";
 import { SessionInfo, SignInButtonType } from "@/services/client/session";
 import { sanitize } from "@/utils/sanitize";
 import { AppSignInLogo } from "../app-logo/app-logo";
 import { Icon } from "../icon";
+import { LoadingButton } from "../loading-button";
 import { TextLink as Link } from "../text-link";
 
 import styles from "./login-form.module.scss";
 
 export type LoginFormProps = {
-  onSuccess?: (info: SessionInfo) => void;
   shadow?: boolean;
   error?: string;
   children?: React.ReactNode;
+  onSuccess?: (info: SessionInfo) => void;
+  onRequireMFA?: (state: Record<string, unknown>) => void;
 };
 
 export function LoginForm({
-  onSuccess,
   error,
   shadow,
   children,
+  onSuccess,
+  onRequireMFA,
 }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const errorId = useId();
 
   const isPage = !onSuccess;
   const location = useLocation();
@@ -102,6 +106,10 @@ export function LoginForm({
             : undefined;
 
         try {
+          // reset mfa session before login
+          const usernameKey = tenantId ? `${tenantId}:${username}` : username;
+          mfaSession.reset(usernameKey);
+
           const info = await session.login(
             { username, password },
             { params, tenant: hasTenantSelect ? tenantId : undefined },
@@ -110,12 +118,26 @@ export function LoginForm({
 
           if (route) {
             const { path, state } = route;
-            navigate(path, {
-              state: {
-                ...locationState,
-                route: { ...state, username },
-              },
-            });
+
+            const routeState = {
+              ...state,
+              username,
+              ...(hasTenantSelect && { tenant: tenantId }),
+            };
+
+            if (onRequireMFA && path === "/mfa") {
+              onRequireMFA({ ...routeState, params });
+            } else {
+              navigate(
+                { pathname: path, search: params?.toString() },
+                {
+                  state: {
+                    ...locationState,
+                    route: routeState,
+                  },
+                },
+              );
+            }
           } else if (user) {
             onSuccess?.(info);
           } else {
@@ -137,6 +159,7 @@ export function LoginForm({
         navigate,
         locationState,
         onSuccess,
+        onRequireMFA,
       ],
     );
 
@@ -221,7 +244,7 @@ export function LoginForm({
   }
 
   return (
-    <Box className={styles.container}>
+    <Box className={styles.container} data-testid="login-page">
       <Box
         className={styles.paper}
         shadow={shadow ? "2xl" : false}
@@ -231,7 +254,7 @@ export function LoginForm({
         p={3}
         mb={3}
       >
-        <AppSignInLogo className={styles.logo} />
+        <AppSignInLogo className={styles.logo} data-testid="logo" />
         {isPage && signInTitle && (
           <Box
             d="flex"
@@ -242,11 +265,17 @@ export function LoginForm({
             }}
           />
         )}
-        <Box as="form" w={100} onSubmit={handleSubmit} mt={3}>
+        <Box
+          as="form"
+          w={100}
+          onSubmit={handleSubmit}
+          mt={3}
+          data-testid="form"
+        >
           {isPage && hasTenantSelect && (
-            <Box mb={4}>
+            <Box mb={4} data-testid="field-tenant">
               {tenantField.showTitle !== false && (
-                <InputLabel htmlFor="tenant">
+                <InputLabel htmlFor="tenant" data-testid="label">
                   {tenantField.title ? tenantField.title : i18n.get("Tenant")}
                 </InputLabel>
               )}
@@ -259,12 +288,13 @@ export function LoginForm({
                 optionLabel={(x) => x.title}
                 onChange={handleTenantChange}
                 clearIcon={false}
+                data-testid="input"
               />
             </Box>
           )}
-          <Box>
+          <Box data-testid="field-username">
             {usernameField.showTitle !== false && (
-              <InputLabel htmlFor="username">
+              <InputLabel htmlFor="username" data-testid="label">
                 {usernameField.title
                   ? usernameField.title
                   : i18n.get("Username")}
@@ -282,16 +312,19 @@ export function LoginForm({
               autoCorrect="off"
               spellCheck="false"
               placeholder={usernameField.placeholder}
+              aria-required="true"
+              aria-describedby={errorText ? errorId : undefined}
+              data-testid="input"
               startAdornment={
                 usernameFieldIcon ? (
-                  <Icon icon={usernameFieldIcon} />
+                  <Icon icon={usernameFieldIcon} aria-hidden="true" />
                 ) : undefined
               }
             />
           </Box>
-          <Box mt={3}>
+          <Box mt={3} data-testid="field-password">
             {passwordField.showTitle !== false && (
-              <InputLabel htmlFor="password">
+              <InputLabel htmlFor="password" data-testid="label">
                 {passwordField.title
                   ? passwordField.title
                   : i18n.get("Password")}
@@ -306,9 +339,13 @@ export function LoginForm({
               onChange={(e) => setPassword(e.target.value)}
               spellCheck="false"
               placeholder={passwordField.placeholder}
+              aria-required="true"
+              aria-invalid={showError}
+              aria-describedby={errorText ? errorId : undefined}
+              data-testid="input"
               startAdornment={
                 passwordFieldIcon ? (
-                  <Icon icon={passwordFieldIcon} />
+                  <Icon icon={passwordFieldIcon} aria-hidden="true" />
                 ) : undefined
               }
               endAdornment={
@@ -319,21 +356,43 @@ export function LoginForm({
                       ? i18n.get("Hide password")
                       : i18n.get("Show password")
                   }
+                  aria-label={
+                    showPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                  data-testid="btn-toggle-password"
                 >
-                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                  <BootstrapIcon
+                    icon={showPassword ? "eye-slash" : "eye"}
+                    aria-hidden="true"
+                  />
                 </Button>
               }
             />
             {isPage && resetPasswordEnabled && (
               <Box d="flex" justifyContent="flex-end" mt={1} mb={1}>
-                <Link href="#" onClick={handleForgotPassword} underline={false}>
+                <Link
+                  href="#"
+                  onClick={handleForgotPassword}
+                  underline={false}
+                  data-testid="link-forgot-password"
+                >
                   {i18n.get("Forgot password?")}
                 </Link>
               </Box>
             )}
           </Box>
           {errorText && (
-            <Alert mt={3} mb={1} p={2} variant="danger">
+            <Alert
+              mt={3}
+              mb={1}
+              p={2}
+              variant="danger"
+              id={errorId}
+              role="alert"
+              data-testid="error"
+            >
               {errorText}
             </Alert>
           )}
@@ -421,8 +480,11 @@ function LoginFormButton({
           mt={2}
           w={100}
           gap={4}
+          data-testid="btn-signin-link"
         >
-          {icon && <Icon icon={icon} className={styles.icon} />}
+          {icon && (
+            <Icon icon={icon} className={styles.icon} aria-hidden="true" />
+          )}
           {title}
         </Link>
       </>
@@ -430,20 +492,21 @@ function LoginFormButton({
   }
 
   return (
-    <Button
+    <LoadingButton
       type={onSubmit ? "submit" : "button"}
       onClick={handleClick}
       variant={variant ?? "primary"}
-      disabled={submitting}
+      loading={submitting}
       d="flex"
       justifyContent="center"
       mt={2}
       w={100}
       gap={4}
+      data-testid="btn-login"
+      aria-label={onSubmit ? i18n.get("Sign in") : title}
     >
-      {submitting && <CircularProgress size={16} indeterminate />}
-      {icon && <Icon icon={icon} className={styles.icon} />}
+      {icon && <Icon icon={icon} className={styles.icon} aria-hidden="true" />}
       {title}
-    </Button>
+    </LoadingButton>
   );
 }

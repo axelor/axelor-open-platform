@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.xml;
 
@@ -28,24 +14,25 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.WstxDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.FlushModeType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FlushModeType;
+import java.util.Objects;
 import javax.xml.stream.XMLInputFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +73,7 @@ public class XMLImporter implements Importer {
 
   private Map<String, Object> context;
 
-  private List<Listener> listeners = Lists.newArrayList();
+  private List<Listener> listeners = new ArrayList<>();
 
   private boolean canClear = true;
 
@@ -94,7 +81,7 @@ public class XMLImporter implements Importer {
   public XMLImporter(
       @Named("axelor.data.config") String configFile, @Named("axelor.data.dir") String dataDir) {
 
-    Preconditions.checkNotNull(configFile);
+    Objects.requireNonNull(configFile);
 
     File file = new File(configFile);
 
@@ -118,7 +105,7 @@ public class XMLImporter implements Importer {
   }
 
   private List<File> getFiles(String... names) {
-    List<File> all = Lists.newArrayList();
+    List<File> all = new ArrayList<>();
     for (String name : names) all.add(dataDir != null ? new File(dataDir, name) : new File(name));
     return all;
   }

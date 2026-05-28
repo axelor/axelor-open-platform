@@ -1,0 +1,183 @@
+/*
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+package com.axelor.cache;
+
+import jakarta.annotation.Nullable;
+import java.io.Closeable;
+import java.time.Duration;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+/**
+ * Cache interface for wrapping different cache implementations
+ *
+ * <p>This interface provides fast and simple operations. For full map capabilities, use {@link
+ * #asMap()}.
+ *
+ * @param <K> the type of keys maintained by this cache
+ * @param <V> the type of mapped values
+ */
+public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable {
+
+  /**
+   * Returns the value associated with the {@code key} in this cache, obtaining that value from the
+   * {@link CacheLoader} if defined and if necessary, otherwise returns {@code null} if there is no
+   * cached value for the {@code key}.
+   *
+   * @param key the key whose associated value is to be returned
+   * @return the value to which the specified key is mapped, or {@code null} if this map contains no
+   *     mapping for the key
+   */
+  @Nullable
+  V get(K key);
+
+  /**
+   * Returns the value associated with the {@code key} in this cache, obtaining that value from the
+   * {@code mappingFunction} if necessary.
+   *
+   * <p>Note that the {@code mappingFunction} is called only if there is no cached value after
+   * calling the cache loader if defined.
+   *
+   * @param key the key with which the specified value is to be associated
+   * @param mappingFunction the function to compute a value
+   * @return the current (existing or computed) value associated with the specified key, or null if
+   *     the computed value is null
+   */
+  @Nullable
+  default V get(K key, Function<? super K, ? extends V> mappingFunction) {
+    return asMap().computeIfAbsent(key, mappingFunction);
+  }
+
+  /**
+   * Returns a map of the values associated with the {@code keys} in this cache, using {@link
+   * CacheLoader} if defined and if necessary.
+   *
+   * @param keys the keys whose associated values are to be returned
+   * @return an unmodifiable mapping of keys to values for the specified keys in this cache
+   */
+  default Map<K, V> getAll(Set<K> keys) {
+    return keys.stream()
+        .map(key -> new SimpleImmutableEntry<>(key, get(key)))
+        .filter(e -> e.getValue() != null)
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  /**
+   * Associates the {@code value} with the {@code key}.
+   *
+   * @param key key with which the specified value is to be associated
+   * @param value value to be associated with the specified key
+   */
+  void put(K key, V value);
+
+  /**
+   * Copies all of the mappings from the specified map to the cache.
+   *
+   * <p>The effect of this call is equivalent to that of calling {@code put(key, value)} on this map
+   * once for each mapping from {@code key} to {@code value} in the specified map.
+   *
+   * @param map the mappings to be stored in this cache
+   */
+  default void putAll(Map<? extends K, ? extends V> map) {
+    map.forEach(this::put);
+  }
+
+  /**
+   * Discards any cached value for the {@code key}.
+   *
+   * @param key the key whose mapping is to be removed from the cache
+   */
+  void invalidate(K key);
+
+  /** Discards all cached values. */
+  void invalidateAll();
+
+  /**
+   * Returns the approximate number of entries in this cache. The actual count may differ because of
+   * concurrent updates and pending invalidations.
+   *
+   * @return the estimated size of the cache
+   */
+  long estimatedSize();
+
+  /**
+   * Returns a view of the entries stored in this cache as a thread-safe map. Modifications made to
+   * the map directly affect the cache.
+   *
+   * <p>Note that if the cache has a cache loader, it will be used. This differs from Caffeine's
+   * Cache#asMap() and is designed to match Redisson RMap behavior.
+   *
+   * <p>In case of tenant-aware cache, the returned map view is for current tenant: you must use
+   * this on demand for correct tenant resolution, not on static initialization.
+   *
+   * @return a thread-safe view of this cache supporting {@link ConcurrentMap} operations
+   */
+  ConcurrentMap<K, V> asMap();
+
+  /**
+   * Returns an iterator over the entries in this cache.
+   *
+   * @return an iterator over the entries in this cache
+   */
+  default Iterator<Entry<K, V>> iterator() {
+    return asMap().entrySet().iterator();
+  }
+
+  /** Signals that the cache is no longer in use and releases any resources. */
+  default void close() {
+    // Do nothing by default
+  }
+
+  /**
+   * Performs any pending maintenance operations needed by the cache. Exactly which activities are
+   * performed -- if any -- is implementation-dependent.
+   */
+  default void cleanUp() {
+    // Do nothing by default
+  }
+
+  /**
+   * Returns key-specific lock for this cache.
+   *
+   * @param key
+   * @return reentrant lock
+   */
+  Lock getLock(K key);
+
+  /**
+   * Sets a time to live.
+   *
+   * @param ttl time to live
+   * @return <code>true</code> if the time to live was set
+   */
+  default boolean expire(Duration ttl) {
+    return false;
+  }
+
+  /**
+   * Clears the time to live.
+   *
+   * @return <code>true</code> if the time to live was removed
+   */
+  default boolean clearExpire() {
+    return false;
+  }
+
+  /**
+   * Returns the remaining time to live in milliseconds.
+   *
+   * @return remaining time to live in milliseconds, or a negative value if there is no time to live
+   */
+  default long remainTimeToLive() {
+    return -1;
+  }
+}

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
@@ -23,11 +9,11 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.QueryBinder;
 import com.google.common.base.Preconditions;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.FlushModeType;
-import javax.persistence.TypedQuery;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
@@ -35,18 +21,50 @@ import org.apache.shiro.subject.Subject;
 
 public class AuthUtils {
 
+  private static final ThreadLocal<User> CURRENT_USER = new ThreadLocal<>();
+
+  /** For internal use only. */
+  public static void setCurrentUser(User user) {
+    CURRENT_USER.set(user);
+  }
+
+  /** For internal use only. */
+  public static User getCurrentUser() {
+    return CURRENT_USER.get();
+  }
+
+  /** For internal use only. */
+  public static void removeCurrentUser() {
+    CURRENT_USER.remove();
+  }
+
   public static Subject getSubject() {
     try {
       return SecurityUtils.getSubject();
     } catch (UnavailableSecurityManagerException e) {
+      // ignore
     }
     return null;
   }
 
+  /**
+   * Retrieves the current user associated with the thread or session.
+   *
+   * <p>It first uses the current user stored in the thread-local (set for batch / audit purpose) if
+   * provided. Else it attempts to retrieve the user based on the principal associated with the
+   * current subject
+   *
+   * @return the current user if available; otherwise null
+   */
   public static User getUser() {
+    final User currentUser = CURRENT_USER.get();
+    if (currentUser != null) {
+      return getUser(currentUser.getCode());
+    }
     try {
       return getUser(getSubject().getPrincipal().toString());
     } catch (NullPointerException | InvalidSessionException e) {
+      // ignore
     }
     return null;
   }
@@ -89,12 +107,13 @@ public class AuthUtils {
   }
 
   private static final String QS_HAS_ROLE =
-      "SELECT self.id FROM Role self WHERE "
-          + "(self.name IN (:roles)) AND "
-          + "("
-          + "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR "
-          + "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))"
-          + ")";
+      """
+      SELECT self.id FROM Role self WHERE \
+      (self.name IN (:roles)) AND \
+      (\
+        (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR \
+        (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))\
+      )""";
 
   public static boolean hasRole(final User user, final String... roles) {
     Preconditions.checkArgument(user != null, "user not provided.");

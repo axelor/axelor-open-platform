@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code;
 
@@ -112,15 +98,15 @@ public class JavaContext implements JavaElement {
 
   private List<String> getStaticStatements() {
     return statics.values().stream()
-        .filter(s -> shouldImportStatic(s))
-        .map(s -> String.format("import static %s;", s))
+        .filter(this::shouldImportStatic)
+        .map("import static %s;"::formatted)
         .collect(toList());
   }
 
   private List<String> getImportStatements() {
     return imports.values().stream()
-        .filter(s -> shouldImport(s))
-        .map(s -> String.format("import %s;", s))
+        .filter(this::shouldImport)
+        .map("import %s;"::formatted)
         .collect(toList());
   }
 

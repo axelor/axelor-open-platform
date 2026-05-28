@@ -1,30 +1,17 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
 import com.axelor.common.FileUtils;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.xml.XMLImporter;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.MetaScanner;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -35,7 +22,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,12 +41,14 @@ class DataLoader extends AbstractLoader {
   @Override
   protected void doLoad(Module module, boolean update) {
 
-    File tmp = extract(module);
-    if (tmp == null) {
-      return;
-    }
+    File tmp = null;
 
     try {
+      tmp = extract(module);
+      if (tmp == null) {
+        return;
+      }
+
       File config = FileUtils.getFile(tmp, getDirName(), INPUT_CONFIG_NAME);
       if (isConfig(config, patCsv)) {
         importCsv(config);
@@ -108,7 +96,7 @@ class DataLoader extends AbstractLoader {
     return DATA_DIR_NAME;
   }
 
-  private File extract(Module module) {
+  private File extract(Module module) throws IOException {
 
     final String dirName = this.getDirName();
     final List<URL> files = MetaScanner.findAll(module.getName(), dirName, "(.+?)");
@@ -117,7 +105,7 @@ class DataLoader extends AbstractLoader {
       return null;
     }
 
-    final File tmp = Files.createTempDir();
+    final File tmp = TempFiles.createTempDir().toFile();
 
     for (URL file : files) {
       String name = file.toString();
@@ -136,15 +124,15 @@ class DataLoader extends AbstractLoader {
   private void copy(InputStream in, File toDir, String name) throws IOException {
     File dst = FileUtils.getFile(toDir, name);
     Files.createParentDirs(dst);
-    OutputStream out = new FileOutputStream(dst);
-    try {
-      ByteStreams.copy(in, out);
-    } finally {
-      out.close();
+    try (OutputStream out = new FileOutputStream(dst)) {
+      in.transferTo(out);
     }
   }
 
   private void clean(File file) {
+    if (file == null) {
+      return;
+    }
     if (file.isDirectory()) {
       for (File child : file.listFiles()) {
         clean(child);

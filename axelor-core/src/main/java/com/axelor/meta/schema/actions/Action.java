@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -26,17 +12,19 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.regex.Pattern;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @XmlType(name = "AbstractAction")
-public abstract class Action {
+public abstract class Action implements Serializable {
 
-  protected final transient Logger log = LoggerFactory.getLogger(getClass());
+  protected transient Logger log = LoggerFactory.getLogger(getClass());
 
   @XmlAttribute(name = "id")
   private String xmlId;
@@ -126,6 +114,20 @@ public abstract class Action {
     return MoreObjects.toStringHelper(getClass()).add("name", getName()).toString();
   }
 
+  /**
+   * Custom deserialization method to reinitialize transient fields.
+   *
+   * <p>Required by the {@link org.redisson.codec.SerializationCodec} codec.
+   *
+   * @param in the ObjectInputStream used for deserialization
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    log = LoggerFactory.getLogger(getClass());
+  }
+
   protected static String toExpression(String expression, boolean quote) {
     Pattern pattern = Pattern.compile("^(#\\{|(eval|select|action):)");
     if (expression != null && !pattern.matcher(expression).find()) {
@@ -142,14 +144,15 @@ public abstract class Action {
     if ("false".equals(expression)) return false;
 
     Object result = handler.evaluate(toExpression(expression, false));
-    if (result instanceof Boolean) return (Boolean) result;
-    if (result instanceof Number) return Double.compare(((Number) result).doubleValue(), 0) != 0;
+    if (result instanceof Boolean booleanResult) return booleanResult;
+    if (result instanceof Number numberResult)
+      return Double.compare(numberResult.doubleValue(), 0) != 0;
 
     return ObjectUtils.notEmpty(result);
   }
 
   @XmlType
-  public abstract static class Element {
+  public abstract static class Element implements Serializable {
 
     @XmlAttribute(name = "if")
     private String condition;

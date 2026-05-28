@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.db.repo;
 
@@ -31,11 +17,11 @@ import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.PanelMailDisplay;
-import com.google.common.base.Objects;
+import jakarta.persistence.EntityManager;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.EntityManager;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
@@ -44,15 +30,14 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
         .filter(f -> Boolean.TRUE.equals(f.getNameField()))
         .findFirst()
         .orElseGet(
-            () -> {
-              return jsonModel.getFields().stream()
-                  .filter(
-                      f ->
-                          "name".equalsIgnoreCase(f.getName())
-                              || "fullName".equalsIgnoreCase(f.getName()))
-                  .findFirst()
-                  .orElse(null);
-            });
+            () ->
+                jsonModel.getFields().stream()
+                    .filter(
+                        f ->
+                            "name".equalsIgnoreCase(f.getName())
+                                || "fullName".equalsIgnoreCase(f.getName()))
+                    .findFirst()
+                    .orElse(null));
   }
 
   private void onSave(MetaJsonModel jsonModel) {
@@ -70,9 +55,16 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     }
 
     // if name field is changed, update or records with new name field value
-    if (!Objects.equal(lastName, jsonModel.getNameField())) {
+    if (!Objects.equals(lastName, jsonModel.getNameField())) {
       MetaJsonRecordRepository records = Beans.get(MetaJsonRecordRepository.class);
-      records.all(jsonModel.getName()).fetchStream().forEach(records::save);
+      try (final Stream<MetaJsonRecord> stream = records.all(jsonModel.getName()).fetchStream()) {
+        stream.forEach(records::save);
+      }
+    }
+
+    // Don't generate views
+    if (Boolean.TRUE.equals(jsonModel.getIsDelegated())) {
+      return;
     }
 
     MetaView gridView = jsonModel.getGridView();
@@ -83,6 +75,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       gridView = new MetaView();
       gridView.setType("grid");
       gridView.setModel(MetaJsonRecord.class.getName());
+      gridView.setJsonModel(jsonModel.getName());
     }
 
     gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
@@ -102,6 +95,10 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(" model=")
             .append('"')
             .append(gridView.getModel())
+            .append('"')
+            .append(" x-json-model=")
+            .append('"')
+            .append(jsonModel.getName())
             .append('"');
 
     Function<String, String> fixCommaList =
@@ -135,16 +132,12 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     String onSave = jsonModel.getOnSave();
     String width = jsonModel.getFormWidth();
 
-    onNew =
-        StringUtils.isBlank(onNew)
-            ? "action-json-record-defaults"
-            : "action-json-record-defaults," + onNew;
-
     MetaView formView = jsonModel.getFormView();
     if (formView == null) {
       formView = new MetaView();
       formView.setType("form");
       formView.setModel(MetaJsonRecord.class.getName());
+      formView.setJsonModel(jsonModel.getName());
     }
     formView.setName("custom-model-" + jsonModel.getName() + "-form");
     formView.setTitle(jsonModel.getTitle());
@@ -163,10 +156,14 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append('"')
             .append(formView.getModel())
             .append('"')
-            .append(" onNew=")
+            .append(" x-json-model=")
             .append('"')
-            .append(onNew)
+            .append(jsonModel.getName())
             .append('"');
+
+    if (!StringUtils.isBlank(onNew)) {
+      xml.append(" onNew=").append('"').append(onNew).append('"');
+    }
 
     if (!StringUtils.isBlank(onSave)) {
       xml.append(" onSave=").append('"').append(onSave).append('"');

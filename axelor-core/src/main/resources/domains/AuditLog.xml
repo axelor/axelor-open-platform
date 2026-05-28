@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
+
+  <module name="audit" package="com.axelor.audit.db" />
+
+  <entity name="AuditLog" table="AUDIT_LOG" jsonAttrs="false" allocationSize="100">
+    <![CDATA[
+    Stores raw audit data for asynchronous processing.
+    Decouples entity changes from audit message generation.
+
+    Multiple AuditLog records may exist for same entity within same transaction.
+    AuditLogProcessor consolidates these during background processing.
+    ]]>
+
+    <string name="relatedModel" required="true" />
+    <long name="relatedId" required="true" />
+    <string name="txId" required="true" title="Transaction ID"/>
+    <enum name="eventType" required="true" ref="AuditEventType" />
+    <string name="currentState" large="true" />
+    <string name="previousState" large="true" />
+    <boolean name="processed" default="false" />
+    <string name="errorMessage" large="true" />
+    <integer name="retryCount" default="0" />
+    <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" index="false"/>
+
+    <!-- Optimized index for AuditProcessor queries - covers all filters + ordering -->
+    <index columns="processed,txId,relatedModel,relatedId,eventType,createdOn,retryCount" name="audit_log_idx_processing"/>
+  </entity>
+
+  <enum name="AuditEventType">
+    <item name="CREATE" title="Create" />
+    <item name="UPDATE" title="Update" />
+    <item name="DELETE" title="Delete" />
+  </enum>
+
+</domain-models>

@@ -1,42 +1,43 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tomcat;
 
+import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TomcatOptions {
 
   private int port = 8080;
 
-  private String contextPath = "/";
+  private String contextPath = "";
+
+  private URI proxyUrl;
 
   private Path baseDir;
+
+  private int maxThreads;
+
+  private int cacheMaxSize = 100 * 1024; // 100M
 
   private List<Path> roots = new ArrayList<>();
 
   private List<Path> classes = new ArrayList<>();
 
   private List<Path> libs = new ArrayList<>();
+
+  private Set<String> tldScanJars = new LinkedHashSet<>();
+
+  // axelor-web-*.jar is included by default so that @ServerEndpoint (and other
+  // Servlet 3.0 pluggability) classes shipped in axelor-web are discovered.
+  private Set<String> pluggabilityScanJars = new LinkedHashSet<>(List.of("axelor-web-*.jar"));
 
   public TomcatOptions(Path webapp) {
     this.roots.add(webapp);
@@ -61,6 +62,16 @@ public class TomcatOptions {
     return this;
   }
 
+  public TomcatOptions addTldScanJar(String pattern) {
+    tldScanJars.add(pattern);
+    return this;
+  }
+
+  public TomcatOptions addPluggabilityScanJar(String pattern) {
+    pluggabilityScanJars.add(pattern);
+    return this;
+  }
+
   public int getPort() {
     return port;
   }
@@ -73,23 +84,46 @@ public class TomcatOptions {
     return contextPath;
   }
 
+  public URI getProxyUrl() {
+    return proxyUrl;
+  }
+
+  public void setProxyUrl(URI proxyUrl) {
+    this.proxyUrl = proxyUrl;
+  }
+
   public void setContextPath(String contextPath) {
-    String context = contextPath == null ? "" : contextPath.trim();
-    if (context.isEmpty()) {
-      context = "/";
-    }
-    if (context.charAt(0) != '/') {
-      context = "/" + context;
-    }
+    String context =
+        Optional.ofNullable(contextPath)
+            .map(String::trim)
+            .map(x -> x.startsWith("/") ? x : "/" + x)
+            .map(x -> x.equals("/") ? "" : x)
+            .orElse("");
     this.contextPath = context;
   }
 
   public Path getBaseDir() {
-    return baseDir == null ? Paths.get("build/tomcat") : baseDir;
+    return baseDir == null ? Path.of("build/tomcat") : baseDir;
   }
 
   public void setBaseDir(Path baseDir) {
     this.baseDir = baseDir;
+  }
+
+  public int getMaxThreads() {
+    return maxThreads;
+  }
+
+  public void setMaxThreads(int maxThreads) {
+    this.maxThreads = maxThreads;
+  }
+
+  public int getCacheMaxSize() {
+    return cacheMaxSize;
+  }
+
+  public void setCacheMaxSize(int cacheMaxSize) {
+    this.cacheMaxSize = cacheMaxSize;
   }
 
   public List<Path> getRoots() {
@@ -104,8 +138,16 @@ public class TomcatOptions {
     return libs;
   }
 
+  public Set<String> getTldScanJars() {
+    return tldScanJars;
+  }
+
+  public Set<String> getPluggabilityScanJars() {
+    return pluggabilityScanJars;
+  }
+
   public Path getDocBase() {
-    return roots.isEmpty() ? Paths.get("src/main/webapp") : roots.get(0);
+    return roots.isEmpty() ? Path.of("src/main/webapp") : roots.getFirst();
   }
 
   public List<Path> getExtraResources() {

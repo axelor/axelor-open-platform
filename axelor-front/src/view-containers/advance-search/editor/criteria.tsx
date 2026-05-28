@@ -1,4 +1,4 @@
-import { Box } from "@axelor/ui";
+import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { memo } from "react";
 
@@ -36,10 +36,23 @@ export const Criteria = memo(function Criteria({
   }
 
   return (
-    <Box d="flex" alignItems="center" g={2} w={100}>
-      <Box d="flex" onClick={handleRemove}>
+    <Box
+      d="flex"
+      alignItems="center"
+      g={2}
+      w={100}
+      data-testid={`criteria-${index}`}
+      role={"listitem"}
+    >
+      <Button
+        d="flex"
+        p={0}
+        justifyContent={"center"}
+        onClick={handleRemove}
+        data-testid={"btn-remove"}
+      >
         <MaterialIcon icon="close" className={styles.icon} />
-      </Box>
+      </Button>
 
       <Box d="flex" g={2} className={styles.inputs}>
         {fields && (
@@ -54,6 +67,7 @@ export const Criteria = memo(function Criteria({
               handleChange({ name: "fieldName", value: value?.name })
             }
             value={field}
+            data-testid={"field"}
           />
         )}
         {Boolean(options?.length) && (
@@ -68,20 +82,23 @@ export const Criteria = memo(function Criteria({
               handleChange({ name: "operator", value: value?.name })
             }
             value={options.find((x) => x.name === operator) ?? null}
+            data-testid={"operator"}
           />
         )}
         {operator && field && filter && (
-          <Widget
-            {...{
-              operator,
-              field,
-              filter,
-              onChange: handleChange,
-              inputProps: {
-                className: styles.criteria,
-              },
-            }}
-          />
+          <div data-testid={"value"}>
+            <Widget
+              {...{
+                operator,
+                field,
+                filter,
+                onChange: handleChange,
+                inputProps: {
+                  className: styles.criteria,
+                },
+              }}
+            />
+          </div>
         )}
       </Box>
     </Box>

@@ -1,4 +1,3 @@
-import parsePhoneNumber from "libphonenumber-js/max";
 import { useMemo } from "react";
 import { defaultCountries } from "react-international-phone";
 
@@ -31,9 +30,7 @@ export const FALLBACK_COUNTRIES: Record<string, string> = {
   zh: "cn", // Chinese -> China
 };
 
-export const DEFAULT_COUNTRIES = [
-  ...defaultCountries,
-];
+export const DEFAULT_COUNTRIES = [...defaultCountries];
 
 export const FLAGS = DEFAULT_COUNTRIES.map((country) => {
   const iso2 = country[1];
@@ -56,16 +53,25 @@ const NUMBER_TYPES: Record<string, () => string> = {
   UNKNOWN: () => i18n.get("Unknown"),
 };
 
-export function getPhoneInfo(phone?: string) {
-  const phoneNumber = parsePhoneNumber(phone ?? "");
+export async function getPhoneInfo(phone?: string) {
+  const phoneNumber = await parse(phone ?? "");
   return {
-    isPossible: () => phoneNumber?.isPossible(),
-    isValid: () => phoneNumber?.isValid(),
+    isPossible: () => phoneNumber?.isPossible() ?? false,
+    isValid: () => phoneNumber?.isValid() ?? false,
     getDisplayType: () => {
       const type = phoneNumber?.getType();
       return (type && NUMBER_TYPES[type]?.()) ?? NUMBER_TYPES.UNKNOWN();
     },
   };
+}
+
+async function parse(phone: string) {
+  const { parsePhoneNumber } = await import("libphonenumber-js/max");
+  try {
+    return parsePhoneNumber(phone);
+  } catch {
+    return null;
+  }
 }
 
 export function useDefaultCountry(

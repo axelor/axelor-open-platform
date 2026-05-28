@@ -1,6 +1,7 @@
 import React, {
   ChangeEventHandler,
   ComponentProps,
+  forwardRef,
   JSXElementConstructor,
   useCallback,
   useMemo,
@@ -20,31 +21,35 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { Field, Property, Schema } from "@/services/client/meta.types";
 import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
 import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
+import { useDisableWheelScroll } from "@/hooks/use-disable-wheel-scroll";
 import { getFieldType } from "./utils";
 
 import styles from "./components.module.css";
 
-function TextField(
-  props: ComponentProps<typeof Input> & {
+const TextField = forwardRef<
+  HTMLInputElement,
+  ComponentProps<typeof Input> & {
     onChange: (value: any) => void;
-  },
-) {
+  }
+>(function TextField(props, ref) {
   return (
     <Input
+      ref={ref}
       {...props}
       value={props.value ?? ""}
       onChange={(e) => props.onChange?.(e.target.value)}
     />
   );
-}
+});
 
 function DateField(props: ComponentProps<typeof DateComponent>) {
-  const schema = useRef({ type: "date" }).current;
+  const schema = useMemo(() => ({ type: "date" }), []);
   return <DateComponent trapFocus {...props} schema={schema} />;
 }
 
 function NumberField(props: ComponentProps<typeof TextField>) {
-  return <TextField {...props} type="number" />;
+  const [, setRef] = useDisableWheelScroll();
+  return <TextField ref={setRef} {...props} type="number" />;
 }
 
 function Select({
@@ -160,6 +165,8 @@ function RelationalSelectWidget({
     target,
     targetName,
     targetSearch,
+    jsonModel,
+    jsonTarget,
     gridView,
     searchLimit,
     domain,
@@ -195,6 +202,7 @@ function RelationalSelectWidget({
   const showSelect = useCallback(() => {
     showSelector({
       model: target,
+      jsonModel: jsonTarget || jsonModel,
       viewName: gridView,
       orderBy: sortBy,
       multiple,
@@ -209,10 +217,12 @@ function RelationalSelectWidget({
     });
   }, [
     showSelector,
-    multiple,
     target,
+    jsonTarget,
+    jsonModel,
     gridView,
     sortBy,
+    multiple,
     searchLimit,
     domain,
     onChange,
@@ -287,7 +297,13 @@ export function BooleanRadio({
   onChange: ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
-    <Box d="flex" alignItems="center" ms={1} me={1}>
+    <Box
+      d="flex"
+      alignItems="center"
+      ms={1}
+      me={1}
+      data-testid={"editor-operator"}
+    >
       {options.map(({ value, label }, index: number) => (
         <Box as="label" d="flex" alignItems="center" key={index} me={2}>
           <Input

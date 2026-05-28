@@ -2,10 +2,10 @@ import { Box, Panel, Popper, clsx } from "@axelor/ui";
 import { useAtom, useSetAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useAtomCallback } from "jotai/utils";
-import uniq from "lodash/uniq";
 import getValue from "lodash/get";
 import isObject from "lodash/isObject";
 import setValue from "lodash/set";
+import uniq from "lodash/uniq";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
@@ -16,7 +16,10 @@ import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
-import { DataStore } from "@/services/client/data-store";
+import {
+  expandJsonFieldValues,
+  updateJsonFieldValue,
+} from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData } from "@/services/client/meta";
@@ -33,15 +36,17 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { useActionExecutor } from "../form/builder/scope";
-import { isValidSequence } from "../grid/builder/utils";
-import { ViewProps } from "../types";
 
 import { CardTemplate } from "../cards/card-template";
 import { useCardClassName } from "../cards/use-card-classname";
+import { useCreateFormAtomByMeta } from "../form/builder/atoms";
+import { useActionExecutor } from "../form/builder/scope";
+import { createContextParams } from "../form/builder/utils";
+import { isValidSequence } from "../grid/builder/utils";
+import { ViewProps } from "../types";
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
-import { createContextParams } from "../form/builder/utils";
+
 import {
   getColumnIndex,
   getColumnRecords,
@@ -95,8 +100,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const getActionContext = useCallback(
     () => ({
-      ...getContext(),
       ...createContextParams(view, action),
+      ...getContext(),
     }),
     [view, action, getContext],
   );
@@ -118,7 +123,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           id: name!,
           title: title!,
           name: name!,
-          dataStore: new DataStore(dataStore.model, dataStore.options),
+          dataStore: dataStore.clone(),
         };
 
         if (view.onNew && ind === 0) {
@@ -134,8 +139,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const searchFieldNames = useMemo(() => {
     const names = Object.keys(fields ?? {});
+    const jsonFieldNames = [columnBy, sequenceBy]
+      .filter((name): name is string => !!name)
+      .map((name) => fields?.[name]?.jsonField)
+      .filter((name): name is string => !!name);
     return uniq(
-      [...names, columnBy, sequenceBy].filter((name) => name),
+      [...names, columnBy, sequenceBy, ...jsonFieldNames].filter(
+        (name) => name,
+      ),
     ) as string[];
   }, [fields, columnBy, sequenceBy]);
 
@@ -258,7 +269,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return onSearch({ offset: 0 });
   }, [onSearch]);
 
+  const formAtom = useCreateFormAtomByMeta(meta);
   const actionExecutor = useActionExecutor(view, {
+    formAtom,
     getContext: getActionContext,
     onRefresh,
   });
@@ -267,9 +280,13 @@ export function Kanban(props: ViewProps<KanbanView>) {
     (column: KanbanColumn) => {
       setColumns((draft) => {
         const col = draft.find((c) => c.name === column.name);
-        col && (col.collapsed = !col.collapsed);
+        if (col) {
+          col.collapsed = !col.collapsed;
+        }
       });
-      column.loading && onSearch({ offset: 0 }, [column.name!]);
+      if (column.loading) {
+        onSearch({ offset: 0 }, [column.name!]);
+      }
     },
     [setColumns, onSearch],
   );
@@ -318,12 +335,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
           const removed = await column.dataStore.delete([
             { id: id!, version: version! },
           ]);
-          removed &&
-            setColumns((columns) => {
-              const state = columns.find((c) => c.name === column.name);
-              state &&
-                (state.records = state.records?.filter((r) => r.id !== id));
+          if (removed) {
+            setColumns((draft) => {
+              const state = draft.find((c) => c.name === column.name);
+              if (state) {
+                state.records = state.records?.filter((r) => r.id !== id);
+              }
             });
+          }
         } catch {
           // Ignore
         }
@@ -406,31 +425,55 @@ export function Kanban(props: ViewProps<KanbanView>) {
           {},
         );
         if (values) {
-          const record = {
-            ...values,
-            [columnBy!]: getColumnByValue(column.name),
-          };
-          const saved = await column.dataStore.save(record);
-          saved &&
-            setColumns((columns) => {
-              const state = columns.find((c) => c.name === column.name);
-              state &&
-                (state.records = [
-                  saved as KanbanRecord,
-                  ...(state.records || []),
-                ]);
+          const columnByField = fields?.[columnBy ?? ""];
+          const { jsonModel } = view;
+          const record: DataRecord = { ...values };
+          if (jsonModel) {
+            record.jsonModel = jsonModel;
+          }
+          if (columnByField?.jsonField && columnByField?.jsonPath) {
+            updateJsonFieldValue(record, columnByField.jsonField, values, {
+              [columnByField.jsonPath]: getColumnByValue(column.name),
             });
+          } else {
+            record[columnBy!] = getColumnByValue(column.name);
+          }
+          const saved = await column.dataStore.save(record);
+          if (saved) {
+            const nextRecord = { ...record, ...saved } as DataRecord;
+            expandJsonFieldValues(nextRecord, [columnBy, sequenceBy], fields);
+            setColumns((_columns) => {
+              const state = _columns.find((c) => c.name === column.name);
+              if (state) {
+                state.records = [
+                  nextRecord as KanbanRecord,
+                  ...(state.records || []),
+                ];
+              }
+            });
+          }
         }
       }
     },
-    [getContext, getColumnByValue, actionExecutor, setColumns, columnBy, view],
+    [
+      getContext,
+      getColumnByValue,
+      actionExecutor,
+      setColumns,
+      columnBy,
+      fields,
+      sequenceBy,
+      view,
+    ],
   );
 
   const onView = useCallback(
     ({ record, column }: { record: KanbanRecord; column?: KanbanColumn }) => {
-      hasEditPopup
-        ? onEditInPopup({ record, column }, true)
-        : onEdit({ record, column }, true);
+      if (hasEditPopup) {
+        onEditInPopup({ record, column }, true);
+      } else {
+        onEdit({ record, column }, true);
+      }
     },
     [hasEditPopup, onEdit, onEditInPopup],
   );
@@ -454,18 +497,32 @@ export function Kanban(props: ViewProps<KanbanView>) {
       ) {
         const { id, version } = _record;
         const record: any = { id, version };
-        const columnByJSONField = fields?.[columnBy ?? ""]?.jsonField;
-        const sequenceByJSONField = fields?.[sequenceBy ?? ""]?.jsonField;
+        const columnByField = fields?.[columnBy ?? ""];
+        const sequenceByField = fields?.[sequenceBy ?? ""];
 
-        if (columnByJSONField) {
-          record[columnByJSONField] = _record[columnByJSONField];
-        }
-        if (sequenceByJSONField) {
-          record[sequenceByJSONField] = _record[sequenceByJSONField];
+        // Collect JSON field updates grouped by parent field (e.g. "attrs")
+        const jsonFieldUpdates: Record<string, Record<string, any>> = {};
+
+        for (const [field, value] of [
+          [columnByField, columnBy && getColumnByValue(columnByValue)],
+          [sequenceByField, sequenceByValue],
+        ] as const) {
+          if (!field?.jsonField || !field?.jsonPath) continue;
+          const updates = (jsonFieldUpdates[field.jsonField] ??= {});
+          updates[field.jsonPath] = value;
         }
 
-        columnBy && setValue(record, columnBy, getColumnByValue(columnByValue));
-        sequenceBy && setValue(record, sequenceBy, sequenceByValue);
+        for (const [jsonField, updates] of Object.entries(jsonFieldUpdates)) {
+          updateJsonFieldValue(record, jsonField, _record, updates);
+        }
+
+        // Handle non-JSON fields normally
+        if (columnBy && !columnByField?.jsonField) {
+          setValue(record, columnBy, getColumnByValue(columnByValue));
+        }
+        if (sequenceBy && !sequenceByField?.jsonField) {
+          setValue(record, sequenceBy, sequenceByValue);
+        }
 
         return record;
       }
@@ -549,7 +606,17 @@ export function Kanban(props: ViewProps<KanbanView>) {
           fields: searchFieldNames,
         });
 
-        records.splice(index, res.length, ...(res as KanbanRecord[]));
+        const mergedRes = res.map((saved, i) => {
+          const original = records[index + i];
+          const merged = { ...original, ...saved };
+          expandJsonFieldValues(
+            merged as DataRecord,
+            [columnBy, sequenceBy],
+            fields,
+          );
+          return merged as KanbanRecord;
+        });
+        records.splice(index, res.length, ...mergedRes);
 
         const colInd = getColumnIndex(updatedColumns, column.name);
 
@@ -635,6 +702,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const canNew = hasButton("new");
   const canEdit = hasButton("edit");
+  const canView = hasButton("view");
   const canDelete = hasButton("delete");
 
   useShortcuts({
@@ -650,6 +718,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          formAtom={formAtom}
           actionExecutor={actionExecutor}
           actions={[
             {
@@ -699,13 +768,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
           onCollapse={onCollapse}
           onLoadMore={onLoadMore}
           onCardMove={onMove}
-          onCardClick={onView}
           {...(canDelete && { onCardDelete: onDelete })}
           {...(canNew && { onCardAdd: onCreate })}
           {...(canEdit && {
             onCardEdit: hasEditPopup ? onEditInPopup : onEdit,
           })}
-          {...({} as any)}
+          {...(canView && {
+            onCardClick: onView,
+          })}
         />
       </Box>
     </Box>
@@ -727,23 +797,24 @@ function KanbanCard({
   onRefresh?: () => Promise<any>;
 }) {
   const { template: templateString } = view;
-  const divRef = useRef<any>(null);
+  const [containerElement, setContainerElement] =
+    useState<HTMLDivElement | null>(null);
   const className = useCardClassName(view, record as DataRecord);
-  const timer = useRef<any>();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [popover, setPopover] = useState(false);
-  const [popoverData, setPopoverData] = useState<{ title: ""; body: "" }>({
+  const [popoverData, setPopoverData] = useState({
     title: "",
     body: "",
   });
 
   function showPopover() {
-    const div = divRef.current;
+    const div = containerElement;
     const summary =
       div &&
-      (div.querySelector(".card-summary.popover") ||
+      ((div.querySelector(".card-summary.popover") ||
         div.querySelector(
           `.${legacyClassNames("card-summary")}.${legacyClassNames("popover")}`,
-        ));
+        )) as HTMLElement);
     if (summary) {
       const text = (summary.textContent || "").trim();
       if (text) {
@@ -760,7 +831,9 @@ function KanbanCard({
 
   const hidePopover = useCallback(function hidePopover() {
     setPopover(false);
-    clearTimeout(timer.current);
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
   }, []);
 
   const hasPopover = (templateString || "").includes("popover");
@@ -773,7 +846,7 @@ function KanbanCard({
   return (
     <>
       <Box
-        ref={divRef}
+        ref={setContainerElement}
         {...(hasPopover
           ? {
               onMouseEnter: showPopover,
@@ -801,8 +874,9 @@ function KanbanCard({
         bg={"white" as any}
         placement="end"
         open={popover}
-        target={divRef.current}
+        target={containerElement}
         offset={[0, 4]}
+        role={"tooltip"}
       >
         <Box
           style={{

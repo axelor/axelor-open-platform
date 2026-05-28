@@ -1,32 +1,37 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.AuthSessionService;
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.MFAService;
+import com.axelor.auth.MFASummaryDTO;
+import com.axelor.auth.db.MFAMethod;
+import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.MFARepository;
 import com.axelor.common.ObjectUtils;
+import com.axelor.inject.Beans;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.shiro.SecurityUtils;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.UserProfile;
 
 public class AxelorProfileManager extends ShiroProfileManager {
+  public static final String PENDING_USER_NAME = "pendingUserName";
+  public static final String PENDING_PROFILE = "pendingProfile";
+  public static final String FULLY_AUTHENTICATED = "isFullyAuthenticated";
+  public static final String AVAILABLE_MFA_METHODS = "availableMFAMethods";
+
+  private static final String PENDING_CLIENT_NAME = "pendingClientName";
 
   public AxelorProfileManager(WebContext context, SessionStore sessionStore) {
     super(context, sessionStore);
@@ -34,7 +39,16 @@ public class AxelorProfileManager extends ShiroProfileManager {
 
   @Override
   protected void saveAll(LinkedHashMap<String, UserProfile> profiles, boolean saveInSession) {
-    super.saveAll(profiles, saveInSession);
+    Set<String> indirectClientNames = Beans.get(ClientListService.class).getIndirectClientNames();
+
+    LinkedHashMap<String, UserProfile> extractedProfiles =
+        profiles.entrySet().stream()
+            .filter(entry -> shouldKeepProfile(entry.getValue(), indirectClientNames))
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1, LinkedHashMap::new));
+
+    super.saveAll(extractedProfiles, saveInSession);
 
     if (ObjectUtils.isEmpty(profiles)) {
       removeSession();
@@ -43,9 +57,61 @@ public class AxelorProfileManager extends ShiroProfileManager {
 
   private void removeSession() {
     try {
-      SecurityUtils.getSubject().logout();
+      Beans.get(AuthSessionService.class).terminateSession(SecurityUtils.getSubject());
     } catch (Exception e) {
       // ignore
     }
+  }
+
+  private boolean shouldKeepProfile(UserProfile profile, Set<String> indirectClientNames) {
+    String clientName = profile.getClientName();
+
+    if (!indirectClientNames.contains(clientName)) {
+      return true;
+    }
+
+    boolean isFullyAuthenticated =
+        sessionStore.get(context, FULLY_AUTHENTICATED).filter(Boolean.TRUE::equals).isPresent();
+
+    if (isFullyAuthenticated) {
+      sessionStore
+          .get(context, PENDING_CLIENT_NAME)
+          .ifPresent(
+              pendingClientName -> {
+                sessionStore.set(context, PENDING_CLIENT_NAME, null);
+                profile.setClientName(pendingClientName.toString());
+              });
+      return true;
+    }
+
+    String username =
+        profile instanceof CommonProfile commonProfile
+            ? Beans.get(AuthPac4jProfileService.class).getUserIdentifier(commonProfile)
+            : profile.getUsername();
+
+    User user = AuthUtils.getUser(username);
+
+    if (user == null) {
+      return true;
+    }
+
+    MFASummaryDTO mfa = Beans.get(MFARepository.class).findSummaryByOwner(user);
+    if (mfa == null || !Boolean.TRUE.equals(mfa.enabled())) {
+      return true;
+    }
+
+    saveMfaContext(profile, user);
+    return false;
+  }
+
+  private void saveMfaContext(UserProfile profile, User user) {
+    MFAService mfaService = Beans.get(MFAService.class);
+    List<MFAMethod> methods = mfaService.getMethods(user);
+
+    // this can throw DisabledSessionException in case sessions are disabled.
+    sessionStore.set(context, PENDING_USER_NAME, user.getCode());
+    sessionStore.set(context, AVAILABLE_MFA_METHODS, methods);
+    sessionStore.set(context, PENDING_PROFILE, profile);
+    sessionStore.set(context, PENDING_CLIENT_NAME, profile.getClientName());
   }
 }

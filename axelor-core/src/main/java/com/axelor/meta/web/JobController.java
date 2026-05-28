@@ -1,29 +1,17 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.web;
 
 import com.axelor.app.internal.AppFilter;
+import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.quartz.JobRunner;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import jakarta.inject.Inject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.quartz.CronExpression;
 
 public class JobController {
@@ -40,9 +27,10 @@ public class JobController {
 
   public void validate(ActionRequest request, ActionResponse response) {
     String cronExpression = request.getContext().asType(MetaSchedule.class).getCron();
+    if (StringUtils.isBlank(cronExpression)) {
+      response.setError(I18n.get("Cron expression is required."));
+    }
     try {
-      CronExpression.validateExpression(cronExpression);
-
       response.setNotify(
           I18n.get("Valid cron. Next execution dates are:")
               + "<br/>"
@@ -94,6 +82,9 @@ public class JobController {
     Date date = new Date();
     for (int i = 0; i < 5; i++) {
       Date next = expression.getNextValidTimeAfter(date);
+      if (next == null) {
+        break;
+      }
       nextTriggerDates.add(next);
       date = next;
     }

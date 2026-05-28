@@ -4,22 +4,20 @@ The next generation web frontend of Axelor.
 
 ## Pre-requisites
 
-- node >= v20
-- pnpm >= 9
+- node >= v24.13
+- pnpm >= 10
 
 ```bash
-# Nodejs
-$ curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-$ sudo apt-get install -y nodejs
+#Nodejs
 
-# Alternatively, `nvm` can be used as a Node Version Manager
-$ curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-$ source ~/.profile
-$ nvm install 20
+# Install Node Version Manager
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+$ source "$HOME/.nvm/nvm.sh"
+# Install and use node version found in .nvmrc of the project
+$ nvm install && nvm use
 
 # pnpm
-$ corepack enable
-$ corepack prepare pnpm@latest-9 --activate
+$ corepack enable pnpm
 ```
 
 See more installation methods:
@@ -64,7 +62,7 @@ Production build are available under `dist` directory.
 
 ### Developing along with `@axelor/ui`
 
-For development purposes we suggest using `pnpm link` to link `@axelor/ui` library. 
+For development purposes we suggest using `pnpm link` to link `@axelor/ui` library.
 
 Make sure to clone `axelor-ui` project next to the `axelor-open-platform` sources :
 ```
@@ -80,14 +78,14 @@ Make sure to clone `axelor-ui` project next to the `axelor-open-platform` source
 │   ├── axelor-web
 ├── axelor-ui
 ```
-Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui` 
+Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui`
 to use the linked version of the library.
 
 ### ENOSPC: System limit for number of file watchers reached
 
 If you encounter this error, means that your system's `fs.inotify.max_user_watches` value is low.
 
-We recommend increasing the value to `524288` by adding the following to your `/etc/sysctl.conf` file: 
+We recommend increasing the value to `524288` by adding the following to your `/etc/sysctl.conf` file:
 `fs.inotify.max_user_watches = 524288`
 
 Then run this command to apply the change immediately: `sudo sysctl -p`
@@ -101,4 +99,4 @@ FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed -
 JavaScript heap out of memory
 ```
 
-you may need to export `NODE_OPTIONS=--max_old_space_size=4096` and build again.
+you may need to export `NODE_OPTIONS=--max-old-space-size=4096` and build again.

@@ -1,9 +1,6 @@
 import isNumber from "lodash/isNumber";
 
-import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
-import { session } from "@/services/client/session";
 
 const BLANK =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -17,6 +14,7 @@ export const META_FILE_MODEL = "com.axelor.meta.db.MetaFile";
  * @param {string} model - target model
  * @param {string} [field] - target field name
  * @param {DataRecord} [parent] - parent with `id` and `_model`
+ * @param {boolean} [download] - whether to download the image
  * @return {string} The generated image URL
  */
 export function makeImageURL(
@@ -24,7 +22,7 @@ export function makeImageURL(
   model?: string,
   field?: string,
   parent?: DataRecord | null,
-  binary?: boolean,
+  download?: boolean,
 ): string {
   if (!value) return BLANK;
 
@@ -36,7 +34,7 @@ export function makeImageURL(
 
   const url = `ws/rest/${model || parent?._model || META_FILE_MODEL}/${id}/${
     image ? field : "content"
-  }/download?${image && !binary ? "image=true&" : ""}v=${ver}`;
+  }/download?${image && !download ? "image=true&" : ""}v=${ver}`;
 
   if (parent) {
     const { id: parentId, _model: parentModel } = parent;
@@ -46,21 +44,4 @@ export function makeImageURL(
   }
 
   return url;
-}
-
-export function validateFileSize(file: File): boolean {
-  if (!file) return false;
-  const maxSize = session.info?.data?.upload?.maxSize ?? 0;
-  const uploadMaxSize = 1048576 * maxSize;
-
-  if (maxSize > 0 && file.size > uploadMaxSize) {
-    alerts.info({
-      message: i18n.get(
-        "You are not allowed to upload a file bigger than {0} MB.",
-        maxSize,
-      ),
-    });
-    return false;
-  }
-  return true;
 }

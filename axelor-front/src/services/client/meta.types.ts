@@ -15,6 +15,7 @@ export type PropertyType =
   | "DATETIME"
   | "BINARY"
   | "ENUM"
+  | "UUID"
   | "ONE_TO_ONE"
   | "MANY_TO_ONE"
   | "ONE_TO_MANY"
@@ -82,6 +83,8 @@ export interface Property {
   widget?: string;
   widgetAttrs?: Record<string, any>; // incoming is string, processed to object
   jsonField?: string;
+  jsonPath?: string;
+  jsonTarget?: string;
 }
 
 export interface Widget {
@@ -151,6 +154,32 @@ export interface Hilite extends BaseHilite {
   background?: string;
   strong?: boolean;
   css?: string;
+}
+
+export interface SummaryItem {
+  name: string;
+  title: string;
+  align?: "start" | "end";
+}
+
+export interface SummaryBarItem extends SummaryItem {
+  aggregate: "sum" | "count" | "avg" | "min" | "max" | "median";
+  on: "selection" | "page";
+}
+
+export interface SummaryCallItem extends SummaryItem {
+  serverType?: string;
+}
+
+export interface SummaryCall {
+  action: string;
+  items: SummaryCallItem[];
+}
+
+export interface SummaryBar {
+  hint?: string;
+  call?: SummaryCall;
+  items?: SummaryBarItem[];
 }
 
 export interface CalendarEventHilite extends BaseHilite {
@@ -285,7 +314,7 @@ export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   colorField?: string;
   imageField?: string;
   accept?: string;
-  popupMaximized?: string;
+  popupMaximized?: "editor" | "selector" | "all";
   jsonModel?: string;
   hilites?: Hilite[];
   tooltip?: Tooltip;
@@ -361,6 +390,8 @@ export interface PanelRelated extends Omit<Panel, "type"> {
   fields?: Property[];
   perms?: Perms;
   showBars?: boolean;
+  jsonModel?: string;
+  jsonTarget?: string;
 }
 
 export interface PanelDashlet extends Omit<Panel, "type"> {
@@ -435,7 +466,7 @@ export interface JsonField extends Omit<Field, "type"> {
   contextFieldTargetName?: string;
   contextFieldValue?: string;
   contextFieldTitle?: string;
-  
+
   forceHidden?: boolean;
 }
 
@@ -467,6 +498,7 @@ export interface View {
   title?: string;
   css?: string;
   model?: string;
+  jsonModel?: string;
   editable?: boolean;
   groups?: string;
   helpLink?: string;
@@ -541,6 +573,7 @@ export interface GridView extends View {
   treeLimit?: number;
   treeField?: string;
   treeFieldTitle?: string;
+  summaryBar?: SummaryBar;
 }
 
 export interface CardsView extends View {
@@ -568,6 +601,7 @@ export interface TreeNode {
   draggable?: boolean;
   domain?: string;
   orderBy?: string;
+  jsonModel?: string;
   items?: (TreeField | Button)[];
 }
 
@@ -615,6 +649,8 @@ export interface ChartConfig {
   scale?: number;
   min?: number;
   max?: number;
+  maxSeries?: number;
+  zoomThreshold?: number;
   axisScale?: "fixed" | "distinct" | "unique"; // radar chart config
   onClick?: string;
   hideLegend?: boolean;
@@ -773,7 +809,6 @@ export type AdvancedSearchAtom = PrimitiveAtom<AdvancedSearchState>;
 export interface SavedFilter {
   id: number;
   version?: number;
-  name: string;
   title: string;
   shared: boolean;
   user?: DataRecord;

@@ -1,7 +1,7 @@
 import { atom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 import deepGet from "lodash/get";
-import deepSet from "lodash/set";
+import deepSetImmutable from "lodash/fp/set";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEnsureRelated } from "@/hooks/use-relation";
@@ -128,7 +128,7 @@ function EnsureRelated({
           const { record, ...rest } = get(formAtom);
           set(formAtom, {
             ...rest,
-            record: deepSet({ ...record }, name, value),
+            record: deepSetImmutable(name, value, { ...record }),
           });
         },
       ),

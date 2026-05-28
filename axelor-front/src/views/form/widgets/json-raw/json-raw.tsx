@@ -5,8 +5,9 @@ import {
   useAtom,
   useAtomValue,
 } from "jotai";
-import { atomFamily, useAtomCallback } from "jotai/utils";
-import { useCallback, useMemo } from "react";
+import { useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
+import { useCallback, useId, useMemo } from "react";
 
 import { Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -91,6 +92,9 @@ function JsonItem({
 
 export function JsonRaw(props: FieldProps<string>) {
   const { valueAtom, readonly } = props;
+  
+  const id = useId();
+  
   const recordAtom = useMemo(
     () =>
       atom(
@@ -190,22 +194,24 @@ export function JsonRaw(props: FieldProps<string>) {
   );
 
   return (
-    <FieldControl {...props} showTitle={false} className={styles.container}>
-      {items.map((item) => {
-        return (
-          <JsonItem
-            key={item.id}
-            readonly={readonly}
-            itemAtom={itemsFamily(item.id)}
-            removeItem={() => remove(item.id)}
-          />
-        );
-      })}
-      {readonly || (
-        <Button variant="link" onClick={add}>
-          <MaterialIcon icon="add" />
-        </Button>
-      )}
+    <FieldControl {...props} showTitle={false} className={styles.container} inputId={id}>
+      <div id={id} data-testid="input">
+        {items.map((item) => {
+          return (
+            <JsonItem
+              key={item.id}
+              readonly={readonly}
+              itemAtom={itemsFamily(item.id)}
+              removeItem={() => remove(item.id)}
+            />
+          );
+        })}
+        {readonly || (
+          <Button variant="link" onClick={add}>
+            <MaterialIcon icon="add" />
+          </Button>
+        )}
+      </div>
     </FieldControl>
   );
 }

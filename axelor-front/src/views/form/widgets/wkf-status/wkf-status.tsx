@@ -5,6 +5,7 @@ import { Tooltip } from "@/components/tooltip";
 import { Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { FieldProps } from "../../builder";
+
 import styles from "./wkf-status.module.css";
 
 const getTagProps = ({ color = "blue" }: Schema) => {
@@ -17,19 +18,26 @@ export function WkfStatus({ valueAtom }: FieldProps<any>) {
   const fields = useAtomValue(valueAtom);
   return (
     fields && (
-      <ul className={styles.wkfStatus}>
-        {fields.map((field: Schema) => (
-          <Tooltip
-            key={field.name}
-            title={field.title}
-            content={() => <span>{field.help}</span>}
-          >
-            <Box d="flex" as="li" {...(field.help && { className: styles.help })}>
-              <span {...getTagProps(field)}>{field.title}</span>
-            </Box>
-          </Tooltip>
-        ))}
-      </ul>
+      // there is only one wkf-status in a view, so no need of dynamic test id here
+      <div data-testid="wkf-status">
+        <ul className={styles.wkfStatus} data-testid="list">
+          {fields.map((field: Schema) => (
+            <Tooltip
+              key={field.name}
+              title={field.title}
+              content={() => <span>{field.help}</span>}
+            >
+              <Box
+                d="flex"
+                as="li"
+                {...(field.help && { className: styles.help })}
+              >
+                <span {...getTagProps(field)}>{field.title}</span>
+              </Box>
+            </Tooltip>
+          ))}
+        </ul>
+      </div>
     )
   );
 }

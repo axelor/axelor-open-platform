@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
 
@@ -80,6 +80,7 @@
     <string name="menuBackground" />
     <integer name="menuOrder" />
     <string name="menuTitle" />
+    <boolean name="isDelegated" />
     <enum name="panelMailDisplay" ref="PanelMailDisplay" title="Messaging panel" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />

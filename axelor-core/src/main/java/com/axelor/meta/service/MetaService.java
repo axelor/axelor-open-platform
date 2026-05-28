@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.service;
 
@@ -67,9 +53,10 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -82,10 +69,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import org.hibernate.transform.BasicTransformerAdapter;
+import org.hibernate.query.TupleTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,9 +171,13 @@ public class MetaService {
   }
 
   public Response findViews(Class<?> model, Map<String, String> views) {
+    return findViews(model, views, null);
+  }
+
+  public Response findViews(Class<?> model, Map<String, String> views, String jsonModel) {
     Response response = new Response();
 
-    Map<String, Object> data = XMLViews.findViews(model.getName(), views);
+    Map<String, Object> data = XMLViews.findViews(model.getName(), views, jsonModel);
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
@@ -197,9 +185,13 @@ public class MetaService {
   }
 
   public Response findView(String model, String name, String type) {
+    return findView(model, name, type, null);
+  }
+
+  public Response findView(String model, String name, String type, String jsonModel) {
     Response response = new Response();
 
-    AbstractView data = XMLViews.findView(name, type, model);
+    AbstractView data = XMLViews.findView(name, type, model, null, jsonModel);
     if (data != null) {
       viewProcessors.forEach(viewProcessor -> viewProcessor.process(data));
     }
@@ -254,6 +246,7 @@ public class MetaService {
       entity.setName(view.getName());
       entity.setType(view.getType());
       entity.setModel(view.getModel());
+      entity.setJsonModel(view.getJsonModel());
       entity.setUser(user);
     }
 
@@ -328,7 +321,7 @@ public class MetaService {
     Search search = (Search) XMLViews.findView(name, "search");
     ScriptHelper helper = search.scriptHandler(context);
 
-    List<Object> data = Lists.newArrayList();
+    List<Object> data = new ArrayList<>();
 
     for (Search.SearchSelect select : search.getSelects()) {
 
@@ -364,8 +357,7 @@ public class MetaService {
       LOG.debug("Found : {}", items.size());
 
       for (Object item : items) {
-        if (item instanceof Map) {
-          Map<String, Object> map = (Map) item;
+        if (item instanceof Map map) {
           for (SearchSelectField field : select.getFields()) {
             if (map.containsKey(field.getName())) {
               map.put(field.getAs(), map.get(field.getName()));
@@ -373,10 +365,10 @@ public class MetaService {
             }
           }
 
-          ((Map) item).put("_model", select.getModel());
-          ((Map) item).put("_modelTitle", select.getLocalizedTitle());
-          ((Map) item).put("_form", select.getFormView());
-          ((Map) item).put("_grid", select.getGridView());
+          map.put("_model", select.getModel());
+          map.put("_modelTitle", select.getLocalizedTitle());
+          map.put("_form", select.getFormView());
+          map.put("_grid", select.getGridView());
         }
       }
 
@@ -414,7 +406,7 @@ public class MetaService {
   @Transactional
   public Response removeAttachment(Request request) {
     Response response = new Response();
-    List<Object> result = Lists.newArrayList();
+    List<Object> result = new ArrayList<>();
     List<Object> records = request.getRecords();
 
     if (records == null || records.isEmpty()) {
@@ -446,7 +438,7 @@ public class MetaService {
   public Response addAttachment(long id, Request request) {
     Response response = new Response();
     Map<String, Object> data = request.getData();
-    Map<String, Object> map = Maps.newHashMap();
+    Map<String, Object> map = new HashMap<>();
 
     Model fileBean = (Model) JPA.find(MetaFile.class, Long.valueOf(data.get("id").toString()));
 
@@ -487,7 +479,7 @@ public class MetaService {
     if (hasDataSet) {
 
       final String string = chart.getDataSet().getText();
-      final Map<String, Object> context = Maps.newHashMap();
+      final Map<String, Object> context = new HashMap<>();
       if (request.getData() != null) {
         context.putAll(request.getData());
       }
@@ -540,12 +532,12 @@ public class MetaService {
     data.put("xType", chart.getCategory().getType());
     data.put("xTitle", chart.getCategory().getLocalizedTitle());
 
-    List<Object> series = Lists.newArrayList();
-    Map<String, Object> config = Maps.newHashMap();
+    List<Object> series = new ArrayList<>();
+    Map<String, Object> config = new HashMap<>();
     List<Map<String, Object>> actions = new ArrayList<>();
 
     for (ChartSeries cs : chart.getSeries()) {
-      Map<String, Object> map = Maps.newHashMap();
+      Map<String, Object> map = new HashMap<>();
       map.put("key", cs.getKey());
       map.put("type", cs.getType());
       map.put("groupBy", cs.getGroupBy());
@@ -654,14 +646,13 @@ public class MetaService {
     return response;
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("unchecked")
   private void transformQueryResult(Query query) {
-    // TODO: fix deprecation when new transformer api is implemented in hibernate
-    query.unwrap(org.hibernate.query.Query.class).setResultTransformer(new DataSetTransformer());
+    query.unwrap(org.hibernate.query.Query.class).setTupleTransformer(new DataSetTransformer());
   }
 
   @SuppressWarnings("serial")
-  private static final class DataSetTransformer extends BasicTransformerAdapter {
+  private static final class DataSetTransformer implements TupleTransformer {
 
     @Override
     public Object transformTuple(Object[] tuple, String[] aliases) {

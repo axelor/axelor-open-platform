@@ -1,24 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
+import jakarta.annotation.Nullable;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +15,7 @@ import java.util.stream.Collectors;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 /** The tenant identifier resolver. */
-public class TenantResolver implements CurrentTenantIdentifierResolver {
+public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
 
   static final ThreadLocal<String> CURRENT_HOST = new ThreadLocal<>();
   static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
@@ -41,6 +30,50 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
     if (!enabled) return;
     CURRENT_TENANT.set(tenantId);
     CURRENT_HOST.set(tenantHost);
+  }
+
+  public static void setCurrentTenant(String tenantId) {
+    if (!enabled) return;
+    CURRENT_TENANT.set(tenantId);
+    CURRENT_HOST.set(findTenantHost(tenantId));
+  }
+
+  public static void forEachTenant(Runnable runnable) {
+    if (!enabled) {
+      runnable.run();
+      return;
+    }
+
+    var current = currentTenantIdentifier();
+    try {
+      for (var tenant : getTenants(false).keySet()) {
+        setCurrentTenant(tenant);
+        runnable.run();
+      }
+    } finally {
+      setCurrentTenant(current);
+    }
+  }
+
+  @Nullable
+  private static String findTenantHost(String tenantId) {
+    var tenantConfigProvider = Beans.get(TenantConfigProvider.class);
+    var config =
+        tenantConfigProvider.find(tenantId == null ? TenantConfig.DEFAULT_TENANT_ID : tenantId);
+
+    if (config == null || Boolean.FALSE.equals(config.getActive())) {
+      return null;
+    }
+
+    var hostsValue = config.getTenantHosts();
+
+    if (StringUtils.isBlank(hostsValue)) {
+      return null;
+    }
+
+    var hosts = Arrays.asList(hostsValue.split("\\s*,\\s*"));
+
+    return hosts.isEmpty() ? null : hosts.get(0);
   }
 
   public static String currentTenantIdentifier() {
@@ -78,7 +111,7 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
       }
     }
 
-    // User-selectabled tenants
+    // User-selectable tenants
     return TenantInfo.multiple(configsToNames(configs));
   }
 

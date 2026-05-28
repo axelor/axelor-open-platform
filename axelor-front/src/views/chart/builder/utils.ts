@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import Color from "color";
 import difference from "lodash/difference";
 import filter from "lodash/filter";
@@ -10,9 +11,58 @@ import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 
 import { moment } from "@/services/client/l10n";
+import { i18n } from "@/services/client/i18n";
 import { ChartView, Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
 import { ChartDataRecord, ChartType } from "./types";
+
+const DEFAULT_MAX_SERIES = 200;
+const DATA_ZOOM_THRESHOLD = 50;
+
+/**
+ * Build dataZoom config for charts with many categories.
+ *
+ * `maxVisible` semantics:
+ *  - `< 0`  — zoom disabled; returns undefined regardless of data length
+ *  - `= 0`  — zoom always shown with 100% of data visible (useful for limited
+ *              series where you still want precise zoom controls)
+ *  - `> 0`  — threshold mode: zoom shown only when `dataLength > maxVisible`;
+ *              initial viewport shows the first `maxVisible` items
+ */
+export function getDataZoom(
+  dataLength: number,
+  axis: "xAxis" | "yAxis" = "xAxis",
+  maxVisible = DATA_ZOOM_THRESHOLD,
+) {
+  if (maxVisible < 0) return undefined;
+
+  const axisIndex = axis === "xAxis" ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
+  const isVertical = axis === "yAxis";
+  const layout = isVertical
+    ? { orient: "vertical", right: 5, width: 20 }
+    : { bottom: 5, height: 20 };
+
+  if (maxVisible === 0) {
+    return [
+      { type: "slider", ...axisIndex, start: 0, end: 100, ...layout },
+      { type: "inside", ...axisIndex, start: 0, end: 100 },
+    ];
+  }
+
+  if (dataLength <= maxVisible) return undefined;
+
+  const endPercent = Math.min((maxVisible / dataLength) * 100, 100);
+  return [
+    {
+      type: "slider",
+      ...axisIndex,
+      start: 0,
+      end: endPercent,
+      ...layout,
+    },
+    { type: "inside", ...axisIndex, start: 0, end: endPercent },
+  ];
+}
 
 const ChartColors = [
   [
@@ -485,13 +535,22 @@ function getDataset({
   series: [{ groupBy } = { groupBy: "" }],
 }: any) {
   return dataset.map((data: any) => {
-    if (xAxis && data[xAxis] === null) {
-      data[xAxis] = "N/A";
+    const needsXAxisFallback = xAxis && data[xAxis] === null;
+    const needsGroupByFallback = groupBy && data[groupBy] === null;
+
+    if (!needsXAxisFallback && !needsGroupByFallback) {
+      return data;
     }
-    if (groupBy && data[groupBy] === null) {
-      data[groupBy] = "N/A";
-    }
-    return data;
+
+    return {
+      ...data,
+      ...(needsXAxisFallback && {
+        [xAxis]: "N/A",
+      }),
+      ...(needsGroupByFallback && {
+        [groupBy]: "N/A",
+      }),
+    };
   });
 }
 
@@ -506,17 +565,23 @@ export function getScale(data: ChartView, dataset: ChartDataRecord[]) {
   return scale;
 }
 
-export function applyTitles(draft: any, data: any) {
+export function applyTitles(
+  draft: any,
+  data: any,
+  options: { xAxis?: any; yAxis?: any } = {},
+) {
   if (data.xTitle && draft.xAxis) {
     draft.xAxis.name = data.xTitle;
     draft.xAxis.nameLocation = "middle";
     draft.xAxis.nameGap = 25;
+    Object.assign(draft.xAxis, options.xAxis);
   }
   const [series] = data.series || [];
   if (series && series.title) {
     draft.yAxis.name = series.title;
     draft.yAxis.nameLocation = "middle";
-    draft.yAxis.nameGap = 50;
+    draft.yAxis.nameGap = 60;
+    Object.assign(draft.yAxis, options.yAxis);
   }
 }
 
@@ -527,23 +592,29 @@ export function PlusData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = uniq(map(dataset, series.groupBy || xAxis));
+  const groupField = series.groupBy || xAxis;
+  const types = uniq(map(dataset, groupField)) as string[];
 
   const result = map(
     groupCollectionBy(dataset, xAxis),
     (group: any[], name: string) => {
-      let value = 0;
+      let value: number | string = 0;
       forEach(group, (item) => {
-        value += $conv(item[series.key]);
+        const val = $conv(item[series.key]);
+        if (Number.isNaN(Number(val))) {
+          value = val;
+        } else {
+          value += val;
+        }
       });
-      if (!series.groupBy && xAxis) series.groupBy = xAxis;
-      const groupBars = series.groupBy
+      const groupBars = groupField
         ? group.reduce(
             (attrs, rec) => ({
               ...attrs,
-              [rec[series.groupBy]]: isNaN(rec[series.key])
+              [rec[groupField]]: Number.isNaN(Number(rec[series.key]))
                 ? rec[series.key]
-                : Number(rec[series.key]),
+                : Number(attrs[rec[groupField]] ?? 0) +
+                  Number(rec[series.key]),
             }),
             {},
           )
@@ -557,14 +628,107 @@ export function PlusData(data: any) {
     },
   );
 
-  return {
+  const configMax = Number(data.config?.maxSeries);
+  const maxSeries = Number.isFinite(configMax) ? configMax : DEFAULT_MAX_SERIES;
+  const { types: cappedTypes, data: cappedResult } = capPlusDataSeries(
     types,
-    data: result,
+    result,
+    groupField,
+    xAxis,
+    maxSeries,
+  );
+
+  return {
+    types: cappedTypes,
+    data: cappedResult,
     formatter: (value: any) =>
       Formatters.decimal(value, {
         props: { serverType: "DECIMAL", scale } as Field,
       }),
   };
+}
+
+function capPlusDataSeries(
+  types: string[],
+  result: any[],
+  groupField: string,
+  xAxis: string,
+  maxSeries: number,
+): { types: string[]; data: any[] } {
+  if (maxSeries <= 0) {
+    return { types, data: result };
+  }
+
+  const othersLabel = i18n.get("Others");
+
+  // Cap types (series/dimensions) when there are too many
+  let cappedTypes = types;
+  let cappedData = result;
+
+  if (types.length > maxSeries) {
+    // Compute total absolute value per type across all result rows
+    const totals = new Map<string, number>();
+    for (const row of result) {
+      for (const type of types) {
+        const val = Number(row[type]);
+        if (!Number.isNaN(val)) {
+          totals.set(type, (totals.get(type) ?? 0) + Math.abs(val));
+        }
+      }
+    }
+
+    const sorted = [...totals.entries()].sort((a, b) => b[1] - a[1]);
+    const topTypes = sorted.slice(0, maxSeries).map(([k]) => k);
+    const tailTypes = new Set(sorted.slice(maxSeries).map(([k]) => k));
+
+    if (groupField !== xAxis) {
+      // Bar/hbar case: each result row has dimension keys — drop tail keys
+      // (no "Others" bucket — it would dwarf individual bars and break the scale)
+      cappedData = result.map((row) => {
+        const newRow: any = { raw: row.raw, x: row.x, y: row.y };
+        for (const t of topTypes) {
+          if (row[t] !== undefined) newRow[t] = row[t];
+        }
+        return newRow;
+      });
+
+      cappedTypes = [...topTypes];
+    } else {
+      // Pie/donut/radar case: each result row corresponds to one type — merge tail rows
+      // groupBy returns object keys as strings; normalize for membership checks
+      const topSet = new Set(topTypes.map((t) => String(t)));
+      const topRows: any[] = [];
+      let othersValue = 0;
+      const othersRaw: any[] = [];
+
+      for (const row of result) {
+        if (topSet.has(String(row.x))) {
+          topRows.push(row);
+        } else {
+          othersValue += Number(row.y) || 0;
+          if (row.raw) othersRaw.push(...row.raw);
+        }
+      }
+
+      cappedData = [...topRows];
+      if (othersValue !== 0) {
+        cappedData.push({
+          [othersLabel]: othersValue,
+          raw: othersRaw,
+          x: othersLabel,
+          y: othersValue.toString(),
+        });
+      }
+
+      cappedTypes = topRows.map((r) => r.x);
+      if (othersValue !== 0) cappedTypes.push(othersLabel);
+    }
+  }
+
+  // Note: xAxis categories are NOT capped here — chart widgets use dataZoom
+  // to let users scroll through many categories instead of dropping data.
+
+  return { types: cappedTypes, data: cappedData };
 }
 
 export function PlotData(data: any) {
@@ -617,14 +781,67 @@ export function PlotData(data: any) {
     (x) => x,
   );
 
+  const plotConfigMax = Number(data.config?.maxSeries);
+  const maxSeries = Number.isFinite(plotConfigMax) ? plotConfigMax : DEFAULT_MAX_SERIES;
+  const cappedResult = capPlotDataSeries(result, maxSeries);
+
   return {
     types,
-    data: result,
+    data: cappedResult,
     formatter: (value: any) =>
       Formatters.decimal(value, {
         props: { serverType: "DECIMAL", scale } as Field,
       }),
   };
+}
+
+function capPlotDataSeries(result: any[], maxSeries: number): any[] {
+  if (maxSeries <= 0 || result.length <= maxSeries) return result;
+
+  const othersLabel = i18n.get("Others");
+
+  // Sort series by total absolute value descending
+  const withTotals = result.map((s) => ({
+    series: s,
+    total: (s.values as { y: number }[]).reduce(
+      (sum, v) => sum + Math.abs(Number(v.y) || 0),
+      0,
+    ),
+  }));
+  withTotals.sort((a, b) => b.total - a.total);
+
+  const topSeries = withTotals.slice(0, maxSeries).map((s) => s.series);
+  const tailSeries = withTotals.slice(maxSeries).map((s) => s.series);
+
+  if (tailSeries.length === 0) return topSeries;
+
+  // Aggregate tail series values by index using the longest series as base
+  const longestTail = tailSeries.reduce(
+    (longest, s) =>
+      s.values.length > longest.values.length ? s : longest,
+    tailSeries[0],
+  );
+  const baseValues = longestTail.values as { x: any; y: any; sort: any }[];
+  const othersValues = baseValues.map((_: any, i: number) => {
+    let ySum = 0;
+    for (const s of tailSeries) {
+      ySum += Number(s.values[i]?.y) || 0;
+    }
+    return {
+      x: baseValues[i].x,
+      y: ySum,
+      sort: baseValues[i].sort,
+    };
+  });
+
+  return [
+    ...topSeries,
+    {
+      key: othersLabel,
+      type: tailSeries[0].type,
+      values: othersValues,
+    },
+  ];
 }
 
 export function getChartData(
@@ -681,5 +898,28 @@ export function prepareTheme(type: ChartType) {
         crossStyle: { color, width: "1" },
       },
     },
+    label: { color },
+    emphasis: {
+      label: { color },
+    },
+    radar: {
+      axisName: { color },
+    },
+    gauge: {
+      axisLabel: { color },
+      detail: { color },
+      title: { color },
+    },
   };
+}
+
+export function useIsDiscrete(chartView?: ChartView) {
+  const isDiscrete = useMemo(
+    () =>
+      chartView?.series?.some(
+        (item) => !item.groupBy || item.groupBy === chartView.xAxis,
+      ),
+    [chartView],
+  );
+  return isDiscrete ?? false;
 }

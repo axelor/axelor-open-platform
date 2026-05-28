@@ -86,6 +86,7 @@ export type ValueAtom<T> = WritableAtom<
 >;
 
 export interface WidgetProps {
+  id?: string;
   schema: Schema;
   formAtom: FormAtom;
   widgetAtom: WidgetAtom;

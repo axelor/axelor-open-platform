@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.text;
 
@@ -49,58 +35,60 @@ public class STTemplateTest extends TemplateScriptTest {
   }
 
   private static final String TEMPLATE_COMPLEX =
-      ""
-          + "<html>\n"
-          + "<style>\n"
-          + "h1 { font-size: 14px; }\n"
-          + "</style>\n"
-          + "<body>\n"
-          + "   <h1>Welcome!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: $x.fullName$</li>\n"
-          + "       <li>Email: <a href='$x.email$'>$x.email$</a></li>\n"
-          + "       <li>Type: $x.contactType$</li>\n"
-          + "       <li>Status: $x.contactStatus$</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>Nick: $x.nickName$</li>\n"
-          + "       <li>Numerology: $x.numerology$</li>\n"
-          + "       <li>Birthdate: $x.birthDate$</li>\n"
-          + "       <li>Favorite Color: $x.favColor$</li>\n"
-          + "$if(x.guardian.id)$"
-          + "       <li>Guardian: $x.guardian.fullName$</li>\n"
-          + "$endif$"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <style>
+      h1 { font-size: 14px; }
+      </style>
+      <body>
+         <h1>Welcome!</h1>
+         <ul>
+             <li>Name: $x.fullName$</li>
+             <li>Email: <a href='$x.email$'>$x.email$</a></li>
+             <li>Type: $x.contactType$</li>
+             <li>Status: $x.contactStatus$</li>
+         </ul>
+         <ul>
+             <li>Nick: $x.nickName$</li>
+             <li>Numerology: $x.numerology$</li>
+             <li>Birthdate: $x.birthDate$</li>
+             <li>Favorite Color: $x.favColor$</li>
+      $if(x.guardian.id)$\
+             <li>Guardian: $x.guardian.fullName$</li>
+      $endif$\
+         </ul>
+      </body>
+      </html>
+      """;
 
   private static final String OUTPUT_COMPLEX =
-      ""
-          + "<html>\n"
-          + "<style>\n"
-          + "h1 { font-size: 14px; }\n"
-          + "</style>\n"
-          + "<body>\n"
-          + "   <h1>Welcome!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: Mrs. John NAME</li>\n"
-          + "       <li>Email: <a href='jsmith@gmail.com'>jsmith@gmail.com</a></li>\n"
-          + "       <li>Type: Customer</li>\n"
-          + "       <li>Status: One</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>Nick: Some Name</li>\n"
-          + "       <li>Numerology: 2</li>\n"
-          + "       <li>Birthdate: 2020-05-22</li>\n"
-          + "       <li>Favorite Color: Red</li>\n"
-          + "       <li>Guardian: Mr. Mark Ram</li>\n"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <style>
+      h1 { font-size: 14px; }
+      </style>
+      <body>
+         <h1>Welcome!</h1>
+         <ul>
+             <li>Name: Mrs. John NAME</li>
+             <li>Email: <a href='jsmith@gmail.com'>jsmith@gmail.com</a></li>
+             <li>Type: Customer</li>
+             <li>Status: One</li>
+         </ul>
+         <ul>
+             <li>Nick: Some Name</li>
+             <li>Numerology: 2</li>
+             <li>Birthdate: 2020-05-22</li>
+             <li>Favorite Color: Red</li>
+             <li>Guardian: Mr. Mark Ram</li>
+         </ul>
+      </body>
+      </html>
+      """;
 
   @Test
   public void testStringTemplateComplex() {
-    StringTemplates st = new StringTemplates('$', '$').withLocale(Locale.FRENCH);
+    StringTemplates st = new StringTemplates('$', '$');
     Template tmpl = st.fromText(TEMPLATE_COMPLEX);
 
     Context context = context();
@@ -191,28 +179,29 @@ public class STTemplateTest extends TemplateScriptTest {
   }
 
   private static final String TEMPLATE_JSON =
-      ""
-          + "<html>\n"
-          + "<body>\n"
-          + "   <h1 style=\"font-size: 14px;\">Hello!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: $x.name$</li>\n"
-          + "       <li>Date: $x.date$</li>\n"
-          + "       <li>Color: $x.color$</li>\n"
-          + "       <li>Contact Name: $x.contact.fullName$</li>\n"
-          + "       <li>Contact Type: $x.contact.contactType$</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>World Name: $x.world.name$</li>\n"
-          + "       <li>World Price: $x.world.price$</li>\n"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <body>
+         <h1 style="font-size: 14px;">Hello!</h1>
+         <ul>
+             <li>Name: $x.name$</li>
+             <li>Date: $x.date$</li>
+             <li>Color: $x.color$</li>
+             <li>Contact Name: $x.contact.fullName$</li>
+             <li>Contact Type: $x.contact.contactType$</li>
+         </ul>
+         <ul>
+             <li>World Name: $x.world.name$</li>
+             <li>World Price: $x.world.price$</li>
+         </ul>
+      </body>
+      </html>
+      """;
 
   @Test
   @Transactional
   public void testStringTemplateJson() {
-    final StringTemplates st = new StringTemplates('$', '$').withLocale(Locale.FRENCH);
+    final StringTemplates st = new StringTemplates('$', '$');
     final Template tmpl = st.fromText(TEMPLATE_JSON);
 
     final MetaJsonRecordRepository $json = Beans.get(MetaJsonRecordRepository.class);
@@ -257,5 +246,29 @@ public class STTemplateTest extends TemplateScriptTest {
     assertEquals("Customer", st.fromText("$x.contactType$").make(vars).render());
     assertEquals("customer", st.fromText("$x.contactType.value$").make(vars).render());
     assertEquals("Customer", st.fromText("$x.contactType.title$").make(vars).render());
+  }
+
+  @Test
+  void testStringTemplateLocalFormat() {
+    final StringTemplates st = new StringTemplates('$', '$');
+    final Map<String, Object> vars = new HashMap<>();
+    vars.put("x", context());
+
+    assertEquals("Customer", st.fromText("$x.contactType$").make(vars).render());
+    assertEquals(
+        "Friday, 22 May 2020",
+        st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
+    assertEquals(
+        "1,000.200", st.fromText("$x.attrs.orderAmount; format=\"%,2.3f\"$").make(vars).render());
+
+    st.withLocale(Locale.FRENCH);
+    assertEquals("Client", st.fromText("$x.contactType$").make(vars).render());
+    assertEquals(
+        "vendredi, 22 mai 2020",
+        st.fromText("$x.birthDate; format=\"EEEE, d MMMM yyyy\"$").make(vars).render());
+    // Since JAVA 9, the French Locale switched to the CLDR data set, which defines U+202F (narrow
+    // no-break space) as the thousands separator.
+    assertEquals(
+        "1\u202F000,200", st.fromText("$x.orderAmount; format=\"%,2.3f\"$").make(vars).render());
   }
 }

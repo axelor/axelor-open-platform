@@ -1,13 +1,25 @@
 .container {
   border: 1px solid var(--bs-border-color);
   border-radius: var(--bs-border-radius);
-}
-
-.container {
   :global {
+    .monaco-editor.vs-dark {
+      --vscode-editor-background: #292a41;
+      --vscode-editorGutter-background: #292a41;
+    }
+
+    .monaco-editor .view-overlays .current-line,
+    .monaco-editor .margin-view-overlays .current-line-margin {
+      background-color: var(--bs-tertiary-bg) !important;
+      border: none !important;
+    }
+
     .monaco-editor,
     .overflow-guard {
       border-radius: var(--bs-border-radius);
+    }
+
+    .monaco-editor .scroll-decoration {
+      box-shadow: none !important;
     }
   }
 }

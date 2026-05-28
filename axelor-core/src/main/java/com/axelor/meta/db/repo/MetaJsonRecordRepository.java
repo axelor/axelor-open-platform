@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.db.repo;
 
@@ -23,7 +9,6 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.hibernate.type.JsonFunction;
-import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
@@ -94,16 +79,21 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
    * @return saved instance {@link MetaJsonRecord}
    */
   public MetaJsonRecord save(Context context) {
-    if (context instanceof MetaJsonContext && ((MetaJsonContext) context).record != null) {
-      return save(((MetaJsonContext) context).record);
+    if (context instanceof MetaJsonContext metaJsonContext && metaJsonContext.record != null) {
+      return save(metaJsonContext.record);
     }
     return save(context.asType(MetaJsonRecord.class));
   }
 
   @Override
   public MetaJsonRecord save(MetaJsonRecord entity) {
-    final MetaJsonModelRepository models = Beans.get(MetaJsonModelRepository.class);
-    final MetaJsonModel model = models.findByName(entity.getJsonModel());
+    final MetaJsonModel model =
+        Query.of(MetaJsonModel.class)
+            .filter("self.name = :name")
+            .bind("name", entity.getJsonModel())
+            .autoFlush(false)
+            .cacheable()
+            .fetchOne();
     // set name value
     if (model != null && model.getNameField() != null) {
       entity.setName((String) new JsonContext(entity).get(model.getNameField()));

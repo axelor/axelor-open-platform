@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -42,15 +28,13 @@ import com.axelor.rpc.Resource;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
 import com.google.inject.servlet.RequestScoped;
+import jakarta.persistence.Query;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
@@ -64,7 +48,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.persistence.Query;
 import javax.script.Bindings;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
@@ -95,7 +78,7 @@ public class ActionHandler {
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
   private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
-      ImmutableSet.of(MetaAction.class, MetaFilter.class);
+      Set.of(MetaAction.class, MetaFilter.class);
 
   ActionHandler(
       ActionRequest request,
@@ -274,15 +257,15 @@ public class ActionHandler {
       // method not found
       if (methods.size() == 0) {
         throw new IllegalArgumentException(
-            new NoSuchMethodException(String.format("%s.%s()", className, methodName)));
+            new NoSuchMethodException("%s.%s()".formatted(className, methodName)));
       }
 
       // validate no-args or only matched method
       if (methods.size() == 1 || StringUtils.isBlank(methodArgs)) {
-        Method method = methods.get(0);
+        Method method = methods.getFirst();
         if (method.getAnnotation(CallMethod.class) == null) {
           throw new IllegalArgumentException(
-              String.format("Action not allowed: %s:%s", className, methodCall));
+              "Action not allowed: %s:%s".formatted(className, methodCall));
         }
       } else { // validate exact matched method with arguments
         final Object validator =
@@ -294,7 +277,7 @@ public class ActionHandler {
                         (proxy, method, args) -> {
                           if (method.getAnnotation(CallMethod.class) == null) {
                             throw new IllegalArgumentException(
-                                String.format("Action not allowed: %s:%s", className, methodCall));
+                                "Action not allowed: %s:%s".formatted(className, methodCall));
                           }
                           return null;
                         }))
@@ -334,7 +317,7 @@ public class ActionHandler {
     Query q = select(query, params);
     q.setMaxResults(1);
     try {
-      return q.getResultList().get(0);
+      return q.getResultList().getFirst();
     } catch (Exception e) {
     }
     return null;
@@ -359,8 +342,7 @@ public class ActionHandler {
   @SuppressWarnings("all")
   public Object search(Class<?> entityClass, String filter, Map params) {
     filter =
-        makeMethodCall(
-            String.format("__repo__(%s).all().filter", entityClass.getSimpleName()), filter);
+        makeMethodCall("__repo__(%s).all().filter".formatted(entityClass.getSimpleName()), filter);
     com.axelor.db.Query q = (com.axelor.db.Query) handleScript(filter);
 
     q = q.bind(bindings);
@@ -435,18 +417,10 @@ public class ActionHandler {
 
   private Object toCompact(final Object item) {
     if (item == null) return null;
-    if (item instanceof Collection) {
-      return Collections2.transform(
-          (Collection<?>) item,
-          new Function<Object, Object>() {
-            @Override
-            public Object apply(Object input) {
-              return toCompact(input);
-            }
-          });
+    if (item instanceof Collection<?> collection) {
+      return collection.stream().map(this::toCompact).collect(Collectors.toList());
     }
-    if (item instanceof Model) {
-      Model bean = (Model) item;
+    if (item instanceof Model bean) {
       if (bean.getId() != null && JPA.em().contains(bean)) {
         return Resource.toMapCompact(bean);
       }
@@ -461,9 +435,9 @@ public class ActionHandler {
   @SuppressWarnings("all")
   private Object process(Object data) {
     if (data == null || data instanceof ContextEntity) return data;
-    if (data instanceof Collection) {
+    if (data instanceof Collection collection) {
       final List items = new ArrayList<>();
-      for (Object item : (Collection) data) {
+      for (Object item : collection) {
         items.add(process(item));
       }
       return items;
@@ -515,8 +489,8 @@ public class ActionHandler {
 
     Object data = action.wrap(this);
 
-    if (data instanceof ActionResponse) {
-      return (ActionResponse) data;
+    if (data instanceof ActionResponse actionResponse) {
+      return actionResponse;
     }
 
     response.setData(process(data));

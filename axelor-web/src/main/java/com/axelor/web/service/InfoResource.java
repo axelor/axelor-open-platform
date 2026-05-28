@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
@@ -25,8 +11,9 @@ import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.theme.MetaThemeService;
@@ -34,22 +21,21 @@ import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +66,9 @@ public class InfoResource {
   @Operation(
       summary = "Retrieve metadata information for the application",
       description =
-          "Retrieve metadata information for `application` and `authentication`. "
-              + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
+          """
+          Retrieve metadata information for `application` and `authentication`. \
+          If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.""")
   public Map<String, Object> info() {
     return infoService.info(request, response);
   }
@@ -127,14 +114,14 @@ public class InfoResource {
 
   private Response getImageContent(Object image) {
     try {
-      if (image instanceof MetaFile) {
-        final MetaFile metaFile = (MetaFile) image;
+      if (image instanceof MetaFile metaFile) {
+        final Store store = FileStoreFactory.getStore();
         final String filePath = metaFile.getFilePath();
-        final java.nio.file.Path inputPath = MetaFiles.getPath(filePath);
 
-        if (Files.exists(inputPath)) {
-          return Response.ok(Files.newInputStream(inputPath))
-              .type(MimeTypesUtils.getContentType(inputPath))
+        if (store.hasFile(filePath)) {
+          final InputStream inputStream = store.getStream(filePath);
+          return Response.ok(inputStream)
+              .type(MimeTypesUtils.getContentType(metaFile.getFileName()))
               .build();
         }
       } else if (ObjectUtils.notEmpty(image)) {

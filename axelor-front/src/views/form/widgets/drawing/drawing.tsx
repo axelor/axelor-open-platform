@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef } from "react";
 import SignaturePad from "signature_pad";
 
 import { Box, clsx } from "@axelor/ui";
@@ -24,8 +24,10 @@ export function Drawing(
   const { schema, readonly, formAtom, widgetAtom, valueAtom, invalid } = props;
   const { type, widgetAttrs, serverType, $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
-  const signaturePadRef = useRef<SignaturePad | null>(null);
+  const signaturePadRef = useRef<SignaturePad>(null);
   const [value, setValue] = useAtom(valueAtom);
+  
+  const id = useId();
   const {
     attrs: { title, required },
   } = useAtomValue(widgetAtom);
@@ -110,16 +112,20 @@ export function Drawing(
           const file = new File([blob], "drawing.png");
 
           const dataStore = new DataStore(META_FILE_MODEL);
-          const metaFile = await dataStore.save({
-            id: record?.id,
-            version: record?.version ?? record?.$version,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            $upload: { file },
-          });
-          if (metaFile.id) {
-            setValue(metaFile, true, record?.id == null);
+          try {
+            const metaFile = await dataStore.save({
+              id: record?.id,
+              version: record?.version ?? record?.$version,
+              fileName: file.name,
+              fileType: file.type,
+              fileSize: file.size,
+              $upload: { file },
+            });
+            if (metaFile.id) {
+              setValue(metaFile, true, record?.id == null);
+            }
+          } catch {
+            // Error is already handled upstream.
           }
         }
       }
@@ -128,9 +134,7 @@ export function Drawing(
     },
     [
       isBinary,
-      record?.$version,
-      record?.id,
-      record?.version,
+      record,
       required,
       setValid,
       setValue,
@@ -206,8 +210,9 @@ export function Drawing(
   }, [isBinaryImage, required, url, setValid]);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <Box
+        data-testid="input"
         bgColor="body"
         border
         flexGrow={1}
@@ -221,6 +226,7 @@ export function Drawing(
       >
         <Box
           as="img"
+          id={id}
           p={schema.inGridEditor ? 0 : 1}
           d="inline-block"
           src={url}

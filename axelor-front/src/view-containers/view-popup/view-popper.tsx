@@ -70,7 +70,12 @@ export function ViewPopper({
   );
 
   return (
-    <Popper bg="body" {...popperProps} className={styles.viewPopper}>
+    <Popper
+      bg="body"
+      {...popperProps}
+      className={styles.viewPopper}
+      role={"dialog"}
+    >
       <ClickAwayListener onClickAway={handleClose}>
         {children}
       </ClickAwayListener>

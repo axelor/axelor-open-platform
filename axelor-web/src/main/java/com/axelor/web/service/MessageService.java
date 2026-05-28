@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
@@ -38,27 +24,26 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import java.util.Objects;
 import org.apache.shiro.authz.UnauthorizedException;
 
 @RequestScoped
@@ -81,7 +66,7 @@ public class MessageService extends AbstractService {
       description = "This service returns the message for the given message id.")
   public Response getMessage(@PathParam("id") long id) {
     final ActionResponse res = new ActionResponse();
-    final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
+    final MailMessage message = JPA.edit(MailMessage.class, Map.of("id", id));
 
     if (message == null) {
       return res;
@@ -160,7 +145,7 @@ public class MessageService extends AbstractService {
       return res;
     }
 
-    Model related = JpaRepository.of(relatedClass.asSubclass(Model.class)).find(relatedId);
+    Model related = JPA.findReferenceById(relatedClass.asSubclass(Model.class), relatedId);
 
     if (related != null) {
       final List<Object> records = new ArrayList<>();
@@ -266,12 +251,12 @@ public class MessageService extends AbstractService {
    */
   @Transactional
   public void removeMessage(long id) {
-    final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
+    final MailMessage message = JPA.edit(MailMessage.class, Map.of("id", id));
     final String eventType = message.getType();
 
     if (!MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
             && !MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)
-        || !Objects.equal(message.getCreatedBy(), AuthUtils.getUser())) {
+        || !Objects.equals(message.getCreatedBy(), AuthUtils.getUser())) {
       final AuthSecurityException cause =
           new AuthSecurityException(JpaSecurity.AccessType.REMOVE, MailMessage.class, id);
       throw new UnauthorizedException(cause.getMessage(), cause);

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -36,10 +22,10 @@ import com.axelor.test.db.EnumStatusNumber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.List;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import org.junit.jupiter.api.Test;
 
 public class EnumTest extends JpaTest {
@@ -81,8 +67,8 @@ public class EnumTest extends JpaTest {
 
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertTrue(result.get(0) instanceof String);
-    assertEquals("OPEN", result.get(0));
+    assertTrue(result.getFirst() instanceof String);
+    assertEquals("OPEN", result.getFirst());
 
     query = em.createNativeQuery("select status_number from contact_enum_check where id = :id");
     query.setParameter("id", entity.getId());
@@ -91,8 +77,8 @@ public class EnumTest extends JpaTest {
 
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertTrue(result.get(0) instanceof Number);
-    assertEquals(3, result.get(0));
+    assertTrue(result.getFirst() instanceof Number);
+    assertEquals(3, result.getFirst());
   }
 
   @Test

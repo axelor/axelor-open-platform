@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.dms.db.repo;
 
@@ -46,11 +32,13 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,11 +46,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
 import org.apache.shiro.authz.UnauthorizedException;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {
@@ -75,8 +60,6 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
   @Inject private MetaAttachmentRepository attachments;
 
-  private static final Pattern previewSupportedPattern = Pattern.compile("\\b(?:pdf|image)\\b");
-
   public DMSFileRepository() {
     super(DMSFile.class);
   }
@@ -85,12 +68,12 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   public DMSFile findHomeByRelated(Model related) {
     return all()
         .filter(
-            ""
-                + "COALESCE(self.isDirectory, FALSE) = TRUE "
-                + "AND self.relatedId = :id "
-                + "AND self.relatedModel = :model "
-                + "AND self.parent.relatedModel = :model "
-                + "AND COALESCE(self.parent.relatedId, 0) = 0")
+            """
+            COALESCE(self.isDirectory, FALSE) = TRUE \
+            AND self.relatedId = :id \
+            AND self.relatedModel = :model \
+            AND self.parent.relatedModel = :model \
+            AND COALESCE(self.parent.relatedId, 0) = 0""")
         .bind("id", related.getId())
         .bind("model", related.getClass().getName())
         .fetchOne();
@@ -220,13 +203,13 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
    * @return home parent
    */
   protected DMSFile findOrCreateHome(Model related) {
-    final List<Filter> dmsRootFilters =
-        Lists.newArrayList(
-            new JPQLFilter(
-                ""
-                    + "COALESCE(self.isDirectory, FALSE) = TRUE "
-                    + "AND self.relatedModel = :model "
-                    + "AND COALESCE(self.relatedId, 0) = 0"));
+    final List<Filter> dmsRootFilters = new ArrayList<>();
+    dmsRootFilters.add(
+        new JPQLFilter(
+            """
+            COALESCE(self.isDirectory, FALSE) = TRUE \
+            AND self.relatedModel = :model \
+            AND COALESCE(self.relatedId, 0) = 0"""));
     final DMSFile dmsRootParent = getRootParent(related);
 
     if (dmsRootParent != null) {
@@ -375,7 +358,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
   @Transactional
   public DMSFile setOffline(DMSFile file, boolean offline) {
-    Preconditions.checkNotNull(file, "file can't be null");
+    Objects.requireNonNull(file, "file can't be null");
 
     // directory can't be marked as offline
     if (Boolean.TRUE.equals(file.getIsDirectory())) {
@@ -507,8 +490,9 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       json.put("metaFile.sizeText", metaFile.getSizeText());
 
       // Put inlineUrl only if preview for that file type is supported, to prevent auto-downloading
-      if (StringUtils.notBlank(fileType) && previewSupportedPattern.matcher(fileType).find()) {
-        json.put("inlineUrl", String.format("ws/dms/inline/%d", file.getId()));
+      if (StringUtils.notBlank(fileType)
+          && MetaFiles.isBrowserPreviewCompatible(MediaType.valueOf(fileType))) {
+        json.put("inlineUrl", "ws/dms/inline/%d".formatted(file.getId()));
       }
     }
 

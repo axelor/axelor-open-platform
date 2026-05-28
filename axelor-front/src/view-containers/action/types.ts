@@ -57,6 +57,7 @@ export interface ActionHandler {
   delValue(name: string, value: any): void;
 
   setValues(values: DataRecord): Promise<void>;
+  setCloseHandler(handler: () => Promise<void>): void;
 
   save(record?: DataRecord): Promise<void>;
   edit(record?: DataRecord | null): Promise<void>;

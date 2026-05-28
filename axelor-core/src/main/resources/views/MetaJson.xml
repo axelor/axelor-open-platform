@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.2.xsd">
 
   <selection name="json.field.type">
     <option value="string">String</option>
@@ -11,6 +11,7 @@
     <option value="datetime">DateTime</option>
     <option value="date">Date</option>
     <option value="time">Time</option>
+    <option value="uuid">UUID</option>
     <option value="panel">Panel</option>
     <option value="enum">Enum</option>
     <option value="button">Button</option>
@@ -91,15 +92,15 @@
         <field name="contextFieldTitle" hidden="true" />
         <field name="contextFieldTarget" hidden="true" />
         <field name="contextFieldTargetName" hidden="true" />
-        <field name="showIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
-        <field name="hideIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
-        <field name="requiredIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
-        <field name="readonlyIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
-        <field name="includeIf" widget="code-editor" x-height="25" x-code-syntax="groovy" help="Server expression to check whether to use this field."/>
+        <field name="showIf" widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="javascript" />
+        <field name="hideIf" widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="javascript" />
+        <field name="requiredIf" widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="javascript" />
+        <field name="readonlyIf" widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="javascript" />
+        <field name="includeIf" widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="groovy" help="Server expression to check whether to use this field."/>
       </panel>
       <panel title="Value Expression">
         <field name="valueExpr" showTitle="false" colSpan="12"
-          widget="code-editor" x-height="100" x-code-syntax="javascript"/>
+          widget="code-editor" x-auto-size="true" x-lite="true" x-code-syntax="javascript"/>
       </panel>
       <panel-related field="roles">
         <field name="name" />
@@ -166,20 +167,26 @@
     <panel title="Overview">
       <field name="name" readonlyIf="id" pattern="^[a-zA-Z][a-zA-Z0-9_\\$]+$"/>
       <field name="title" />
-      <field name="onNew" />
-      <field name="onSave" />
-      <field name="formWidth" />
-      <field name="orderBy" />
-      <field name="groupBy" />
-      <field name="panelMailDisplay" />
+      <label showIf="isDelegated" hidden="true" title="This model is flagged as delegated. Make appropriate change depending on the delegation requirements." colSpan="12"/>
+      <field name="isDelegated" hidden="true"/>
     </panel>
-    <panel title="Menu">
-      <field name="menuTitle" title="Title"/>
-      <field name="menuParent" title="Parent menu" domain="self.action is null" canNew="true" form-view="meta-menu-form"/>
-      <field name="menuIcon" title="Icon"/>
-      <field name="menuBackground" title="Icon background"/>
-      <field name="menuOrder" title="aop.meta.order"/>
-    </panel>
+    <panel-tabs hideIf="isDelegated">
+      <panel title="Views">
+        <field name="onNew" />
+        <field name="onSave" />
+        <field name="formWidth" />
+        <field name="orderBy" />
+        <field name="groupBy" />
+        <field name="panelMailDisplay" />
+      </panel>
+      <panel title="Menu">
+        <field name="menuTitle" title="Title"/>
+        <field name="menuParent" title="Parent menu" domain="self.action is null" canNew="true" form-view="meta-menu-form"/>
+        <field name="menuIcon" title="Icon"/>
+        <field name="menuBackground" title="Icon background"/>
+        <field name="menuOrder" title="aop.meta.order"/>
+      </panel>
+    </panel-tabs>
     <panel-tabs>
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
         <field name="name"/>
@@ -196,8 +203,7 @@
     <field name="attrs" />
   </grid>
 
-  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord"
-    onNew="action-json-record-defaults">
+  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord">
     <panel title="Overview">
       <field name="attrs" colSpan="12" />
     </panel>
@@ -215,6 +221,7 @@
     <field name="modelField" expr="attrs" />
   </action-record>
 
+  <!-- TODO: kept in case old views use it, but needs to be removed eventually -->
   <action-record name="action-json-record-defaults" model="com.axelor.meta.db.MetaJsonRecord">
     <field name="jsonModel" expr="#{jsonModel}" />
   </action-record>

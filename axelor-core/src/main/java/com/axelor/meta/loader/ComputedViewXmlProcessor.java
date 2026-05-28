@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -22,15 +8,14 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.Position;
-import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -297,7 +282,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode = toolBarNode;
       position = Position.INSIDE_LAST;
     } else {
-      elements = ImmutableList.of(element);
+      elements = List.of(element);
       targetNode =
           (Node)
               evaluateXPath(
@@ -326,7 +311,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode = menuBarNode;
       position = Position.INSIDE_LAST;
     } else {
-      elements = ImmutableList.of(element);
+      elements = List.of(element);
       final Node toolBarNode =
           (Node)
               evaluateXPath(
@@ -352,7 +337,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private void doInsertPanelMail(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node targetNode;
     final Position position;
     final Node panelMailNode =
@@ -412,14 +397,14 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode.getParentNode().removeChild(targetNode);
       return null;
     } else {
-      final Node node = baseDocument.importNode(elements.get(0), true);
+      final Node node = baseDocument.importNode(elements.getFirst(), true);
       targetNode.getParentNode().replaceChild(node, targetNode);
       return doInsert(elements.subList(1, elements.size()), Position.AFTER, node);
     }
   }
 
   private Node doReplaceToolBar(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node toolBarNode =
         (Node)
             evaluateXPath(
@@ -442,7 +427,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private Node doReplaceMenuBar(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node menuBarNode =
         (Node)
             evaluateXPath(
@@ -482,7 +467,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private Node doReplacePanelMail(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node panelMailNode =
         (Node)
             evaluateXPath(

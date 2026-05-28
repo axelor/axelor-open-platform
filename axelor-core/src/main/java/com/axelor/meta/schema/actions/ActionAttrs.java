@@ -1,32 +1,17 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionAttrs extends Action {
@@ -61,7 +46,7 @@ public class ActionAttrs extends Action {
   @SuppressWarnings("all")
   protected Object evaluate(ActionHandler handler) {
 
-    Map<String, Object> map = Maps.newHashMap();
+    Map<String, Object> map = new HashMap<>();
     for (Attribute attribute : attributes) {
       if (!attribute.test(handler) || Strings.isNullOrEmpty(attribute.getFieldName())) continue;
       for (String field : attribute.fieldName.split(",")) {
@@ -71,7 +56,7 @@ public class ActionAttrs extends Action {
         field = field.trim();
         Map<String, Object> attrs = (Map) map.get(field);
         if (attrs == null) {
-          attrs = Maps.newHashMap();
+          attrs = new HashMap<>();
           map.put(field, attrs);
         }
 

@@ -3,22 +3,19 @@ import { Grid, GridProvider, GridState } from "@axelor/ui/grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WritableAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import forEach from "lodash/forEach";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
-import { Field, GridView } from "@/services/client/meta.types";
-import { useGridState } from "./utils";
+import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
-import { resetView } from "@/services/client/meta";
+import { MetaData, resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
-import { useSelector } from "@/hooks/use-relation";
-import { nextId } from "@/views/form/builder/utils";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
-import { toTitleCase } from "@/utils/names";
-import { unaccent } from "@/utils/sanitize.ts";
+import { useViewMeta } from "@/view-containers/views/scope";
 
+import { CustomizeSelectorDialog } from "./customize-selector";
+import { useGridState } from "./utils";
 import styles from "./customize.module.scss";
 
 const reload = () => window.location.reload();
@@ -28,11 +25,13 @@ type ViewHandler = (state?: GridState) => GridView | undefined;
 function CustomizeDialog({
   title = i18n.get("Columns"),
   view,
+  jsonFields,
   canShare,
   onUpdate,
 }: {
   title?: string;
   view: GridView;
+  jsonFields?: MetaData["jsonFields"];
   canShare?: boolean;
   onUpdate?: (fn: ViewHandler) => void;
 }) {
@@ -48,7 +47,11 @@ function CustomizeDialog({
       }))
       .filter((item) => item.hidden !== true) as DataRecord[],
   );
-  const showSelector = useSelector();
+
+  const currentFieldsInView: string[] = useMemo(
+    () => records.map((r) => r.name) as string[],
+    [records],
+  );
 
   const { selectedRows } = state;
 
@@ -77,133 +80,78 @@ function CustomizeDialog({
             (v) => v.name === record.name,
           ) || {
             name: record.name,
-            type: "field",
+            type: record.type,
           };
           if (saveWidths && schemaItem.type === "field") {
             const mainGridItem = gridState?.columns?.find(
               (c) => c.name === record.name && c.computed && c.width,
             );
-            mainGridItem &&
-              ((schemaItem as Field).width = `${parseInt(
+            if (mainGridItem) {
+              (schemaItem as Field).width = `${parseInt(
                 String(mainGridItem.width)!,
-              )}`);
+              )}`;
+            }
+          }
+          if ((schemaItem as JsonField).jsonField) {
+            return {
+              name: schemaItem.name,
+              type: "field",
+            };
           }
           return schemaItem;
         });
 
-      view.customViewShared = shared;
-
       return {
         ...view,
+        customViewShared: shared,
         items,
       } as GridView;
     },
     [view, shared, state.rows, saveWidths, records],
   );
 
-  const handleSelect = useCallback(() => {
-    const extraFields = view?.items
-      ?.filter(
-        (item) =>
-          (item.name && item.name.includes(".")) || item.type !== "field",
-      )
-      .map((item) => ({
-        id: nextId(),
-        name: item.name,
-        type: "field",
-        label: item.title || item.autoTitle,
-      }));
-    showSelector({
-      model: "com.axelor.meta.db.MetaField",
+  const handleSelect = useCallback(async () => {
+    let selected: DataRecord[] = [];
+
+    await dialogs.modal({
+      open: true,
       title: i18n.get("Columns"),
-      multiple: true,
-      view: {
-        name: "custom-meta-field-grid",
-        fields: {
-          label: {
-            name: "label",
-            type: "STRING",
-            required: true,
-          },
-          name: {
-            name: "name",
-            type: "STRING",
-            required: true,
-          },
-        },
-        type: "grid",
-        items: [
-          {
-            type: "field",
-            name: "label",
-            title: "Title",
-            sortable: false,
-            searchable: false,
-          },
-          {
-            type: "field",
-            name: "name",
-            title: "Name",
-          },
-        ],
-      } as unknown as GridView,
-      viewParams: {
-        "_can-customize-popup": false,
-      },
-      domain:
-        "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames",
-      context: {
-        _excludedFieldNames: ["id", "version"],
-        _model: "com.axelor.meta.db.MetaField",
-        _modelName: view.model,
-      },
-      onGridSearch: (records, page, search) => {
-        let recs: DataRecord[] = [];
-        forEach(records, (rec) => {
-          recs.push({
-            ...rec,
-            label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
-          });
-        });
-        if (page.offset === 0) {
-          // add the extra fields at the end of the first page only
-          let extra = extraFields;
-          if (search && search.name) {
-            extra = extraFields?.filter(
-              (f) =>
-                f.name &&
-                unaccent(f.name.toLowerCase()).includes(
-                  unaccent(search.name.toLowerCase()),
-                ),
-            );
-          }
-          extra?.forEach((i) => recs.push(i));
+      content: (
+        <CustomizeSelectorDialog
+          view={view}
+          jsonFields={jsonFields}
+          excludeFields={currentFieldsInView}
+          onSelectionChange={(selection: DataRecord[]) => {
+            selected = selection;
+          }}
+        />
+      ),
+      size: "lg",
+      onClose: (isOk) => {
+        if (isOk) {
+          setRecords((_records) => [
+            ..._records,
+            ...(selected || [])
+              .filter((s) => !_records.find((r) => r.name === s.name))
+              .map((record) => ({
+                ...record,
+                title: record.label,
+              })),
+          ]);
         }
-        return recs;
-      },
-      onSelect: (selected) => {
-        setRecords((records) => [
-          ...records,
-          ...(selected || [])
-            .filter((s) => !records.find((r) => r.name === s.name))
-            .map((record) => ({
-              ...record,
-              type: "field",
-              title: record.label,
-            })),
-        ]);
       },
     });
-  }, [showSelector, view]);
+  }, [currentFieldsInView, jsonFields, view]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
       content: i18n.get("Do you really want to delete the selected record(s)?"),
     });
-    confirmed &&
-      setRecords((records) =>
-        records.filter((r, ind) => !selectedRows?.includes(ind)),
+    if (confirmed) {
+      setRecords((_records) =>
+        _records.filter((r, ind) => !selectedRows?.includes(ind))
       );
+    }
   }, [selectedRows]);
 
   useEffect(() => {
@@ -214,6 +162,7 @@ function CustomizeDialog({
     <Box d="flex" flexDirection="column" flex={1} p={3}>
       <Panel
         className={styles.panel}
+        contentClassName={styles.panelContent}
         header={title}
         toolbar={{
           items: [
@@ -293,6 +242,10 @@ export function useCustomizePopup({
   const canCustomize =
     allowCustomization && view?.name && isUserAllowedCustomizeViews();
 
+  const {
+    meta: { jsonFields },
+  } = useViewMeta();
+
   const showCustomizeDialog = useAtomCallback(
     useCallback(
       async (get, set, { title }: { title?: string }) => {
@@ -342,9 +295,9 @@ export function useCustomizePopup({
             title: i18n.get("OK"),
             variant: "primary",
             onClick: async (fn) => {
-              const view = getView?.(gridState);
-              if (view) {
-                await saveView(view);
+              const _view = getView?.(gridState);
+              if (_view) {
+                await saveView(_view);
                 fn(true);
                 reload();
               }
@@ -358,6 +311,7 @@ export function useCustomizePopup({
           content: (
             <CustomizeDialog
               view={view}
+              jsonFields={jsonFields}
               title={title}
               canShare={canShare}
               onUpdate={(fn) => {
@@ -370,7 +324,7 @@ export function useCustomizePopup({
           onClose: () => {},
         });
       },
-      [view, stateAtom],
+      [view, stateAtom, jsonFields],
     ),
   );
 

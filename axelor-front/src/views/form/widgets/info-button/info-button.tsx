@@ -73,6 +73,7 @@ export function InfoButton(props: WidgetProps) {
         className={clsx(styles.button)}
         disabled={disabled}
         onClick={handleClick}
+        data-testid="button"
       >
         {icon && (
           <Icon

@@ -1,6 +1,7 @@
 import {
   ForwardedRef,
   forwardRef,
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -30,10 +31,12 @@ export type {
   SelectValue,
 } from "@axelor/ui";
 
-export interface SelectProps<Type, Multiple extends boolean>
-  extends AxSelectProps<Type, Multiple> {
+export interface SelectProps<
+  Type,
+  Multiple extends boolean,
+> extends AxSelectProps<Type, Multiple> {
   canSelect?: boolean;
-  fetchOptions?: (inputValue: string) => Promise<Type[]>;
+  fetchOptions?: (inputValue: string, signal: AbortSignal) => Promise<Type[]>;
   canCreateOnTheFly?: boolean;
   canShowNoResultOption?: boolean;
   onShowCreateAndSelect?: (inputValue: string) => void;
@@ -43,10 +46,10 @@ export interface SelectProps<Type, Multiple extends boolean>
 
 const EMPTY: any[] = [];
 
-export const Select = forwardRef(function Select<
-  Type,
-  Multiple extends boolean,
->(props: SelectProps<Type, Multiple>, ref: ForwardedRef<HTMLDivElement>) {
+function SelectInner<Type, Multiple extends boolean>(
+  props: SelectProps<Type, Multiple>,
+  ref: ForwardedRef<HTMLDivElement>,
+): ReactElement | null {
   const {
     autoFocus,
     readOnly,
@@ -58,6 +61,7 @@ export const Select = forwardRef(function Select<
     onShowCreateAndSelect,
     onInputChange,
     onOpen,
+    onClose,
     canSelect = true,
     openOnFocus = true,
     value = null,
@@ -70,8 +74,10 @@ export const Select = forwardRef(function Select<
   const [inputValue, setInputValue] = useState("");
 
   const [ready, setReady] = useState(!fetchOptions);
-  const selectRef = useRefs(ref);
-  const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const selectRef = useRef<HTMLDivElement>(null);
+  const combinedRef = useRefs(selectRef, ref);
+  const loadTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const abortRef = useRef<AbortController>(undefined);
 
   const loadOptions = useCallback(
     (inputValue: string) => {
@@ -79,13 +85,36 @@ export const Select = forwardRef(function Select<
         clearTimeout(loadTimerRef.current);
       }
 
+      const abortController = new AbortController();
+      if (abortRef.current) {
+        abortRef.current.abort(
+          new DOMException("Concurrent request", "AbortError"),
+        );
+      }
+      abortRef.current = abortController;
+
       loadTimerRef.current = setTimeout(
         async () => {
           if (fetchOptions) {
-            const items = await fetchOptions(inputValue);
-            loadTimerRef.current = undefined;
-            setItems(items || []);
-            setReady(true);
+            try {
+              const items = await fetchOptions(
+                inputValue,
+                abortController.signal,
+              );
+              loadTimerRef.current = undefined;
+              if (!abortController.signal.aborted) {
+                setItems(items || []);
+                setReady(true);
+              }
+            } catch (error) {
+              // Ignore AbortError
+              if (
+                !(error instanceof DOMException) ||
+                error.name !== "AbortError"
+              ) {
+                throw error;
+              }
+            }
           }
         },
         inputValue ? 300 : 0,
@@ -94,25 +123,47 @@ export const Select = forwardRef(function Select<
     [fetchOptions],
   );
 
+  const refs = useRef({
+    fetchOptions,
+    loadOptions,
+    inputValue,
+  });
+
+  useEffect(() => {
+    refs.current = {
+      fetchOptions,
+      loadOptions,
+      inputValue,
+    };
+  }, [fetchOptions, loadOptions, inputValue]);
+
+  const isOpenRef = useRef(false);
+
   const handleOpen = useCallback(() => {
+    isOpenRef.current = true;
     if (onOpen) onOpen();
-    if (fetchOptions && !inputValue && !loadTimerRef.current) {
-      loadOptions("");
+    const {
+      fetchOptions: _fetchOptions,
+      loadOptions: _loadOptions,
+      inputValue: _inputValue,
+    } = refs.current;
+    if (_fetchOptions && !_inputValue && !loadTimerRef.current) {
+      _loadOptions("");
     }
-  }, [fetchOptions, inputValue, loadOptions, onOpen]);
+  }, [onOpen]);
 
   const handleClose = useCallback(() => {
+    isOpenRef.current = false;
+    onClose?.();
     setReady(false);
-  }, []);
+  }, [onClose]);
 
   const handleInputChange = useCallback(
     (text: string) => {
       setInputValue(text);
       if (onInputChange) onInputChange(text);
-      if (fetchOptions) {
-        if (text) {
-          loadOptions(text);
-        }
+      if (isOpenRef.current && fetchOptions) {
+        loadOptions(text);
       }
     },
     [fetchOptions, loadOptions, onInputChange],
@@ -222,7 +273,7 @@ export const Select = forwardRef(function Select<
       clearOnBlur
       clearOnEscape
       {...selectProps}
-      ref={selectRef}
+      ref={combinedRef}
       value={value}
       autoFocus={autoFocus}
       readOnly={readOnly || !canSelect}
@@ -232,7 +283,10 @@ export const Select = forwardRef(function Select<
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       onChange={handleChange}
-      className={clsx(className, { [styles.readonly]: readOnly })}
+      className={clsx(className, {
+        [styles.readonly]: readOnly,
+        [styles.disabled]: selectProps.disabled,
+      })}
       menuOptions={{
         maxWidth: 600,
         ...menuOptions,
@@ -242,7 +296,11 @@ export const Select = forwardRef(function Select<
       })}
     />
   );
-}) as unknown as <Type, Multiple extends boolean>(
-  props: SelectProps<Type, Multiple>,
-  ref: ForwardedRef<HTMLDivElement>,
-) => React.ReactNode;
+}
+
+export const Select = forwardRef(SelectInner) as <
+  Type,
+  Multiple extends boolean = false,
+>(
+  props: SelectProps<Type, Multiple> & { ref?: ForwardedRef<HTMLDivElement> },
+) => ReactElement | null;

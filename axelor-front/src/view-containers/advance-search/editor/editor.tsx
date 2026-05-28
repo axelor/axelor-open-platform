@@ -3,7 +3,8 @@ import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
-import { Box, Button, Divider, Input } from "@axelor/ui";
+import { Box, Button, clsx, Divider, Input } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select } from "@/components/select";
@@ -24,6 +25,20 @@ import { BooleanRadio, RelationalWidget } from "./components";
 import { Criteria } from "./criteria";
 
 import styles from "./editor.module.scss";
+
+const ARCHIVE_OPTIONS: {
+  title: string;
+  value: AdvancedSearchState["archiveType"];
+}[] = [
+  {
+    title: i18n.get("Archived only"),
+    value: "archived",
+  },
+  {
+    title: i18n.get("Include archived"),
+    value: "all",
+  },
+];
 
 export const getEditorDefaultState = () =>
   ({
@@ -50,9 +65,6 @@ function FormControl({
     </Box>
   );
 }
-
-const getFilterName = (title?: string) =>
-  title?.replace(" ", "_").toLowerCase();
 
 export interface EditorProps {
   stateAtom: AdvancedSearchAtom;
@@ -95,13 +107,13 @@ export function Editor({
       [stateAtom],
     ),
   );
-  const [archived, setArchived] = useAtom(
+  const [archiveType, setArchiveType] = useAtom(
     useMemo(
       () =>
         focusAtom(
           stateAtom,
-          (o) => o.archived,
-          (o, v) => ({ ...o, archived: v }),
+          (o) => o.archiveType,
+          (o, v) => ({ ...o, archiveType: v }),
         ),
       [stateAtom],
     ),
@@ -272,8 +284,6 @@ export function Editor({
       if (id && !savedAs) {
         savedFilter.id = id;
         savedFilter.version = version;
-      } else {
-        savedFilter.name = getFilterName(title);
       }
       onSave?.(savedFilter as SavedFilter);
     },
@@ -320,7 +330,14 @@ export function Editor({
     id && title && filters?.find((f) => f.id === id)?.title !== title;
 
   return (
-    <Box d="flex" flexDirection="column" alignItems="start" pt={2} g={2}>
+    <Box
+      d="flex"
+      flexDirection="column"
+      alignItems="start"
+      pt={2}
+      g={2}
+      data-testid={"filters-editor"}
+    >
       {(contextFields?.length ?? 0) > 0 && (
         <Box d="flex" alignItems="center" g={2}>
           <Box d="flex" alignItems="center">
@@ -374,15 +391,30 @@ export function Editor({
             { label: i18n.get("or"), value: "or" },
           ]}
         />
-        <FormControl title={i18n.get("Show archived")}>
-          <Input
-            type="checkbox"
-            checked={Boolean(archived)}
-            onChange={({ target: { checked } }) => setArchived(checked)}
-            name={"archived"}
-            m={0}
+        <Box title={i18n.get("Archived records options")}>
+          <Select
+            className={clsx(styles.archivedSelect, {
+              [styles.activeArchive]: archiveType !== "default",
+            })}
+            multiple={false}
+            clearIcon={archiveType !== "default" ? undefined : false}
+            autoComplete={false}
+            options={ARCHIVE_OPTIONS}
+            inputStartAdornment={
+              <BootstrapIcon
+                className={styles.archiveIcon}
+                icon={archiveType !== "default" ? "archive-fill" : "archive"}
+              />
+            }
+            optionKey={(x) => x.value!}
+            optionLabel={(x) => x.title}
+            optionEqual={(x, y) => x.value === y.value}
+            onChange={(val) => setArchiveType(val?.value || "default")}
+            value={ARCHIVE_OPTIONS.find((x) => x.value === archiveType)}
+            renderValue={() => null}
+            data-testid={"editor-archive"}
           />
-        </FormControl>
+        </Box>
       </Box>
       <Box
         d="flex"
@@ -390,6 +422,8 @@ export function Editor({
         alignItems="flex-start"
         g={2}
         w={100}
+        data-testid={"editor-criteria"}
+        role={"list"}
       >
         {criteria.map((item, index: number) => (
           <Criteria
@@ -403,20 +437,35 @@ export function Editor({
         ))}
       </Box>
       <Box d="flex" alignItems="center">
-        <Button variant="link" size="sm" onClick={handleCriteriaAdd}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={handleCriteriaAdd}
+          data-testid={"btn-add"}
+        >
           {i18n.get("Add filter")}
         </Button>
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
-        <Button variant="link" size="sm" onClick={() => onClear?.()}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => onClear?.()}
+          data-testid={"btn-clear-editor"}
+        >
           {i18n.get("Clear")}
         </Button>
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
         {canExport && (
-          <Button variant="link" size="sm" onClick={() => onExport?.()}>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => onExport?.()}
+            data-testid={"btn-export"}
+          >
             {i18n.get("Export")}
           </Button>
         )}
@@ -425,7 +474,12 @@ export function Editor({
         </Box>
         {canExportFull && canExport && (
           <>
-            <Button variant="link" size="sm" onClick={() => onExport?.(true)}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => onExport?.(true)}
+              data-testid={"btn-export-full"}
+            >
               {i18n.get("Export full")}
             </Button>
             <Box className={styles.divider}>
@@ -433,7 +487,12 @@ export function Editor({
             </Box>
           </>
         )}
-        <Button variant="link" size="sm" onClick={() => onApply?.()}>
+        <Button
+          variant="link"
+          size="sm"
+          onClick={() => onApply?.()}
+          data-testid={"btn-apply"}
+        >
           {i18n.get("Apply")}
         </Button>
       </Box>
@@ -446,6 +505,7 @@ export function Editor({
             placeholder={i18n.get("Save filter as")}
             value={title}
             onChange={(e) => handleChange("title", e.target.value)}
+            data-testid={"filter-title"}
           />
           {canShare && (
             <FormControl title={i18n.get("Share")}>
@@ -457,6 +517,7 @@ export function Editor({
                 }
                 name={"shared"}
                 m={0}
+                data-testid={"can-share"}
               />
             </FormControl>
           )}
@@ -468,6 +529,7 @@ export function Editor({
               size="sm"
               variant="primary"
               onClick={() => handleFilterSave()}
+              data-testid={"btn-save"}
             >
               {id ? i18n.get("Update") : i18n.get("Save")}
             </Button>
@@ -478,6 +540,7 @@ export function Editor({
               size="sm"
               variant="primary"
               onClick={() => handleFilterSave(true)}
+              data-testid={"btn-save-as"}
             >
               {i18n.get("Save as")}
             </Button>
@@ -488,6 +551,7 @@ export function Editor({
               size="sm"
               variant="danger"
               onClick={() => handleFilterRemove()}
+              data-testid={"btn-delete"}
             >
               {i18n.get("Delete")}
             </Button>

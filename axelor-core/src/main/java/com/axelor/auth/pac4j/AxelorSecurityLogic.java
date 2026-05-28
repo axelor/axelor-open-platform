@@ -1,34 +1,18 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
@@ -46,39 +30,35 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   @Inject
-  public AxelorSecurityLogic(
-      ErrorHandler errorHandler, Config config, ClientListService clientListService) {
+  public AxelorSecurityLogic(ErrorHandler errorHandler, ClientListService clientListService) {
     this.errorHandler = errorHandler;
-    setProfileManagerFactory(AxelorProfileManager::new);
+    defaultClientName = clientListService.getDefaultClientName();
 
-    final List<Authorizer> authorizers =
-        config.getAuthorizers().values().stream().collect(Collectors.toUnmodifiableList());
     setAuthorizationChecker(
         (context, sessionStore, profiles, authorizerNames, authorizersMap, clients) ->
-            authorizers.stream()
+            authorizersMap.values().stream()
                 .allMatch(authorizer -> authorizer.isAuthorized(context, sessionStore, profiles)));
 
-    final List<Matcher> matchers =
-        config.getMatchers().values().stream().collect(Collectors.toUnmodifiableList());
     setMatchingChecker(
-        (context, sessionStore, matcherNames, matchersMap, clients) ->
-            matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
-    defaultClientName = clientListService.getDefaultClientName();
+        (CallContext ctx,
+            String matchersValue,
+            Map<String, Matcher> matchersMap,
+            List<Client> clients) ->
+            matchersMap.values().stream().allMatch(matcher -> matcher.matches(ctx)));
   }
 
   @Override
   protected HttpAction redirectToIdentityProvider(
-      WebContext context, SessionStore sessionStore, List<Client> currentClients) {
-
+      final CallContext ctx, final List<Client> currentClients) {
+    final var context = ctx.webContext();
     final var currentClient = (IndirectClient) findClient(context, currentClients);
 
     if (currentClient.getRedirectionActionBuilder() == null) {
       currentClient.init(true);
     }
 
-    final Optional<RedirectionAction> action =
-        currentClient.getRedirectionAction(context, sessionStore);
-    return action.isPresent() ? action.get() : unauthorized(context, sessionStore, currentClients);
+    final Optional<RedirectionAction> action = currentClient.getRedirectionAction(ctx);
+    return action.isPresent() ? action.get() : unauthorized(ctx, currentClients);
   }
 
   @Override
@@ -98,6 +78,6 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     return clients.stream()
         .filter(client -> defaultClient.equals(client.getName()))
         .findFirst()
-        .orElseGet(() -> clients.get(0));
+        .orElseGet(clients::getFirst);
   }
 }

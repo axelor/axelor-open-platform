@@ -1,34 +1,19 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.socket.inject;
 
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.inject.Beans;
+import jakarta.websocket.Extension;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpSession;
-import javax.websocket.Extension;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
@@ -64,9 +49,7 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
   @Override
   public void modifyHandshake(
       ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
-    HttpSession httpSession = (HttpSession) request.getHttpSession();
     final Map<String, Object> properties = sec.getUserProperties();
-    properties.put(HttpSession.class.getName(), httpSession);
     properties.put(Subject.class.getName(), SecurityUtils.getSubject());
     properties.put(SecurityManager.class.getName(), SecurityUtils.getSecurityManager());
 

@@ -58,12 +58,19 @@ function updateRecord(
 
 export type DataStoreListener = (ds: DataStore) => void;
 
+export type DataStoreListenerOptions = {
+  /** Notify even when no changes */
+  force?: boolean;
+};
+
 export class DataStore extends DataSource {
   #options: SearchOptions;
   #records: DataRecord[] = [];
   #page: SearchPage = {};
 
-  #listeners: DataStoreListener[] = [];
+  readonly #listeners: DataStoreListener[] = [];
+
+  readonly #forcedListeners: DataStoreListener[] = [];
 
   constructor(model: string, options: SearchOptions = {}) {
     super(model);
@@ -87,8 +94,16 @@ export class DataStore extends DataSource {
     return this.#records;
   }
 
-  subscribe(listener: DataStoreListener) {
-    const listeners = this.#listeners;
+  clone(options?: SearchOptions) {
+    return new DataStore(this.model, {
+      ...this.#options,
+      ...options,
+    });
+  }
+
+  subscribe(listener: DataStoreListener, options?: DataStoreListenerOptions) {
+    const { force } = options ?? {};
+    const listeners = force ? this.#forcedListeners : this.#listeners;
     listeners.push(listener);
     return () => {
       const index = listeners.indexOf(listener);
@@ -98,8 +113,11 @@ export class DataStore extends DataSource {
     };
   }
 
-  #notify() {
-    this.#listeners.forEach((fn) => fn(this));
+  #notify(changed: boolean = true) {
+    this.#forcedListeners.forEach((listener) => listener(this));
+    if (changed) {
+      this.#listeners.forEach((listener) => listener(this));
+    }
   }
 
   #setVersion(context: DataContext, nested = false) {
@@ -156,7 +174,7 @@ export class DataStore extends DataSource {
     this.#records = _records;
     this.#page = _page;
 
-    if (changed) this.#notify();
+    this.#notify(changed);
   }
 
   async read(

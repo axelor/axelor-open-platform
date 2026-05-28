@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.report;
 
@@ -22,23 +8,19 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
-import com.axelor.db.internal.DBHelper;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.eclipse.birt.report.model.api.ModuleHandle;
-import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * This is a {@link ResourceLocator} that first searches external reports directory for the
- * resources and fallbacks to module resources if not found.
+ * This is a {@link IResourceLocator} that first searches external reports directory for the
+ * resources and falls back to module resources if not found.
  */
 public class ReportResourceLocator implements IResourceLocator {
 
@@ -46,14 +28,12 @@ public class ReportResourceLocator implements IResourceLocator {
 
   private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
 
-  private static final Logger log = LoggerFactory.getLogger(ReportResourceLocator.class);
-
   private Path searchPath;
 
   public ReportResourceLocator() {
     final String dir =
         AppSettings.get().getPath(AvailableAppSettings.REPORTS_DESIGN_DIR, DEFAULT_REPORT_DIR);
-    this.searchPath = Paths.get(dir);
+    this.searchPath = Path.of(dir);
   }
 
   @SuppressWarnings("rawtypes")
@@ -64,13 +44,6 @@ public class ReportResourceLocator implements IResourceLocator {
 
   @Override
   public URL findResource(ModuleHandle moduleHandle, String fileName, int type) {
-    if (DBHelper.isOracle() && fileName.endsWith(".rptlibrary")) {
-      final URL found =
-          find(moduleHandle, fileName.replace(".rptlibrary", ".oracle.rptlibrary"), type);
-      if (found != null) {
-        return found;
-      }
-    }
     return find(moduleHandle, fileName, type);
   }
 
@@ -96,8 +69,8 @@ public class ReportResourceLocator implements IResourceLocator {
     // if already an url
     if (URL_PATTERN.matcher(fileName).matches()) {
       try {
-        return new URL(fileName);
-      } catch (MalformedURLException e) {
+        return URI.create(fileName).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
       }
     }
 

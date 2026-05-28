@@ -13,10 +13,12 @@
 .item {
   position: relative;
   overflow: hidden;
+  align-items: center;
 
   .name {
     width: 50%;
     text-align: right;
+    overflow-wrap: anywhere;
   }
 
   .progress {
@@ -25,6 +27,9 @@
 
   .actions {
     width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     a {
       cursor: pointer;
     }

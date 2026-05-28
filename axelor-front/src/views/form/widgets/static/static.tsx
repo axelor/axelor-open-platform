@@ -6,7 +6,7 @@ export function Static({ schema, formAtom }: FieldProps<string>) {
   const { text } = schema;
   const { record } = useAtomValue(formAtom);
   return (
-    <div>
+    <div data-testid="static">
       <TemplateRenderer template={text} context={record} />
     </div>
   );

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.views;
 
@@ -37,18 +23,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("search")
@@ -146,7 +132,7 @@ public class Search extends AbstractView {
   }
 
   public ScriptHelper scriptHandler(Map<String, Object> variables) {
-    Map<String, Object> map = Maps.newHashMap(variables);
+    Map<String, Object> map = new HashMap<>(variables);
     for (BaseSearchField field : searchFields) {
       map.put(field.getName(), field.validate(variables.get(field.getName())));
     }
@@ -310,7 +296,7 @@ public class Search extends AbstractView {
 
       Class<? extends Model> klass = getModelClass();
 
-      List<Filter> all = Lists.newArrayList();
+      List<Filter> all = new ArrayList<>();
       Filter filter = where.build(scriptHelper);
       if (filter == null) {
         return null;
@@ -487,8 +473,8 @@ public class Search extends AbstractView {
       }
 
       for (int i = 1; i < names.length; i++) {
-        if (value instanceof Map) {
-          value = ((Map) value).get(names[i]);
+        if (value instanceof Map map) {
+          value = map.get(names[i]);
         } else if (value instanceof Model) {
           Mapper mapper = Mapper.of(value.getClass());
           value = mapper.get(value, names[i]);
@@ -503,7 +489,7 @@ public class Search extends AbstractView {
         return null;
       }
 
-      List<Filter> filters = Lists.newArrayList();
+      List<Filter> filters = new ArrayList<>();
       if (ObjectUtils.notEmpty(inputs)) {
         for (SearchSelectInput input : inputs) {
 
@@ -514,8 +500,8 @@ public class Search extends AbstractView {
 
           if (value != null) {
 
-            if (value instanceof String) {
-              value = ((String) value).trim();
+            if (value instanceof String string) {
+              value = string.trim();
             }
 
             Filter filter;

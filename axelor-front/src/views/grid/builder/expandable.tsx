@@ -32,10 +32,9 @@ import {
 import {
   Layout,
   fetchRecord,
-  showErrors,
   useFormPerms,
-  useGetErrors,
 } from "@/views/form";
+import { showErrors, useGetErrors } from "@/views/form/builder/form-errors";
 import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
@@ -67,6 +66,8 @@ export function ExpandIcon({
     </Box>
   );
 }
+
+const timeSymbol = Symbol("$$time");
 
 export function ExpandableFormView({
   gridView,
@@ -113,11 +114,11 @@ export function ExpandableFormView({
     onSave: onSaveAction,
   } = schema;
 
-  const fetchedRef = useRef<DataRecord>();
+  const fetchedRef = useRef<DataRecord>(null);
   const closeRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
+  const widgetHandler = useRef<FormWidgetsHandler>(null);
 
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);
@@ -127,6 +128,9 @@ export function ExpandableFormView({
   const showConfirmDirty = useViewConfirmDirty();
   const getErrors = useGetErrors();
 
+  // Intentionally capture the initial record only — the expandable form manages
+  // its own state via editorFormAtom and should not reset when the grid row updates.
+  // eslint-disable-next-line react-hooks/refs
   const editorRecord = useRef(record).current;
   const editorFormAtom = useMemo(
     () =>
@@ -193,11 +197,11 @@ export function ExpandableFormView({
         get,
         set,
         rec: DataRecord,
-        opts: { fromAction?: boolean } = {},
+        opts: { fromAction?: boolean; fromReload?: boolean } = {},
       ) => {
         let hasFetched = false;
 
-        const { fromAction } = opts;
+        const { fromAction, fromReload } = opts;
 
         const _record: DataRecord = await (async () => {
           const fields = Object.keys(meta.fields ?? {});
@@ -220,6 +224,7 @@ export function ExpandableFormView({
 
         const record: DataRecord = (fetchedRef.current = {
           id: rec.id,
+          [timeSymbol]: Date.now(),
           ..._record,
           ...(rec._dirty
             ? {
@@ -250,7 +255,7 @@ export function ExpandableFormView({
             await actionExecutor.execute(action);
           }
 
-          if (!isNew && fromAction) {
+          if (!isNew && (fromAction || fromReload)) {
             const event = new CustomEvent("form:refresh", {
               detail: { tabId, formId: record.id },
             });
@@ -408,7 +413,7 @@ export function ExpandableFormView({
   );
 
   const doRefresh = useCallback(() => {
-    if (record) doOnLoad(record);
+    if (record) doOnLoad(record, { fromReload: true });
   }, [record, doOnLoad]);
 
   const doActionReload = useCallback(async () => {

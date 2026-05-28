@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -118,18 +104,6 @@ public class JsonContext extends SimpleBindings {
     }
   }
 
-  private void ensureManaged(Object value) {
-    if (value instanceof Model) {
-      final Model bean = (Model) value;
-      if (bean.getId() == null || bean.getId() <= 0) {
-        throw new IllegalArgumentException();
-      }
-    }
-    if (value instanceof Collection) {
-      ((Collection<?>) value).forEach(this::ensureManaged);
-    }
-  }
-
   private void propagate() {
     context.put(jsonField, toJson(this));
   }
@@ -201,16 +175,15 @@ public class JsonContext extends SimpleBindings {
       return super.get(key);
     }
 
-    if (value instanceof Map) {
-      return ContextHandlerFactory.newHandler(targetClass, (Map) value).getProxy();
+    if (value instanceof Map map) {
+      return ContextHandlerFactory.newHandler(targetClass, map).getProxy();
     }
 
-    if (value instanceof Collection) {
-      return ((Collection<?>) value)
-          .stream()
-              .map(item -> (Map<String, Object>) item)
-              .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
-              .collect(Collectors.toList());
+    if (value instanceof Collection<?> collection) {
+      return collection.stream()
+          .map(item -> (Map<String, Object>) item)
+          .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
+          .collect(Collectors.toList());
     }
 
     return super.get(key);
@@ -218,11 +191,6 @@ public class JsonContext extends SimpleBindings {
 
   @Override
   public Object put(String name, Object value) {
-    try {
-      ensureManaged(value);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("cannot set unsaved values to field: " + name);
-    }
     try {
       return super.put(name, value);
     } finally {

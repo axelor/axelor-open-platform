@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -22,18 +8,27 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
-import com.axelor.common.StringUtils;
-import com.axelor.db.tenants.TenantResolver;
-import com.axelor.i18n.I18n;
+import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
+import com.axelor.db.Model;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
+import com.axelor.rpc.PendingExportService;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
-import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
-import com.google.common.io.Files;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
+import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -41,102 +36,126 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionExport extends Action {
 
-  private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
-  private static final String DEFAULT_DIR = "${date}/${name}";
+  private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
+  private static final String TEMPLATE_DIR =
+      AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
 
-  @XmlAttribute(name = "output")
-  private String output;
-
-  @XmlAttribute(name = "download")
-  private Boolean download;
+  @XmlAttribute private Boolean attachment;
 
   @XmlElement(name = "export")
   private List<Export> exports;
 
-  public String getOutput() {
-    return output;
-  }
-
-  public Boolean getDownload() {
-    return download;
+  public Boolean getAttachment() {
+    return attachment;
   }
 
   public List<Export> getExports() {
     return exports;
   }
 
-  public static File getExportPath() {
-    final Path exportPath =
-        Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
-    final String tenantId = TenantResolver.currentTenantIdentifier();
-    if (StringUtils.isBlank(tenantId)) {
-      return exportPath.toFile();
-    }
-    return exportPath.resolve(tenantId).toFile();
-  }
-
-  protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
+  protected PendingExport doExport(Export export, ActionHandler handler) throws IOException {
     String templatePath = handler.evaluate(export.template).toString();
 
-    Reader reader = null;
-
-    try {
-      File template = new File(templatePath);
-      if (template.isFile()) {
-        reader = new FileReader(template);
-      }
-
-      if (reader == null) {
-        InputStream is = ResourceUtils.getResourceStream(templatePath);
-        if (is == null) {
-          throw new FileNotFoundException("No such template: " + templatePath);
-        }
-        reader = new InputStreamReader(is);
-      }
-
-      String name = export.getName();
-      if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
-        name = handler.evaluate(toExpression(name, true)).toString();
-      }
-
+    try (Reader reader = createTemplateReader(templatePath)) {
+      String name = resolveExportName(export, handler);
       log.info("export {} as {}", templatePath, name);
 
-      Templates engine = new StringTemplates('$', '$');
-      if ("groovy".equals(export.engine)) {
-        engine = new GroovyTemplates();
-      }
+      String contents = handler.template(createTemplateEngine(export), reader);
 
-      File output = getExportPath();
-      output = FileUtils.getFile(output, dir, name);
+      InputStream stream = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
+      return new PendingExport(stream, name);
+    }
+  }
 
-      String contents = null;
+  /**
+   * Create a template engine based on the export engine.
+   *
+   * @param export the export definition
+   * @return the template engine
+   */
+  private Templates createTemplateEngine(Export export) {
+    if ("groovy".equals(export.engine)) {
+      return new GroovyTemplates();
+    }
 
-      contents = handler.template(engine, reader);
+    return new StringTemplates('$', '$');
+  }
 
-      Files.createParentDirs(output);
-      Files.asCharSink(output, Charsets.UTF_8).write(contents);
+  /**
+   * Resolve the export name.
+   *
+   * @param export the export definition
+   * @param handler the action handler
+   * @return the resolved export name
+   */
+  private String resolveExportName(Export export, ActionHandler handler) {
+    String name = export.getName();
 
-      log.info("file saved: {}", output);
+    if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
+      name = handler.evaluate(toExpression(name, true)).toString();
+    }
 
-      return FileUtils.getFile(dir, name).toString();
-    } finally {
-      if (reader != null) {
-        reader.close();
+    return FileUtils.safeFileName(name);
+  }
+
+  /**
+   * Find the template file.
+   *
+   * @param templatePath the template path
+   * @return the template file
+   */
+  private File findTemplateFile(String templatePath) {
+    Store store = FileStoreFactory.getStore();
+
+    if (store.hasFile(templatePath)) {
+      return store.getFile(templatePath);
+    }
+
+    // if not found, search the template directory
+    return FileUtils.getFile(TEMPLATE_DIR, templatePath);
+  }
+
+  /**
+   * Create the template reader.
+   *
+   * @param templatePath the template path
+   * @return the template reader
+   * @throws IOException if an I/O error occurs
+   */
+  private Reader createTemplateReader(String templatePath) throws IOException {
+    File templateFile = findTemplateFile(templatePath);
+
+    if (templateFile.isFile()) {
+      return new FileReader(templateFile);
+    }
+
+    InputStream resourceStream = ResourceUtils.getResourceStream(templatePath);
+    if (resourceStream == null) {
+      throw new FileNotFoundException("No such template: " + templatePath);
+    }
+
+    return new InputStreamReader(resourceStream);
+  }
+
+  @Override
+  protected void checkPermission(ActionHandler handler) {
+    super.checkPermission(handler);
+
+    if (Boolean.TRUE.equals(getAttachment())) {
+      var id = (Long) handler.getContext().get("id");
+
+      if (id != null) {
+        var klass = handler.getContext().getContextClass().asSubclass(Model.class);
+        handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);
       }
     }
   }
@@ -145,28 +164,32 @@ public class ActionExport extends Action {
   public Object evaluate(ActionHandler handler) {
     log.info("action-export: {}", getName());
 
-    String dir = output == null ? DEFAULT_DIR : output;
-
-    dir =
-        dir.replace("${name}", getName())
-            .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
-            .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
-    dir = handler.evaluate(dir).toString();
-
     for (Export export : exports) {
       if (!export.test(handler)) {
         continue;
       }
       final Map<String, Object> result = new HashMap<>();
+      InputStream exportStream = null;
       try {
-        String file = doExport(dir, export, handler);
-        if (Boolean.TRUE.equals(getDownload())) {
-          result.put("exportFile", file);
+        PendingExport pendingExport = doExport(export, handler);
+        exportStream = pendingExport.stream();
+        String exportName = pendingExport.name();
+        result.put("exportFile", exportName);
+
+        if (Boolean.TRUE.equals(getAttachment())) {
+          Long id = (Long) handler.getContext().get("id");
+          if (id != null) {
+            Class<? extends Model> modelClass =
+                handler.getContext().getContextClass().asSubclass(Model.class);
+            Model model = JPA.em().find(modelClass, id);
+            MetaFile attachedMetaFile = createAttachment(model, exportStream, exportName);
+            result.put("attached", attachedMetaFile);
+          }
+        } else {
+          String token = Beans.get(PendingExportService.class).add(exportStream);
+          result.put("exportToken", token);
         }
-        ActionValidateBuilder validateBuilder =
-            new ActionValidateBuilder(ValidatorType.NOTIFY)
-                .setMessage(I18n.get("Export complete."));
-        result.putAll(validateBuilder.build());
+
         return result;
       } catch (Exception e) {
         log.error("error while exporting: ", e);
@@ -174,9 +197,30 @@ public class ActionExport extends Action {
             new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
         result.putAll(validateBuilder.build());
         return result;
+      } finally {
+        close(exportStream);
       }
     }
     return null;
+  }
+
+  private MetaFile createAttachment(Model model, InputStream exportStream, String fileName) {
+    try {
+      var dmsFile = Beans.get(MetaFiles.class).attach(exportStream, fileName, model);
+      return dmsFile.getMetaFile();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  private void close(Closeable closeable) {
+    try {
+      if (closeable != null) {
+        closeable.close();
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   @XmlType

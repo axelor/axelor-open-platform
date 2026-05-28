@@ -3,8 +3,9 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 java {
+  withJavadocJar()
   toolchain {
-    languageVersion = JavaLanguageVersion.of(11)
+    languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
@@ -17,14 +18,10 @@ dependencies {
   }
 }
 
-configurations {
-  // Remove Junit4, only keep Junit5
-  testImplementation.exclude group: 'junit', module: 'junit'
-  testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-}
-
 configurations.all {
   exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+  exclude group: 'org.glassfish.jaxb', module: 'jaxb-runtime'
+  exclude group: 'commons-logging', module: 'commons-logging'
 
   resolutionStrategy {
     force libs.slf4j_api
@@ -34,5 +31,5 @@ configurations.all {
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
   options.compilerArgs = ['-Xlint:-options']
-     options.incremental = true
+  options.incremental = true
 }

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.dms.db.repo;
 
@@ -22,20 +8,22 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.PermissionRepository;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.tenants.TenantAware;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -43,8 +31,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
 
 public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
@@ -75,13 +61,14 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     final Permission permission =
         findOrCreate(
             "perm.dms.file.__read__",
-            "self.id = ANY(SELECT x.id FROM DMSFile x "
-                + "LEFT JOIN x.permissions x_permissions "
-                + "LEFT JOIN x_permissions.user x_permissions_user "
-                + "LEFT JOIN x_permissions.group x_permissions_group "
-                + "LEFT JOIN x_permissions.permission x_permissions_permission "
-                + "WHERE (x_permissions_user = ? OR x_permissions_group = ?) "
-                + "AND x_permissions_permission.canRead = true)",
+            """
+            self.id = ANY(SELECT x.id FROM DMSFile x \
+            LEFT JOIN x.permissions x_permissions \
+            LEFT JOIN x_permissions.user x_permissions_user \
+            LEFT JOIN x_permissions.group x_permissions_group \
+            LEFT JOIN x_permissions.permission x_permissions_permission \
+            WHERE (x_permissions_user = ? OR x_permissions_group = ?) \
+            AND x_permissions_permission.canRead = true)""",
             "__user__, __user__.group");
     permission.setCanCreate(false);
     permission.setCanRead(true);
@@ -109,13 +96,14 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
         permission =
             findOrCreate(
                 "perm.dms.file.__full__",
-                "self.id = ANY(SELECT x.id FROM DMSFile x "
-                    + "LEFT JOIN x.permissions x_permissions "
-                    + "LEFT JOIN x_permissions.user x_permissions_user "
-                    + "LEFT JOIN x_permissions.group x_permissions_group "
-                    + "LEFT JOIN x_permissions.permission x_permissions_permission "
-                    + "WHERE (x_permissions_user = ? OR x_permissions_group = ?) "
-                    + "AND x_permissions_permission.canCreate = true)",
+                """
+                self.id = ANY(SELECT x.id FROM DMSFile x \
+                LEFT JOIN x.permissions x_permissions \
+                LEFT JOIN x_permissions.user x_permissions_user \
+                LEFT JOIN x_permissions.group x_permissions_group \
+                LEFT JOIN x_permissions.permission x_permissions_permission \
+                WHERE (x_permissions_user = ? OR x_permissions_group = ?) \
+                AND x_permissions_permission.canCreate = true)""",
                 "__user__, __user__.group");
         permission.setCanCreate(true);
         permission.setCanRead(true);
@@ -126,13 +114,14 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
         permission =
             findOrCreate(
                 "perm.dms.file.__write__",
-                "self.id = ANY(SELECT x.id FROM DMSFile x "
-                    + "LEFT JOIN x.permissions x_permissions "
-                    + "LEFT JOIN x_permissions.user x_permissions_user "
-                    + "LEFT JOIN x_permissions.group x_permissions_group "
-                    + "LEFT JOIN x_permissions.permission x_permissions_permission "
-                    + "WHERE (x_permissions_user = ? OR x_permissions_group = ?) "
-                    + "AND x_permissions_permission.canWrite = true)",
+                """
+                self.id = ANY(SELECT x.id FROM DMSFile x \
+                LEFT JOIN x.permissions x_permissions \
+                LEFT JOIN x_permissions.user x_permissions_user \
+                LEFT JOIN x_permissions.group x_permissions_group \
+                LEFT JOIN x_permissions.permission x_permissions_permission \
+                WHERE (x_permissions_user = ? OR x_permissions_group = ?) \
+                AND x_permissions_permission.canWrite = true)""",
                 "__user__, __user__.group");
         permission.setCanCreate(false);
         permission.setCanRead(true);
@@ -220,7 +209,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     for (DMSFile parentFile = entity.getFile().getParent();
         parentFile != null;
         parentFile = parentFile.getParent()) {
-      if (!filterPermission(parentFile.getPermissions(), entity).findFirst().isPresent()) {
+      if (filterPermission(parentFile.getPermissions(), entity).findFirst().isEmpty()) {
         final DMSPermission dmsPermission = new DMSPermission();
         dmsPermission.setUser(entity.getUser());
         dmsPermission.setGroup(entity.getGroup());
@@ -260,63 +249,67 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
         .forEach(
             ids ->
                 executor.execute(
-                    new TenantAware(
-                        () -> {
-                          JPA.em()
-                              .createQuery(
-                                  "UPDATE DMSPermission self SET self.value = :value "
-                                      + "WHERE self.id IN :ids")
-                              .setParameter("value", entity.getValue())
-                              .setParameter("ids", ids)
-                              .executeUpdate();
-                          JPA.flush();
-                          JPA.clear();
-                        })));
+                    ContextAware.of()
+                        .build(
+                            () -> {
+                              JPA.em()
+                                  .createQuery(
+                                      """
+                                      UPDATE DMSPermission self SET self.value = :value \
+                                  WHERE self.id IN :ids""")
+                                  .setParameter("value", entity.getValue())
+                                  .setParameter("ids", ids)
+                                  .executeUpdate();
+                              JPA.flush();
+                              JPA.clear();
+                            })));
 
     Lists.partition(createPermissionFileIds, BATCH_SIZE)
         .forEach(
             ids ->
                 executor.execute(
-                    new TenantAware(
-                        () -> {
-                          final Group group =
-                              Optional.ofNullable(entity.getGroup())
-                                  .map(Group::getId)
-                                  .map(id -> JpaRepository.of(Group.class).find(id))
-                                  .orElse(null);
-                          final User user =
-                              Optional.ofNullable(entity.getUser())
-                                  .map(User::getId)
-                                  .map(id -> JpaRepository.of(User.class).find(id))
-                                  .orElse(null);
-                          final Permission permission =
-                              Optional.ofNullable(entity.getPermission())
-                                  .map(Permission::getId)
-                                  .map(id -> JpaRepository.of(Permission.class).find(id))
-                                  .orElse(null);
-                          JpaRepository.of(DMSFile.class)
-                              .all()
-                              .filter("self.id IN :ids")
-                              .bind("ids", ids)
-                              .fetch()
-                              .forEach(
-                                  file -> {
-                                    final DMSPermission dmsPermission = new DMSPermission();
-                                    dmsPermission.setValue(entity.getValue());
-                                    dmsPermission.setFile(file);
-                                    dmsPermission.setGroup(group);
-                                    dmsPermission.setUser(user);
-                                    dmsPermission.setPermission(permission);
-                                    JPA.em().persist(dmsPermission);
-                                  });
-                          JPA.flush();
-                          JPA.clear();
-                        })));
+                    ContextAware.of()
+                        .build(
+                            () -> {
+                              final Group group =
+                                  Optional.ofNullable(entity.getGroup())
+                                      .map(Group::getId)
+                                      .map(id -> JpaRepository.of(Group.class).find(id))
+                                      .orElse(null);
+                              final User user =
+                                  Optional.ofNullable(entity.getUser())
+                                      .map(User::getId)
+                                      .map(id -> JpaRepository.of(User.class).find(id))
+                                      .orElse(null);
+                              final Permission permission =
+                                  Optional.ofNullable(entity.getPermission())
+                                      .map(Permission::getId)
+                                      .map(id -> JpaRepository.of(Permission.class).find(id))
+                                      .orElse(null);
+                              JpaRepository.of(DMSFile.class)
+                                  .all()
+                                  .filter("self.id IN :ids")
+                                  .bind("ids", ids)
+                                  .fetch()
+                                  .forEach(
+                                      file -> {
+                                        final DMSPermission dmsPermission = new DMSPermission();
+                                        dmsPermission.setValue(entity.getValue());
+                                        dmsPermission.setFile(file);
+                                        dmsPermission.setGroup(group);
+                                        dmsPermission.setUser(user);
+                                        dmsPermission.setPermission(permission);
+                                        JPA.em().persist(dmsPermission);
+                                      });
+                              JPA.flush();
+                              JPA.clear();
+                            })));
   }
 
   private void recursiveRemoveHavingSamePermission(DMSPermission entity) {
     final JpaRepository<DMSFile> dmsFileRepo = JpaRepository.of(DMSFile.class);
-    final List<Long> entityIds = Lists.newArrayList(entity.getId());
+    final List<Long> entityIds = new ArrayList<>();
+    entityIds.add(entity.getId());
 
     // Find orphan parent permissions.
     for (DMSFile parentFile = entity.getFile().getParent();
@@ -325,8 +318,9 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
       if (dmsFileRepo
           .all()
           .filter(
-              "self.parent = :parent AND self != :baseFile "
-                  + "AND (self.permissions.user = :user OR self.permissions.group = :group)")
+              """
+              self.parent = :parent AND self != :baseFile \
+              AND (self.permissions.user = :user OR self.permissions.group = :group)""")
           .bind("parent", parentFile)
           .bind("baseFile", entity.getFile())
           .bind("user", entity.getUser())
@@ -402,6 +396,6 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
   }
 
   private int getValueLevel(DMSPermission entity) {
-    return ImmutableMap.of("READ", 1, "WRITE", 2, "FULL", 3).getOrDefault(entity.getValue(), 0);
+    return Map.of("READ", 1, "WRITE", 2, "FULL", 3).getOrDefault(entity.getValue(), 0);
   }
 }

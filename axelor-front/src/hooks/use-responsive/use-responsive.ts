@@ -1,4 +1,4 @@
-import { MutableRefObject } from "react";
+import { RefObject } from "react";
 
 import { device } from "@/utils/device";
 import { useContainerQuery } from "../use-container-query";
@@ -23,7 +23,7 @@ export function useResponsive() {
 }
 
 export function useResponsiveContainer(
-  ref: MutableRefObject<HTMLElement | null>
+  ref: RefObject<HTMLElement | null>
 ) {
   const xs = useContainerQuery(ref, "width < 576px");
   const sm = useContainerQuery(ref, "width < 768px");

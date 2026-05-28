@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth;
 
@@ -35,9 +21,9 @@ import com.axelor.auth.pac4j.ldap.AxelorLdapProfileService;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -139,7 +125,7 @@ public class LdapTest {
 
   void loginFailed() {
     try {
-      authLdap.validate(new UsernamePasswordCredentials("jsmith", "Password"), null, null);
+      authLdap.validate(null, new UsernamePasswordCredentials("jsmith", "Password"));
     } catch (CredentialsException e) {
       // ignore
     }
@@ -151,7 +137,7 @@ public class LdapTest {
     LdapProfile p = authLdap.findById("jsmith");
     assertNotNull(p);
 
-    authLdap.validate(new UsernamePasswordCredentials("jsmith", "password"), null, null);
+    authLdap.validate(null, new UsernamePasswordCredentials("jsmith", "password"));
     LdapProfile profile = authLdap.findById("jsmith");
     userService.saveUser(profile);
 

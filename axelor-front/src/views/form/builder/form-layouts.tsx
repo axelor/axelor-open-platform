@@ -1,5 +1,5 @@
 import { clsx } from "@axelor/ui";
-import { memo, useMemo } from "react";
+import { memo, useMemo, type JSX } from "react";
 
 import { Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";

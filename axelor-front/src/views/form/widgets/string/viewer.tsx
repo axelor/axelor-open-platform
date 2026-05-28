@@ -1,5 +1,5 @@
 import { AdornedInput, Box, Button, clsx } from "@axelor/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
 
 import { useAfterActions } from "../../builder/scope";
 import styles from "./string.module.scss";
@@ -23,11 +23,13 @@ function DottedViewerInput({ value: _value, ...inputProps }: any) {
 }
 
 export function ViewerInput({
+  id,
   name,
   value,
   type,
   endAdornment,
 }: {
+  id?: string;
   name?: string;
   type?: string;
   value: string | number;
@@ -38,6 +40,7 @@ export function ViewerInput({
     : AdornedInput;
   return (
     <InputComponent
+      id={id}
       px={0}
       type={type || "text"}
       value={value}
@@ -79,7 +82,6 @@ export function ViewerLink({
       alignSelf="start"
       textAlign="start"
       textDecoration="none"
-      overflow="hidden"
       onClick={onClick}
       tabIndex={-1}
       className={styles.viewer}

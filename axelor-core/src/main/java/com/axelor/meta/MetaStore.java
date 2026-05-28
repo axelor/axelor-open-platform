@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -23,7 +9,10 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -50,10 +39,7 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +50,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,13 +61,13 @@ public final class MetaStore {
 
   private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
-  private static final Cache<String, Action> ACTIONS =
-      CacheBuilder.newBuilder().maximumSize(1000).weakValues().build();
+  private static final AxelorCache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder("actions").maximumSize(1000).build(XMLViews::findAction);
 
   private MetaStore() {}
 
   /** Used for unit testing. */
-  static void resister(ObjectViews views) {
+  static void register(ObjectViews views) {
     try {
       for (Action item : views.getActions()) {
         ACTIONS.put(item.getName(), item);
@@ -90,13 +77,7 @@ public final class MetaStore {
   }
 
   public static Action getAction(String name) {
-    Action action = ACTIONS.getIfPresent(name);
-    if (action == null) {
-      action = XMLViews.findAction(name);
-      if (action != null) {
-        ACTIONS.put(name, action);
-      }
-    }
+    Action action = ACTIONS.get(name);
     if (action == null) {
       return null;
     }
@@ -105,6 +86,42 @@ public final class MetaStore {
       return action;
     }
     return null;
+  }
+
+  public static Map<String, Object> getPermissions(Property property) {
+    final Map<String, Object> map = new HashMap<>();
+    MetaPermissions perms = Beans.get(MetaPermissions.class);
+    final User user = AuthUtils.getUser();
+    if (user == null || AuthUtils.isAdmin(user)) {
+      return null;
+    }
+
+    // Field permissions
+    map.put("read", perms.canRead(user, property.getEntity().getName(), property.getName()));
+    map.put("write", perms.canWrite(user, property.getEntity().getName(), property.getName()));
+    map.put("export", perms.canExport(user, property.getEntity().getName(), property.getName()));
+
+    // Model permissions
+    final Map<String, Object> modelPerms =
+        property.getTarget() != null ? getPermissions(property.getTarget()) : new HashMap<>();
+
+    if (ObjectUtils.isEmpty(modelPerms)) {
+      return map;
+    }
+
+    // Merge Model & Field permissions
+    for (String key : modelPerms.keySet()) {
+      boolean modelPerm =
+          ObjectUtils.isEmpty(modelPerms.get(key))
+              || Boolean.parseBoolean(modelPerms.get(key).toString());
+      if (map.containsKey(key)) {
+        map.replace(key, Boolean.parseBoolean(map.get(key).toString()) && modelPerm);
+      } else {
+        map.put(key, modelPerm);
+      }
+    }
+
+    return map;
   }
 
   public static Map<String, Object> getPermissions(Class<?> model) {
@@ -146,12 +163,16 @@ public final class MetaStore {
 
   public static Map<String, Object> findFields(
       final Class<?> modelClass, final Collection<String> names) {
+    return findFields(modelClass, names, null);
+  }
+
+  public static Map<String, Object> findFields(
+      final Class<?> modelClass, final Collection<String> names, String jsonModel) {
     final Map<String, Object> data = new HashMap<>();
     final Mapper mapper = Mapper.of(modelClass);
     final Map<String, Property> fieldsMap = new LinkedHashMap<>();
     final List<Object> fields = new ArrayList<>();
 
-    boolean massUpdate = false;
     Object bean = null;
     try {
       bean = modelClass.getDeclaredConstructor().newInstance();
@@ -170,12 +191,7 @@ public final class MetaStore {
       if (property.isEnum()) {
         map.put("selectionList", getSelectionList(property.getEnumType()));
       }
-      if (property.getTarget() != null) {
-        map.put("perms", getPermissions(property.getTarget()));
-      }
-      if (property.isMassUpdate() && !name.contains(".")) {
-        massUpdate = true;
-      }
+      map.put("perms", getPermissions(property));
       // find the default value
       if (!property.isTransient() && !property.isVirtual()) {
         Object obj = null;
@@ -202,11 +218,13 @@ public final class MetaStore {
     }
 
     Map<String, Object> perms = getPermissions(modelClass);
-    if (massUpdate) {
-      if (perms == null) {
-        perms = new HashMap<>();
-      }
-      perms.put("massUpdate", massUpdate);
+
+    data.put("perms", perms);
+    data.put("fields", fields);
+
+    // Don't process dotted json fields for custom models if jsonModel is not given
+    if (MetaJsonRecord.class.isAssignableFrom(modelClass) && StringUtils.isBlank(jsonModel)) {
+      return data;
     }
 
     // find dotted json fields
@@ -222,7 +240,11 @@ public final class MetaStore {
         continue;
       }
       if (!jsonFields.containsKey(first)) {
-        jsonFields.put(first, findJsonFields(modelClass.getName(), first));
+        var jsonAttrs =
+            StringUtils.isBlank(jsonModel)
+                ? findJsonFields(modelClass.getName(), first)
+                : findJsonFields(jsonModel);
+        jsonFields.put(first, jsonAttrs);
       }
       final Map<String, Object> jsonField = jsonFields.get(first);
       if (jsonField != null && jsonField.containsKey(field)) {
@@ -234,9 +256,6 @@ public final class MetaStore {
         }
       }
     }
-
-    data.put("perms", perms);
-    data.put("fields", fields);
 
     return data;
   }
@@ -429,13 +448,17 @@ public final class MetaStore {
         attrs.put("target", MetaJsonRecord.class.getName());
         if (record.getTargetJsonModel() != null) {
           final MetaJsonModel targetModel = record.getTargetJsonModel();
-          String domain = String.format("self.jsonModel = '%s'", targetModel.getName());
+          String domain = "self.jsonModel = '%s'".formatted(targetModel.getName());
           if (!StringUtils.isBlank(record.getDomain())) {
-            domain = String.format("(%s) AND (%s)", domain, record.getDomain());
+            domain = "(%s) AND (%s)".formatted(domain, record.getDomain());
           }
           attrs.put("domain", domain);
-          attrs.put("gridView", targetModel.getGridView().getName());
-          attrs.put("formView", targetModel.getFormView().getName());
+          if (targetModel.getGridView() != null) {
+            attrs.put("gridView", targetModel.getGridView().getName());
+          }
+          if (targetModel.getFormView() != null) {
+            attrs.put("formView", targetModel.getFormView().getName());
+          }
           attrs.put("targetName", "name");
           attrs.put("jsonTarget", targetModel.getName());
         }
@@ -484,9 +507,9 @@ public final class MetaStore {
       Map<String, Object> data = new HashMap<>();
       option.setData(data);
 
-      if (item instanceof ValueEnum<?>) {
-        Object value = ((ValueEnum<?>) item).getValue();
-        if (!Objects.equal(name, value)) {
+      if (item instanceof ValueEnum<?> enumValue) {
+        Object value = enumValue.getValue();
+        if (!Objects.equals(name, value)) {
           data.put("value", value);
         }
       }

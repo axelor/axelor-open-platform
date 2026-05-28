@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.mail.web;
 
@@ -36,75 +22,75 @@ import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
 import com.axelor.team.db.Team;
 import com.axelor.team.db.repo.TeamRepository;
+import jakarta.inject.Inject;
+import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.persistence.TypedQuery;
 
 public class MailController extends JpaSupport {
 
   private static final String SQL_UNREAD =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isRead IS NULL OR g.isRead = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isRead IS NULL OR g.isRead = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_SUBSCRIBERS =
-      ""
-          + "SELECT DISTINCT(u) FROM User u "
-          + "LEFT JOIN u.group g "
-          + "LEFT JOIN u.roles r "
-          + "LEFT JOIN g.roles gr "
-          + "WHERE "
-          + "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-          + "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR "
-          + "	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR "
-          + " (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))";
+      """
+      SELECT DISTINCT(u) FROM User u \
+      LEFT JOIN u.group g \
+      LEFT JOIN u.roles r \
+      LEFT JOIN g.roles gr \
+      WHERE \
+      (u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND \
+      ((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR \
+      	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR \
+       (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))""";
 
   private static final String SQL_INBOX =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_IMPORTANT =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isStarred = true AND g.isArchived = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isStarred = true AND g.isArchived = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_ARCHIVE =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isArchived = true) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isArchived = true) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   @Inject private MailMessageRepository messages;
 
@@ -172,7 +158,7 @@ public class MailController extends JpaSupport {
 
     String type = (String) request.getRawContext().get("type");
 
-    final Model related = (Model) request.getRecords().get(0);
+    final Model related = (Model) request.getRecords().getFirst();
     final List<MailMessage> all =
         messages.findBy(type, related, request.getLimit(), request.getOffset());
 
@@ -195,7 +181,7 @@ public class MailController extends JpaSupport {
       return;
     }
 
-    final MailMessage parent = messages.find((Long) request.getRecords().get(0));
+    final MailMessage parent = messages.find((Long) request.getRecords().getFirst());
 
     if (parent == null) {
       return;
@@ -279,7 +265,7 @@ public class MailController extends JpaSupport {
     if (unread == null) {
       unread = 0L;
     }
-    return String.format("%s/%s", unread, total);
+    return "%s/%s".formatted(unread, total);
   }
 
   private List<MailMessage> findChildren(MailMessage message) {

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code;
 
@@ -29,6 +15,12 @@ import com.axelor.common.FileUtils;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Widget;
 import com.axelor.tools.code.entity.EntityGenerator;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -44,18 +36,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import org.hibernate.annotations.Type;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -129,7 +115,7 @@ public class TestMergeFields {
     final List<Class<?>> entities = loadEntities("MyName");
     final String field = "myName";
 
-    assertNull(getAnnotation(entities.get(0), field, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), field, NameColumn.class));
     assertNotNull(getAnnotation(entities.get(2), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), field, NameColumn.class));
@@ -142,7 +128,7 @@ public class TestMergeFields {
     final List<Class<?>> entities = loadEntities("MyOtherName");
     final String field = "myName";
 
-    assertNull(getAnnotation(entities.get(0), field, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(2), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), field, NameColumn.class));
@@ -151,7 +137,7 @@ public class TestMergeFields {
 
     final String otherField = "myOtherName";
 
-    assertNull(getAnnotation(entities.get(0), otherField, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), otherField, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), otherField, NameColumn.class));
     assertNotNull(getAnnotation(entities.get(2), otherField, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), otherField, NameColumn.class));
@@ -233,7 +219,7 @@ public class TestMergeFields {
   List<Class<?>> loadEntities(String name) throws Exception {
     final List<Class<?>> classes = new ArrayList<>();
     for (int i = 0; i < 6; ++i) {
-      classes.add(loadEntity(String.format("%s%d", name, i)));
+      classes.add(loadEntity("%s%d".formatted(name, i)));
     }
     return classes;
   }

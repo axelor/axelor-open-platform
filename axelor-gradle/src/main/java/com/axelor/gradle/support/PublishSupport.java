@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.gradle.support;
 
@@ -27,7 +13,8 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.jvm.tasks.Jar;
+import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin;
 
 public class PublishSupport extends AbstractSupport {
@@ -54,10 +41,10 @@ public class PublishSupport extends AbstractSupport {
 
     final SourceSet main = extension.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
     final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
-    final Jar sourcesJar =
+    final TaskProvider<Jar> sourcesJar =
         project
             .getTasks()
-            .create(
+            .register(
                 "sourcesJar",
                 Jar.class,
                 task -> {
@@ -68,14 +55,18 @@ public class PublishSupport extends AbstractSupport {
                 });
 
     if (project.getPlugins().hasPlugin(JavaGradlePluginPlugin.class)) {
+      if (project.getPlugins().hasPlugin("com.gradle.plugin-publish")) {
+        // Since version 1.0.0, Plugin Publish Plugin automatically applies Maven Publish Plugin
+        // https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#plugin-publishing-plugin
+        return;
+      }
+
       publishing
           .getPublications()
           .create(
               "pluginMaven",
               MavenPublication.class,
-              publication -> {
-                publication.artifact(sourcesJar);
-              });
+              publication -> publication.artifact(sourcesJar));
     } else {
       publishing
           .getPublications()

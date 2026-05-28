@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.views;
 
@@ -37,6 +23,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.TypedQuery;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,12 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import javax.persistence.TypedQuery;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.EXISTING_PROPERTY, property = "type")
@@ -338,16 +324,17 @@ public abstract class AbstractView {
     final TypedQuery<Object[]> query =
         JPA.em()
             .createQuery(
-                "SELECT self.field, self.type, self.help, self.style "
-                    + "FROM MetaHelp self "
-                    + "WHERE self.model = :model AND (self.view = :view OR self.view IS NULL) AND self.language IN (:lang, :baseLang) "
-                    + "ORDER BY self.view ASC, self.language DESC",
+                """
+                SELECT self.field, self.type, self.help, self.style \
+                FROM MetaHelp self \
+                WHERE self.model = :model AND (self.view = :view OR self.view IS NULL) AND self.language IN (:lang, :baseLang) \
+                ORDER BY self.view ASC, self.language DESC""",
                 Object[].class)
             .setParameter("lang", lang)
             .setParameter("baseLang", baseLang)
             .setParameter("model", getModel())
             .setParameter("view", getName())
-            .setHint(QueryHints.HINT_CACHEABLE, true);
+            .setHint(AvailableHints.HINT_CACHEABLE, true);
 
     final List<Object[]> found = query.getResultList();
 

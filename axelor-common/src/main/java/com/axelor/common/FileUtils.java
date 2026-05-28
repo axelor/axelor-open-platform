@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common;
 
@@ -23,18 +9,22 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import com.google.common.base.Preconditions;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumSet;
+import java.util.Objects;
 
 /** This class provides some helper methods to deal with files. */
 public final class FileUtils {
@@ -47,7 +37,7 @@ public final class FileUtils {
    * @return the file
    */
   public static File getFile(String first, String... more) {
-    Preconditions.checkNotNull(first, "first element must not be null");
+    Objects.requireNonNull(first, "first element must not be null");
     File file = new File(first);
     if (more != null) {
       for (String name : more) {
@@ -66,8 +56,8 @@ public final class FileUtils {
    * @return the file
    */
   public static File getFile(File directory, String next, String... more) {
-    Preconditions.checkNotNull(directory, "directory must not be null");
-    Preconditions.checkNotNull(next, "next element must not be null");
+    Objects.requireNonNull(directory, "directory must not be null");
+    Objects.requireNonNull(next, "next element must not be null");
     File file = new File(directory, next);
     if (more != null) {
       for (String name : more) {
@@ -207,7 +197,7 @@ public final class FileUtils {
    *   <li>Replaces spaces and consecutive underscore with a single dash
    *   <li>Trims dot, dash and underscore from beginning and end of filename (with and without the
    *       extension part)
-   *       <ul>
+   * </ul>
    *
    * @param originalFileName The filename to be sanitized
    * @return string The sanitized filename
@@ -297,5 +287,130 @@ public final class FileUtils {
     }
 
     return fileName;
+  }
+
+  /**
+   * Return the name of the file
+   *
+   * @param filePath the file path
+   * @return name of the file
+   */
+  public static String getFileName(String filePath) {
+    if (filePath == null) {
+      return null;
+    }
+
+    return getFileName(Path.of(filePath));
+  }
+
+  /**
+   * Return the name of the file
+   *
+   * @param filePath the file path
+   * @return name of the file
+   */
+  public static String getFileName(Path filePath) {
+    if (filePath == null) {
+      return null;
+    }
+
+    return filePath.getFileName().toString();
+  }
+
+  /**
+   * Copy the contents of the given source file to the given destination file.
+   *
+   * @param source the source file to copy from
+   * @param destination the destination file to copy to
+   * @throws IOException in case of I/O errors
+   */
+  public static void copyFile(File source, File destination) throws IOException {
+    if (!source.exists()) {
+      return;
+    }
+
+    write(destination, new FileInputStream(source));
+  }
+
+  public static void copyPath(Path source, Path destination) throws IOException {
+    if (!Files.exists(source)) {
+      return;
+    }
+
+    write(destination, Files.newInputStream(source));
+  }
+
+  private static final int BUFFER_SIZE = 4096;
+
+  /**
+   * Copy the contents of the given InputStream to the given File.
+   *
+   * @param file the file to copy to
+   * @param inputStream the inputStream to copy from
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(File file, InputStream inputStream) throws IOException {
+    write(file, inputStream, false);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given File.
+   *
+   * @param file the file to copy to
+   * @param inputStream the inputStream to copy from
+   * @param append write to the end of the file rather than the beginning
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(File file, InputStream inputStream, boolean append) throws IOException {
+    write(file.toPath(), inputStream, append);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given Path.
+   *
+   * @param path the path to copy to
+   * @param inputStream the inputStream to copy from
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(Path path, InputStream inputStream) throws IOException {
+    write(path, inputStream, false);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given Path.
+   *
+   * @param path the path to copy to
+   * @param inputStream the inputStream to copy from
+   * @param append write to the end of the file rather than the beginning
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(Path path, InputStream inputStream, boolean append) throws IOException {
+    Files.createDirectories(path.getParent());
+
+    try (BufferedOutputStream bos =
+        new BufferedOutputStream(
+            Files.newOutputStream(
+                path, append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE))) {
+      int read = 0;
+      byte[] bytes = new byte[BUFFER_SIZE];
+      while ((read = inputStream.read(bytes)) != -1) {
+        bos.write(bytes, 0, read);
+      }
+      bos.flush();
+    }
+  }
+
+  /**
+   * Check if the candidate path is located inside the parent path
+   *
+   * @param parent the parent path
+   * @param candidate the candidate path
+   * @return tru if the candidate path is located inside the parent path, otherwise false
+   */
+  public static boolean isChildPath(Path parent, Path candidate) {
+    final Path normalizedParent = parent.normalize();
+    final Path normalizedCandidate = normalizedParent.resolve(candidate).normalize();
+    return normalizedCandidate.startsWith(normalizedParent)
+        && !normalizedCandidate.equals(normalizedParent);
   }
 }

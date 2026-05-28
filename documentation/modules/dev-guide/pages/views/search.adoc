@@ -123,6 +123,6 @@ Some `<action-menu>` can be defined in order to run quick actions. The `Launch` 
 <1> : All not null search fields
 <2> : Selected search result ids group by model
 
-a special `__ref__` built-in variable can be used in expression. It will refer to the first selected record in
+a special `\\__ref__` built-in variable can be used in expression. It will refer to the first selected record in
 multi-object search view.
 

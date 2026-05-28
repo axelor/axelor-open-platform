@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -26,10 +12,8 @@ import com.axelor.common.XMLUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.Position;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +45,7 @@ public abstract class AbstractXmlProcessor {
   static final String MENU_BAR = "menubar";
   static final String PANEL_MAIL = "panel-mail";
   static final Map<Position, Position> ROOT_NODE_POSITION_MAP =
-      ImmutableMap.of(Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
+      Map.of(Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
 
   static AppConfig appConfigProvider;
 
@@ -109,20 +93,18 @@ public abstract class AbstractXmlProcessor {
   private static final Pattern NS_PATTERN = Pattern.compile("/(\\w)");
 
   public static final LoadingCache<String, XPathExpression> XPATH_EXPRESSION_CACHE =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .maximumSize(10_000)
           .build(
-              new CacheLoader<String, XPathExpression>() {
-                public XPathExpression load(String key) throws Exception {
-                  XPath xPath;
+              key -> {
+                XPath xPath;
 
-                  synchronized (XPATH_FACTORY) {
-                    xPath = XPATH_FACTORY.newXPath();
-                  }
-
-                  xPath.setNamespaceContext(NS_CONTEXT);
-                  return xPath.compile(NS_PATTERN.matcher(key).replaceAll("/:$1"));
+                synchronized (XPATH_FACTORY) {
+                  xPath = XPATH_FACTORY.newXPath();
                 }
+
+                xPath.setNamespaceContext(NS_CONTEXT);
+                return xPath.compile(NS_PATTERN.matcher(key).replaceAll("/:$1"));
               });
 
   public Object evaluateXPath(
@@ -134,12 +116,12 @@ public abstract class AbstractXmlProcessor {
   private String prepareXPathExpression(String subExpression, String name, String type) {
     final String rootExpr = "/:object-views/:%s[@name='%s']";
     final String expr = subExpression.startsWith("/") ? subExpression.substring(1) : subExpression;
-    return String.format(expr.isEmpty() ? rootExpr : rootExpr + "/" + expr, type, name, expr);
+    return (expr.isEmpty() ? rootExpr : rootExpr + "/" + expr).formatted(type, name, expr);
   }
 
   private Object evaluateXPath(String expression, Object item, QName returnType)
       throws XPathExpressionException {
-    XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.getUnchecked(expression);
+    XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.get(expression);
 
     synchronized (xPathExpression) {
       return xPathExpression.evaluate(item, returnType);
@@ -148,8 +130,8 @@ public abstract class AbstractXmlProcessor {
 
   public List<Element> findElements(NodeList nodeList) {
     return nodeListToStream(nodeList)
-        .filter(node -> node instanceof Element)
-        .map(node -> (Element) node)
+        .filter(Element.class::isInstance)
+        .map(Element.class::cast)
         .collect(Collectors.toList());
   }
 
@@ -161,7 +143,7 @@ public abstract class AbstractXmlProcessor {
 
   public Node findViewNode(Document document) {
     return nodeListToStream(document.getFirstChild().getChildNodes())
-        .filter(node -> node instanceof Element)
+        .filter(Element.class::isInstance)
         .findFirst()
         .orElseThrow(NoSuchElementException::new);
   }
@@ -171,7 +153,7 @@ public abstract class AbstractXmlProcessor {
   }
 
   public List<Node> nodeListToList(NodeList nodeList) {
-    return new AbstractList<Node>() {
+    return new AbstractList<>() {
       @Override
       public int size() {
         return nodeList.getLength();

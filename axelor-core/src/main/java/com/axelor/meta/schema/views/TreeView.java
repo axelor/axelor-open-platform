@@ -1,35 +1,24 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 @XmlType
 @JsonTypeName("tree")
@@ -88,6 +77,9 @@ public class TreeView extends AbstractView {
     @XmlAttribute private String domain;
 
     @XmlAttribute private String orderBy;
+
+    @XmlAttribute(name = "x-json-model")
+    private String jsonModel;
 
     @XmlElements({
       @XmlElement(name = "field", type = NodeField.class),
@@ -151,10 +143,21 @@ public class TreeView extends AbstractView {
       this.orderBy = orderBy;
     }
 
+    public String getJsonModel() {
+      return jsonModel;
+    }
+
+    public void setJsonModel(String jsonModel) {
+      this.jsonModel = jsonModel;
+    }
+
     public List<AbstractWidget> getItems() {
       if (items != null) {
         for (AbstractWidget item : items) {
           item.setModel(model);
+          if (item instanceof NodeField) {
+            ((NodeField) item).setNodeJsonModel(jsonModel);
+          }
         }
       }
       return items;
@@ -171,12 +174,79 @@ public class TreeView extends AbstractView {
 
     @XmlAttribute private String as;
 
+    private String nodeJsonModel;
+
     public String getAs() {
       return as;
     }
 
     public void setAs(String as) {
       this.as = as;
+    }
+
+    public void setNodeJsonModel(String jsonModel) {
+      this.nodeJsonModel = jsonModel;
+    }
+
+    private Class<?> getNodeFieldTargetClass() {
+      try {
+
+        if (StringUtils.isBlank(nodeJsonModel)) {
+          Mapper mapper = Mapper.of(Class.forName(this.getModel()));
+          return mapper.getProperty(getName()).getTarget();
+        }
+
+        Class<?> modelClass = Class.forName(this.getModel());
+        Mapper mapper = Mapper.of(modelClass);
+
+        int dotIndex = getName().indexOf('.');
+        if (dotIndex > 0) {
+          String jsonField = getName().substring(0, dotIndex);
+          String fieldName = getName().substring(dotIndex + 1);
+          Property jsonProperty = mapper.getProperty(jsonField);
+
+          if (jsonProperty != null && jsonProperty.isJson()) {
+            Map<String, Object> jsonFields =
+                StringUtils.notBlank(nodeJsonModel)
+                    ? MetaStore.findJsonFields(nodeJsonModel)
+                    : MetaStore.findJsonFields(modelClass.getName(), jsonField);
+
+            if (jsonFields != null && jsonFields.containsKey(fieldName)) {
+              Map<String, Object> attrs = (Map<String, Object>) jsonFields.get(fieldName);
+              String target = (String) attrs.get("target");
+              if (target != null) {
+                return Class.forName(target);
+              }
+            }
+          }
+        }
+
+        return null;
+
+      } catch (ClassNotFoundException | NullPointerException e) {
+        return null;
+      }
+    }
+
+    @Override
+    public String getTarget() {
+      try {
+        return getNodeFieldTargetClass().getName();
+      } catch (NullPointerException e) {
+        return null;
+      }
+    }
+
+    @Override
+    public String getTargetName() {
+      String targetModel = getTarget();
+      if (targetModel == null) return null;
+      try {
+        return Mapper.of(Class.forName(targetModel)).getNameField().getName();
+      } catch (Exception e) {
+        // ignore
+      }
+      return null;
     }
 
     @Override

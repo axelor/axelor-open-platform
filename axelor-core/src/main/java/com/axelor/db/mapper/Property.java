@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.mapper;
 
@@ -26,9 +12,26 @@ import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.converters.AbstractEncryptedConverter;
+import com.axelor.db.hibernate.type.EncryptedTextType;
+import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.i18n.I18n;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -43,25 +46,12 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-import javax.persistence.Version;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import org.hibernate.Length;
+import org.hibernate.usertype.UserType;
 
 public class Property {
 
@@ -164,20 +154,18 @@ public class Property {
 
     for (Annotation annotation : annotations) {
 
-      if (annotation instanceof Lob) {
-        if (type == PropertyType.STRING) type = PropertyType.TEXT;
-        else if (type != PropertyType.TEXT) type = PropertyType.BINARY;
-      }
-
       if (javaType == BigDecimal.class) {
         type = PropertyType.DECIMAL;
       }
+      if (javaType == UUID.class) {
+        type = PropertyType.UUID;
+      }
 
-      if (annotation instanceof OneToOne) {
+      if (annotation instanceof OneToOne oneToOne) {
         type = PropertyType.ONE_TO_ONE;
         target = (Class<? extends Model>) javaType;
-        mappedBy = ((OneToOne) annotation).mappedBy();
-        orphan = !((OneToOne) annotation).orphanRemoval();
+        mappedBy = oneToOne.mappedBy();
+        orphan = !oneToOne.orphanRemoval();
       }
 
       if (annotation instanceof ManyToOne) {
@@ -185,19 +173,19 @@ public class Property {
         target = (Class<? extends Model>) javaType;
       }
 
-      if (annotation instanceof OneToMany) {
+      if (annotation instanceof OneToMany oneToMany) {
         type = PropertyType.ONE_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = ((OneToMany) annotation).mappedBy();
-        orphan = !((OneToMany) annotation).orphanRemoval();
+        mappedBy = oneToMany.mappedBy();
+        orphan = !oneToMany.orphanRemoval();
       }
 
-      if (annotation instanceof ManyToMany) {
+      if (annotation instanceof ManyToMany manyToMany) {
         type = PropertyType.MANY_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = ((ManyToMany) annotation).mappedBy();
+        mappedBy = manyToMany.mappedBy();
       }
 
       if (annotation instanceof Id) {
@@ -211,39 +199,37 @@ public class Property {
         hidden = true;
       }
 
-      if (annotation instanceof Column) {
-        unique = ((Column) annotation).unique();
-        nullable = ((Column) annotation).nullable();
+      if (annotation instanceof Column column) {
+        unique = column.unique();
+        nullable = column.nullable();
+
+        if (column.length() >= Length.LONG32 && type == PropertyType.STRING) {
+          type = PropertyType.TEXT;
+        }
       }
 
       // Give javax.validators precedence
       if (annotation instanceof NotNull) {
         required = true;
       }
-      if (annotation instanceof Size) {
-        Size s = (Size) annotation;
+      if (annotation instanceof Size s) {
         maxSize = s.max();
         minSize = s.min();
       }
-      if (annotation instanceof Digits) {
-        Digits d = (Digits) annotation;
+      if (annotation instanceof Digits d) {
         scale = d.fraction();
         precision = d.integer() + scale;
       }
-      if (annotation instanceof Min) {
-        Min m = (Min) annotation;
+      if (annotation instanceof Min m) {
         minSize = m.value();
       }
-      if (annotation instanceof Max) {
-        Max m = (Max) annotation;
+      if (annotation instanceof Max m) {
         maxSize = m.value();
       }
-      if (annotation instanceof DecimalMin) {
-        DecimalMin m = (DecimalMin) annotation;
+      if (annotation instanceof DecimalMin m) {
         minSize = m.value();
       }
-      if (annotation instanceof DecimalMax) {
-        DecimalMax m = (DecimalMax) annotation;
+      if (annotation instanceof DecimalMax m) {
         maxSize = m.value();
       }
 
@@ -264,28 +250,27 @@ public class Property {
         equalsInclude = true;
       }
 
-      if (annotation instanceof Sequence) {
+      if (annotation instanceof Sequence sequenceAnnotation) {
         sequence = true;
-        sequenceName = ((Sequence) annotation).value();
+        sequenceName = sequenceAnnotation.value();
       }
 
-      if (annotation instanceof org.hibernate.annotations.Type) {
-        json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
-        encrypted =
-            "encrypted_text".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+      if (annotation instanceof org.hibernate.annotations.Type typeAnnotation) {
+        Class<? extends UserType<?>> userType = typeAnnotation.value();
+        json = JsonType.class.isAssignableFrom(userType);
+        encrypted = EncryptedTextType.class.isAssignableFrom(userType);
       }
 
       // encrypted
-      if (annotation instanceof Convert) {
-        Class<?> converter = ((Convert) annotation).converter();
+      if (annotation instanceof Convert convert) {
+        Class<?> converter = convert.converter();
         if (AbstractEncryptedConverter.class.isAssignableFrom(converter)) {
           encrypted = true;
         }
       }
 
       // Widget attributes
-      if (annotation instanceof Widget) {
-        Widget w = (Widget) annotation;
+      if (annotation instanceof Widget w) {
         title = w.title();
         help = w.help();
         readonly = w.readonly();
@@ -310,7 +295,7 @@ public class Property {
 
     if (type == null) {
       throw new IllegalArgumentException(
-          String.format("Invalid property of type '%s': %s", javaType.getName(), name));
+          "Invalid property of type '%s': %s".formatted(javaType.getName(), name));
     }
   }
 
@@ -562,8 +547,8 @@ public class Property {
 
     if (this.isCollection()) {
       this.clear(bean);
-      if (value instanceof Collection<?>) {
-        this.addAll(bean, (Collection<?>) value);
+      if (value instanceof Collection<?> collection) {
+        this.addAll(bean, collection);
       } else {
         this.add(bean, value);
       }
@@ -591,7 +576,7 @@ public class Property {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private Object add(Object bean, Object item, boolean associate) {
-    Preconditions.checkNotNull(bean);
+    Objects.requireNonNull(bean);
     Preconditions.checkArgument(entity.isInstance(bean));
     Preconditions.checkState(isCollection());
 
@@ -678,7 +663,7 @@ public class Property {
    * @return the same bean instance
    */
   public Object clear(Object bean) {
-    Preconditions.checkNotNull(bean);
+    Objects.requireNonNull(bean);
     Preconditions.checkArgument(entity.isInstance(bean));
     Preconditions.checkState(this.isCollection());
 
@@ -716,10 +701,10 @@ public class Property {
    */
   public boolean valueChanged(Object bean, Object oldValue) {
     Object current = get(bean);
-    if (current instanceof BigDecimal && oldValue instanceof BigDecimal) {
-      return ((BigDecimal) current).compareTo((BigDecimal) oldValue) != 0;
+    if (current instanceof BigDecimal currentDecimal && oldValue instanceof BigDecimal oldDecimal) {
+      return currentDecimal.compareTo(oldDecimal) != 0;
     }
-    return !Objects.equal(current, oldValue);
+    return !Objects.equals(current, oldValue);
   }
 
   /**
@@ -732,7 +717,7 @@ public class Property {
    */
   public Map<String, Object> toMap() {
 
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     for (Field field : this.getClass().getDeclaredFields()) {
 
@@ -746,10 +731,10 @@ public class Property {
 
       if ((value == null)
           || Modifier.isTransient(field.getModifiers())
-          || (value instanceof String && ((String) value).equals(""))
-          || (value instanceof Boolean && !((Boolean) value))
-          || (value instanceof Integer && ((Integer) value) == 0)
-          || (value instanceof Object[] && ((Object[]) value).length == 0)) {
+          || (value instanceof String strValue && strValue.equals(""))
+          || (value instanceof Boolean boolValue && !boolValue)
+          || (value instanceof Integer intValue && intValue == 0)
+          || (value instanceof Object[] objValue && objValue.length == 0)) {
         continue;
       }
 

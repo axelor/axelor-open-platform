@@ -24,13 +24,12 @@ import {
 import {
   Layout,
   restoreSelectedStateWithSavedRecord,
-  showErrors,
   useFormAttachment,
   useFormPerms,
-  useGetErrors,
   useHandleFocus,
   usePrepareSaveRecord,
 } from "../../form";
+import { showErrors, useGetErrors } from "../../form/builder/form-errors";
 import { Form, FormState, useFormHandlers } from "../../form/builder";
 
 import styles from "./details.module.scss";
@@ -72,8 +71,8 @@ export function Details({
     recordHandler,
   });
 
-  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
-  const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
+  const widgetHandler = useRef<FormWidgetsHandler>(null);
+  const resetStatesByName = useRef<FormState["statesByName"]>(null);
   const isSaveOnLoad = useRef(false);
   const dirtyAtom = useViewDirtyAtom();
 

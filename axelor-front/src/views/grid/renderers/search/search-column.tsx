@@ -42,18 +42,6 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (
-      [
-        "Enter",
-        "Tab",
-        "ArrowRight",
-        "ArrowLeft",
-        "ArrowUp",
-        "ArrowDown",
-      ].includes(e.key)
-    ) {
-      e.stopPropagation();
-    }
     if (e.key === "Enter") {
       e.preventDefault();
       applySearch();

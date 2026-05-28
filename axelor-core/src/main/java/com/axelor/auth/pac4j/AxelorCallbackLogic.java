@@ -1,34 +1,36 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
+import static com.axelor.auth.pac4j.AxelorProfileManager.AVAILABLE_MFA_METHODS;
+import static com.axelor.auth.pac4j.AxelorProfileManager.PENDING_USER_NAME;
+
+import com.axelor.app.AppSettings;
+import com.axelor.auth.MFAService;
+import com.axelor.auth.db.MFAMethod;
+import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
+import org.pac4j.core.context.FrameworkParameters;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultCallbackLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.OkAction;
@@ -36,7 +38,7 @@ import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.core.util.Pac4jConstants;
-import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.JEEFrameworkParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +47,8 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   private final ErrorHandler errorHandler;
   private final AxelorCsrfMatcher csrfMatcher;
-  private final AuthPac4jInfo pac4jInfo;
+  private final MFAService mfaService;
+  private final AxelorUrlResolver urlResolver;
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -55,39 +58,35 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       ErrorHandler errorHandler,
       AxelorCsrfMatcher csrfMatcher,
       DefaultCallbackClientFinder clientFinder,
-      AuthPac4jInfo pac4jInfo) {
+      AuthPac4jInfo pac4jInfo,
+      MFAService mfaService,
+      AxelorUrlResolver urlResolver) {
     this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
-    this.pac4jInfo = pac4jInfo;
-    setProfileManagerFactory(AxelorProfileManager::new);
+    this.mfaService = mfaService;
+    this.urlResolver = urlResolver;
     setClientFinder(clientFinder);
   }
 
   @Override
   public Object perform(
-      WebContext webContext,
-      SessionStore sessionStore,
       Config config,
-      HttpActionAdapter httpActionAdapter,
       String inputDefaultUrl,
       Boolean inputRenewSession,
-      String defaultClient) {
+      String defaultClient,
+      FrameworkParameters parameters) {
+
+    final var jeeParameters = (JEEFrameworkParameters) parameters;
 
     try {
-      final JEEContext context = (JEEContext) webContext;
-      context.getNativeRequest().setCharacterEncoding("UTF-8");
+      jeeParameters.getRequest().setCharacterEncoding("UTF-8");
     } catch (UnsupportedEncodingException e) {
-      return handleException(e, httpActionAdapter, webContext);
+      final var context = config.getWebContextFactory().newContext(parameters);
+      return handleException(e, config.getHttpActionAdapter(), context);
     }
 
     return super.perform(
-        webContext,
-        sessionStore,
-        config,
-        httpActionAdapter,
-        pac4jInfo.getBaseUrl(),
-        inputRenewSession,
-        defaultClient);
+        config, AppSettings.get().getBaseURL(), inputRenewSession, defaultClient, parameters);
   }
 
   /**
@@ -96,8 +95,10 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
    * @see com.axelor.auth.pac4j.AxelorCallbackClientFinder
    */
   @Override
-  protected void renewSession(
-      final WebContext context, final SessionStore sessionStore, final Config config) {
+  protected void renewSession(CallContext ctx, Config config) {
+    final var context = ctx.webContext();
+    final var sessionStore = ctx.sessionStore();
+
     final var optOldSessionId = sessionStore.getSessionId(context, true);
     if (optOldSessionId.isEmpty()) {
       logger.error(
@@ -109,7 +110,8 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
         final var optNewSessionId = sessionStore.getSessionId(context, true);
         if (optNewSessionId.isEmpty()) {
           logger.error(
-              "No new session identifier retrieved although the session creation has been requested");
+              "No new session identifier retrieved although the session creation has been"
+                  + " requested");
         } else {
           final var newSessionId = optNewSessionId.get();
           logger.debug("Renewing session: {} -> {}", oldSessionId, newSessionId);
@@ -122,7 +124,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
               // Don't fail because of any unavailable clients.
               if (baseClient.isInitialized()) {
                 try {
-                  baseClient.notifySessionRenewal(oldSessionId, context, sessionStore);
+                  baseClient.notifySessionRenewal(ctx, oldSessionId);
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
                 }
@@ -137,14 +139,28 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
   }
 
   @Override
-  protected HttpAction redirectToOriginallyRequestedUrl(
-      WebContext context, SessionStore sessionStore, final String defaultUrl) {
-
+  protected HttpAction redirectToOriginallyRequestedUrl(CallContext ctx, String defaultUrl) {
     // Add CSRF token cookie and header
-    csrfMatcher.addResponseCookieAndHeader(context, sessionStore);
+    csrfMatcher.addResponseCookieAndHeader(ctx);
+
+    final var context = ctx.webContext();
+    final var sessionStore = ctx.sessionStore();
+
+    final var pendingUsername = sessionStore.get(context, PENDING_USER_NAME).map(Object::toString);
+
+    if (pendingUsername.isPresent()) {
+      @SuppressWarnings("unchecked")
+      List<MFAMethod> methods =
+          sessionStore
+              .get(context, AVAILABLE_MFA_METHODS)
+              .filter(List.class::isInstance)
+              .map(o -> (List<MFAMethod>) o)
+              .orElse(Collections.emptyList());
+      return mfaAction(pendingUsername.get(), methods, context);
+    }
 
     // If XHR, return status code only
-    if (AuthPac4jInfo.isXHR(context)) {
+    if (AuthPac4jInfo.isXHR(ctx)) {
       return new OkAction("{}");
     }
 
@@ -176,6 +192,52 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
     logger.debug("redirectUrl: {}", redirectUrl);
     return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
+  }
+
+  protected HttpAction mfaAction(String username, List<MFAMethod> methods, WebContext context) {
+    try {
+      context.setResponseContentType(HttpConstants.APPLICATION_JSON + "; charset=utf-8");
+      final Map<String, Object> state = new HashMap<>();
+      state.putAll(Map.of("methods", methods, "username", username));
+
+      mfaService.processEmailMethod(state, methods, username);
+
+      final Map<String, Object> responseData =
+          Map.of("route", Map.of("path", "/mfa", "state", state));
+      final HttpAction action;
+
+      if (AuthPac4jInfo.isXHR(context)) {
+        final String content = new ObjectMapper().writeValueAsString(responseData);
+        action = HttpActionHelper.buildFormPostContentAction(context, content);
+      } else {
+        // Query params into fragment for HashRouter
+        var fragmentBuilder = jakarta.ws.rs.core.UriBuilder.fromPath("/mfa");
+        addQueryParams(fragmentBuilder, state);
+        var fragment = fragmentBuilder.build().toString();
+        var uriBuilder =
+            jakarta.ws.rs.core.UriBuilder.fromPath(
+                    urlResolver.compute(AxelorFormClient.LOGIN_URL, context))
+                .fragment(fragment);
+        String redirectionUrl = uriBuilder.build().toString();
+        action = HttpActionHelper.buildRedirectUrlAction(context, redirectionUrl);
+      }
+
+      return action;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to process MFA response data", e);
+    }
+  }
+
+  // Allows repeated params
+  private void addQueryParams(jakarta.ws.rs.core.UriBuilder uriBuilder, Map<String, Object> state) {
+    state.forEach(
+        (key, value) -> {
+          if (value instanceof Collection<?> collection) {
+            collection.forEach(item -> uriBuilder.queryParam(key, item.toString()));
+          } else if (value != null) {
+            uriBuilder.queryParam(key, value.toString());
+          }
+        });
   }
 
   @Override

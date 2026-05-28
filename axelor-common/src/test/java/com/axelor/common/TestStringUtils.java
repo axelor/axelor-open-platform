@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common;
 
@@ -44,16 +30,32 @@ public class TestStringUtils {
   }
 
   static final String text1 =
-      "" + "  this is some text\n" + "  this is some text\n" + "  this is some text\n";
+      """
+        this is some text
+        this is some text
+        this is some text
+      """;
 
   static final String text2 =
-      "" + "  this is some text\n" + "    \tthis is some text\n" + "   this is some text\n";
+      """
+        this is some text
+          	this is some text
+         this is some text
+      """;
 
   static final String text3 =
-      "" + "  this is some text\n" + "  this is some text\n" + " this is some text\n";
+      """
+        this is some text
+        this is some text
+       this is some text
+      """;
 
   static final String text4 =
-      "" + "this is some text\n" + "    |this is some text\n" + "    |this is some text\n";
+      """
+      this is some text
+          |this is some text
+          |this is some text
+      """;
 
   @Test
   public void testStripIndent() {
@@ -63,7 +65,10 @@ public class TestStringUtils {
     assertFalse(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "this is some text\n" + "this is some text");
+        """
+        this is some text
+        this is some text
+        this is some text""");
 
     lines = StringUtils.stripIndent(text2).split("\n");
     assertFalse(Character.isWhitespace(lines[0].charAt(0)));
@@ -71,7 +76,10 @@ public class TestStringUtils {
     assertTrue(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "  \tthis is some text\n" + " this is some text");
+        """
+        this is some text
+          	this is some text
+         this is some text""");
 
     lines = StringUtils.stripIndent(text3).split("\n");
     assertTrue(Character.isWhitespace(lines[0].charAt(0)));
@@ -79,7 +87,10 @@ public class TestStringUtils {
     assertFalse(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + " this is some text\n" + " this is some text\n" + "this is some text");
+        """
+         this is some text
+         this is some text
+        this is some text""");
   }
 
   @Test
@@ -87,7 +98,10 @@ public class TestStringUtils {
     String[] lines = StringUtils.stripMargin(text4).split("\n");
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "this is some text\n" + "this is some text");
+        """
+        this is some text
+        this is some text
+        this is some text""");
   }
 
   @Test

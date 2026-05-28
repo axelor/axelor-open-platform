@@ -1,25 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.event;
 
 import com.axelor.inject.Beans;
 import com.google.common.reflect.TypeToken;
+import jakarta.annotation.Priority;
+import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,25 +19,23 @@ import java.lang.reflect.WildcardType;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Priority;
-import javax.inject.Qualifier;
 
 class Observer implements Comparable<Observer> {
   public final Method method;
   public final Type eventActualType;
   public final Class<?> eventRawType;
-  public final Class<?> declaringClass;
+  final Class<?> bindingClass;
 
   private int priority;
   private Set<Annotation> qualifiers = new HashSet<>();
 
-  public Observer(Method method) {
+  Observer(Method method, Class<?> bindingClass) {
     assert method.getParameters().length == 1;
     final Parameter param = method.getParameters()[0];
 
     for (Annotation annotation : param.getAnnotations()) {
-      if (annotation instanceof Priority) {
-        this.priority = ((Priority) annotation).value();
+      if (annotation instanceof Priority priorityInst) {
+        this.priority = priorityInst.value();
       }
       if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
         qualifiers.add(annotation);
@@ -58,9 +44,12 @@ class Observer implements Comparable<Observer> {
 
     this.method = method;
     this.method.setAccessible(true);
-    this.declaringClass = method.getDeclaringClass();
-    this.eventActualType = param.getParameterizedType();
-    this.eventRawType = param.getType();
+    this.bindingClass = bindingClass;
+
+    final TypeToken<?> resolvedEventType =
+        TypeToken.of(bindingClass).resolveType(param.getParameterizedType());
+    this.eventActualType = resolvedEventType.getType();
+    this.eventRawType = resolvedEventType.getRawType();
   }
 
   public boolean matches(Type eventType, Set<Annotation> qualifiers) {
@@ -75,8 +64,8 @@ class Observer implements Comparable<Observer> {
   }
 
   private boolean isUnbounded(Type type) {
-    if (type instanceof ParameterizedType) {
-      for (Type t : ((ParameterizedType) type).getActualTypeArguments()) {
+    if (type instanceof ParameterizedType parameterizedType) {
+      for (Type t : parameterizedType.getActualTypeArguments()) {
         if (t instanceof WildcardType && t.getTypeName().equals("?")) {
           return true;
         }
@@ -95,21 +84,20 @@ class Observer implements Comparable<Observer> {
 
   public static boolean isObserver(Method method) {
     return !Modifier.isAbstract(method.getModifiers())
-        && !Modifier.isAbstract(method.getDeclaringClass().getModifiers())
         && method.getParameterCount() == 1
         && method.getParameters()[0].isAnnotationPresent(Observes.class);
   }
 
   public void invoke(Object event) {
-    Object target = Beans.get(this.declaringClass);
+    Object target = Beans.get(this.bindingClass);
     try {
       method.invoke(target, event);
     } catch (InvocationTargetException e) {
       // Exception raised by a synchronous or transactional observer for a synchronous event stops
       // the notification chain and the exception is propagated immediately.
       Throwable throwable = e.getCause();
-      if (throwable instanceof RuntimeException) {
-        throw (RuntimeException) throwable;
+      if (throwable instanceof RuntimeException runtimeException) {
+        throw runtimeException;
       }
       throw new ObserverException(throwable);
     } catch (IllegalAccessException e) {
@@ -127,16 +115,22 @@ class Observer implements Comparable<Observer> {
     if (!(obj instanceof Observer)) return false;
     if (this == obj) return true;
     final Observer other = (Observer) obj;
-    return Objects.equals(method, other.method);
+    return Objects.equals(method, other.method) && Objects.equals(bindingClass, other.bindingClass);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(31, method);
+    return Objects.hash(31, method, bindingClass);
   }
 
   @Override
   public String toString() {
-    return "Observer(method=" + method + ", qualifiers=" + qualifiers + ")";
+    return "Observer(method="
+        + method
+        + ", bindingClass="
+        + bindingClass
+        + ", qualifiers="
+        + qualifiers
+        + ")";
   }
 }

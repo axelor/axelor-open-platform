@@ -4,7 +4,38 @@ import React from "react";
 
 import { sanitize } from "@/utils/sanitize";
 
-const blockedList = ["eval", "Function", "Reflect", "Proxy"];
+const blockedList = [
+  "eval",
+  "Function",
+  "Reflect",
+  "Proxy",
+  "Object",
+  "globalThis",
+  "window",
+  "self",
+  "document",
+  "__proto__",
+  "prototype",
+  "constructor",
+];
+const blockedProps = new Set(blockedList);
+
+// Globals allowed as X.method() — only needed for names in blockedList
+const allowedGlobals = new Map([
+  ["Object", new Set(["entries", "keys", "values", "fromEntries"])],
+]);
+
+// Globals allowed as direct function calls (e.g. parseFloat("123"))
+const allowedGlobalFunctions = new Set([
+  "parseFloat",
+  "parseInt",
+  "isNaN",
+  "isFinite",
+  "Number",
+  "String",
+  "Boolean",
+]);
+
 const sanitizeURL = ["xlinkHref", "src", "href", "action", "formAction"];
 
 function ScopeTransformer({ types: t, template }) {
@@ -27,12 +58,29 @@ function ScopeTransformer({ types: t, template }) {
       "checkFunction",
       `function %%name%%(obj, key) {
         const value = obj[key];
-        if (value === Function) throw new Error("Access to 'Function' is not allowed.");
+        if (value === Function
+          || value === (async function(){}).constructor
+          || value === (function*(){}).constructor
+          || value === (async function*(){}).constructor
+        ) throw new Error("Access to 'Function' is not allowed.");
         if (value === React.createElement) throw new Error("Access to 'React.createElement' is not allowed.");
-        if (value === React.createFactory) throw new Error("Access to 'React.createFactory' is not allowed.");
         if (value === React.cloneElement) throw new Error("Access to 'React.cloneElement' is not allowed.");
         return typeof value === "function" ? value.bind(obj) : value;
       }`
+    );
+  }
+
+  function validateOptionalFunction(file) {
+    return addHelper(
+      file,
+      "checkOptionalFunction",
+      `function %%name%%(obj, key) {
+        if (obj == null) return undefined;
+        return %%checkFunction%%(obj, key);
+      }`,
+      {
+        checkFunction: validateFunction(file),
+      }
     );
   }
 
@@ -43,6 +91,25 @@ function ScopeTransformer({ types: t, template }) {
       `function %%name%%(value) {
         const isJavaScriptProtocol = /^[\\u0000-\\u001F ]*j[\\r\\n\\t]*a[\\r\\n\\t]*v[\\r\\n\\t]*a[\\r\\n\\t]*s[\\r\\n\\t]*c[\\r\\n\\t]*r[\\r\\n\\t]*i[\\r\\n\\t]*p[\\r\\n\\t]*t[\\r\\n\\t]*\\:/i;
         if (typeof value === 'string' && isJavaScriptProtocol.test(value)) throw new Error("javascript: URLs are not allowed.");
+        return value;
+      }`
+    );
+  }
+
+  function validateProperty(file) {
+    return addHelper(
+      file,
+      "checkProperty",
+      `function %%name%%(key) {
+        const blocked = ${JSON.stringify(Array.from(blockedProps))};
+        if (typeof key === 'symbol') {
+          throw new Error("Access to symbol properties is not allowed.");
+        }
+        const value = key == null ? key : String(key);
+        if (typeof value === 'string' && blocked.includes(value)) {
+          throw new Error("Access to '" + key + "' is not allowed.");
+        }
+        // Return the normalized key so coercion happens once and cannot mutate later.
         return value;
       }`
     );
@@ -158,16 +225,100 @@ function ScopeTransformer({ types: t, template }) {
   let ctx;
   let usingSanitize;
 
-  let isVisited = (() => {
-    let visited = [];
-    return (v) => {
-      if (visited.includes(v)) return true;
-      visited.push(v);
-    };
-  })();
+  const visited = new WeakSet();
+  const isVisited = (v) => {
+    if (visited.has(v)) return true;
+    visited.add(v);
+  };
 
   const jsxMemberObject = Symbol();
   const isReact = (node) => t.isIdentifier(node) && node.name === "React";
+
+  function handleMemberExpression(path, state, isOptional) {
+    const { node, scope } = path;
+    if (isVisited(node)) return;
+    const originalProperty = node.property;
+    const makeMember = isOptional
+      ? (obj, prop, computed) =>
+          t.optionalMemberExpression(obj, prop, computed, true)
+      : (obj, prop, computed) => t.memberExpression(obj, prop, computed);
+
+    const isAllowedGlobalAccess = (() => {
+      if (!t.isIdentifier(node.object) || node.computed) return false;
+      if (!t.isIdentifier(node.property)) return false;
+      const methods = allowedGlobals.get(node.object.name);
+      if (methods === undefined) return false;
+      return methods === null || methods.has(node.property.name);
+    })();
+
+    const obj =
+      node.object.name &&
+      !isReact(node.object) &&
+      !isAllowedGlobalAccess &&
+      !scope.hasBinding(node.object.name)
+        ? makeMember(ctx, node.object, false)
+        : node.object;
+
+    const name =
+      t.isTemplateLiteral(node.property) &&
+      node.property.quasis.length === 1
+        ? node.property.quasis[0].value.raw
+        : node.property.name || node.property.value;
+
+    if (blockedProps.has(name)) {
+      throw path.buildCodeFrameError(
+        `Access to '${name}' is not allowed.`
+      );
+    }
+
+    if (node.computed) {
+      node.property = t.callExpression(validateProperty(state.file), [
+        originalProperty,
+      ]);
+    }
+
+    const isCreateElement = () =>
+      node.loc &&
+      ["createElement", "cloneElement"].includes(name);
+    const isConstructor = () => name === "constructor";
+    const isStaticComputedProperty =
+      t.isStringLiteral(originalProperty) ||
+      t.isNumericLiteral(originalProperty) ||
+      t.isBooleanLiteral(originalProperty) ||
+      t.isNullLiteral(originalProperty) ||
+      (t.isTemplateLiteral(originalProperty) &&
+        originalProperty.expressions.length === 0);
+    const isDynamicComputedProperty = node.computed && !isStaticComputedProperty;
+
+    // don't allow access to 'constructor' and `React.createElement` methods
+    if (
+      !t.isAssignmentExpression(path.container) &&
+      (isConstructor() ||
+        isCreateElement() ||
+        (t.isTemplateLiteral(originalProperty) &&
+          originalProperty.expressions.length) ||
+        isDynamicComputedProperty)
+    ) {
+      const validator = isOptional
+        ? validateOptionalFunction(state.file)
+        : validateFunction(state.file);
+      const replacement = t.callExpression(validator, [
+        obj,
+        t.isIdentifier(node.property) && !node.computed
+          ? t.stringLiteral(node.property.name)
+          : node.property,
+      ]);
+      isVisited(replacement);
+      path.replaceWith(replacement);
+    } else if (
+      (node.loc || node.object[jsxMemberObject]) &&
+      obj !== node.object
+    ) {
+      const replacement = makeMember(obj, node.property, node.computed);
+      isVisited(replacement);
+      path.replaceWith(replacement);
+    }
+  }
 
   return {
     visitor: {
@@ -221,9 +372,21 @@ function ScopeTransformer({ types: t, template }) {
           blockedList.includes(node.name) &&
           (parent.computed || parent.property !== node)
         ) {
-          throw path.buildCodeFrameError(
-            `Access to '${node.name}' is not allowed.`
-          );
+          // Allow access to allowed global methods (e.g. Object.entries)
+          const methods = allowedGlobals.get(node.name);
+          const isAllowedAccess =
+            methods !== undefined &&
+            (t.isMemberExpression(parent) ||
+              t.isOptionalMemberExpression(parent)) &&
+            !parent.computed &&
+            parent.object === node &&
+            t.isIdentifier(parent.property) &&
+            (methods === null || methods.has(parent.property.name));
+          if (!isAllowedAccess) {
+            throw path.buildCodeFrameError(
+              `Access to '${node.name}' is not allowed.`
+            );
+          }
         }
 
         if (isReact(node)) {
@@ -250,7 +413,48 @@ function ScopeTransformer({ types: t, template }) {
           return;
         }
 
+        // Don't rewrite allowed global functions (parseFloat, parseInt, etc.)
+        if (allowedGlobalFunctions.has(node.name)) return;
+
         path.replaceWith(t.memberExpression(ctx, node));
+      },
+      ThisExpression(path) {
+        throw path.buildCodeFrameError("Access to 'this' is not allowed.");
+      },
+      "ImportExpression|Import"(path) {
+        throw path.buildCodeFrameError("Dynamic import() is not allowed.");
+      },
+      CallExpression(path) {
+        if (path.node.callee.type === "Import") {
+          throw path.buildCodeFrameError("Dynamic import() is not allowed.");
+        }
+      },
+      ObjectProperty(path, state) {
+        const { node } = path;
+        if (!t.isObjectPattern(path.parent)) return;
+        let key;
+        if (t.isIdentifier(node.key) && !node.computed) {
+          key = node.key.name;
+        } else if (t.isStringLiteral(node.key)) {
+          key = node.key.value;
+        } else if (
+          t.isTemplateLiteral(node.key) &&
+          node.key.quasis.length === 1 &&
+          node.key.expressions.length === 0
+        ) {
+          key = node.key.quasis[0].value.raw;
+        }
+        if (key && blockedProps.has(key)) {
+          throw path.buildCodeFrameError(
+            `Access to '${key}' is not allowed.`
+          );
+        }
+        // Wrap dynamic computed keys with runtime validation
+        if (node.computed && !key) {
+          node.key = t.callExpression(validateProperty(state.file), [
+            node.key,
+          ]);
+        }
       },
       JSXAttribute(path, state) {
         const { node } = path;
@@ -294,98 +498,10 @@ function ScopeTransformer({ types: t, template }) {
         }
       },
       OptionalMemberExpression(path, state) {
-        const { node, scope } = path;
-        const obj =
-          node.object.name &&
-          !isReact(node.object) &&
-          !scope.hasBinding(node.object.name)
-            ? t.optionalMemberExpression(ctx, node.object, node.computed, true)
-            : node.object;
-
-        const name =
-          t.isTemplateLiteral(node.property) &&
-          node.property.quasis.length === 1
-            ? node.property.quasis[0].value.raw
-            : node.property.name || node.property.value;
-
-        const isCreateElement = () =>
-          node.loc &&
-          ["createElement", "createFactory", "cloneElement"].includes(name);
-        const isConstructor = () => name === "constructor";
-
-        // don't allow access to 'constructor' and `React.createElement` methods
-        if (
-          !t.isAssignmentExpression(path.container) &&
-          (isConstructor() ||
-            isCreateElement() ||
-            (t.isTemplateLiteral(node.property) &&
-              node.property.expressions.length) ||
-            (node.computed &&
-              (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
-        ) {
-          path.replaceWith(
-            t.callExpression(validateFunction(state.file), [
-              obj,
-              t.isIdentifier(node.property) && !node.computed
-                ? t.stringLiteral(node.property.name)
-                : node.property,
-            ])
-          );
-        } else if (
-          (node.loc || node.object[jsxMemberObject]) &&
-          obj !== node.object
-        ) {
-          path.replaceWith(
-            t.optionalMemberExpression(obj, node.property, node.computed, true)
-          );
-        }
+        handleMemberExpression(path, state, true);
       },
       MemberExpression(path, state) {
-        const { node, scope } = path;
-        const obj =
-          node.object.name &&
-          !isReact(node.object) &&
-          !scope.hasBinding(node.object.name)
-            ? t.memberExpression(ctx, node.object)
-            : node.object;
-
-        const name =
-          t.isTemplateLiteral(node.property) &&
-          node.property.quasis.length === 1
-            ? node.property.quasis[0].value.raw
-            : node.property.name || node.property.value;
-
-        const isCreateElement = () =>
-          node.loc &&
-          ["createElement", "createFactory", "cloneElement"].includes(name);
-        const isConstructor = () => name === "constructor";
-
-        // don't allow access to 'constructor' and `React.createElement` methods
-        if (
-          !t.isAssignmentExpression(path.container) &&
-          (isConstructor() ||
-            isCreateElement() ||
-            (t.isTemplateLiteral(node.property) &&
-              node.property.expressions.length) ||
-            (node.computed &&
-              (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
-        ) {
-          path.replaceWith(
-            t.callExpression(validateFunction(state.file), [
-              obj,
-              t.isIdentifier(node.property) && !node.computed
-                ? t.stringLiteral(node.property.name)
-                : node.property,
-            ])
-          );
-        } else if (
-          (node.loc || node.object[jsxMemberObject]) &&
-          obj !== node.object
-        ) {
-          path.replaceWith(
-            t.memberExpression(obj, node.property, node.computed)
-          );
-        }
+        handleMemberExpression(path, state, false);
       },
     },
   };

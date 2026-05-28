@@ -1,3 +1,4 @@
+import { Ref, useCallback, useEffect, useRef } from "react";
 import {
   DateSelectArg,
   EventApi,
@@ -9,8 +10,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { clsx } from "@axelor/ui";
-import { useCallback, useEffect, useRef } from "react";
+
+import { clsx, useRefs } from "@axelor/ui";
 
 import styles from "./scheduler.module.scss";
 
@@ -41,7 +42,10 @@ function toSchedulerEvent<T>(event: EventApi) {
   } as SchedulerEvent<T>;
 }
 
+export type SchedulerRef = FullCalendar;
+
 export interface SchedulerProps<T> {
+  ref?: Ref<FullCalendar | null>;
   className?: string;
   date?: Date;
   view?: SchedulerView;
@@ -57,6 +61,7 @@ export interface SchedulerProps<T> {
   onEventClick?: (event: SchedulerEvent<T>, element: HTMLElement) => void;
   onEventCreate?: (event: SchedulerEvent<T>) => void;
   onEventChange?: (event: SchedulerEvent<T>) => void;
+  onEventDragStart?: () => void;
 }
 
 const timeViewMap = {
@@ -74,6 +79,7 @@ const dayViewMap = {
 export function Scheduler<T>(props: SchedulerProps<T>) {
   const {
     className,
+    ref,
     editable = true,
     editableDuration,
     locale,
@@ -86,10 +92,12 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
     onEventCreate,
     onEventChange,
     onEventClick,
+    onEventDragStart,
     onDayClick,
   } = props;
   const calendarRef = useRef<FullCalendar>(null);
 
+  const refs = useRefs(calendarRef, ref);
   const view = allDayOnly ? dayViewMap[mode] : timeViewMap[mode];
   const date = props.date;
 
@@ -115,6 +123,11 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
     [onEventChange],
   );
 
+  const handleDragStart = useCallback(
+    () => onEventDragStart?.(),
+    [onEventDragStart],
+  );
+
   const handleClick = useCallback(
     ({ event, el }: EventClickArg) => {
       onEventClick?.(toSchedulerEvent<T>(event), el);
@@ -132,7 +145,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
   return (
     <div className={clsx(styles.scheduler, className)}>
       <FullCalendar
-        ref={calendarRef}
+        ref={refs}
         selectable={true}
         selectMirror={true}
         dayMaxEvents={maxEvents}
@@ -148,6 +161,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         select={handleSet}
         eventChange={handleChange}
         eventClick={handleClick}
+        eventDragStart={handleDragStart}
         eventDurationEditable={editableDuration}
         navLinks={true}
         navLinkDayClick={handleDayClick}

@@ -91,6 +91,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
 
   return (
     <Panel
+      data-testid="mail-followers"
       header={i18n.get("Followers")}
       toolbar={{
         iconOnly: true,

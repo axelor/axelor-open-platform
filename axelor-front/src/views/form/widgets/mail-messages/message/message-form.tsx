@@ -5,16 +5,17 @@ import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
+import { Tag } from "@/components/tag";
 import { dialogs } from "@/components/dialogs";
 import { Select, SelectOptionProps } from "@/components/select";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
-import { SelectionTag } from "@/views/form/widgets";
 
 import HtmlEditor from "../../html/editor";
 import { Message, MessageFile, MessageRecipient } from "../message/types";
 import { MessageFiles } from "./message-files";
+import { DEFAULT_COMPLETION_PAGE_SIZE } from "@/utils/app-settings";
 
 export function useMessagePopup() {
   return useCallback(
@@ -109,6 +110,7 @@ function Form({
         url: "ws/search/emails",
         method: "POST",
         body: {
+          limit: DEFAULT_COMPLETION_PAGE_SIZE,
           data: {
             search: term,
             selected: (recipients || []).map(function (x) {
@@ -162,7 +164,7 @@ function Form({
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<MessageRecipient>) => {
       return (
-        <SelectionTag
+        <Tag
           title={getLabel(option)}
           onRemove={() => handleRemove(option)}
         />
@@ -192,6 +194,7 @@ function Form({
             placeholder={i18n.get("Recipients")}
             fetchOptions={searchEmails}
             renderValue={renderValue}
+            canShowNoResultOption={true}
           />
         </Box>
       )}

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useRouteError } from "react-router";
 
 import { ErrorBox } from "@/components/error-box";
 import { useRoute } from "@/hooks/use-route";

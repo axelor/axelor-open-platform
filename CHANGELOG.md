@@ -1,3 +1,2266 @@
+## 8.2.0 (2026-05-20)
+
+#### Feature
+
+* Add zoomThreshold config option to charts
+
+  <details>
+  
+  A new `zoomThreshold` per-chart config option controls data zoom slider behavior.
+  Defaults to `50`.
+  
+  - **`> 0`** — zoom slider enabled only when the number of data points exceeds the value;
+    initial view shows the first N items.
+  - **`= 0`** — zoom slider always shown, fully zoomed out (all data visible); useful when you
+    want precise zoom controls regardless of series size.
+  - **`< 0`** — zoom disabled; no zoom controls are shown.
+  
+  ```xml
+  <!-- Enable zoom slider only when more than 20 data points are present -->
+  <config name="zoomThreshold" value="20" />
+  
+  <!-- Always show zoom controls, full data visible -->
+  <config name="zoomThreshold" value="0" />
+  
+  <!-- Disable zoom controls entirely -->
+  <config name="zoomThreshold" value="-1" />
+  ```
+  
+  </details>
+
+* Set number input text alignment to right in editable grid
+
+  <details>
+  
+  Number values are now right-aligned in editable grid cells. Increment/decrement controls, which remain always visible 
+  in editable grid cells while normal form fields keep their existing hover behavior.
+  
+  </details>
+
+* Allow extending the implements attribute when overriding an entity
+
+  <details>
+  
+  When an entity is overridden in another module, the `implements` attribute is now merged with the parent entity's 
+  value. New interfaces declared in the override are added to the existing list.
+  
+  Note: this is additive only — interfaces declared on the parent entity cannot be removed by an override.
+  
+  </details>
+
+* Add custom model support for all view types
+
+  <details>
+  
+  Custom models (based on `MetaJsonRecord`) can now be used across all view types:
+  kanban, calendar, tree, gantt, cards, grid, and form.
+  
+  Custom JSON fields can be used in view-level attributes such as `columnBy`,
+  `sequenceBy`, `eventStart`, `eventStop`, `colorBy`, `taskStart`, `taskParent`,
+  `parent`, etc. using dotted notation (e.g. `attrs.status`).
+  
+  Tree view nodes now support the `x-json-model` attribute to filter records by
+  their custom model. Cards and kanban views also support `x-json-model` in the
+  XML schema.
+  
+  </details>
+
+* Add jsonModel support for custom model views
+
+  <details>
+  
+  Add jsonModel field to MetaView and MetaViewCustom to properly resolve
+  custom model views across relation widgets and view metadata APIs.
+  
+  Fixes #1650
+  
+  </details>
+
+* Upgrade GraalJS to 25.0.3 and optimize JavaScript integration
+
+  <details>
+  
+  - Upgrade GraalJS from 24.2.2 to 25.0.3
+  - Add shared engine and source caching for improved performance
+  - Implement AutoCloseable on JavaScriptScriptHelper for proper context cleanup
+  - Replace allowAllAccess(true) with explicit permissions for better security
+  - Set ECMAScript version to 2024 (stable release)
+  
+  </details>
+
+* Add Load more option for tree view child nodes
+
+  <details>
+  
+  Tree view child nodes are now loaded in pages using the default page size
+  instead of all at once. When more children exist, a "Load more" row appears
+  at the end of the list. Previously loaded children are cached so
+  re-expanding a node does not trigger additional server calls. Refresh and
+  sort clear the cache.
+  
+  </details>
+
+* Make CodeEditor lighter, more usable and add auto-size / lite modes
+
+  <details>
+  
+  The CodeEditor widget was too heavy for typical form usage. It has been streamlined to be simpler, more usable, 
+  and more compact: minimap, sticky scroll, auto-completion and suggestions are disabled, scroll decoration shadow is 
+  removed, and consistent top/bottom padding is applied.
+  
+  Default `height` has been lowered from 400px to 360px.
+  
+  New features:
+  - Auto-size mode via `x-auto-size="true"`: editor grows with content up to the specified height (defaults to 360px, 
+  min 36px). Vertical scrollbar is hidden while content fits and shown only when overflowing.
+  - Lite mode via `x-lite="true"`: minimal editor with no line numbers, folding, hover, suggestions, context menu or 
+  current-line highlight — suitable for small inline fields.
+  - `placeholder` attribute is now forwarded to the editor.
+  
+  </details>
+
+* Add Export as PNG to chart dashlet menu
+
+  <details>
+  
+  Charts can now be exported as a PNG image from the dashlet action menu.
+  
+  Note: the existing export action has been renamed from "Export" to "Export as CSV" for clarity.
+  
+  </details>
+
+* Add maxSeries config option to charts to prevent excessive memory consumption
+
+  <details>
+  
+  Chart rendering for large datasets now limits excessive series output to prevent high memory
+  consumption. The new `maxSeries` per-chart config keeps only the top N series by total value.
+  Pie, donut, radar, line, area, and scatter charts aggregate the remaining series into an
+  "Others" bucket; bar and horizontal bar charts drop tail series to preserve scale accuracy.
+  Defaults to `200`; set to `0` to disable the limit.
+  
+  ```xml
+  <!-- Show only the top 20 products -->
+  <config name="maxSeries" value="20" />
+  ```
+  
+  </details>
+
+* Add cascade handling for json custom field relations
+
+  <details>
+  
+  Implement cascade persist, merge, and delete for custom field
+  relationships stored as JSON (MetaJsonField). Cascade decisions
+  are driven by a central policy: json-one-to-many to MetaJsonRecord
+  is owned (persist/merge/remove + orphan removal), everything else
+  is persist/merge only with no target deletion.
+  
+  </details>
+
+* Add active session management for users
+
+  <details>
+  
+  Users can now view and revoke their active sessions from the user form.
+  Each session displays the browser and OS, the client IP address, the 
+  sign-in time, and the last activity time. The current session is 
+  highlighted and cannot be revoked.
+  
+  Admins can view and revoke sessions for any user. Non-admin users can only
+  manage their own sessions.
+  
+  </details>
+
+* Add isDelegated option for custom models
+
+  <details>
+  
+  Add isDelegated boolean field to MetaJsonModel to allow custom models
+  to use manually-defined views instead of auto-generated ones.
+  
+  </details>
+
+* Add UUID field type support for domain entities
+
+  <details>
+  
+  Added support for UUID field type in domain entities to store uuid values more efficiently.
+  Also added a common UuidUtils to generate UUID v4 and v7.
+  
+  </details>
+
+#### Change
+
+* Change password reset token max-age unit from hours to minutes
+
+  <details>
+  
+  The `application.reset-password.max-age` configuration property now accepts a value in minutes
+  instead of hours. The default has also been reduced from 24 hours to 30 minutes. If you have 
+  customized this setting, update your configuration accordingly.
+  
+  </details>
+
+* Change encrypted fields hashing algorithm
+
+  <details>
+  
+  The legacy `$AES$` encryptor used `PBKDF2WithHmacSHA1`, which is no longer considered secure for password-based key
+  derivation. Encrypted fields now use `PBKDF2WithHmacSHA256` with 600,000 iterations. The ciphertext format is now
+  self-describing: the iteration count, salt size, and IV size are embedded directly in the payload header. Decryption is
+  therefore independent of current defaults, and future parameter changes never break existing stored values.
+  
+  The application transparently decrypts legacy `$AES$` ciphertext alongside the new formats, so existing encrypted
+  values continue to be readable without any immediate migration.
+  
+  To migrate existing `$AES$` values to the new format, run the database encryption CLI tool. No
+  `encryption.old-password` or `encryption.old-algorithm` settings are required when coming from the legacy encryptor.
+  
+  The new PBKDF2WithHmacSHA256 algorithm is significantly more CPU-intensive than the legacy `PBKDF2WithHmacSHA1`. Each
+  encrypted field uses a distinct random salt, so a separate AES key must be derived per field, and that derivation
+  dominates the processing time.
+  
+  To keep throughput acceptable on large datasets, database encryption CLI tool uses default **100,000 iterations** 
+  during migration instead of the runtime default of 600,000. This can be overridden with the `--iteration` flag : 
+  `axelor database encrypt --iteration 200000`. Values written during migration can be re-migrated to a higher count 
+  at any time thanks to the self-describing format.
+  
+  </details>
+
+* Improve related messages endpoint performance
+
+  <details>
+  
+  The messages endpoint loaded the full related entity just to read its id and class. It now uses a
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Change Query Selector values() row shape for many-to-one fields
+
+  <details>
+  
+  As a side-effect of dropping the redundant full-entity fetch for many-to-one fields in `Selector`, the raw row shape
+  returned by `Selector.values(int, int)` has changed for any `select()` that includes an m2o field.
+  
+  Before, a single slot in each row held the fully materialized referenced entity (e.g. a `Title` instance), followed
+  by three scalar slots for `id`, `version` and the name field. Now, only the three scalars are emitted — the full-entity
+  slot is gone.
+  
+  For example, with `select("firstName", "title", "title.code")` the row layout is now:
+  
+  ```
+  [ id, version, firstName, title.id, title.version, title.name, title.code ]
+  ```
+  
+  whereas previously it was:
+  
+  ```
+  [ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+  ```
+  
+  Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read
+  the three scalars instead. Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is
+  unchanged ({`id`, `$version`, `nameField`} compact map under the reference key).
+  
+  </details>
+
+* Rework user password update flow with identity verification
+
+  <details>
+  
+  The password update flow now requires identity verification before allowing changes.
+  A new "Change Password" button replaces the inline password fields on the user form.
+  
+  The `password` field on `User` is no longer required — external provider users (SSO, OAuth)
+  no longer receive a random UUID password.
+  
+  Non-admin users are now blocked from modifying restricted fields (`code`, `group`, `roles`,
+  `permissions`, `password`, etc.) via the User CRUD endpoint.
+  
+  SQL migration script:
+  
+  ```sql
+  ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+  ```
+  
+  </details>
+
+* Improve message followers endpoints performance
+
+  <details>
+  
+  The message followers endpoints loaded the full target entity just to read its id and class. They now use a 
+  lightweight existence check followed by a lazy reference (proxy), avoiding the full row fetch.
+  
+  </details>
+
+* Exclude dotted collection paths from Query Selector
+
+  <details>
+  
+  `Query.Selector` no longer includes dotted field paths that walk through or resolve to a collection
+  (`@OneToMany`, `@ManyToMany`). These paths were silently accepted before and produced a SELECT column with an implicit
+  join, which was rarely the intended behavior and often led to ambiguous or duplicated results.
+  
+  The following inputs to `select(...)` are now silently dropped:
+  
+  * paths where any intermediate segment is a collection, e.g. `addresses.street` or `contact.addresses.street`
+  * paths whose leaf is itself a collection reached through a dotted expression, e.g. `contact.addresses`
+  
+  Single-segment collection fields like `select("addresses")` are unaffected — they keep being resolved and returned 
+  as a list of compact maps in the output.
+  
+  If your code relied on the previous behavior to flatten a sub-field of a collection into the row, switch to either
+  selecting the collection itself (`select("addresses")`) and reading the sub-field from the nested compact maps, or
+  issuing a dedicated query on the target entity.
+  
+  </details>
+
+* Remove MySQL and Oracle database support
+
+  <details>
+  
+  Both databases had only partial support that was never actively used or maintained. 
+  Removing them to reduce complexity and focus on PostgreSQL as the primary supported database.
+  
+  </details>
+
+* Speed up embedded Tomcat startup with jar scan filtering
+
+  <details>
+  
+  Embedded Tomcat was scanning every jar on the classpath for annotations,
+  TLDs, and web fragments. Configure StandardJarScanFilter to skip all
+  jars by default. Add `--tld-scan-jars` / `--pluggability-scan-jars` CLI 
+  options to configure TLD scanning (JSP taglibs) and Servlet 3.0 pluggability 
+  scanning (web-fragment.xml, @WebServlet / @WebFilter / @WebListener)
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Jackson from 2.21.0 to 2.21.3
+  - Upgrade Jsoup from 1.22.1 to 1.22.2
+  - Upgrade Swagger from 2.2.43 to 2.2.50
+  - Upgrade ByteBuddy from 1.18.5 to 1.18.8
+  - Upgrade Birt from 4.22.0 to 4.23.0
+  - Upgrade Snakeyaml from 2.5 to 2.6
+  - Upgrade Ldaptive from 2.4.2 to 2.5.0
+  - Upgrade Hibernate from 6.6.42 to 6.6.50
+  - Upgrade Redisson from 3.52.0 to 4.3.1
+  - Upgrade Junit from 5.14.3 to 6.0.3
+  - Upgrade Groovy from 4.0.30 to 4.0.32
+  - Upgrade Tomcat from 10.1.52 to 10.1.55
+  - Upgrade Slf4j from 2.0.17 to 2.0.18
+  - Upgrade Undertow from 2.3.23 to 2.3.24
+  - Upgrade Gradle from 8.14.3 to 8.14.5
+  - Upgrade PostgreSQL JDBC from 42.7.10 to 42.7.11
+  - Upgrade Caffeine from 3.2.3 to 3.2.4
+  - Upgrade Resteasy from 6.2.15 to 6.2.16
+  
+  </details>
+
+* Improve chart rendering for large datasets
+
+  <details>
+  
+  Chart rendering has been improved to handle large datasets more reliably.
+  
+  - A loading spinner is shown while chart data is being fetched.
+  - Axis labels are truncated when space is limited and a tooltip reveals the full label on hover.
+  - Large mode and LTTB downsampling are applied automatically on scatter and line charts with
+    very large datasets to keep rendering fast.
+  
+  </details>
+
+* Improve user password requirements
+
+  <details>
+  
+  The password policy system has been reworked to provide more useful, secure, and customizable built-in policies.
+  
+  **Default behavior changes:**
+  - Minimum password length increased from 4 to 8 characters (mandatory, cannot be disabled).
+  - New password must differ from the current one (mandatory, cannot be disabled).
+  - Passwords must not contain the user login code (case-insensitive substring check).
+  
+  **New opt-in policies** — each can be enabled with a single configuration property
+  (`user.password.<policy>.enabled = true`):
+  - `digits` — requires a minimum number of digit characters.
+  - `lowerCase` — requires a minimum number of lowercase characters.
+  - `upperCase` — requires a minimum number of uppercase characters.
+  - `specialChars` — requires a minimum number of special (non-alphanumeric) characters.
+  - `pattern` — requires the password to match a custom regular expression.
+  - `score` — requires a minimum strength score computed (0–4 scale).
+  
+  **Breaking changes:**
+  - The `user.password.pattern` property has been removed. Use the new `pattern` policy
+    (`user.password.pattern.enabled = true` / `user.password.pattern.value = <regex>`) or
+    combine the new built-in policies to achieve equivalent constraints.
+  - The `user.password.pattern-title` property has been removed.
+  
+  </details>
+
+* Improve RestService download performance
+
+  <details>
+  
+  The download endpoint loaded the full entity to read a single field, which triggered an unnecessary fetch of the 
+  entire row including its associations. The field is now retrieved with a targeted projection query, reducing 
+  latency and avoiding spikes on entities with heavy relations. The permission check has also been consolidated.
+  
+  </details>
+
+* Move CacheBuilder#weakValues/weakKeys to CaffeineCacheBuilder
+
+#### Fix
+
+* Avoid shutdown hook deadlock during Tomcat startup
+
+  <details>
+  
+  The shutdown hook is now registered after Tomcat has fully started instead of
+  during initialization, preventing a potential deadlock if shutdown is triggered
+  while startup is still in progress.
+  
+  </details>
+
+* Fix NPE from Mapper.toBean() with computed fields
+
+  <details>
+  
+  When mapping values to a bean, computed fields often depend on other
+  field values. By populating non-virtual fields first, we ensure that
+  dependencies are available when virtual fields are processed.
+  
+  </details>
+
+* Fix reload expanded node on tree grid refresh
+* Fix encrypted fields migration
+
+  <details>
+  
+  Fix several issues during encrypted fields migration :
+  - non-deterministic pagination issue that preventing already-migrated records from being re-processed at shifted 
+  offsets.
+  - Handle inheritance strategies for entities : skip inherited fields for `SINGLE_TABLE` and `JOINE`D so they are 
+  migrated by the parent class.
+  
+  Also few improvements has been done :
+  - Use JDBC batch statements instead of individual JPQL UPDATE queries : select decrypted values via JPA (so the old 
+  encryptor is applied automatically), then re-encrypt and persist via `PreparedStatement.addBatch()` / `executeBatch()`
+  for better performance and reduced DB load
+  - Add validation of migration settings (required password, known algorithms, warn on no-op rotations) before starting
+  - Infer missing old encryption settings from current values when rotating : only need to configure what actually 
+  changed. Ex : no need to set `old-password` is we rotate only the algorithm.
+  
+  </details>
+
+* Fix tree node orderBy attribute not being applied
+
+  <details>
+  
+  `orderBy` attribute defined on tree node was not being applied during the search request of the node.
+  
+  </details>
+
+* Fix itemSpan not applied to custom JSON fields in form view
+
+  <details>
+  
+  `itemSpan` defined on parent container was not being applied to custom JSON fields in form view.
+  
+  </details>
+
+* Fix translatable text/html widgets ignoring translation in readonly
+
+  <details>
+  
+  When a translation exists for the current locale, the text and html widgets
+  now display the translated value in readonly mode, matching the behavior of
+  the string widget. Previously the editable input was shown with the raw
+  stored value instead.
+  
+  </details>
+
+* Fix Tags widget readonly rendering in form and grid views
+
+  <details>
+  
+  When a Tags widget (`widget="Tags"`) was set to readonly, it rendered
+  as a plain empty text input instead of displaying tag pills. The readonly
+  Tags widget now renders tag pills directly using the same Overflow layout
+  as the grid cell renderer, with proper overflow menu support.
+  
+  </details>
+
+* Fix copy and export errors not displayed to user
+
+  <details>
+  
+  When an exception is thrown from the copy or export methods,
+  the error is now displayed in a dialog instead of being silently ignored.
+  
+  </details>
+
+* Fix view-param limit support in tree view
+
+  <details>
+  
+  The view-param limit support in tree view was not being applied to the root node.
+  
+  </details>
+
+* Fix scrollbar flash when downloading file
+* Fix translatable text/html widgets flag button position and visibility
+
+  <details>
+  
+  In the text widget, the translation flag button was not positioned correctly
+  next to the input. In the html widget, the flag button was hidden entirely
+  when a translation existed. Both widgets now show the flag button at the
+  top-right of the field, consistent with the string widget behavior.
+  
+  </details>
+
+* Avoid full m2o entity fetch in Query Selector
+
+  <details>
+  
+  When a many-to-one field like `title` was included in a `select()`, the generated JPQL contained both the bare join
+  alias (`_title`) and its `id`/`version`/`nameField` scalars. The bare alias caused Hibernate to materialize the entire
+  referenced entity — every column of the target table — even though only the compact {`id`, `$version`, `nameField`} map
+  was ever returned to callers.
+  
+  The full entity fetch is now dropped: only the three scalars are selected, which is all `fetch()` actually consumes.
+  
+  </details>
+
+* Consolidate form validation errors by priority per field
+
+  <details>
+  
+  When saving a form with multiple constraint violations on the same field,
+  all errors were shown (e.g. "Login is invalid" and "Login is too small").
+  Now only the highest-priority error per field is displayed, using this order:
+  required > min/max > pattern > custom errors > invalid.
+  
+  Also fix server-side validation errors using the raw field name (e.g. "code")
+  instead of the field title (e.g. "Login").
+  
+  </details>
+
+* Fix XSS vulnerability in download filename handling
+
+  <details>
+  
+  Use textContent instead of innerHTML when setting the download link text
+  to prevent script execution via crafted filenames.
+  
+  </details>
+
+* Fix NPE in JobController cron validation with no further valid firing times
+* Fix central logout and session timeout redirect when MFA is enabled
+
+  <details>
+  
+  MfaClient restores pending profile but overwrites its clientName.
+  Now always restore pending client name when session is marked as fully authenticated by MFA authenticator.
+  
+  </details>
+
+* Fix mail followers recipients request limit
+
+  <details>
+  
+  The mail followers recipient request limit wasn't provided, allowing related service to be called with an unbounded 
+  limit. Cap the effective limit to `api.pagination.max-per-page` so that the email search respects the configured 
+  pagination maximum and use `api.pagination.default-per-page` as the default when no limit is specified in the request.
+  
+  </details>
+
+* Fix pass selected in custom collection field context
+* Fix ConcurrentModificationException in AuditTracker on entity delete
+
+  <details>
+  
+  AuditTracker.processDelete() now iterates over a snapshot of the deleted
+  entities set, preventing ConcurrentModificationException when cascaded
+  deletes add new entries during iteration.
+  
+  </details>
+
+* Fix various cache issues
+
+  <details>
+  
+  Fix various issues with caches including incorrect log arguments,
+  swallowed exceptions in eviction listeners,
+  NPE in default `getAll()` method,
+  premature eviction of tenant caches in cluster environments,
+  closing underlying tenant-specific caches when closing wrapper tenant-aware cache.
+  
+  </details>
+
+* Fix NPE in AuditProcessor when processing computed fields
+* Fix theme colors not applied to panel dashlet
+
+  <details>
+  
+  Refactor dashlet widget to use the Panel component from @axelor/ui so that
+  theme color variables are correctly applied to the dashlet header and body.
+  Also fix chart views not occupying the full height of the dashlet container.
+  
+  </details>
+
+* Fix handle focus navigation in grid view search column
+* Fix gauge chart showing NaN% when category axis is formatted
+
+  <details>
+  
+  Gauge charts were reading the value from the category axis field (e.g. month),
+  which gets formatted into a string (e.g. "May") by the chart data pipeline.
+  Using a string as the gauge value caused ECharts to display NaN%.
+  The gauge now correctly reads the value from the series key field instead.
+  
+  </details>
+
+* Fix image widget binary field to use $upload
+
+  <details>
+  
+  Image widget on binary fields now uses the $upload mechanism via the upload
+  endpoint instead of sending the file as a base64 data URL in the save payload.
+  
+  </details>
+
+* Fix NPE in MetaFiles.upload() recovery block
+
+  <details>
+  
+  Add null check for temporary file copy to prevent masking of root persistence exceptions with NPEs during new file uploads.
+  
+  </details>
+
+* Fix calendar drag-and-drop not saving when popover is open
+
+  <details>
+  
+  Close the event popover when a drag operation starts on the calendar view.
+  Previously, if the template popover was open, dragging an event to another
+  date would not trigger a save.
+  
+  </details>
+
+* Fix OOM in OpenAPI scanner by limiting scan to Axelor modules
+
+  <details>
+  
+  OpenAPI scanner now limits the scan to Axelor modules only, reducing memory usage and preventing OutOfMemoryError. So 
+  resources in non-Axelor JARs no longer appear in the spec.
+  
+  </details>
+
+* Fix date widget portal focus handling in editable grid
+
+  <details>
+  
+  Keep the date picker rendered in portal mode for grid layout stability,
+  while preventing focus-trap and blur interactions from causing repeated
+  blur loops or React update crashes when using month/year selectors.
+  
+  </details>
+
+* Fix cache busting of JSP and HTML files
+
+  <details>
+  
+  Exclude .jsp, .html, and .htm files from static resource cache busting
+  in NoCacheFilter. These files should not receive immutable cache headers
+  as they are server-rendered or serve as application entry points.
+  
+  </details>
+
+#### Security
+
+* Upgrade Pac4j & Shiro dependencies
+
+  <details>
+  
+  Upgrade Pac4j from 6.3.1 to 6.5.1 and Shiro from 2.0.6 to 2.1.0 for security reasons
+  
+  </details>
+
+* Fix RestService upload missing file content type validation
+
+  <details>
+  
+  Only the declared file type from the request data was validated against the whitelist/blacklist, allowing a malicious 
+  user to bypass validation by sending a file with an allowed extension but different content. Now the actual file 
+  content is inspected via Apache Tika for both attachment and non-attachment uploads.
+  
+  </details>
+
+* Fix file upload content type validation to prevent extension spoofing
+
+  <details>
+  
+  MetaFiles.checkType(File) now pass null as the filename hint to Tika, ensuring detection relies solely on magic
+  bytes. Previously, the filename was used as a hint and could influence the result, allowing a malicious file 
+  disguised with an allowed extension to bypass validation.
+  
+  </details>
+
+
+## 8.1.1 (2026-03-09)
+
+#### Change
+
+* Replace react-text-mask with internal <MaskedInput> component
+
+  <details>
+  
+  Replace the unmaintained react-text-mask dependency with a fully
+  internal <MaskedInput> implementation covering the same feature set.
+  
+  </details>
+
+#### Fix
+
+* Fix required validation in duration widget
+* Fix false `React.createFactory` error on undefined property access
+
+  <details>
+  
+  The expression parser sandbox checked property access values against
+  `React.createFactory`, which was removed in React 19 and is `undefined`.
+  This caused any computed property lookup returning `undefined` (e.g. an
+  object key miss with nullish coalescing) to falsely throw an error.
+  
+  </details>
+
+* Fix SingleSelect dropdown not closing on Tab key
+* Fix EML file upload failures
+* Fix multi-tenancy AxelorCache.asMap() usage
+
+  <details>
+  
+  With multi-tenancy, AxelorCache.asMap() returns a map view for current tenant.
+  Using it on static field either cause null tenant if called before multi-tenancy module,
+  or resolution to tenant of first usage. AxelorCache.asMap() should be called on demand only.
+  
+  Moreover, on app shutdown, we need to iterate over the cache for each tenant.
+  
+  Affected usage:
+    - Pending exports
+    - Mail channel
+  
+  </details>
+
+* Fix lost action-view context in calendar views
+
+  <details>
+  
+  Calendar views with context-based domains (e.g. `self.user.id = :_userId`) displayed
+  no events because the calendar widget's `_domainContext` overwrote the action-view's
+  context variables during filter merge. The DataStore's original context is now preserved
+  by spreading it first when building the calendar's domain context.
+  
+  </details>
+
+* Fix `x-popup-maximized` attribute on relational fields
+
+  <details>
+  
+  This fixes `x-popup-maximized` attribute to control the maximized 
+  (i.e., fullscreen) state of popup windows for relational fields.
+  
+  </details>
+
+#### Security
+
+* Fix sandbox bypass via async/generator function constructors
+
+  <details>
+  
+  The expression parser sandbox only blocked the regular `Function` constructor,
+  allowing code execution through `AsyncFunction`, `GeneratorFunction`, and
+  `AsyncGeneratorFunction` constructors obtained via `.constructor` on async,
+  generator, and async generator function instances.
+  
+  </details>
+
+* Block expression sandbox escapes via this and prototype access
+
+  <details>
+  
+  The expression parser now blocks `this` and dangerous properties such as
+  `__proto__`, `prototype`, and `constructor`, including computed access, to
+  prevent sandbox escapes and prototype pollution vectors.
+  
+  </details>
+
+
+## 8.1.0 (2026-02-20)
+
+#### Feature
+
+* Add support to custom entity sequence allocation size
+
+  <details>
+  
+  Allows specifying custom allocation size for sequences used by entities. This can be useful for optimizing 
+  performance.
+  
+  This allows to provide custom entity sequence allocation size in multiple ways:
+  - From xml entity definition itself, using `allocationSize` attribute
+  - Sequence specific configuration defined in application settings,
+  `application.entity.sequence.%MY_SEQ%.allocation_size`
+  - Global default allocation size : `application.entity.sequence.default_allocation_size`
+  
+  When `allocationSize` is 1, it forces Hibernate to execute a `SELECT nextval('seq')` query for every single entity 
+  saved. Having an `allocationSize` greater than 1 is the performance tuner for database inserts. It controls how
+  many IDs Hibernate fetches from the database in a single network call.
+  
+  </details>
+
+* Add drag-and-drop support into the widget area
+
+  <details>
+  
+  Add support to simply drag and drop files directly into binary/binary-link/image widgets. Users can now drag files 
+  from their desktop or file explorer directly into the widget area, bypassing the traditional system file picker dialog
+  
+  </details>
+
+* Add summary bar feature in grid view
+
+  <details>
+  
+  The summary bar can be used to show summary by the selected rows, page and action in a grid view.
+  
+  </details>
+
+* Include date range and view mode in calendar context
+
+  <details>
+  
+  In calendar views, the context now includes the following information:
+  - `_calendarViewMode`: current view type (day, week, or month)
+  - `_calendarStartDate`: first visible date of the viewport (inclusive)
+  - `_calendarEndDate`: last visible date of the viewport (exclusive)
+  
+  </details>
+
+* Improve React-based HTML applications embedded
+
+  <details>
+  
+  React-based HTML applications embedded can now retrieve some information (theme/language/...) and subscribe to 
+  changes via a listener pattern.
+  
+  </details>
+
+* Allow displaying archived records only from advance search
+
+  <details>
+  
+  Show archived boolean is replaced by selection as follow
+  - Include archived : include the archived records
+  - Only archived    : only display the archived records.
+  
+  </details>
+
+* Asynchronous Queue-Based Audit Tracking
+
+  <details>
+  
+  Improved audit tracking with asynchronous queue-based processing to improve the performance.
+  Now the listener performs a lightweight capture of raw data and inserts simple `AuditLog` rows into the database. The 
+  main operation has no more complex logic executed, reducing the execution time. After the transaction commits, a 
+  background thread picks up the AuditLog entries and handle the tracking process : generate the associated mail message 
+  and emails sending.
+  
+  - Introduce `AuditLog` entity for persistent audit event storage with full state capture. It support retry logic 
+  with max retries and error tracking.
+  - For security and performance reasons, certain field types are automatically excluded from audit tracking : 
+  passwords/encrypted/binary/collection and transient fields.
+  - Tracking messages are not created immediately when a record is created/updated. Instead, they appear in the stream 
+  after a brief delay.
+  - Adaptive back-pressure mechanism controlled with following properties : 
+  `application.audit.logs.flush-threshold`, `application.audit.processor.batch-delay`, 
+  `application.audit.processor.activity-window`, `application.audit.processor.busy-backoff-interval`, 
+  `application.audit.processor.busy-backoff-max-retries` and `application.audit.processor.batch-size`.
+  
+  </details>
+
+* Add `oid` database type for binary fields
+
+  <details>
+  
+  Since 8.0, `binary` fields declared in domains now map to `bytea` instead of `oid`. `bytea` is the modern standard for
+  binary data up to a few hundred megabytes. `oid` is a legacy mechanism that introduces significant maintenance
+  headaches and should only be used for specific "streaming" use cases. For compatibility reasons, this adds support to 
+  use `oid` database type for `binary` fields. This can be enabled by adding `large="true"` attribute on field definition.
+  
+  </details>
+
+* Implement findById and getReferenceById in entity repositories
+
+  <details>
+  
+  Implement two new methods in entity repositories : 
+  
+  - `findById(Long id)` : same as `find(Long id)` but return an Optional
+  - `getReferenceById(Long id)` : retrieves a reference (proxy) to an entity without immediately loading its state
+  
+  </details>
+
+* Add real-time mail message updates
+
+  <details>
+  
+  The mail messages widget now supports real-time updates via WebSocket.
+  This is necessary since the introduction of asynchronous audit tracking.
+  The implementation also supports distributed environments using Redis/Valkey for message broadcasting.
+  
+  </details>
+
+#### Change
+
+* Update sorting behavior in grouped grids
+
+  <details>
+  
+  On grouped grids, the grouped results can become inconsistent due to sorted fields. This automatically prioritizes 
+  grouping fields in the sort order to ensure consistent grouping records through pagination.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Byte Buddy from 1.17.8 to 1.18.5
+  - Upgrade ASM from 9.8 to 9.9.1
+  - Upgrade Snakeyaml from 2.4 to 2.5
+  - Upgrade Jsoup from 1.21.2 to 1.22.1
+  - Upgrade Flyway from 11.11.2 to 11.20.3
+  - Upgrade Junit from 5.13.4 to 5.14.3
+  - Upgrade Apache Commons IO from 2.20.0 to 2.21.0
+  - Upgrade Guava from 33.4.8 to 33.5.0
+  - Upgrade Minio from 8.5.17 to 8.6.0
+  - Upgrade Jackson from 2.19.4 to 2.21.0
+  - Upgrade PostgreSQL JDBC from 42.7.9 to 42.7.10
+  - Upgrade Tomcat from 10.1.50 to 10.1.52
+  - Upgrade Groovy from 4.0.29 to 4.0.30
+  - Upgrade Logback from 1.5.25 to 1.5.32
+  - Upgrade Swagger from 2.2.41 to 2.2.43
+  - Upgrade Undertow from 2.3.21.Final to 2.3.23.Final
+  - Upgrade Hibernate ORM from 6.6.40.Final to 6.6.42.Final
+  - Upgrade Jakarta JAXB API from 4.0.4 to 4.0.5
+  
+  </details>
+
+#### Deprecate
+
+* The `sequential` attribute on `entity` definition is now deprecated
+
+  <details>
+  
+  Since Hibernate 6.x, it creates a sequence per entity hierarchy instead of a single sequence `hibernate_sequence`.
+  So the `sequential` attribute is no longer needed and should be removed from entity definitions. It is marked as 
+  deprecated and will be removed in further version. All entities will now use their own sequence.
+  
+  </details>
+
+#### Fix
+
+* Automatically initialize jsonModel field for custom model forms
+
+  <details>
+  
+  When creating a new record in a custom model form view, the jsonModel field
+  is now automatically set to match the view's jsonModel value.
+  
+  This ensures custom model records are properly initialized with the correct
+  jsonModel identifier without requiring additional backend actions or manual
+  intervention.
+  
+  </details>
+
+* Fix search on grid multi-select widget field
+* Fix observer lookup for plain class event hierarchies
+
+  <details>
+  
+  Observers whose event parameter is a supertype are now correctly invoked when a subtype event
+  is fired. For example, an observer declared as `onModel(@Observes ModelEvent e)` is now
+  triggered when a `ContactEvent extends ModelEvent` is fired, as required by the CDI
+  specification.
+  
+  Previously, observer lookup used an exact class match, so supertype observers were never
+  notified for subtype events.
+  
+  </details>
+
+* Support observer method inheritance in EventBus
+
+  <details>
+  
+  Observer methods are now inherited by subclasses, as required by the CDI specification.
+  Previously, only methods declared directly on the bound class were discovered; inherited
+  observer methods were silently ignored.
+  
+  Overriding rules are also respected: if a subclass overrides an observer method, only the
+  overriding version is invoked (the parent version is suppressed), matching standard Java
+  method override semantics.
+  
+  </details>
+
+* Fix theme builder typography properties path
+* Resolve generic type variables in inherited observer methods
+
+  <details>
+  
+  When an observer method is declared in a generic base class (e.g. `onSave(@Observes SaveEvent<T>
+  event)`), the event parameter type is now correctly resolved to the concrete type argument
+  supplied by the subclass (e.g. `SaveEvent<Contact>` for `class ContactHandler extends
+  GenericHandler<Contact>`).
+  
+  Previously, the unresolved type variable `T` was used for matching, causing generic observer
+  methods to either never match or match too broadly.
+  
+  </details>
+
+
+## 8.0.5 (2026-01-23)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Quartz from 2.5.1 to 2.5.2
+  - Upgrade Logback from 1.5.21 to 1.5.25
+  - Upgrade Undertow from 2.3.20.Final to 2.3.21.Final
+  - Upgrade Hibernate from 6.6.36.Final to 6.6.40.Final
+  - Upgrade Resteasy from 6.2.14.Final to 6.2.15.Final
+  - Upgrade Tomcat from 10.1.49 to 10.1.50
+  - Upgrade Swagger from 2.2.40 to 2.2.41
+  - Upgrade Greenmail from 2.1.7 to 2.1.8
+  - Upgrade Moxy from 4.0.8 to 4.0.9
+  - Upgrade pac4j from 6.2.2 to 6.3.1
+  - Upgrade Redisson from 3.51.0 to 3.52.0
+  - Upgrade PostgreSQL JDBC driver from 42.7.8 to 42.7.9
+  - Upgrade BIRT from 4.21.0 to 4.22.0
+  
+  Due to OpenPDF library upgrade, import statements using `com.lowagie` package should be migrated to `org.openpdf`.
+  
+  </details>
+
+#### Fix
+
+* Fix step validation in decimal input widget
+* Fix alpha transparency usage in theme editor
+* Fix check draggable attribute in tree view node
+* Fix dms grid auto scroll issue on cell selection
+* Fix generating extended entities not included in project
+
+  <details>
+  
+  Extended entities having a super class were wrongly generated in project : Entities in a 'SINGLE_TABLE' hierarchy 
+  shouldn't be annotated with `@Table` (the root class declares the table mapping for the hierarchy). Issue only 
+  happens with entities declared in module dependencies (project dependencies not concerned).
+  
+  </details>
+
+* Disallow `form` tag in DOMPurify sanitization
+* Normalize empty HTML content in HTML widget
+
+  <details>
+  
+  Treat HTML editor output that contains only whitespace or <br> tags as empty.
+  This prevents leftover <br> content when clearing the field and allows required
+  validation to work as expected.
+  
+  </details>
+
+* Fix perform advanced search on entire dms tree
+
+## 8.0.4 (2026-01-05)
+
+#### Feature
+
+* Implement tenant-aware AxelorCache
+
+  <details>
+  
+  By default, when multi-tenancy is active, the cache automatically segregates entries based
+  on the current tenant context.
+  Use `CacheBuilder#nonTenantAware()` to disable this behavior and allow the cache
+  to be shared globally across all tenants.
+  
+  </details>
+
+#### Fix
+
+* Fix connect/disconnect lines in gantt view
+* Fix bind close action in popup view
+
+  <details>
+  
+  When header/footer is hidden then it should still bind close handler properly
+  so that action handler can close the view.
+  
+  </details>
+
+* Fix kanban record opening permission check (canView/read)
+
+  <details>
+  
+  Allow opening a record in form view from the kanban view
+  when either read or canView permission is granted.
+  
+  </details>
+
+* Fix MFA form email resend timer
+
+  <details>
+  
+  Fix initial email resend timer when email method is default.
+  Fix email resend timer on browser refresh.
+  
+  </details>
+
+* Fix adding custom button in grid view customization
+* Fix auto-selection of created record in M2O widget
+
+  <details>
+  
+  When a record is created through the many-to-one widget using the popup form,
+  the record is persisted via an action. After clicking **OK**, the newly created
+  record should be automatically selected in the M2O widget.
+  
+  </details>
+
+* Fix findFields to consider jsonModel for custom models
+
+  <details>
+  
+  Fix findFields returning wrong field metadata when different JSON models
+  have fields with the same name. The method now correctly filters fields
+  by jsonModel to avoid returning data from unrelated custom models.
+  
+  </details>
+
+* Fix action-attrs support on tooolbar/menubar
+
+  <details>
+  
+  Fix changing title of toolbar buttons and menubar items in form view.
+  Also add support for title/hidden/readonly attributes for cards/kanban/dms/grid views.
+  
+  </details>
+
+* Improve DMS upload notification visibility and statuses
+
+  <details>
+  
+  Keep the DMS upload panel visible briefly after uploads complete, show accurate titles for running/failed/complete states, and add missing translations.
+  
+  </details>
+
+* Don't show automatic attrs on form view when there is at least one manual custom field
+
+  <details>
+  
+  Don't show automatic attrs on form view when there is at least one manual custom field,
+  e.g. `<field name="attrs.customField" />`
+  Static widgets on grid view (like `button`) do not prevent automatic attrs.
+  
+  </details>
+
+* Apply tenant-aware for database-dependent caches
+
+  <details>
+  
+  Use tenant-aware caches for MFAService, I18nBundle, and MetaStore.
+  Any cache that contains database-dependent data should be tenant-aware.
+  
+  </details>
+
+
+## 8.0.3 (2025-12-04)
+
+#### Fix
+
+* Restore flush on JPA.persist and JPA.merge
+
+  <details>
+  
+  In previous version, we removed automatic flush calls from JPA.persist() and JPA.merge() methods to restore JDBC 
+  batching for bulk operations.
+  We restored this behavior to ensure backward compatibilities. It was initially added for an eager synchronization model 
+  (assume read-your-own-writes consistency immediately after any `persist` or `merge`) but also to reduced cognitive 
+  load (doesn't have to wired about potential synchronization issues). We thought the impact will be restricted, but 
+  the fact is that lot of process depending the behavior. This requires more preparation and details before we can get 
+  ride of this anti-pattern strategy and fit on standard.
+  
+  </details>
+
+
+## 8.0.2 (2025-12-01)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Quartz from 2.5.0 to 2.5.1
+  - Upgrade Hibernate from 6.6.31 to 6.6.36
+  - Upgrade Groovy from 4.0.28 to 4.0.29
+  - Upgrade Logback from 1.5.19 to 1.5.21
+  - Upgrade Caffeine from 3.2.2 to 3.2.3
+  - Upgrade Undertow from 2.3.19 to 2.3.20
+  - Upgrade Tomcat from 10.1.47 to 10.1.49
+  - Upgrade Bytebuddy from 1.17.7 to 1.17.8
+  - Upgrade Swagger from 2.2.38 to 2.2.40
+  - Upgrade Greenmail from 2.1.6 to 2.1.7
+  - Upgrade Shiro from 2.0.5 to 2.0.6
+  - Upgrade Jackson from 2.19.2 to 2.19.4
+  
+  </details>
+
+* Remove flush from JPA.persist and and JPA.merge
+
+  <details>
+  
+  Removed automatic flush calls from JPA.persist() and JPA.merge() methods to restore JDBC batching for bulk operations.
+  Previously, calling flush inside these methods forced Hibernate to execute SQL immediately, disabling JDBC batching
+  and causing significant performance degradation. Since entities use SEQUENCE-based ID generation,
+  Hibernate does not require an immediate flush to obtain IDs.
+  
+  Behavior changes:
+  - Constraint violations detected at next flush or transaction commit instead of during .save()
+  - JPA lifecycle callbacks (@PrePersist, @PostPersist, @PreUpdate, @PostUpdate, etc.) execute at flush time rather than immediately after save()
+  - JPA event listeners and entity interceptors (e.g., AuditInterceptor setting createdBy/updatedBy) trigger at flush time, not during save()
+  - SQL execution order may shift slightly due to batching (no functional impact)
+  - The changes are now not visible to native SQL or other connections/sessions until the transaction successfully commits
+  
+  Code that expects entity state to be populated by listeners/interceptors immediately after save() must call flush()
+  explicitly. For example, asserting createdBy field after save() now requires flush() to trigger the audit interceptor.
+  
+  </details>
+
+* Use Gradle distribution plugin
+
+  <details>
+  
+  In recent 8.0, we introduced a new task `buildApp` to build application distribution. Now we rely on built-in Gradle 
+  distribution plugin. It provides `installDist` (replace `buildApp`) but also adds support to package content into ZIP 
+  and TAR archives (ie `distZip` and `distTar`). CLI is still in BETA, so both tasks have been disabled by default. 
+  Request the tasks explicitly to generate the archives.
+  
+  </details>
+
+#### Fix
+
+* Prevent long panel titles from overflowing
+
+  <details>
+  
+  Form panel headers now force their title container to shrink so overly long
+  titles are truncated (ellipsis) instead of spilling outside of the panel
+  frame. Applies to standard panels, o2m/m2m grids, and dashlets.
+  
+  </details>
+
+* Fetch calendar records based on visible range instead of current month
+
+  <details>
+  
+  Previously, records were fetched based on the strict start and end of the current month. This caused missing data for 
+  the trailing days of the previous month and leading days of the next month that were still visible. The fetch logic 
+  now calculates the actual start and end dates of the visible viewport.
+  
+  </details>
+
+* Fix files upload store
+
+  <details>
+  
+  Ensures all stream are closed in order to avoid memory leak.
+  S3 now upload files using stream-based uploads instead of file based upload as it costs a bit of extra I/O.
+  S3 caching mechanism stores the entire file content in the Java Heap memory : this cause high memory consumption.
+  
+  </details>
+
+* Fix monaco editor worker loading for non-basic languages
+
+  <details>
+  
+  Web workers is required for rich language features (validation, formatting, completion). This ensure these 
+  resources are fetched correctly using explicit paths containing `/vs`.
+  
+  </details>
+
+* Fix how to handle 50x response errors
+
+  <details>
+  
+  Display 50x error response in alter, except for the special maintenance mode.
+  
+  </details>
+
+* Fix redundant dashlet refresh after grid initialization
+
+  <details>
+  
+  Previously, when a dashlet was not yet rendered (e.g., in an inactive panel tab or hidden state) and refresh: true was set through action-attrs, it would trigger an unnecessary refresh once it became visible.
+  This fix ensures that if the dashlet has already been refreshed during grid initialization, the extra refresh triggered by the earlier refresh: true flag is skipped.
+  
+  </details>
+
+
+## 8.0.1 (2025-11-10)
+
+#### Feature
+
+* Improve frontend loading performance with lazy loading
+
+  <details>
+  
+  Lazy load application routes, but also ReactDatePicker and libphonenumber-js libraries. This reduce main bundle size 
+  by 50% and loaded them on-demand.
+  
+  </details>
+
+#### Fix
+
+* Fix blinking grid header
+
+  <details>
+  
+  While switching from edit/view mode, grid header label was blinking due to style changes.
+  
+  </details>
+
+* Rotate x-axis labels to avoid hiding overlaps on bar chart
+* Don't render grid footer if no records
+
+  <details>
+  
+  In case of `all` grid aggregation type, don't render grid footer if there is no record. This also ensure 
+  the aggregate function doesn't not crash when no data are available.
+  
+  </details>
+
+* Fix time series with line chart
+
+  <details>
+  
+  Use xAxis type "time" for `<category type="date|time" />`
+  Line chart was always using "category" type (equal spacing),
+  which is incorrect when dealing with time.
+  
+  </details>
+
+* Fix search collection records when saving via onChange
+* Fix test sources used as deployment assembly in eclipse
+
+  <details>
+  
+  Sometime when refreshing gradle projects, test sources appears as
+  deployment assembly causing unexpected behavior.
+  
+  </details>
+
+* Fix forbidden action condition when changing user password
+
+  <details>
+  
+  Add script-allowed `com.axelor.auth.UserService` for `passwordMatchesPattern` method.
+  
+  </details>
+
+* Fix UI blocking after re-login popup
+
+  <details>
+  
+  Fix duplicate count decrement upon 401 (session expiration),
+  that caused non-blocking UI after re-login from popup.
+  
+  </details>
+
+* Fix response error handling
+
+  <details>
+  
+  On constraint violations, return the violations mentioning the fields and the associated explicit constraint message.
+  
+  Add the check, not null and too long violations to as explicit messages returned to users. Other cases are default messages.
+  
+  </details>
+
+* Fix handling of end-of-lines in i18n messages
+
+  <details>
+  
+  CSV normalized end-of-lines to \r\n, between CSV records only, not for cell data.
+  CSV cell data is now also normalized to \r\n.
+  
+  For multiline translation keys, need to normalize back to \n, as that's
+  what is used in source code, meta views, etc.
+  This fixes translations when keys contain end-of-lines.
+  
+  </details>
+
+* Fix set action attrs in collection field of m2o editor
+
+  <details>
+  
+  This fix enables setting action-attrs (e.g., show/hide columns) for collection fields in O2O/M2O editors.
+  Attributes can now be set both from the main form scope (customer.addresses.country: { hidden: true })
+  and within the editor scope (addresses.country: { hidden: true }).
+  
+  </details>
+
+* Fix close action behavior in custom model popup
+* Fix binding of collection of proxies
+
+  <details>
+  
+  Example:
+  
+  ```java
+  // titles contains HibernateProxy objects
+  List<Contact> results = contactRepo.all().filter("self.title IN :titles").bind("titles", titles).fetch();
+  ```
+  
+  Caused UnknownEntityTypeException
+  
+  </details>
+
+* Fix missing series labels on bar chart
+
+  <details>
+  
+  Also don't show bar group for discrete bar,
+  i.e., when groupBy is not used.
+  
+  </details>
+
+* Adjust compose message popup title and buttons
+* Horizontal bar chart y-axis should be in descending order
+
+  <details>
+  
+  For example, if y-axis has years,
+  top should be earliest, bottom should be latest.
+  
+  </details>
+
+* Add `title` attribute on `xmlId` fields in Meta entities
+* Fix pass action context in panel-dashlet edit form
+
+  <details>
+  
+  When a form view is opened through the `panel-dashlet` `edit icon` in a `tab view`,
+  the newly opened form view (in tab) record should be treated as the `_parent`,
+  and the original panel-dashlet record should be passed as a nested `_parent` within it.
+  
+  </details>
+
+* Make autocomplete search non-blocking to prevent keyboard input disruption
+
+  <details>
+  
+  On M2O input autocomplete, as soon as search was triggered, onSelect then search query was triggered. onSelect is a 
+  UI blocking action, so any subsequent keyboard input in that time is skipped causing a poor user experience on heavy 
+  application.
+  
+  Now onSelect is triggered if necessary, means only if the context doesn't change. This reduce the number of calls.
+  Moreover, keyboard input isn't blocking on input element anymore. This allow users to continue typing smoothly while 
+  the onSelect action processes in the background.
+  
+  An abortion technique is implemented to abort previous search request depending on keyboard input received.
+  
+  </details>
+
+
+## 8.0.0 (2025-10-14)
+
+#### Feature
+
+* Implement `Tag` widget for M2O/O2O to render value as a tag element.
+* Add docx/xlsx/odt/ods to action-report supported formats
+* Lazy load popper to improve views rendering
+* Auto adaptive scale for grid aggregation
+
+  <details>
+  
+  Grid aggregation values had a hard coded scale to 2. Now, grid aggregation values have 
+  auto adaptive scale depending on values calculated and trailing zeros are removed.
+  
+  </details>
+
+* Rework axelor-export storage
+
+  <details>
+  
+  Exported files are now created as a temporary files instead of being saved to `data.export.dir` directory.
+  It used to be possible to disable downloading and have exported files only accessible in `data.export.dir` directory.
+  This is no longer the case: the export files have to be either downloaded or attached to the current record.
+  
+  - Add `attachment="true|false"` attribute to attach the exported file to the current object.
+  - Remove `download` attribute: direct downloading is default
+  - Remove `output` attribute.
+  
+  </details>
+
+* Add LDAP support to subtree search for users
+
+  <details>
+  
+  By default, search scope to locate users is `subtree`: search whole subtree of base DN. Use new property 
+  `auth.ldap.user.search.subtree = true | false`, to update the search scope to `onelevel` if needed.
+  
+  </details>
+
+* Add API key authentication via HTTP header
+
+  <details>
+  
+  Added support for authenticating API requests using API keys via the `API-KEY` HTTP header.
+  Introduced `UserToken` entity to manage API tokens per user, with secure token generation, hashing,
+  and expiration handling.
+  
+  Tokens can be created, revoked, and rotated from the User form.
+  
+  </details>
+
+* Implement new Fixture api
+
+  <details>
+  
+  The new `Fixture` api provides a more clean yaml format.
+  
+  For example:
+  
+  ```yaml
+  - type: User      # model
+    key: user:admin # unique key
+    properties:
+      name: Some Name
+      code: admin
+      role: role:1  # reference key
+      groups:
+        - group:1   # reference key
+        - group:2   # reference key
+  ```
+  
+  - `type` is the model name.
+  - `key` is a unique key for the fixture record.
+  - `properties` contains the fields of the model.
+  
+  The relationships are defined using reference keys.
+  
+  </details>
+
+* Cache version/hash-named static assets in production
+* Implement a new context propagation system across threads and tasks submission
+
+  <details>
+  
+  The new context propagation system is used to propagate context across threads and tasks submission. This is an all
+  in one system combining `TenantAware` and `AuditableRunner` behaviors.
+  
+  Main issue is to propagate in threads and tasks all information's coming from HTTP requests (only available in
+  servlet environments). Are concerned: the current user, tenant, locale, language and base URL. Some can be
+  determined by application properties, some logic can be dependent from the request. The system is now able to propagate
+  all current context information in threads and tasks. It also allows manually defining them in (case of scheduling /
+  batching).
+  
+  `ContextAwareRunnable` or `ContextAwareCallable` can be used to propagate context
+  information.
+  
+  Usage :
+  ```java
+  ContextAware.of()
+  .withTransaction(true) // true by default
+  .withUser(AuthUtils.getUser("admin"))
+  .withTenantId(myTenant)
+  .build(
+    () -> {
+      // Task code here
+    }
+  )
+  .run()
+  ```
+  
+  </details>
+
+* Re-implement run and database gradle tasks
+
+  <details>
+  
+  Re-implemented `run` and `database` gradle tasks as `JavaExec` tasks.
+  This allows running them with vscode java debugger.
+  
+  Also, as Gradle support in all major IDEs is now matured, the `run`
+  task should be the preferred way to debug axelor apps.
+  
+  </details>
+
+* Add checkDuplicateClasses gradle task
+
+  <details>
+  
+  Added a new `checkDuplicateClasses` gradle task to detect conflicting dependencies in application projects.
+  
+  The task analyzes runtime classpath dependencies and identifies duplicate classes between different
+  jar files, helping to prevent classpath conflicts that can cause runtime issues.
+  
+  Key features:
+  - Automatically excludes Axelor modules (which can have duplicate domain classes by design)
+  - Supports exclude patterns for specific libraries
+  
+  </details>
+
+* Support global and component-specific cache configuration
+
+  <details>
+  
+  Cache can be configured for the whole application or for specific components (Hibernate, Shiro).
+  
+  ```properties
+  # Global cache configuration applied to Hibernate, Shiro and internal components
+  # ~~~~~
+  # Global cache provider: default/caffeine/redisson
+  application.cache.provider = redisson
+  # Global cache configuration for specified provider: either on filesystem or resource in classpath
+  application.cache.config = redisson.yaml
+  
+  # Hibernate-specific cache configuration (takes precedence over global cache configuration)
+  # ~~~~~
+  #application.cache.hibernate.provider = redisson
+  #application.cache.hibernate.config = redisson.yaml
+  
+  # Shiro-specific cache configuration (takes precedence over global cache configuration)
+  # ~~~~~
+  #application.cache.shiro.provider = redisson
+  #application.cache.shiro.config = redisson.yaml
+  ```
+  
+  </details>
+
+* Add application bundle & CLI support
+
+  <details>
+  
+  The command line support can be used to implement custom commands
+  to perform various tasks. The command line runner will locate
+  `CliCommand` instances using service loader interface. A `database`
+  command is added to perform various database related tasks.
+  
+  The Gradle plugin adds a new task `installDist` to build application
+  distribution. The application bundle will be generated at
+  `build/install/{project-name}` folder which includes extracted war
+  application in the `app/` directory, launcher script dependencies in
+  the `lib/` directory and executable scripts in the `bin/` directory.
+  
+  The `axelor` script is an executable command line tool that can be used
+  to execute various commands provided by the app: `./bin/axelor --help`
+  for more details.
+  
+  </details>
+
+* Add S3-Compatible Object Storage
+
+  <details>
+  
+  Added support for S3-compatible object storage for DMSFile/MetaFile.
+  The default implementation remains disk storage, but it can be switched to an S3-compatible service by configuring the `data.object-storage.*` properties.
+  This change introduces a storage abstraction layer (`FileStoreFactory`) that should be used instead of direct file system access to ensure compatibility with both storage types.
+  
+  </details>
+
+* Implement multi-tenancy support of quartz schedulers
+
+  <details>
+  
+  The app will now configure scheduled tasks per tenant during startup.  
+  Also added support to update/remove tasks per tenant at runtime.
+  
+  </details>
+
+* Add Multi-Factor Authentication (MFA) support
+
+  <details>
+  
+  Introduced Multi-Factor Authentication (MFA) as an optional security feature to enhance user account protection.
+  Supported MFA methods: 
+    - TOTP (Time-based One-Time Password) via authenticator apps.
+    - Email verification codes (with 5-minute validity)
+    - Recovery codes as backup authentication method
+  Users can configure, test, and enable MFA from their preferences, select a default MFA method, and
+  are prompted for a second-factor code during login once MFA is activated.
+  
+  </details>
+
+* Implement scripting policy check support
+
+  <details>
+  
+  A scripting policy has been introduced to control which Java classes are accessible from scripts (Groovy, Expression Language, JavaScript). By default, access to most application classes is now restricted.
+  
+  If your application uses scripts that call custom services or other classes, you will need to explicitly allow them. You can do this in two ways:
+  
+  *  Add the `@com.axelor.script.ScriptAllowed` annotation to your service interfaces or classes.
+  *  Implement the `com.axelor.script.ScriptPolicyConfigurator` interface to programmatically define allowed/denied packages and classes.
+  
+  Additionally, a script execution timeout has been introduced to prevent infinite loops, which defaults to 5 minutes. This can be configured globally or per script execution.
+  
+  `doInJpa` helper has been removed, as it allowed unrestricted database access.
+  To get a bean instance with policy check, `\\__bean__` helper has been introduced to replace unrestricted `com.axelor.inject.Beans.get` usage.
+  
+  Note that the scripting policy is also applied to Groovy template engines by using the same class scanner
+  and compiler configuration as for Groovy scripts. A side effect is that Groovy templates now use the same JPA class scanner.
+  
+  </details>
+
+* Add code generation support for test entities
+
+  <details>
+  
+  Test entities can now be generated from XML files. This enables using the 
+  same domain modeling approach for test entities as production code.
+  
+  </details>
+
+* Add LDAP support to subtree search for groups
+
+  <details>
+  
+  By default, search scope to locate groups is `subtree`: search whole subtree of base DN. Use new property 
+  `auth.ldap.group.search.subtree = true | false`, to update the search scope to `onelevel` if needed.
+  
+  </details>
+
+* Add show and copy button to form password widget in readonly
+
+  <details>
+  
+  Improve form password widget in readonly mode by showing the "show password" button
+  if there is any value and adding a copy button to copy the value to clipboard.
+  
+  </details>
+
+* Return MediaType when downloading a file
+
+  <details>
+  
+  When downloading a file, return the right `Content-Type`.
+  Only pdf/images and html files can be previewed in browser.
+  
+  </details>
+
+* Format bytes on system information page
+* Add AxelorCache caching interface supporting distributed caching
+
+  <details>
+  
+  The `AxelorCache` interface wraps various cache implementations.
+  
+  Supported implementations include:
+    - Caffeine (in-memory)
+    - Redisson (Redis/Valkey)
+  
+  The underlying implementation that is used depends on application configuration.
+  
+  Usage example:
+  
+  ```java
+  private static final AxelorCache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
+  ```
+  
+  Added `DistributedFactory`, which is a utility class that facilitates concurrency control in distributed cache environments.
+  It provides static methods to access distributed-aware synchronization primitives, such as locks and atomic longs.
+  
+  </details>
+
+* Add mass updatable fields even if not declared in grid view
+
+  <details>
+  
+  Currently, only fields declared in the grid view marked with the massUpdate attribute are updatable.
+  Now, fields in the entity, even if not declared in the grid view, will also be listed in the mass update popover.
+  
+  </details>
+
+#### Change
+
+* Download i18n export as zip file instead of using data.export.dir
+
+  <details>
+  
+  I18n exports are now downloaded as zip archive,
+  instead of being created in `data.export.dir` directory.
+  
+  </details>
+
+* Use Shiro 2 argon2id hash algorithm
+
+  <details>
+  
+  Use Shiro 2 default hash algorithm: argon2id
+  
+  To migrate passwords to the more secure algorithm, you can force users with old hashes
+  to change their passwords:
+  
+  ```sql
+  UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
+  ```
+  
+  When users set their new passwords, the new hash algorithm will be used.
+  
+  https://shiro.apache.org/blog/2024/02/apache-shiro-200-released.html
+  
+  </details>
+
+* Re-implemented audit tracking/fields support
+
+  <details>
+  
+  The old Interceptor based implementation has several limitations and couldn't work
+  in cases where persistence session is created manually.
+  
+  The new implementation uses event listener api and thus can have access to the session
+  for which the events are fired. Fixing, issues caused by persistent session created
+  manually.
+  
+  Also, new api handles multi-threading cases more effectively.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  * Upgrade to Guice 7 (Jakarta EE 9)
+  * Upgrade Hibernate from 5.6.x to 6.6.31.Final
+  * Upgrade BIRT from 4.4.2 to 4.21.0
+  
+  Many of your reports will likely have rendering changes or may even be broken due to numerous emitter improvements/changes in BIRT.
+  
+  `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but enabled by default.
+  
+  BIRT has a transitive dependency to Apache POI, upgraded from 3.9 to 5.4.0, that includes **breaking** changes:
+  https://poi.apache.org/changes.html
+  
+  Also, the XML parser in BIRT has become stricter. Most notably, in your `fontsConfig.xml`,
+  you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
+  Otherwise, your font configuration file will fail validation and will be ignored.
+  
+  * Upgrade Apache Tomcat from 9.0.x to 10.1.47
+  * Upgrade Junit5 from 5.11.4 to 5.13.4
+  * Upgrade Ldaptive from 2.3.2 to 2.4.2
+  * Upgrade jsoup from 1.18.3 to 1.21.2
+  * Upgrade pac4j from 5.7.x to 6.2.2, buji-pac4j from 8.1.x to 9.1.0, and jakartaee-pac4j from 7.1.x to 8.0.1
+  * Upgrade mysql-connector-j from 8.4.0 to 9.4.0
+  * Upgrade Postgresql JDBC from 42.7.4 to 42.7.8
+  * Upgrade Apache Tika from 2.9.x to 3.2.3
+  * Upgrade UnboundID LDAP SDK from 6.0.11 to 7.0.3
+  * Upgrade Woodstox from 6.7.0 to 7.1.1
+  * Update Swagger from 2.2.28 to 2.2.38
+  * Upgrade snakeyaml from 2.3 to 2.4
+  * Upgrade Shiro from 1.13.0 to 2.0.5
+  * Upgrade Redisson from 3.38.1 to 3.51.0
+  * Upgrade Jackson from 2.18.x to 2.19.2
+  * Upgrade HikariCP from 6.3.0 to 7.0.2
+  * Upgrade hazelcast from 5.3.7 to 5.5.0
+  * Upgrade guava from 33.3.1-jre to 33.4.8-jre
+  * Upgrade from Groovy 3 to Groovy 4
+  * Upgrade GraalJS from 22.3.5 to 24.2.2
+  * Upgrade Flyway from 9.22.3 to 11.11.2
+  * Upgrade Apache Commons JXPath from 1.3 to 1.4.0
+  * Upgrade commons-io from 2.18.0 to 2.20.0
+  * Upgrade commons-csv from 1.12.0 to 1.14.1
+  * Upgrade Caffeine from 3.1.6 to 3.2.2
+  * Update Byte Buddy from 1.15.11 to 1.17.7
+  * Upgrade ASM from 9.7.1 to 9.8
+  * Upgrade to Resteasy 6 (Jakarta EE 10)
+  * Upgrade to Quartz 2.5
+  * Upgrade to Logback 1.5
+  * Switch from org.fusesource.jansi to org.jline:jansi 3.30.6
+  * Upgrade to Jakarta XML Binding 4.0
+  * Upgrade to Jakarta WebSocket 2.0
+  * Upgrade to Jakarta Mail 2.1 and Jakarta Activation 2.1
+  * Upgrade Hibernate Validator from 6.2.5.Final to 8.0.3.Final
+  * Upgrade Infinispan from 13.0.22 to 15.2.6.Final
+  * Upgrade Ehcache from 3.10.8 to 3.11.1
+  * Upgrade Undertow from 2.2.37.Final to 2.3.19.Final
+  
+  </details>
+
+* Upgrade Gradle from 8.11.1 to 8.14.3
+* Remove Junit4 support
+
+  <details>
+  
+  JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support 
+  for JUnit Jupiter (JUnit 5) was introduced in v6.0. It is time to drop support for JUnit 4. Migrate your Junit tests 
+  to Junit5.
+  
+  </details>
+
+* Implement token-based download for ActionResponse#setExport
+
+  <details>
+  
+  Data export process now requires a token param instead of a file path relative to the export directory.
+  ActionResponse#setExport has been updated and overloaded accordingly:
+  
+  - `ActionResponse#setExport(String path)`
+  - `ActionResponse#setExport(String path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(Path path, String name)`
+  - `ActionResponse#setExport(InputStream stream, String name)`
+  
+  The file path is copied to a dedicated temporary file for pending export.
+  `path` filename is used for download name if `name` is not specified as second parameter.
+  
+  </details>
+
+* Migrate from Guava Cache to Caffeine for internal components
+* Update `AuthUtils#getUser()` to resolve the current user
+
+  <details>
+  
+  Initially, `the AuthUtils#getUser()` method is used to retrieve the current connected user. This is only available in
+  servlet environments. In case of non-servlet environments (batch/schedule/...), there is no connected user.
+  Now the method retrieves the current user associated with the thread or session (see context propagation system 
+  based on `ContextAware*` classes). It first uses the current user stored in the thread-local if provided. Else it 
+  attempts to retrieve the connected user if any.
+  
+  </details>
+
+* Deprecate `TagSelect` widget in favor of `Tags`.
+
+  <details>
+  
+  `TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it’s just a renaming of the widget 
+  name for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage 
+  will be removed in a next version.
+  
+  </details>
+
+* Upgrade from JDK 11 to JDK 21
+
+  <details>
+  
+  https://docs.oracle.com/en/java/javase/21/migrate/index.html
+  
+  </details>
+
+* Switch to Shiro native sessions
+
+  <details>
+  
+  We have switched from servlet-container sessions to Shiro native sessions. This change enables the use of Redis/Valkey server as a session store and simplifies the overall architecture by leveraging Shiro's `SessionDAO`.
+  
+  Key changes to be aware of:
+  
+  * By default, the session manager now uses in-memory Caffeine cache. This means that sessions are not persisted between application restarts.
+  * `HttpSessionListener` is no longer used. Instead, you can access active sessions via `AuthSessionService.getActiveSessions()` which uses the `SessionDAO`.
+  
+  For more details about Shiro's session management, see the https://shiro.apache.org/session-management.html[Shiro Session Management documentation].
+  
+  </details>
+
+* JEE Jakarta transition
+
+  <details>
+  
+  Move from Java EE to Jakarta EE. This include transition from the `javax` namespace to the `jakarta` namespace.
+  
+  </details>
+
+* Upgrade Spotless Gradle plugin from 6.25.0 to 7.0.4
+
+  <details>
+  
+  https://github.com/diffplug/spotless/blob/gradle/7.0.4/plugin-gradle/CHANGES.md#704---2025-05-27
+  
+  </details>
+
+* AppSettings#getBaseURL resolves as tenant host and app base url before request host
+
+  <details>
+  
+  In case of multi-tenancy, base url should favor tenant host.
+  Without multi-tenancy, base url should favor app config base url.
+  
+  Request host is now last fallback.
+  
+  </details>
+
+* Save/update/delete filters now by id instead of name
+
+  <details>
+  
+  Removed field `name` on MetaFilter.
+  Removed unique constraint on name, filterView,
+  and replaced it with index `meta_filter_filter_view_idx` on filterView.
+  
+  This allows different users to create filters with the same title.
+  
+  Database migration script:
+  
+  ```sql
+  ALTER TABLE meta_filter DROP COLUMN name;
+  CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+  ```
+  
+  </details>
+
+#### Deprecate
+
+* Deprecate `TenantAware` and `AuditableRunner`
+
+  <details>
+  
+  This is replaced by a generic context propagation system based on ContextState and ContextAware* wrappers.
+  Use `ContextAwareRunnable` or `ContextAwareCallable` instead.
+  
+  </details>
+
+#### Remove
+
+* Remove `data.export.dir` setting
+
+  <details>
+  
+  Another consequence of supporting multiple storage providers
+  is the removal of export directory setting `data.export.dir`.
+  If you used it, you should migrate your code to create temporary files
+  or directories instead, using `com.axelor.file.temp.TempFiles`,
+  then download or attach the files somewhere for the users to access.
+  
+  Related ActionExport#getExportPath is also removed.
+  
+  </details>
+
+* Remove `top` attribute in `menuitem`
+
+  <details>
+  
+  Top menu support has been removed since 7.0. To ensure compatibility, the attribute was still present in xsd.
+  
+  </details>
+
+* Remove `record.` prefix support in expressions/templates/EvalRefSelect
+
+  <details>
+  
+  Added for backward compatibility, accessing fields now no longer need `record.` prefix. Update your js expressions, 
+  templates and EvalRefSelect `x-eval-*` attributes according.
+  
+  </details>
+
+* Remove `MetaPermissions#isCollectionReadable` method
+* Remove method `JPA#withTransaction(Supplier)` in favor of `JPA#callInTransaction(Supplier)`
+* Remove built-in license header support
+
+  <details>
+  
+  As part of the AxelorPlugin, we historically provided built-in support to manage license headers. This support has been
+  removed and `licenseFormat`, `licenseCheck` and related tasks no longer exist. The plugin on which support was provided
+  is no longer maintained. This is now application or module responsibility to provide it.
+  
+  There are many Gradle plugins that can do the job. [List](https://plugins.gradle.org/search?term=license+header) is
+  available on the Gradle plugin portal. The awesome [Spotless](https://plugins.gradle.org/plugin/com.diffplug.gradle.spotless) 
+  formatting plugin provides support for adding license headers.
+  
+  </details>
+
+* Remove Gradle support for database management
+
+  <details>
+  
+  This removes Gradle support for database management (init/update/...) in favor of new CLI.
+  
+  </details>
+
+* Remove support of Font Awesome icons
+
+  <details>
+  
+  Use either Material Symbols and Bootstrap Icons.
+  
+  </details>
+
+* Remove deprecated web services
+
+  <details>
+  
+  Remove deprecated `ws/files/report/{link:.\*}` and `ws/files/data-export/{fileName:.*}` web services in favor of their 
+  equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
+  
+  </details>
+
+* Remove help `css` deprecated support
+
+  <details>
+  
+  Help widget `css` support is removed, use `variant` instead.
+  
+  </details>
+
+#### Fix
+
+* Fix StringTemplate not taking into account locale for LocalDate/LocalDateTome/LocalTime formatting
+* Render Label widget as static text instead of a template
+* Fix item count in grid group aggregation
+
+  <details>
+  
+  On a grid with multiple groups, the item count displayed on each level was incorrect.
+  
+  </details>
+
+* Fix prevents value change on number input via mouse wheel
+* Fix saving of custom attrs items in grid customization
+
+  <details>
+  
+  Custom attrs fields/buttons that were auto-added were not properly processed
+  when saving customization.
+  
+  This fixes preserving and removing of those fields.
+  
+  When saved, all custom fields are explicitly present as view items.
+  
+  </details>
+
+* Fix edit-window support and check perms in m2o editor
+* Fix audit tracking issue when L1 cache is cleared
+
+  <details>
+  
+  When a tracked value is lazy proxy and is not in L1 cache, it will
+  give lazy initialization error.
+  
+  </details>
+
+* Fix show download option in binary widget
+* Fix tree-grid border styles
+* Same context for form field and json field
+
+  <details>
+  
+  With this change custom field and form field are accessible through
+  same way, i.e. form field can directly be accessed and custom fields are 
+  accessed like `$attr.customFieldName` in both kinds of fields.
+  
+  </details>
+
+* Fix null base url when using TenantAware
+* Fix generateCode task spurious warning "track unknown field"
+
+  <details>
+  
+  When defining an entity in xml, extending an entity not available in project source (defined in dependencies),
+  that super entity was not available in lookup and caused spurious warning "track unknown field".
+  
+  Now make sure to compute lookup for any super classes if not present.
+  
+  </details>
+
+* Fix add $attachments to form action context
+* Fix styles for top level tree-grid
+* Allow selecting all custom fields when customizing grid columns
+
+  <details>
+  
+  When there are no custom fields in original grid view, all custom fields visible in grid are added to view.
+  
+  But in the case when there is at least one custom field defined in original view, only that custom field was listed 
+  in grid customization selector. Now all custom fields are listed, even those who aren't checked are visible in grid.
+  
+  </details>
+
+* Check MetaPermissionRule on mass update
+
+  <details>
+  
+  During massUpdate web service, if any fields are not allowed to be updated through 
+  MetaPermissionRule, return an exception and display it to the user.
+  
+  </details>
+
+* Add client side searching/sorting to fields selector grid
+* Fix closing LDAP connection pool when shutting down Tomcat
+
+  <details>
+  
+  With Runtime.getRuntime().addShutdownHook(),
+  closing LDAP connection pool will attempt to log something
+  after the web application has already been stopped.
+  
+  Instead, now observing ShutdownEvent,
+  ensuring we close LDAP connection pool within application lifecycle.
+  
+  Fixes various NoClassDefFoundError, such as:
+  
+  java.lang.NoClassDefFoundError: ch/qos/logback/classic/spi/ThrowableProxy
+  Caused by: java.lang.ClassNotFoundException: Illegal access: this web application instance has been stopped already.
+  Caused by: java.lang.IllegalStateException: Illegal access: this web application instance has been stopped already.
+  
+  </details>
+
+* Fix json fields in customized grid
+
+  <details>
+  
+  Fix json fields handling in customized grid leading to duplication issues.
+  
+  </details>
+
+* Validate image size against maximum upload size setting on html widget
+
+#### Security
+
+* Don't allow arbitrary file as template and export name in axelor-export
+
+  <details>
+  
+  The template file should be either uploaded MetaFile or should be
+  within the `template.search-dir`.
+  
+  Shouldn't be possible to have a "path" as export name (eg some/foo.xml).
+  
+  </details>
+
+
 ## 7.4.3 (2025-07-17)
 
 #### Feature
@@ -3928,12 +6191,12 @@
   <field name="myTextField" widget="markdown"/>
   ```
   
-  | Attribute           | Description                                                    |
-  | ------------------- | -------------------------------------------------------------- |
-  |`x-lite`             | Enable lite toolbar (defaults to `false`)                      |
-  |`x-preview-style`    | Markdown editor's preview style: `tab` (default), `vertical`   |
-  |`x-initial-edit-type`| Initial editor type: `markdown` (default), `wysiwyg`           |
-  |`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`) |
+  | Attribute             | Description                                                    |
+  |-----------------------|----------------------------------------------------------------|
+  | `x-lite`              | Enable lite toolbar (defaults to `false`)                      |
+  | `x-preview-style`     | Markdown editor's preview style: `tab` (default), `vertical`   |
+  | `x-initial-edit-type` | Initial editor type: `markdown` (default), `wysiwyg`           |
+  | `x-hide-mode-switch`  | Whether to hide edit typo switch tab bar (defaults to `false`) |
   
   </details>
 
@@ -5054,7 +7317,7 @@
 
   <details>
   
-  `javax.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
+  `jakarta.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
   to overwrite the `shared-cache-mode` from `persistence.xml`. It allow to enable/disable
   the shared cache mode (ie second-level cache).
   

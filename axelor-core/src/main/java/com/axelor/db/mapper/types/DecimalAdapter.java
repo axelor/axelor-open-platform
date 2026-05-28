@@ -1,30 +1,16 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.mapper.types;
 
 import com.axelor.db.mapper.TypeAdapter;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Digits;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import javax.persistence.Column;
-import javax.validation.constraints.Digits;
 
 public class DecimalAdapter implements TypeAdapter<BigDecimal> {
 
@@ -35,22 +21,21 @@ public class DecimalAdapter implements TypeAdapter<BigDecimal> {
     Integer scale = null;
     Boolean nullable = null;
     for (Annotation a : annotations) {
-      if (a instanceof Digits) {
-        scale = ((Digits) a).fraction();
+      if (a instanceof Digits digits) {
+        scale = digits.fraction();
       }
-      if (a instanceof Column) {
-        nullable = ((Column) a).nullable();
+      if (a instanceof Column column) {
+        nullable = column.nullable();
       }
     }
 
-    boolean empty =
-        value == null || (value instanceof String && "".equals(((String) value).trim()));
+    boolean empty = value == null || (value instanceof String s && "".equals(s.trim()));
     if (empty) {
       return Boolean.TRUE.equals(nullable) ? null : BigDecimal.ZERO;
     }
 
-    if (value instanceof BigDecimal) {
-      return adjust((BigDecimal) value, scale);
+    if (value instanceof BigDecimal decimal) {
+      return adjust(decimal, scale);
     }
     return adjust(new BigDecimal(value.toString()), scale);
   }

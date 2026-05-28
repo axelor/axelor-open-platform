@@ -70,7 +70,7 @@ Let's create a controller class `HelloController` that uses the above `HelloServ
 ----
 package com.axelor.hello.web
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 import com.axelor.hello.db.Hello
 

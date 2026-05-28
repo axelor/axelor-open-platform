@@ -1,24 +1,9 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.test;
 
-import com.axelor.db.JPA;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -26,11 +11,11 @@ import com.google.inject.Module;
 import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.RequestScoper;
 import com.google.inject.servlet.ServletScopes;
+import jakarta.persistence.EntityManagerFactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -75,17 +60,17 @@ public class GuiceExtension
 
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
-    injector = null;
-
     // Close the entity manager factory else when tests ends, the connection
     // aren't resealed. After many tests there is too many clients
     try {
-      EntityManagerFactory managerFactory = JPA.em().getEntityManagerFactory();
+      EntityManagerFactory managerFactory = injector.getInstance(EntityManagerFactory.class);
       if (managerFactory != null) {
         managerFactory.close();
       }
     } catch (Exception ex) {
       // ignore
+    } finally {
+      injector = null;
     }
   }
 

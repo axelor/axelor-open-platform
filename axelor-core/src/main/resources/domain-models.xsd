@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
-    Axelor Business Solutions
-
-    Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+   SPDX-FileCopyrightText: Axelor <https://axelor.com>
+   SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/domain-models"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://axelor.com/xml/ns/domain-models"
-  elementFormDefault="qualified" attributeFormDefault="unqualified" version="7.4">
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="8.2">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -464,7 +448,7 @@
         <xsd:attribute name="large" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              Whether the text value is large (CLOB in database).
+              Whether the text value is large (use bytea database type).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -570,12 +554,30 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="large" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the binary value is large (Reference to a Large Object stored in pg_largeobject system table).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="default" use="prohibited"/>
         <xsd:attribute name="readonly" use="prohibited"/>
         <xsd:attribute name="unique" use="prohibited"/>
         <xsd:attribute name="hidden" use="prohibited"/>
         <xsd:attribute name="massUpdate" use="prohibited"/>
       </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Uuid">
+    <xsd:annotation>
+      <xsd:documentation>UUID Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="dm:SimpleColumn">
+        <xsd:attribute name="selection" use="prohibited"/>
+      </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
 
@@ -942,6 +944,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
+        <xsd:element name="uuid" type="dm:Uuid">
+          <xsd:annotation>
+            <xsd:documentation>
+              UUID field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
         <xsd:element name="one-to-one" type="dm:OneToOneColumn">
           <xsd:annotation>
             <xsd:documentation>
@@ -1052,6 +1061,7 @@
         <xsd:documentation>
           Whether the records of this entity should be in
           unique sequence (else a global sequence will be used).
+          DEPRECATED: shouldn't be used, will use a sequence per entity
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1155,6 +1165,13 @@
           </xsd:enumeration>
         </xsd:restriction>
       </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="allocationSize" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>
+          The amount to increment by when allocating sequence numbers from the sequence.
+        </xsd:documentation>
+      </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
 

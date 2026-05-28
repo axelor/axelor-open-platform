@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -29,7 +15,7 @@ import com.axelor.quartz.JobRunner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.quartz.Job;
@@ -86,7 +72,7 @@ public class TestScheduler extends AbstractTest {
   public void test() throws SchedulerException, InterruptedException {
     int current = 0;
     jobCounter = 0;
-    runner.start();
+    runner.init();
     Thread.sleep(3000);
     current = jobCounter;
     assertEquals(4, current);
@@ -97,6 +83,6 @@ public class TestScheduler extends AbstractTest {
     current = jobCounter;
     assertEquals(6, current);
 
-    runner.stop();
+    runner.shutdown();
   }
 }

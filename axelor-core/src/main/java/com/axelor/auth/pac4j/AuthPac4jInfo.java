@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
@@ -24,20 +10,24 @@ import com.axelor.auth.pac4j.local.AxelorAuthenticator;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.authenticator.Authenticator;
+import org.pac4j.core.profile.UserProfile;
 import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.JEEFrameworkParameters;
 
 @Singleton
 public class AuthPac4jInfo {
 
   private Authenticator authenticator;
-
-  public String getBaseUrl() {
-    return AppSettings.get().getBaseURL();
-  }
 
   /**
    * Return the main callback endpoint for users authentication
@@ -45,9 +35,14 @@ public class AuthPac4jInfo {
    * @return url form where the users are authenticated
    */
   public String getCallbackUrl() {
-    String authCallbackUrl = AppSettings.get().get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
+    AppSettings settings = AppSettings.get();
+    String authCallbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
     if (StringUtils.isBlank(authCallbackUrl)) {
-      authCallbackUrl = UriBuilder.from(getBaseUrl()).addPath("/callback").toUri().toString();
+      authCallbackUrl =
+          UriBuilder.from(Optional.ofNullable(settings.getBaseURL()).orElse(""))
+              .addPath("/callback")
+              .toUri()
+              .toString();
     }
     return authCallbackUrl;
   }
@@ -61,7 +56,7 @@ public class AuthPac4jInfo {
     final AppSettings settings = AppSettings.get();
     String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_DEFAULT_URL, null);
     if (StringUtils.isBlank(authLogoutUrl)) {
-      authLogoutUrl = getBaseUrl();
+      authLogoutUrl = settings.getBaseURL();
       if (StringUtils.isBlank(authLogoutUrl)) {
         authLogoutUrl = ".";
       }
@@ -81,8 +76,28 @@ public class AuthPac4jInfo {
     return authenticator;
   }
 
+  public Optional<UserProfile> getUserProfile(ServletRequest request, ServletResponse response) {
+    final var config = Beans.get(Config.class);
+    final var webContextFactory = config.getWebContextFactory();
+    final var sessionStoreFactory = config.getSessionStoreFactory();
+    final var profileManagerFactory = config.getProfileManagerFactory();
+
+    final var parameters =
+        new JEEFrameworkParameters((HttpServletRequest) request, (HttpServletResponse) response);
+
+    final var context = webContextFactory.newContext(parameters);
+    final var sessionStore = sessionStoreFactory.newSessionStore(parameters);
+    final var profileManager = profileManagerFactory.apply(context, sessionStore);
+
+    return profileManager.getProfile();
+  }
+
+  public static boolean isXHR(CallContext ctx) {
+    return isXHR(ctx.webContext());
+  }
+
   public static boolean isXHR(WebContext context) {
-    return context instanceof JEEContext && isXHR(((JEEContext) context).getNativeRequest());
+    return context instanceof JEEContext jeeContext && isXHR(jeeContext.getNativeRequest());
   }
 
   public static boolean isXHR(HttpServletRequest request) {

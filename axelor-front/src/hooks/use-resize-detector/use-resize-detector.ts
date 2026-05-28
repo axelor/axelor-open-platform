@@ -1,15 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-export function useResizeDetector() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [size, setSize] = useState<{ height: number; width: number }>();
+export function useResizeDetector({
+  keepLastSize = false,
+}: {
+  keepLastSize?: boolean;
+} = {}) {
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  const [size, setSize] = useState<{ height?: number; width?: number }>({});
 
   useEffect(() => {
-    const { current } = ref;
+    const current = ref;
     if (current == null) return;
 
     let cancelled = false;
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
 
     const observer = new ResizeObserver((entries) => {
       if (cancelled) return;
@@ -18,7 +22,15 @@ export function useResizeDetector() {
         for (const entry of entries) {
           if (entry.target === current) {
             const { height, width } = entry.contentRect;
-            setSize({ height, width });
+            setSize((prev) => {
+              const nextHeight =
+                keepLastSize && !height ? prev.height : height;
+              const nextWidth = keepLastSize && !width ? prev.width : width;
+              if (prev.height === nextHeight && prev.width === nextWidth) {
+                return prev;
+              }
+              return { height: nextHeight, width: nextWidth };
+            });
           }
         }
       }, 500);
@@ -32,12 +44,10 @@ export function useResizeDetector() {
       observer.unobserve(current);
       observer.disconnect();
     };
-  }, [ref]);
+  }, [ref, keepLastSize]);
 
-  const { height, width } = size ?? {
-    height: ref.current?.offsetHeight,
-    width: ref.current?.offsetWidth,
-  };
+  const height = size.height ?? ref?.offsetHeight;
+  const width = size.width ?? ref?.offsetWidth;
 
-  return { ref, height, width };
+  return { ref: setRef, height, width };
 }

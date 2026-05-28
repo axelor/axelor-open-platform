@@ -1,37 +1,28 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.gradle;
 
+import com.axelor.common.PropertiesUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.axelor.common.YamlUtils;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -61,27 +52,50 @@ public class AxelorUtils {
   private static final String EE_SUFFIX = "enterprise";
   private static final String USE_EE_PLATFORM_PROPERTY = "axelor.platform.ee";
 
+  private static final String CONFIGS_FILES_PATH = "src/main/resources";
+  private static final List<String> CONFIGS_FILES =
+      List.of("axelor-config.properties", "axelor-config.yml", "axelor-config.yaml");
+
   private AxelorUtils() {}
 
   private static LoadingCache<Project, List<Project>> includedBuildRootsCache =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .build(
-              new CacheLoader<Project, List<Project>>() {
-                @Override
-                public List<Project> load(Project project) throws Exception {
-                  return project.getGradle().getIncludedBuilds().stream()
-                      .map(b -> ((IncludedBuildInternal) b).getTarget())
-                      .map(b -> b.getMutableModel().getRootProject())
-                      .collect(Collectors.toList());
-                }
+              project -> {
+                return project.getGradle().getIncludedBuilds().stream()
+                    .map(b -> ((IncludedBuildInternal) b).getTarget())
+                    .map(b -> b.getMutableModel().getRootProject())
+                    .collect(Collectors.toList());
               });
+
+  public static Path findAxelorConfig(Project project) {
+    Path rootPath = project.getRootDir().toPath().resolve(CONFIGS_FILES_PATH);
+    return CONFIGS_FILES.stream()
+        .map(rootPath::resolve)
+        .filter(Files::exists)
+        .findFirst()
+        .orElse(null);
+  }
+
+  public static Map<String, String> parseAxelorConfig(Project project, Path filePath) {
+    try {
+      if (filePath.toString().endsWith(".properties")) {
+        return PropertiesUtils.propertiesToMap(PropertiesUtils.loadProperties(filePath));
+      } else {
+        return YamlUtils.getFlattenedMap(YamlUtils.loadYaml(filePath));
+      }
+    } catch (Exception e) {
+      project.getLogger().error("Unable to open configuration file %s".formatted(filePath));
+    }
+    return new HashMap<>();
+  }
 
   public static String toRelativePath(Project project, File file) {
     return project.getProjectDir().toPath().relativize(file.toPath()).toString();
   }
 
   private static List<Project> includedBuildRoots(Project project) {
-    return includedBuildRootsCache.getUnchecked(project);
+    return includedBuildRootsCache.get(project);
   }
 
   public static List<Project> findIncludedBuildProjects(Project project) {
@@ -199,8 +213,7 @@ public class AxelorUtils {
 
   public static Project findProject(Project project, ResolvedArtifact artifact) {
     final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
-    if (cid instanceof ProjectComponentIdentifier) {
-      ProjectComponentIdentifier id = (ProjectComponentIdentifier) cid;
+    if (cid instanceof ProjectComponentIdentifier id) {
       String path = id.getProjectPath();
       Project sub = project.findProject(path);
       if (":".equals(path)) {
@@ -252,7 +265,7 @@ public class AxelorUtils {
       return;
     }
 
-    if (shouldUsePlatformEE(project)) {
+    if (usePlatformEE(project)) {
       project
           .getConfigurations()
           .all(
@@ -278,7 +291,7 @@ public class AxelorUtils {
   }
 
   private static void addImplementations(Project project) {
-    final boolean useEE = shouldUsePlatformEE(project);
+    final boolean useEE = usePlatformEE(project);
     final String version = VersionUtils.getVersion().version;
     final String config = JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME;
 
@@ -322,7 +335,7 @@ public class AxelorUtils {
     return module;
   }
 
-  private static boolean shouldUsePlatformEE(Project project) {
+  public static boolean usePlatformEE(Project project) {
     return Boolean.parseBoolean((String) project.findProperty(USE_EE_PLATFORM_PROPERTY));
   }
 

@@ -376,7 +376,7 @@ auth.provider.keycloak.secret = 233d1690-4498-490c-a60d-5d12bb685557
 # provider authentication realm
 auth.provider.keycloak.realm = demo-app
 # Keycloak server base URI
-auth.provider.keycloak.base-uri = http://localhost:8083/auth
+auth.provider.keycloak.base-uri = http://localhost:8083/
 
 # Google
 # Client: org.pac4j.oidc.client.GoogleOidcClient
@@ -607,12 +607,13 @@ auth.provider.saml.private-key-password = open-platform-demo-passwd
 auth.provider.saml.identity-provider-metadata-path = http://localhost:9012/simplesaml/saml2/idp/metadata.php
 # path to SP metadata
 auth.provider.saml.service-provider-metadata-path = path/to/sp-metadata.xml
-# full callback URL for proper SP metadata generation
-auth.provider.saml.callback-url = https://example.com/my-axelor-app/callback
+# SP entity ID
+auth.provider.saml.service-provider-entity-id = sp.test.pac4j
 -----
 
+NOTE: Proper SP metadata generation requires a full callback URL. This means you must set either `application.base-url` (so that callback URL can be computed as `application.base-url` + "/callback") or `auth.callback-url`.
+
 By default, the SAML client will accept assertions based on a previous authentication for one hour, but you can change that behavior.
-The service provider entity ID defaults to `auth.callback-url` + "?client_name=SAML2Client", but you can customize it.
 
 .axelor-config.properties
 [source,properties]
@@ -621,8 +622,6 @@ The service provider entity ID defaults to `auth.callback-url` + "?client_name=S
 #
 # accept assertions based on a previous authentication for one hour by default
 auth.provider.saml.maximum-authentication-lifetime = 3600
-# custom SP entity ID
-auth.provider.saml.service-provider-entity-id = sp.test.pac4j
 -----
 
 You can control aspects of the authentication request such as forced and/or passive authentication.
@@ -807,12 +806,29 @@ You may tweak user and group search if needed for your LDAP server.
 # template to search users by user identifier
 auth.ldap.user.filter = (uid={0})
 
-# user identifier attribute: uid / cn
+# define the user DN format
+auth.ldap.user.dn-format =
+
+# user identifier attribute: uid / cn (default to `uid`)
 auth.ldap.user.id-attribute = uid
+
+# define the username attribute (default to `uid`)
+auth.ldap.user.username-attribute = uid
+
+# Enable subtree search for users (true by default)
+auth.ldap.user.search.subtree = true
 
 # template to search groups by user identifier
 auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
+
+# Enable subtree search for groups (true by default)
+auth.ldap.group.search.subtree = true
 -----
+
+NOTE: Perform DN resolution for users by specifying either `auth.ldap.user.filter` _or_ `auth.ldap.user.dn-format`.
+If you specify neither, it will fall back to formatter built from `auth.ldap.user.id-attribute` and `auth.ldap.user.base`
+(e.g., `uid=%s,ou=users,dc=example,dc=com`) where `%s` will be assigned the user identifier value.
+Also, `auth.ldap.user.search.subtree` is applicable when using `auth.ldap.user.filter` only.
 
 :ldap-profile-service: https://github.com/pac4j/pac4j/blob/master/pac4j-ldap/src/main/java/org/pac4j/ldap/profile/service/LdapProfileService.java[LdapProfileService]
 
@@ -914,3 +930,43 @@ When the user is done, they may call the logout endpoint.
 # Basic authentication
 auth.local.basic-auth = indirect, direct
 -----
+
+== Emergency Password Reset
+
+In a disaster or recovery scenario — for example, when an administrator has lost their credentials and cannot log in
+— it is not possible to reset the password through the application UI. Instead, a system administrator can generate a
+new password hash and update the user record directly in the database.
+
+Axelor uses Apache Shiro with Argon2id for password hashing. The `shiro-tools-hasher` command-line tool, provided by
+the Shiro project, can generate a compatible hash for any plain-text password.
+
+=== Generate a password hash
+
+Download the `shiro-tools-hasher` jar and run:
+
+[source,bash]
+----
+(cd /tmp && curl -sSL -O https://repo1.maven.org/maven2/org/apache/shiro/tools/shiro-tools-hasher/2.1.0/shiro-tools-hasher-2.1.0-cli.jar)
+java -jar /tmp/shiro-tools-hasher-2.1.0-cli.jar -a argon2id -p
+----
+
+The tool will prompt for the password interactively (input is not echoed). It outputs a hash string  in the format
+`$shiro2$argon2id$...`, which is the value to store in the database.
+
+=== Update the user record
+
+Once you have the hash, update the user's password directly in the database:
+
+[source,sql]
+----
+UPDATE auth_user SET password = '$shiro2$argon2id$...' WHERE code = 'my_user';
+----
+
+Replace `$shiro2$argon2id$...` with the hash generated in the previous step and `my_user` with the actual login code of
+the user to recover.
+
+[CAUTION]
+====
+This is a low-level operation that bypasses all application-level password policies. It should only be performed by a
+trusted system administrator as part of a controlled recovery procedure.
+====

@@ -41,7 +41,6 @@ export function useHttpWatch() {
                 return;
               }
             }
-            setCount((count) => count - 1);
             return new Promise((resolve, reject) => {
               setPending((pending) => [
                 ...pending,
@@ -57,9 +56,10 @@ export function useHttpWatch() {
             });
           } else if (res.status >= 500) {
             const contentType = res.headers.get("Content-Type");
+            const showErrorPage = res.headers.get("X-Show-Error-Page");
 
             // Response has HTML content, so we show it as full page.
-            if (contentType?.includes("text/html")) {
+            if (contentType?.includes("text/html") && showErrorPage === "true") {
               const html = await res.text();
               if (html.trim()) {
                 document.open();
@@ -72,7 +72,7 @@ export function useHttpWatch() {
               }
             }
 
-            // Show alert when response has no HTML content.
+            // else show alert error
             const technical = session.info?.user?.technical;
             const message = i18n.get(
               "An error has occurred{0}. Please contact your administrator.",

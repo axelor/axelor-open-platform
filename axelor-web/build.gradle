@@ -12,7 +12,7 @@ dependencies {
   testImplementation project(":axelor-test")
   implementation project(":axelor-core")
 
-  compileOnly libs.javax_servlet
+  compileOnly libs.jakarta_servlet
   compileOnly libs.websocket_api
 
   implementation libs.resteasy
@@ -24,14 +24,14 @@ dependencies {
   implementation libs.apache_shiro
   implementation libs.eclipselink_moxy
   implementation libs.buji_pac4j
-
+  implementation libs.redisson
 }
 
 jar {
   into('webapp') {
     from "src/main/webapp"
     from "${rootDir}/axelor-front/dist"
-    duplicatesStrategy 'exclude'
+    duplicatesStrategy = 'exclude'
   }
 }
 

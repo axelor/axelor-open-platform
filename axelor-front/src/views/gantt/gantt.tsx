@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import get from "lodash/get";
+
 import { Box, DndProvider } from "@axelor/ui";
 import {
   ConnectProps,
   GANTT_TYPES,
   Gantt as GanttComponent,
+  GanttData,
   GanttField,
+  GanttFieldRenderer,
   GanttRecord,
   GanttType,
-  GanttData,
-  GanttFieldRenderer,
 } from "@axelor/ui/gantt";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -20,15 +22,24 @@ import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
-import { Field, GanttView, Widget } from "@/services/client/meta.types";
+import { Field, GanttView, JsonField, Widget } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import format from "@/utils/format";
 import { compare } from "@/utils/sort";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+import {
+  useViewContext,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
-import { formatRecord, getFieldNames, transformRecord } from "./utils";
+import {
+  formatRecord,
+  getFieldValue,
+  getJsonFieldNames,
+  transformRecord,
+} from "./utils";
 
 import styles from "./gantt.module.scss";
 
@@ -114,10 +125,40 @@ function ActionsCell({
   );
 }
 
+function extractJsonFieldValue(taskData: DataRecord, column: Field): any {
+  const { jsonField, jsonPath } = column as JsonField;
+  if (!jsonField || !jsonPath) return undefined;
+  const blob = taskData[jsonField];
+  if (blob == null) return undefined;
+  try {
+    const parsed = typeof blob === "string" ? JSON.parse(blob) : blob;
+    const raw = get(parsed, jsonPath);
+    // Relation fields within JSON blobs are stored as stringified JSON objects
+    if (typeof raw === "string" && (column as JsonField).targetName) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        // fall through and return raw value
+      }
+    }
+    return raw;
+  } catch {
+    return undefined;
+  }
+}
+
 function fieldFormatter(column: Field, value: any, record: any) {
-  return format(value, {
+  const taskData = (record as GanttRecord).taskData as DataRecord | undefined;
+  const context = taskData ?? record;
+
+  let val = value;
+  if (val === undefined && taskData && (column as JsonField).jsonField) {
+    val = extractJsonFieldValue(taskData, column);
+  }
+
+  return format(val, {
     props: column,
-    context: record,
+    context,
   });
 }
 
@@ -128,18 +169,22 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const showEditor = useManyEditor(action, dashlet);
   const getViewContext = useViewContext();
 
-  const { fields, view } = meta;
+  const { fields, jsonFields, view } = meta;
   const { items } = view;
   const { domain, context } = action;
 
-  const fieldNames = useMemo(() => getFieldNames(view), [view]);
+  const fieldNames = useMemo(
+    () => getJsonFieldNames(view, jsonFields),
+    [view, jsonFields],
+  );
 
   const { formatter, transformer } = useMemo(
     () => ({
-      formatter: (record: DataRecord) => formatRecord(view, record),
-      transformer: (record: GanttRecord) => transformRecord(view, record),
+      formatter: (record: DataRecord) => formatRecord(view, record, jsonFields),
+      transformer: (record: GanttRecord, source?: DataRecord) =>
+        transformRecord(view, record, source, jsonFields),
     }),
-    [view],
+    [view, jsonFields],
   );
 
   const handleExpand = useCallback(
@@ -182,16 +227,20 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       const set = connectSetTypes[`${source}_${target}`];
       const record = records.find((r) => r.id === finishId);
       if (record) {
-        const $set: DataRecord[] = record[set] || [];
+        const $set: DataRecord[] = formatter(record)?.[set] || [];
         if (!$set?.find((obj) => String(obj.id) === String(startId))) {
           return updateRecord({
-            ...record,
-            [set]: [...$set, { id: startId }],
+            id: record.id,
+            version: record.version,
+            ...transformer(
+              { [set]: [...$set, { id: startId }] } as unknown as GanttRecord,
+              record,
+            ),
           });
         }
       }
     },
-    [records, updateRecord],
+    [records, formatter, transformer, updateRecord],
   );
 
   const handleRecordDisconnect = useCallback(
@@ -199,14 +248,20 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       const set = connectSetTypes[`${source}_${target}`];
       const record = records.find((r) => r.id === finishId);
       if (record) {
-        const $set: DataRecord[] = record[set] || [];
+        const $set: DataRecord[] = formatter(record)?.[set] || [];
         return updateRecord({
-          ...record,
-          [set]: $set?.filter((obj) => String(obj.id) !== String(startId)),
+          id: record.id,
+          version: record.version,
+          ...transformer(
+            {
+              [set]: $set?.filter((obj) => String(obj.id) !== String(startId)),
+            } as unknown as GanttRecord,
+            record,
+          ),
         });
       }
     },
-    [records, updateRecord],
+    [records, transformer, formatter, updateRecord],
   );
 
   const handleRecordUpdate = useCallback(
@@ -214,7 +269,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       updateRecord({
         id: record.id,
         version: record.version,
-        ...transformer(changes as GanttRecord),
+        ...transformer(changes as GanttRecord, record as DataRecord),
       }),
     [transformer, updateRecord],
   );
@@ -240,12 +295,16 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
   const showRecordEditor = useCallback(
     (record: GanttData) => {
-      const { model, title } = view;
+      const { model, title, jsonModel } = view;
       if (model) {
         const isNew = !record.id;
+        if (isNew && jsonModel) {
+          (record as DataRecord).jsonModel = jsonModel;
+        }
         showEditor({
           title: title ?? "",
           model,
+          jsonModel,
           record,
           viewName: action.views?.find((v) => v.type === "form")?.name,
           readonly: false,
@@ -267,24 +326,26 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
   const handleRecordAddSubTask = useCallback(
     async (record?: DataRecord) => {
-      const { taskParent, taskDuration, taskProgress, taskStart } = view;
-      showRecordEditor({
-        ...(taskStart && {
-          [taskStart]: moment().format("YYYY-MM-DDTHH:mm:ss[Z]"),
-        }),
-        ...(taskDuration && { [taskDuration]: 1 }),
-        ...(taskProgress && { [taskProgress]: 0 }),
-        ...(taskParent &&
-          record && {
-            [taskParent]: {
-              id: record.id,
-              version: record.version,
-              name: record.name,
-            },
-          }),
-      } as GanttData);
+      const ganttData: Partial<GanttRecord> = {};
+      if (view.taskStart) {
+        ganttData.startDate = moment().format("YYYY-MM-DDTHH:mm:ss[Z]");
+      }
+      if (view.taskDuration) {
+        ganttData.duration = 1;
+      }
+      if (view.taskProgress) {
+        ganttData.progress = 0;
+      }
+      if (view.taskParent && record) {
+        ganttData.parent = {
+          id: record.id,
+          version: record.version,
+          name: record.name,
+        } as any;
+      }
+      showRecordEditor(transformer(ganttData as GanttRecord) as GanttData);
     },
-    [view, showRecordEditor],
+    [view, transformer, showRecordEditor],
   );
 
   useEffect(() => {
@@ -361,7 +422,8 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
   const ganttRecords = useMemo(() => {
     const { taskStart = "", taskSequence, taskParent = "" } = view;
-    const getParent = (task: DataRecord) => task[taskParent];
+    const getParent = (task: DataRecord) =>
+      getFieldValue(task, taskParent, jsonFields);
 
     function collect(
       parent?: DataRecord["id"],
@@ -369,15 +431,16 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     ): DataRecord[] {
       let dataset = records.filter(
         (item) =>
-          item[taskStart] &&
-          (parent
-            ? (getParent(item) || {}).id === parent
-            : getParent(item) === parent),
+          getFieldValue(item, taskStart, jsonFields) &&
+          getParent(item)?.id == parent,
       );
 
       if (taskSequence) {
         dataset = dataset.sort((x1, x2) =>
-          compare(x1[taskSequence], x2[taskSequence]),
+          compare(
+            getFieldValue(x1, taskSequence, jsonFields),
+            getFieldValue(x2, taskSequence, jsonFields),
+          ),
         );
       }
 
@@ -396,7 +459,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
     const list = collect(null);
     return list.map(formatter) as GanttRecord[];
-  }, [view, formatter, records]);
+  }, [view, formatter, records, jsonFields]);
 
   // register tab:refresh
   useViewTabRefresh("gantt", onSearch);

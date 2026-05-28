@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
@@ -22,13 +8,13 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +51,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
     logger.debug("result: {}", result.stream().map(Client::getName).collect(Collectors.toList()));
 
     // fallback: no client found and we have a default client, use it
-    if (result.isEmpty() && CommonHelper.isNotBlank(clientNames)) {
+    if (result.isEmpty() && StringUtils.isNotBlank(clientNames)) {
       clients
           .findClient(clientNames)
           .filter(this::isInitialized)
@@ -78,7 +64,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
     // fallback: no client found and we only have one indirect client, use it
     if (result.isEmpty() && indirectClients.size() == 1) {
-      logger.debug("Defaulting to the only client: {}", indirectClients.get(0));
+      logger.debug("Defaulting to the only client: {}", indirectClients.getFirst());
       result.addAll(indirectClients);
     }
 
@@ -86,8 +72,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
   }
 
   private boolean isInitialized(Client client) {
-    if (client instanceof BaseClient) {
-      final BaseClient baseClient = ((BaseClient) client);
+    if (client instanceof BaseClient baseClient) {
       return baseClient.getCredentialsExtractor() != null && baseClient.getAuthenticator() != null;
     }
     return true;

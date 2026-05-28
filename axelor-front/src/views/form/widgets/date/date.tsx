@@ -5,6 +5,7 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -22,6 +23,7 @@ import {
   getTimeFormat,
 } from "@/utils/format";
 import { toCamelCase } from "@/utils/names";
+import { useFormOverlay } from "@/views/form/builder/overlay-scope";
 
 import { FieldControl, FieldProps, WidgetState } from "../../builder";
 import { ViewerInput } from "../string/viewer";
@@ -53,6 +55,7 @@ export function DateComponent({
   value,
   onChange,
   trapFocus,
+  inputId,
 }: {
   schema: Schema;
   value?: string | null;
@@ -61,15 +64,18 @@ export function DateComponent({
   readonly?: boolean;
   invalid?: boolean;
   trapFocus?: boolean;
+  inputId?: string;
 }) {
   const { focus } = attrs || {};
-  const { uid, placeholder } = schema;
-  const pickerRef = useRef<any>();
+  const { placeholder } = schema;
+  const pickerRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const valueRef = useRef<string | null>();
+  const valueRef = useRef<string | null>(undefined);
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
+  const openRef = useRef(false);
+  const { onOpenOverlay, onCloseOverlay } = useFormOverlay();
 
   const type =
     toCamelCase(
@@ -93,12 +99,27 @@ export function DateComponent({
   );
   const [valueFormat, format] = dateFormats[type] || dateFormats.date;
 
+  const notifyOpen = useCallback(() => {
+    if (!openRef.current) {
+      openRef.current = true;
+      onOpenOverlay?.();
+    }
+  }, [onOpenOverlay]);
+
+  const notifyClose = useCallback(() => {
+    if (openRef.current) {
+      openRef.current = false;
+      onCloseOverlay?.();
+    }
+  }, [onCloseOverlay]);
+
   const getInput = useCallback(() => {
     const calendar = pickerRef.current;
     return calendar?.input?.inputElement as HTMLElement;
   }, []);
 
   const handleOpen = useCallback((isFocus?: boolean) => {
+    notifyOpen();
     setOpen(true);
     if (isFocus) {
       setTimeout(() => {
@@ -112,7 +133,7 @@ export function DateComponent({
         }
       }, 100);
     }
-  }, []);
+  }, [notifyOpen]);
 
   const handleBlur = useCallback(
     (e?: FocusEvent<HTMLElement>) => {
@@ -137,6 +158,7 @@ export function DateComponent({
 
   const handleClose = useCallback(
     (focus?: boolean) => {
+      notifyClose();
       setOpen(false);
       if (focus) {
         focusInput(getInput());
@@ -154,7 +176,7 @@ export function DateComponent({
         );
       }
     },
-    [getInput, handleBlur],
+    [getInput, handleBlur, notifyClose],
   );
 
   const handleClickOutSide = useCallback(
@@ -251,6 +273,10 @@ export function DateComponent({
   );
 
   useEffect(() => {
+    return () => notifyClose();
+  }, [notifyClose]);
+
+  useEffect(() => {
     // if value exist and it's invalid moment date value
     // then it should reset to null
     if (value && !$date) {
@@ -262,7 +288,7 @@ export function DateComponent({
     return (
       <Box ref={boxRef} d="flex">
         <Picker
-          id={uid}
+          id={inputId}
           showMonthDropdown
           showYearDropdown
           todayButton={
@@ -312,7 +338,6 @@ export function DateComponent({
           }
           onSelect={handleSelect}
           onChange={handleChange}
-          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           onClickOutside={handleClickOutSide}
         />
@@ -321,7 +346,7 @@ export function DateComponent({
   }
 
   return readonly ? (
-    <ViewerInput name={schema.name} value={textValue} />
+    <ViewerInput id={inputId} name={schema.name} value={textValue} />
   ) : trapFocus ? (
     <FocusTrap enabled={open}>{render()}</FocusTrap>
   ) : (
@@ -333,8 +358,9 @@ export function Date(props: FieldProps<string>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const [value, setValue] = useAtom(valueAtom);
   const { attrs } = useAtomValue(widgetAtom);
+  const id = useId();
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} inputId={id}>
       <DateComponent
         schema={schema}
         readonly={readonly}
@@ -342,6 +368,7 @@ export function Date(props: FieldProps<string>) {
         attrs={attrs}
         value={value}
         onChange={setValue}
+        inputId={id}
       />
     </FieldControl>
   );

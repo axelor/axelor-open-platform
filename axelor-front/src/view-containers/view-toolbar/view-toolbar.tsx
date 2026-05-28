@@ -1,6 +1,13 @@
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 
 import {
   Box,
@@ -8,14 +15,15 @@ import {
   CommandItem,
   CommandItemProps,
   RenderCommandItemProps,
+  useRefs,
 } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
+import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
-import { DataStore } from "@/services/client/data-store";
 import { toTitleCase } from "@/utils/names";
 
 import {
@@ -91,9 +99,16 @@ function ActionCommandItem({
     schema: Schema;
     context?: DataContext;
   }) {
-  const { name, showIf, hideIf, readonlyIf } = schema;
-  const [hidden, setHidden] = useState<boolean | undefined>(schema.hidden);
-  const [readonly, setReadonly] = useState<boolean>(schema.readonly);
+  const {
+    name,
+    hidden: hiddenBySchema,
+    readonly: readonlyBySchema,
+    showIf,
+    hideIf,
+    readonlyIf,
+  } = schema;
+  const [hidden, setHidden] = useState<boolean | undefined>();
+  const [readonly, setReadonly] = useState<boolean>();
 
   const attrs = useAtomValue(
     useMemo(
@@ -106,17 +121,20 @@ function ActionCommandItem({
     const hasExpr = showIf || hideIf || readonlyIf;
     if (!hasExpr) return;
     const updateAttrs = (record: DataRecord) => {
-      (showIf || hideIf) &&
-        setHidden((hidden) => {
+      if (showIf || hideIf) {
+        setHidden((_hidden) => {
           if (hideIf) {
-            hidden = !!parseExpression(hideIf)(record);
+            _hidden = !!parseExpression(hideIf)(record);
           }
-          if ((!hidden || !hideIf) && showIf) {
-            hidden = !parseExpression(showIf)(record);
+          if ((!_hidden || !hideIf) && showIf) {
+            _hidden = !parseExpression(showIf)(record);
           }
-          return hidden;
+          return _hidden;
         });
-      readonlyIf && setReadonly(parseExpression(readonlyIf)(record));
+      }
+      if (readonlyIf) {
+        setReadonly(parseExpression(readonlyIf)(record));
+      }
     };
 
     if (recordHandler) {
@@ -129,11 +147,12 @@ function ActionCommandItem({
   return (
     <CommandItem
       {...props}
+      text={attrs?.title || props.text}
       {...(schema.css && {
         variant: findButtonVariant(schema),
       })}
-      hidden={attrs?.hidden ?? hidden}
-      {...((readonly || attrs?.readonly) && {
+      hidden={hidden ?? attrs?.hidden ?? hiddenBySchema}
+      {...((readonly ?? attrs?.readonly ?? readonlyBySchema) && {
         onClick: undefined,
         disabled: true,
       })}
@@ -168,13 +187,13 @@ export function ToolbarActions({
   actionContext?: DataContext;
   buttons?: Button[];
   menus?: Menu[];
-  parentRef?: React.RefObject<HTMLDivElement>;
+  parentRef?: React.RefObject<HTMLDivElement | null>;
   parentWidth?: number;
 }) {
   const { action } = useViewTab();
   const actionContext = _actionContext ?? action.context;
 
-  const innerRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const responsive = useMemo(() => {
     // Compute total width of children, excluding responsive dropdown menu.
     let width = innerRef.current?.offsetWidth ?? 0;
@@ -270,7 +289,7 @@ export function ToolbarActions({
   );
 
   return (
-    <Box d="flex" textWrap={false} overflow="hidden">
+    <Box d="flex" textWrap={false} data-testid="view-actions">
       {responsive && (
         <CommandBar
           items={[
@@ -284,6 +303,8 @@ export function ToolbarActions({
               showDownArrow: true,
             } as CommandItemProps,
           ]}
+          data-testid="more"
+          aria-label={i18n.get("More actions")}
         />
       )}
       <Box
@@ -296,7 +317,7 @@ export function ToolbarActions({
           },
         })}
       >
-        <CommandBar items={items} />
+        <CommandBar items={items} data-testid="actions" />
       </Box>
     </Box>
   );
@@ -407,7 +428,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
         },
         onClick: () => switchToView(key),
       };
-    });
+    }) as CommandItemProps[];
   }, [views, viewType, switchToView]);
 
   const farItems = useMemo(() => {
@@ -465,11 +486,23 @@ export function ViewToolBar(props: ViewToolBarProps) {
     typeof pageTextOrComp === "function" ? pageTextOrComp : undefined;
 
   const { ref, width } = useResizeDetector();
+  const actionsContainerRef = useRef<HTMLDivElement | null>(null);
+  const handleRef = useRefs(ref, actionsContainerRef);
 
   return (
-    <Box className={styles.toolbar}>
-      <CommandBar className={styles.actions} iconOnly items={actions} />
-      <Box ref={ref} d="flex" className={styles.extra}>
+    <Box
+      className={styles.toolbar}
+      data-testid="toolbar"
+      role="toolbar"
+      aria-label={i18n.get("View toolbar")}
+    >
+      <CommandBar
+        className={styles.actions}
+        iconOnly
+        items={actions}
+        data-testid="common-actions"
+      />
+      <Box ref={handleRef} d="flex" className={styles.extra} gap={2}>
         {(toolbar?.length > 0 || menubar?.length > 0) && (
           <ToolbarActions
             buttons={toolbar}
@@ -478,13 +511,17 @@ export function ViewToolBar(props: ViewToolBarProps) {
             getActionData={getActionData}
             actionExecutor={actionExecutor}
             recordHandler={recordHandler}
-            parentRef={ref}
+            parentRef={actionsContainerRef}
             parentWidth={width}
           />
         )}
         {children}
       </Box>
-      {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
+      {pageText && (
+        <Box className={styles.pageInfo} data-testid="page-info">
+          {pageText}
+        </Box>
+      )}
       {PageComp && (
         <Box className={styles.pageInfo}>
           <PageComp />
@@ -493,6 +530,8 @@ export function ViewToolBar(props: ViewToolBarProps) {
       {pageActions && (
         <CommandBar
           className={styles.pageActions}
+          data-testid="page-actions"
+          aria-label={i18n.get("Page navigation")}
           items={[
             {
               key: "prev",
@@ -501,6 +540,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               },
               disabled: !canPrev,
               onClick: handlePrev,
+              description: i18n.get("Previous"),
             },
             {
               key: "next",
@@ -510,16 +550,26 @@ export function ViewToolBar(props: ViewToolBarProps) {
               },
               disabled: !canNext,
               onClick: handleNext,
+              description: i18n.get("Next"),
             },
             ...(paginationActions || []),
           ]}
         />
       )}
       {switchActions && (
-        <CommandBar items={switchActions} className={styles.viewSwitch} />
+        <CommandBar
+          items={switchActions}
+          className={styles.viewSwitch}
+          data-testid="view-switcher"
+          aria-label={i18n.get("Switch view")}
+        />
       )}
       {sessionInfo?.user?.technical && (
-        <CommandBar items={farItems} className={styles.farItems} />
+        <CommandBar
+          items={farItems}
+          className={styles.farItems}
+          data-testid="view-settings"
+        />
       )}
       {Boolean(helpLink) && (
         <CommandBar
@@ -535,6 +585,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             },
           ]}
           className={styles.helpLink}
+          data-testid="view-help"
         />
       )}
     </Box>

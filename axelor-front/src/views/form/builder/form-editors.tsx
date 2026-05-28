@@ -1,7 +1,8 @@
 import { Box, clsx } from "@axelor/ui";
 import { ScopeProvider } from "bunshi/react";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai-family";
 import filter from "lodash/filter";
 import cloneDeep from "lodash/cloneDeep";
 import getObjValue from "lodash/get";
@@ -12,7 +13,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useEditor, useSelector } from "@/hooks/use-relation";
+import { useEditor, useEditorInTab, useSelector, isPopupMaximized } from "@/hooks/use-relation";
+import { usePermitted } from "@/hooks/use-permitted";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -28,7 +30,8 @@ import {
 import { toKebabCase } from "@/utils/names.ts";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
-import { Layout as FormViewLayout, useGetErrors } from "../form";
+import { Layout as FormViewLayout } from "../form";
+import { getTopError, useGetErrors } from "./form-errors";
 import { createFormAtom, formDirtyUpdater } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
@@ -277,7 +280,9 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const model = schema.target!;
 
   const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
+  const isPermitted = usePermitted(model, perms);
   const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const hasValue = useAtomValue(
@@ -329,29 +334,54 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   const handleEdit = useAtomCallback(
     useCallback(
-      (get, set, readonly: boolean = false, record?: DataRecord) => {
+      async (get, set, _readonly: boolean = false, _record?: DataRecord) => {
+        const $record = _record ?? get(valueAtom);
+
+        if (!(await isPermitted($record, _readonly))) {
+          return;
+        }
+
+        if (showEditorInTab) {
+          return showEditorInTab($record, _readonly);
+        }
+
+        const jsonModel = schema.jsonTarget || schema.jsonModel;
         showEditor({
           model,
+          jsonModel,
           title: title ?? "",
-          onSelect: (record) => {
-            set(valueAtom, record, true);
-          },
-          record: record ?? get(valueAtom),
-          readonly,
+          onSelect: (record) => set(valueAtom, record, true),
+          record: $record,
+          readonly: _readonly,
+          maximize: isPopupMaximized(schema, "editor"),
           viewName: formViewName,
         });
       },
-      [model, formViewName, showEditor, title, valueAtom],
+      [
+        model,
+        formViewName,
+        isPermitted,
+        schema,
+        showEditor,
+        showEditorInTab,
+        title,
+        valueAtom,
+        schema.jsonTarget,
+        schema.jsonModel,
+      ],
     ),
   );
 
   const handleSelect = useAtomCallback(
     useCallback(
       async (get, set) => {
+        const jsonModel = schema.jsonTarget || schema.jsonModel;
         showSelector({
           model,
+          jsonModel,
           domain,
           orderBy,
+          maximize: isPopupMaximized(schema, "selector"),
           context: get(formAtom).record,
           limit: searchLimit,
           viewName: gridViewName,
@@ -370,11 +400,14 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         gridViewName,
         model,
         orderBy,
+        schema,
         searchLimit,
         canNew,
         showSelector,
         handleEdit,
         valueAtom,
+        schema.jsonTarget,
+        schema.jsonModel,
       ],
     ),
   );
@@ -400,22 +433,42 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const titleActions = !readonly && (
     <div className={styles.actions}>
       {canEdit && canShowIcon("edit") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Edit")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Edit")}
+          data-testid={"btn-edit"}
+        >
           <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
         </Box>
       )}
       {canView && !canEdit && canShowIcon("view") && (
-        <Box d="flex" alignItems="center" title={i18n.get("View")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("View")}
+          data-testid={"btn-view"}
+        >
           <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
         </Box>
       )}
       {canSelect && canShowIcon("select") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Select")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Select")}
+          data-testid={"btn-select"}
+        >
           <MaterialIcon icon="search" onClick={handleSelect} />
         </Box>
       )}
       {canRemove && canShowIcon("clear") && (
-        <Box d="flex" alignItems="center" title={i18n.get("Clear")}>
+        <Box
+          d="flex"
+          alignItems="center"
+          title={i18n.get("Clear")}
+          data-testid={"btn-clear"}
+        >
           <MaterialIcon icon="cancel" onClick={handleDelete} />
         </Box>
       )}
@@ -604,7 +657,7 @@ function useItemsFamily({
             set(itemsAtom, next, fireOnChange, markDirty);
           },
         ),
-      (a, b) => a.id === b.id,
+      (a: DataRecord, b: DataRecord) => a.id === b.id,
     );
   }, [itemsAtom, isInitial, isClean, exclusive, multiple]);
 
@@ -696,10 +749,11 @@ function useItemsFamily({
   const items = useAtomValue(itemsAtom);
   const isCleanInitial = !!initialItem && isClean(initialItem);
 
+  const itemsLength = items?.length;
   const ensureValid = useAtomCallback(
     useCallback(
       (get) => {
-        if (initialItem || items?.length === 0) {
+        if (initialItem || itemsLength === 0) {
           return setInvalid(widgetAtom, false);
         }
         const currItems = get(itemsAtom);
@@ -713,7 +767,7 @@ function useItemsFamily({
         itemsAtom,
         setInvalid,
         widgetAtom,
-        items?.length,
+        itemsLength,
       ],
     ),
   );
@@ -957,8 +1011,9 @@ const RecordEditor = memo(function RecordEditor({
   );
 
   const [loaded, setLoaded] = useState<DataRecord>({});
-  const checkInvalidRef = useRef<() => void>();
+  const checkInvalidRef = useRef<() => void>(null);
 
+  /* eslint-disable react-hooks/refs */
   const editorAtom = useMemo(() => {
     const getRecord = (_value: DataRecord) => {
       const value = _value || EMPTY_RECORD;
@@ -1010,6 +1065,39 @@ const RecordEditor = memo(function RecordEditor({
 
         set(editorFormAtom, state);
 
+        // sync statesByName (for collection field selected state ) for json fields
+        const selectedStateJsonFields = Object.keys(state.statesByName)
+          .map((name) => {
+            const field = state.fields[name];
+            const widgetState = state.statesByName[name];
+            return widgetState?.selected && field?.jsonField
+              ? {
+                  name,
+                  selected: widgetState.selected,
+                  jsonField: field?.jsonField,
+                }
+              : { name };
+          })
+          .filter((item) => item?.jsonField);
+
+        if (selectedStateJsonFields.length > 0) {
+          // this selected state in parent form is used to fill selected in prepare context
+          set(parent, (draft) => ({
+            ...draft,
+            statesByName: {
+              ...draft.statesByName,
+              ...selectedStateJsonFields.reduce(
+                (states, { name, jsonField, selected }) => {
+                  const key = `${jsonField}.${name}`;
+                  const currState = draft.statesByName[key];
+                  return { ...states, [key]: { ...currState, selected } };
+                },
+                {},
+              ),
+            },
+          }));
+        }
+
         // the update is intended for dirty state changed
         // no value changes occurs through this update
         // also need to sync dirty with parent form dirty state
@@ -1030,6 +1118,7 @@ const RecordEditor = memo(function RecordEditor({
       },
     );
   }, [editorFormAtom, loaded, parent, schema, valueAtom]);
+  /* eslint-enable react-hooks/refs */
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, EMPTY_RECORD, {
@@ -1038,6 +1127,7 @@ const RecordEditor = memo(function RecordEditor({
     });
 
   const { actionHandler: parentHandler } = useFormScope();
+
   actionHandler.setSaveHandler(
     useCallback(
       async (record?: DataRecord) => parentHandler.save(record),
@@ -1052,6 +1142,10 @@ const RecordEditor = memo(function RecordEditor({
   );
   actionHandler.setValidateHandler(
     useCallback(async () => parentHandler.validate(), [parentHandler]),
+  );
+
+  actionHandler.setCloseHandler(
+    useCallback(async () => parentHandler.close(), [parentHandler]),
   );
 
   const ds = useMemo(() => new DataStore(model), [model]);
@@ -1083,7 +1177,7 @@ const RecordEditor = memo(function RecordEditor({
 
   useAsyncEffect(async () => load(), [load]);
 
-  const mountRef = useRef<boolean>();
+  const mountRef = useRef<boolean>(false);
 
   useEffect(() => {
     mountRef.current = true;
@@ -1109,8 +1203,11 @@ const RecordEditor = memo(function RecordEditor({
         if (invalid && editor.json) {
           const state = get(editorAtom);
           errors = getErrors(state)?.reduce(
-            (errorList, error) =>
-              errorList.concat(Object.values(error) as string[]),
+            (errorList, fieldErrors) => {
+              const top = getTopError(fieldErrors);
+              if (!top) return errorList;
+              return errorList.concat(Array.isArray(top) ? top : [top]);
+            },
             [] as string[],
           );
         }
@@ -1121,9 +1218,11 @@ const RecordEditor = memo(function RecordEditor({
     ),
   );
 
-  checkInvalidRef.current = checkInvalid;
+  useEffect(() => {
+    checkInvalidRef.current = checkInvalid;
+  }, [checkInvalid]);
 
-  const idRef = useRef<number>();
+  const idRef = useRef<number>(null);
   const id = useAtomValue(
     useMemo(() => selectAtom(valueAtom, (x) => x.id ?? 0), [valueAtom]),
   );
@@ -1205,6 +1304,7 @@ function JsonEditor(props: FormEditorProps) {
   );
 
   const editorFieldsRef = useRef<Record<string, JsonField>>({});
+  /* eslint-disable react-hooks/refs */
   const editorFieldsAtom = useMemo(() => {
     return atom((get) => {
       if (
@@ -1245,6 +1345,7 @@ function JsonEditor(props: FormEditorProps) {
       return editorFieldsRef.current;
     });
   }, [formAtom, jsonFields, modelFields]);
+  /* eslint-enable react-hooks/refs */
 
   const editorFields = useAtomValue(editorFieldsAtom);
   const jsonEditor = useMemo(
@@ -1274,8 +1375,9 @@ function JsonEditorInner({
   const jsonModel = schema.jsonModel;
   const jsonFields: Record<string, JsonField> = schema.jsonFields ?? {};
   const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
-  const jsonValueRef = useRef<DataRecord>();
+  const jsonValueRef = useRef<DataRecord>(null);
 
+  /* eslint-disable react-hooks/refs */
   const jsonAtom = useMemo(() => {
     return atom(
       (get) => {
@@ -1324,6 +1426,7 @@ function JsonEditorInner({
       },
     );
   }, [formAtom, jsonModel, jsonNameField, valueAtom]);
+  /* eslint-enable react-hooks/refs */
 
   const jsonLayout = schema.jsonModel ? FormViewLayout : undefined;
   const jsonEditor = useMemo(() => {

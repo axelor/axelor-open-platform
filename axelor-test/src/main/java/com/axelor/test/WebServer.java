@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.test;
 
@@ -24,6 +10,7 @@ import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import dev.resteasy.guice.GuiceResteasyBootstrapServletContextListener;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.Servlets;
@@ -32,14 +19,13 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.api.ListenerInfo;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
 public final class WebServer {
@@ -83,7 +69,7 @@ public final class WebServer {
   }
 
   public WebTarget target() {
-    return client().target(String.format("http://localhost:%s%s", PORT, CONTEXT_PATH));
+    return client().target("http://localhost:%s%s".formatted(PORT, CONTEXT_PATH));
   }
 
   private Undertow createServer() {
@@ -128,7 +114,7 @@ public final class WebServer {
     public InstanceHandle<GuiceResteasyBootstrapServletContextListener> createInstance()
         throws InstantiationException {
 
-      return new InstanceHandle<GuiceResteasyBootstrapServletContextListener>() {
+      return new InstanceHandle<>() {
 
         @Override
         public GuiceResteasyBootstrapServletContextListener getInstance() {
@@ -155,7 +141,7 @@ public final class WebServer {
     @Override
     public InstanceHandle<GuiceServletContextListener> createInstance()
         throws InstantiationException {
-      return new InstanceHandle<GuiceServletContextListener>() {
+      return new InstanceHandle<>() {
 
         @Override
         public GuiceServletContextListener getInstance() {

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -26,8 +12,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.rpc.filter.Operator;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -102,7 +86,7 @@ public class Criteria {
       if (!key.matches("^[a-zA-Z].*$") || "context".equals(key)) {
         continue;
       }
-      final Map<String, Object> criterion = new HashMap<String, Object>();
+      final Map<String, Object> criterion = new HashMap<>();
       criterion.put("fieldName", key);
       criterion.put("operator", "like");
       criterion.put("value", request.getData().get(key));
@@ -118,8 +102,8 @@ public class Criteria {
   public static Criteria parse(
       Map<String, Object> rawCriteria, Class<?> beanClass, boolean translate) {
     final Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
-    final List<Filter> all = Lists.newArrayList();
-    final Map<String, Object> context = Maps.newHashMap();
+    final List<Filter> all = new ArrayList<>();
+    final Map<String, Object> context = new HashMap<>();
     final List<?> domains = (List<?>) rawCriteria.get("_domains");
 
     if (domains != null) {
@@ -162,10 +146,9 @@ public class Criteria {
 
   @SuppressWarnings("all")
   private static List<Filter> parseDomains(final List<?> domains, final Map<String, ?> context) {
-    final List<Filter> filters = Lists.newArrayList();
+    final List<Filter> filters = new ArrayList<>();
     for (final Object item : domains) {
-      if (item instanceof Map && ((Map) item).containsKey("domain")) {
-        final Map map = (Map) item;
+      if (item instanceof Map map && map.containsKey("domain")) {
         filters.add(JPQLFilter.forDomain((String) map.get("domain")));
         try {
           context.putAll((Map) map.get("context"));
@@ -182,7 +165,7 @@ public class Criteria {
     Operator operator = Operator.get((String) rawCriteria.get("operator"));
 
     if (operator == Operator.AND || operator == Operator.OR || operator == Operator.NOT) {
-      List<Filter> filters = new ArrayList<Filter>();
+      List<Filter> filters = new ArrayList<>();
       for (Object raw : (List<?>) rawCriteria.get("criteria")) {
         filters.add(parseCriterion((Map<String, Object>) raw, beanClass));
       }
@@ -204,8 +187,8 @@ public class Criteria {
                 .orElseThrow(
                     () ->
                         new IllegalArgumentException(
-                            String.format("%s doesn't have a name column.", property.getTarget())));
-        fieldName = String.format("%s.%s", fieldName, nameField.getName());
+                            "%s doesn't have a name column.".formatted(property.getTarget())));
+        fieldName = "%s.%s".formatted(fieldName, nameField.getName());
       }
     }
 
@@ -216,8 +199,8 @@ public class Criteria {
       return Filter.notBetween(fieldName, rawCriteria.get("value"), rawCriteria.get("value2"));
     }
 
-    if (value instanceof String) {
-      value = ((String) value).trim();
+    if (value instanceof String stringValue) {
+      value = stringValue.trim();
     }
 
     switch (operator) {

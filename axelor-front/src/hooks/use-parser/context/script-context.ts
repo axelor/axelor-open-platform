@@ -18,8 +18,6 @@ import {
 import { unaccent } from "@/utils/sanitize";
 import { ActionOptions } from "@/view-containers/action";
 
-let warnedRecordPrefix = false;
-
 export type ScriptContextOptions = {
   valid?: (name?: string) => boolean;
   execute?: (name: string, options?: ActionOptions) => Promise<any>;
@@ -124,12 +122,11 @@ export function createScriptContext(
       if (items && items.length) {
         items.forEach(function (item) {
           let value = 0;
-          let value2 = 0;
           if (field in item) {
             value = +(item[field] || 0);
           }
           if (operation && field2 && field2 in item) {
-            value2 = +(item[field2] || 0);
+            const value2 = +(item[field2] || 0);
             switch (operation) {
               case "*":
                 value = value * value2;
@@ -194,10 +191,26 @@ export function createScriptContext(
       let model = context._model;
 
       if (fieldName) {
-        const field = getField(fieldName);
-        if (field && field.target) {
-          record = get(record, fieldName) || {};
-          model = field.target;
+        const dotIndex = fieldName.indexOf(".");
+        const key = fieldName.substring(0, dotIndex);
+        if (isJsonField(key)) {
+          const jsonField = getField(key);
+          const subPath = fieldName.substring(dotIndex + 1);
+          const field = jsonField ? getField(subPath) : undefined;
+          if (field && field.target) {
+            const jsonText = record[key];
+            const json = tryJson(jsonText);
+            if (json) {
+              record = get(json, subPath) || {};
+              model = field.target;
+            }
+          }
+        } else {
+          const field = getField(fieldName);
+          if (field && field.target) {
+            record = get(record, fieldName) || {};
+            model = field.target;
+          }
         }
       }
 
@@ -256,15 +269,6 @@ export function createScriptContext(
 
   return new Proxy<Context>(context as Context, {
     get(target, p, receiver) {
-      if (p === "record") {
-        if (session?.info?.application?.mode != "prod" && !warnedRecordPrefix) {
-          console.warn(
-            `Trying to access field with "record." prefix. This is deprecated and support will be removed in next major version.`,
-          );
-          warnedRecordPrefix = true;
-        }
-        return receiver;
-      }
       if (p === "_parent" && receiver._createParentContext) {
         return (
           parentContext ?? (parentContext = receiver._createParentContext())

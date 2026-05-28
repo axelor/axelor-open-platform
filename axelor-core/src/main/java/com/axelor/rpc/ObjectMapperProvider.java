@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.rpc;
 
@@ -48,14 +34,14 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import groovy.lang.GString;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
@@ -70,8 +56,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       if (value != null) {
         final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
         final Map<String, Object> map =
-            value instanceof ContextEntity
-                ? ((ContextEntity) value).getContextMap()
+            value instanceof ContextEntity contextEntity
+                ? contextEntity.getContextMap()
                 : Resource.toMap(value);
         serializer.serialize(map, jgen, provider);
       }

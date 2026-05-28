@@ -49,6 +49,7 @@ export function DashletActions({
     onLegendShowHide,
     onRefresh,
     onExport,
+    onExportPNG,
   } = useAtomValue(useDashletHandlerAtom());
   const hasPagination = ["grid", "cards", "tree"].includes(viewType!);
   const { toolbar, menubar } = (view as GridView | CardsView) || {};
@@ -103,6 +104,7 @@ export function DashletActions({
           onLegendShowHide={onLegendShowHide}
           onRefresh={onRefresh}
           onExport={onExport}
+          onExportPNG={onExportPNG}
         />
       )}
     </Box>
@@ -117,6 +119,7 @@ function DashletMenu({
   onAction,
   onRefresh,
   onExport,
+  onExportPNG,
 }: DashletMenuProps) {
   const [legend, showLegend] = useState(true);
 
@@ -175,8 +178,20 @@ function DashletMenu({
             {
               key: "export",
               text: i18n.get("Export"),
-              hidden: !onExport,
+              hidden: viewType === "chart" || !onExport,
               onClick: onExport,
+            },
+            {
+              key: "export-csv",
+              text: i18n.get("Export as CSV"),
+              hidden: viewType !== "chart" || !onExport,
+              onClick: onExport,
+            },
+            {
+              key: "export-png",
+              text: i18n.get("Export as PNG"),
+              hidden: viewType !== "chart" || !onExportPNG,
+              onClick: onExportPNG,
             },
             ...getViewActions(),
           ],
@@ -199,6 +214,8 @@ function DashletListMenu(
   const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
+
+  const { onRefresh } = props;
 
   const onExport = useAtomCallback(
     useCallback(
@@ -234,7 +251,7 @@ function DashletListMenu(
               [classes.itemActionEnabled]: canPrev,
             }),
             disabled: !canPrev,
-            onClick: () => dataStore.search({ offset: offset - limit }),
+            onClick: () => onRefresh?.({ offset: offset - limit }),
           },
           {
             key: "next",
@@ -246,7 +263,7 @@ function DashletListMenu(
               [classes.itemActionEnabled]: canNext,
             }),
             disabled: !canNext,
-            onClick: () => dataStore.search({ offset: offset + limit }),
+            onClick: () => onRefresh?.({ offset: offset + limit }),
           },
           {
             key: "new",

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
@@ -28,6 +14,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectRepository;
+import io.buji.pac4j.realm.Pac4jRealm;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +34,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton
@@ -127,9 +114,7 @@ public class AuthPac4jProfileService {
   @Nullable
   public Group getGroup(CommonProfile profile) {
     return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
-        .map(
-            group ->
-                group instanceof Collection ? ((Collection<?>) group).iterator().next() : group)
+        .map(group -> group instanceof Collection<?> c ? c.iterator().next() : group)
         .map(String::valueOf)
         .map(this::getGroup)
         .orElse(null);
@@ -153,7 +138,12 @@ public class AuthPac4jProfileService {
   }
 
   public Set<Permission> getPermissions(CommonProfile profile) {
-    return profile.getPermissions().stream()
+    Collection<?> permissions =
+        Optional.ofNullable(profile.getAttribute(Pac4jRealm.SHIRO_PERMISSIONS, Collection.class))
+            .orElse(Collections.emptySet());
+
+    return permissions.stream()
+        .map(String::valueOf)
         .map(permissionRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));

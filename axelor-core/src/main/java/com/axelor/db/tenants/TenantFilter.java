@@ -1,43 +1,31 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.tenants;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.AxelorSessionManager;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.inject.Singleton;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.HttpHeaders;
+import org.apache.shiro.session.Session;
 import org.pac4j.core.context.HttpConstants;
 
 @Singleton
@@ -52,6 +40,17 @@ public class TenantFilter implements Filter {
   private static final String PATH_CALLBACK = "/callback";
 
   private boolean enabled;
+
+  private final AxelorSessionManager sessionManager;
+
+  private final TenantConfigProvider tenantConfigProvider;
+
+  @Inject
+  public TenantFilter(
+      AxelorSessionManager sessionManager, TenantConfigProvider tenantConfigProvider) {
+    this.sessionManager = sessionManager;
+    this.tenantConfigProvider = tenantConfigProvider;
+  }
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -88,11 +87,13 @@ public class TenantFilter implements Filter {
       if (AuthPac4jInfo.isWebSocket(req)) {
         res.sendError(HttpServletResponse.SC_FORBIDDEN);
       } else {
-        final HttpSession httpSession = req.getSession(false);
+        final Session session = sessionManager.getSession(req, res);
 
-        if (httpSession != null) {
-          httpSession.invalidate();
+        if (session != null) {
+          session.stop();
         }
+
+        removeCookie(req, res, TENANT_COOKIE_NAME);
 
         if (AuthPac4jInfo.isXHR(req)) {
           // Ajax request
@@ -100,7 +101,8 @@ public class TenantFilter implements Filter {
           res.setContentType(HttpConstants.APPLICATION_JSON);
           response.setCharacterEncoding(StandardCharsets.UTF_8.name());
           final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-          res.getWriter().write(mapper.writeValueAsString(Map.of("status", 1)));
+          res.getWriter()
+              .write(mapper.writeValueAsString(Map.of("status", 1, "error", e.getMessage())));
         } else {
           // Full page load
           res.sendRedirect(".");
@@ -112,57 +114,61 @@ public class TenantFilter implements Filter {
     }
   }
 
-  // When tenant comes from header/cookie, need to check it.
-  // For login, consider header only.
-  private Optional<String> getRequestTenant(
-      HttpServletRequest req, boolean isLogin, Map<String, String> tenants) {
-    return Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
+  /**
+   * Gets tenant from header/cookie. For login, consider header only.
+   *
+   * @param request
+   * @param isLogin
+   * @return tenant
+   */
+  private Optional<String> getRequestTenant(HttpServletRequest request, boolean isLogin) {
+    return Optional.ofNullable(request.getHeader(TENANT_HEADER_NAME))
         .filter(StringUtils::notBlank)
         .or(
             () ->
                 isLogin
                     ? Optional.empty()
-                    : Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
+                    : Optional.ofNullable(getCookie(request, TENANT_COOKIE_NAME))
                         .map(Cookie::getValue)
-                        .filter(StringUtils::notBlank))
-        .filter(tenants::containsKey);
+                        .filter(StringUtils::notBlank));
   }
 
-  private String currentTenant(HttpServletRequest req, HttpServletResponse res)
-      throws BadTenantException {
-    final TenantInfo tenantInfo = TenantResolver.getTenantInfo(false);
-    final String hostTenant = tenantInfo.getHostTenant();
-
-    final HttpSession httpSession = req.getSession(false);
+  private String currentTenant(HttpServletRequest req, HttpServletResponse res) {
+    final Session session = sessionManager.getSession(req, res);
     final Optional<String> sessionTenant =
-        Optional.ofNullable(httpSession)
-            .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
-
-    if (hostTenant != null) {
-      if (httpSession != null && sessionTenant.isEmpty()) {
-        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, hostTenant);
-      }
-      return hostTenant;
-    }
-
+        Optional.ofNullable(session).map(s -> (String) s.getAttribute(TENANT_ATTRIBUTE_NAME));
     final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
-    final Map<String, String> tenants = tenantInfo.getTenants();
+
+    // Get tenant from session first, then request, then any host-resolved tenant.
     final String tenant =
         sessionTenant
             .filter(t -> !isLogin)
-            .or(() -> getRequestTenant(req, isLogin, tenants))
-            .orElse(null);
+            .or(() -> getRequestTenant(req, isLogin))
+            .orElseGet(() -> TenantResolver.getTenantInfo(false).getHostTenant());
 
+    // Missing tenant
     if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
       throw new BadTenantException();
     }
 
-    if (httpSession != null && tenant != null) {
-      if (!tenants.containsKey(tenant)) {
-        throw new BadTenantException();
-      } else if ((sessionTenant.isEmpty() || isLogin)) {
-        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
+    if (tenant != null) {
+      final TenantConfig config = tenantConfigProvider.find(tenant);
+
+      // Check active tenant
+      if (config == null || Boolean.FALSE.equals(config.getActive())) {
+        throw new TenantNotFoundException(tenant);
       }
+
+      // Check tenant host
+      final String hosts = config.getTenantHosts();
+      if (StringUtils.notBlank(hosts)
+          && !List.of(hosts.split("\\s*,\\s*")).contains(TenantResolver.CURRENT_HOST.get())) {
+        throw new BadTenantException();
+      }
+    }
+
+    if (session != null && sessionTenant.isEmpty()) {
+      session.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
     }
 
     if (isLogin) {
@@ -199,29 +205,18 @@ public class TenantFilter implements Filter {
 
     if (request.isSecure()) {
       cookie.setSecure(true);
+      cookie.setAttribute("SameSite", "None");
     }
 
     response.addCookie(cookie);
-
-    if (cookie.getSecure()) {
-      addSameSite(response, name);
-    }
   }
 
-  // With Jakarta Servlet API, we'll be able to use Cookie#setAttribute to set SameSite=None
-  // Add SameSite=None attribute manually for now
-  private void addSameSite(HttpServletResponse response, String name) {
-    boolean first = true;
-    for (String cookieString : response.getHeaders(HttpHeaders.SET_COOKIE)) {
-      if (StringUtils.notEmpty(cookieString) && cookieString.startsWith(name)) {
-        cookieString += "; SameSite=None";
-      }
-      if (first) {
-        response.setHeader(HttpHeaders.SET_COOKIE, cookieString);
-        first = false;
-      } else {
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieString);
-      }
+  private void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    Cookie cookie = getCookie(request, name);
+    if (cookie != null) {
+      cookie.setMaxAge(0);
+      cookie.setValue("");
+      response.addCookie(cookie);
     }
   }
 }

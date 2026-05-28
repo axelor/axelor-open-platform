@@ -1,4 +1,6 @@
 import com.axelor.common.VersionUtils
+import com.axelor.gradle.task.CentralPortalUploadTask
+
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -16,13 +18,16 @@ apply plugin: com.axelor.gradle.support.ChangelogSupport
 apply from: "version.gradle"
 
 def gitGitRevision(p) {
-  def gitFolder = "$p.projectDir/.git/"
-  if( !new File(gitFolder).exists() ) {
-    gitFolder = "$rootProject.projectDir/.git/"
+  def gitEntry = new File("$p.projectDir/.git")
+  if( !gitEntry.exists() ) {
+    gitEntry = new File("$rootProject.projectDir/.git")
   }
-  if( !new File(gitFolder).exists() ) {
+  if( !gitEntry.exists() ) {
     return null
   }
+  def gitFolder = gitEntry.isFile()
+      ? new File(gitEntry.text.trim().replace("gitdir: ", "")).canonicalPath + "/"
+      : gitEntry.path + "/"
 
   def head = new File(gitFolder + "HEAD").text.split(":")
   def isCommit = head.length == 1
@@ -56,16 +61,17 @@ configure(subprojects - project(':axelor-front')) {
 
   apply plugin: com.axelor.gradle.support.JavaSupport
   apply plugin: com.axelor.gradle.support.EclipseSupport
-  apply plugin: com.axelor.gradle.support.LicenseSupport
   apply plugin: com.axelor.gradle.support.PublishSupport
+  apply plugin: com.axelor.gradle.support.DuplicatedClassSupport
   apply plugin: 'com.adarshr.test-logger'
+  apply plugin: 'signing'
 
   group = "com.axelor"
   version = rootProject.version
 
   testlogger {
-    theme 'mocha'
-    slowThreshold 3000
+    theme = 'mocha'
+    slowThreshold = 3000
   }
 
   afterEvaluate {
@@ -78,17 +84,17 @@ configure(subprojects - project(':axelor-front')) {
     manifest {
       def gitRev = gitGitRevision(project);
       attributes(
-        'Build-Jdk-Spec': System.properties['java.specification.version'],
-        'Build-Jdk': System.properties['java.version'],
-        'Build-Date': ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")),
-        'Implementation-Title': project.name,
-        'Implementation-Version': project.version,
-        'Implementation-Vendor': 'Axelor',
-        'Implementation-Vendor-Id': 'com.axelor',
-        'Implementation-Vendor-Url': 'http://axelor.com',
-        'Specification-Title': project.name,
-        'Specification-Version': project.version,
-        'Specification-Vendor': 'Axelor')
+          'Build-Jdk-Spec': System.properties['java.specification.version'],
+          'Build-Jdk': System.properties['java.version'],
+          'Build-Date': ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")),
+          'Implementation-Title': project.name,
+          'Implementation-Version': project.version,
+          'Implementation-Vendor': 'Axelor',
+          'Implementation-Vendor-Id': 'com.axelor',
+          'Implementation-Vendor-Url': 'http://axelor.com',
+          'Specification-Title': project.name,
+          'Specification-Version': project.version,
+          'Specification-Vendor': 'Axelor')
       if (gitRev) {
         attributes['Implementation-Build'] = gitRev
       }
@@ -98,8 +104,10 @@ configure(subprojects - project(':axelor-front')) {
       include "LICENSE"
       into "META-INF"
     }
-
   }
+
+  def centralPortalBundleName = "centralPortalBundle.zip"
+  def centralPortalUrlPath = project.layout.buildDirectory.dir('central')
 
   project.afterEvaluate {
     publishing {
@@ -121,16 +129,71 @@ configure(subprojects - project(':axelor-front')) {
               distribution = 'repo'
             }
           }
+
+          developers {
+            developer {
+              id = "axelor-team"
+              name = "Axelor Team"
+              email = 'it@axelor.com'
+            }
+          }
+
+          scm {
+            url = "https://github.com/axelor/axelor-open-platform"
+            connection = "scm:git:https://github.com/axelor/axelor-open-platform.git"
+            developerConnection = "scm:git:ssh://git@github.com/axelor/axelor-open-platform.git"
+          }
+        }
+      }
+      repositories {
+        maven {
+          name = "CentralPortal"
+          url = centralPortalUrlPath
         }
       }
     }
+
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+
+    signing {
+      required = { rootProject.finalRelease }
+      useInMemoryPgpKeys(signingKey, signingPassword)
+      sign publishing.publications
+    }
   }
 
+  tasks.register("centralPortalBundle", Zip) {
+    description = "Create central portal bundle"
+    group = "publishing"
+
+    dependsOn(project.name == "axelor-gradle"
+        ? "publishPluginMavenPublicationToCentralPortalRepository"
+        : "publishMavenJavaPublicationToCentralPortalRepository")
+
+    from(centralPortalUrlPath)
+    exclude("**/maven-metadata*.*")
+    archiveFileName.set(centralPortalBundleName)
+    destinationDirectory.set(project.layout.buildDirectory)
+  }
+
+  tasks.register("uploadToCentralPortal", CentralPortalUploadTask) {
+    description = "Publish artifact to central portal"
+    group = "publishing"
+
+    dependsOn(centralPortalBundle)
+
+    username = project.findProperty("centralPortalUserName")
+    password = project.findProperty("centralPortalToken")
+    autoPublish = false
+    archiveFile = project.layout.buildDirectory.file(centralPortalBundleName)
+    publicationName = project.name + "-" + project.version
+  }
 }
 
-task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
-  description "Update version text in source files."
-  group "Axelor"
+tasks.register("updateVersion", com.axelor.gradle.tasks.UpdateVersion) {
+  description = "Update version text in source files."
+  group = "Axelor"
   processFiles = fileTree(projectDir) {
     include '**/src/**/resources/**/*.xml'
     include '**/src/**/resources/domain-models.xsd'
@@ -145,7 +208,14 @@ changelog {
   version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "")
   output.set(file("CHANGELOG.md"))
   inputPath.set(file("changelogs/unreleased"))
-  types.set(["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"])
+  types.set([
+    "Feature",
+    "Change",
+    "Deprecate",
+    "Remove",
+    "Fix",
+    "Security"
+  ])
   header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
 }
 

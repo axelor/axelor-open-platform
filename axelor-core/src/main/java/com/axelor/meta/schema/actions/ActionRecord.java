@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions;
 
@@ -29,13 +15,13 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Resource;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionRecord extends Action {
@@ -207,8 +193,8 @@ public class ActionRecord extends Action {
         }
 
         if (Boolean.TRUE.equals(((RecordField) recordField).getCanCopy())
-            && value instanceof Model) {
-          value = JPA.copy((Model) value, true);
+            && value instanceof Model model) {
+          value = JPA.copy(model, true);
         }
 
         try {
@@ -238,13 +224,10 @@ public class ActionRecord extends Action {
 
     if (canSave(handler, (Model) target)) {
       JPA.runInTransaction(
-          new Runnable() {
-            @Override
-            public void run() {
-              Model bean = JPA.save(((Model) result[0]));
-              map.putAll(Resource.toMapCompact(bean));
-              result[0] = bean;
-            }
+          () -> {
+            Model bean = JPA.save(((Model) result[0]));
+            map.putAll(Resource.toMapCompact(bean));
+            result[0] = bean;
           });
     }
 

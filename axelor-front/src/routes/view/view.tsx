@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from "jotai";
 import { useEffect, useCallback, useMemo, useRef } from "react";
-import { generatePath, useParams, useSearchParams } from "react-router-dom";
+import { generatePath, useParams, useSearchParams } from "react-router";
 import { useAtomCallback } from "jotai/utils";
 import { produce } from "immer";
 
@@ -44,9 +44,9 @@ export function View() {
   const { redirect, location } = useRoute();
   const [searchParams] = useSearchParams();
 
-  const pathRef = useRef<string | null>(null);
-  const tabPathRef = useRef<string | null>(null);
-  const actionRef = useRef<string>();
+  const pathRef = useRef<string>(null);
+  const tabPathRef = useRef<string>(null);
+  const actionRef = useRef<string>('');
   const qsRef = useRef<Record<string, Record<string, string>>>({});
   const homeAction = session.info?.user?.action;
 

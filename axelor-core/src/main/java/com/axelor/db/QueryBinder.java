@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -23,16 +9,19 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Parameter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import javax.persistence.FlushModeType;
-import javax.persistence.Parameter;
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 
 /**
  * The query binder class provides the helper methods to bind query parameters and mark the query
@@ -40,14 +29,14 @@ import org.hibernate.jpa.QueryHints;
  */
 public class QueryBinder {
 
-  private final javax.persistence.Query query;
+  private final jakarta.persistence.Query query;
 
   /**
    * Create a new query binder for the given query instance.
    *
    * @param query the query instance
    */
-  private QueryBinder(javax.persistence.Query query) {
+  private QueryBinder(jakarta.persistence.Query query) {
     this.query = query;
   }
 
@@ -57,7 +46,7 @@ public class QueryBinder {
    * @param query the query instance
    * @return a new query binder instance
    */
-  public static QueryBinder of(javax.persistence.Query query) {
+  public static QueryBinder of(jakarta.persistence.Query query) {
     return new QueryBinder(query);
   }
 
@@ -77,7 +66,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setCacheable(boolean cacheable) {
-    query.setHint(QueryHints.HINT_CACHEABLE, cacheable);
+    query.setHint(AvailableHints.HINT_CACHEABLE, cacheable);
     return this;
   }
 
@@ -99,7 +88,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setReadOnly(boolean readOnly) {
-    query.setHint(QueryHints.HINT_READONLY, readOnly);
+    query.setHint(AvailableHints.HINT_READ_ONLY, readOnly);
     return this;
   }
 
@@ -143,10 +132,10 @@ public class QueryBinder {
 
     final ScriptBindings bindings;
 
-    if (namedParams instanceof ScriptBindings) {
-      bindings = (ScriptBindings) namedParams;
+    if (namedParams instanceof ScriptBindings scriptBindings) {
+      bindings = scriptBindings;
     } else {
-      Map<String, Object> variables = Maps.newHashMap();
+      Map<String, Object> variables = new HashMap<>();
       if (namedParams != null) {
         variables.putAll(namedParams);
       }
@@ -175,12 +164,11 @@ public class QueryBinder {
       int pos = i + 1;
       Parameter<?> param;
       Object value = params[i];
-      if (value instanceof ContextEntity) {
-        value = ((ContextEntity) value).getContextId();
-      } else if (value instanceof Model) {
-        value = ((Model) value).getId();
-      } else if (value instanceof String) {
-        final String expr = (String) value;
+      if (value instanceof ContextEntity entity) {
+        value = entity.getContextId();
+      } else if (value instanceof Model model) {
+        value = model.getId();
+      } else if (value instanceof String expr) {
         if (expr.startsWith("__") && expr.endsWith("__") && bindings.containsKey(expr)) {
           // special variable
           value = bindings.get(expr);
@@ -191,10 +179,15 @@ public class QueryBinder {
       } catch (Exception e) {
         continue;
       }
-      try {
-        query.setParameter(pos, value);
-      } catch (IllegalArgumentException e) {
-        query.setParameter(pos, adapt(value, param));
+
+      if (value instanceof Collection<?> collection) {
+        query.setParameter(pos, adaptCollection(collection, param));
+      } else {
+        try {
+          query.setParameter(pos, value);
+        } catch (IllegalArgumentException e) {
+          query.setParameter(pos, adapt(value, param));
+        }
       }
     }
 
@@ -209,7 +202,7 @@ public class QueryBinder {
     }
 
     final List<String> names = Splitter.on('.').splitToList(dottedName);
-    return getRelatedValue(bindings.get(names.get(0)), names.subList(1, names.size()));
+    return getRelatedValue(bindings.get(names.getFirst()), names.subList(1, names.size()));
   }
 
   private Object getRelatedValue(Object value, Collection<String> subNames) {
@@ -252,18 +245,22 @@ public class QueryBinder {
       return this;
     }
 
-    if (value instanceof ContextEntity) {
-      value = ((ContextEntity) value).getContextId();
-    } else if (value instanceof Model) {
-      value = ((Model) value).getId();
-    } else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+    if (value instanceof ContextEntity entity) {
+      value = entity.getContextId();
+    } else if (value instanceof Model model) {
+      value = model.getId();
+    } else if (value == null || value instanceof String string && "".equals(string.trim())) {
       value = adapt(value, parameter);
     }
 
-    try {
-      query.setParameter(name, value);
-    } catch (IllegalArgumentException e) {
-      query.setParameter(name, adapt(value, parameter));
+    if (value instanceof Collection<?> collection) {
+      query.setParameter(name, adaptCollection(collection, parameter));
+    } else {
+      try {
+        query.setParameter(name, value);
+      } catch (IllegalArgumentException e) {
+        query.setParameter(name, adapt(value, parameter));
+      }
     }
 
     return this;
@@ -274,24 +271,42 @@ public class QueryBinder {
    *
    * @return the query instance
    */
-  public javax.persistence.Query getQuery() {
+  public jakarta.persistence.Query getQuery() {
     return query;
   }
 
-  private Object adapt(Object value, Parameter<?> param) {
+  private Collection<?> adaptCollection(Collection<?> value, Parameter<?> param) {
     final Class<?> type = param.getParameterType();
+
     if (type == null) {
       return value;
     }
 
+    final Collector<Object, ?, ? extends Collection<?>> collector =
+        value instanceof Set ? Collectors.toUnmodifiableSet() : Collectors.toUnmodifiableList();
+
+    return value.stream().map(v -> adapt(v, type)).filter(Objects::nonNull).collect(collector);
+  }
+
+  private Object adapt(Object value, Parameter<?> param) {
+    final Class<?> type = param.getParameterType();
+
+    if (type == null) {
+      return value;
+    }
+
+    return adapt(value, type);
+  }
+
+  private Object adapt(Object value, Class<?> type) {
     value = Adapter.adapt(value, type, type, null);
 
-    if (value instanceof Number && Model.class.isAssignableFrom(type)) {
-      value = JPA.em().find(type, ((Number) value).longValue());
-    } else if (value instanceof Model && type.isInstance(value)) {
-      Model bean = (Model) value;
+    if (value instanceof Number number && Model.class.isAssignableFrom(type)) {
+      value = JPA.em().find(type, number.longValue());
+    } else if (value instanceof Model bean && type.isInstance(value)) {
       if (bean.getId() != null) {
-        value = JPA.find(bean.getClass(), bean.getId());
+        Class<Model> beanClass = EntityHelper.getEntityClass(bean);
+        value = JPA.find(beanClass, bean.getId());
       }
     }
 

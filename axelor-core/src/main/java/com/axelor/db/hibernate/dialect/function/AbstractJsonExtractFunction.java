@@ -1,89 +1,115 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.hibernate.dialect.function;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import jakarta.persistence.PersistenceException;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
-import javax.persistence.PersistenceException;
-import org.hibernate.QueryException;
-import org.hibernate.dialect.function.SQLFunction;
-import org.hibernate.engine.spi.Mapping;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.type.Type;
+import java.util.stream.Collector;
+import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.query.ReturnableType;
+import org.hibernate.sql.ast.SqlAstNodeRenderingMode;
+import org.hibernate.sql.ast.SqlAstTranslator;
+import org.hibernate.sql.ast.spi.SqlAppender;
+import org.hibernate.sql.ast.tree.SqlAstNode;
+import org.hibernate.sql.ast.tree.expression.Literal;
+import org.hibernate.type.BasicTypeReference;
 
-public abstract class AbstractJsonExtractFunction implements SQLFunction {
+public abstract class AbstractJsonExtractFunction extends StandardSQLFunction {
 
-  private static final Pattern NAME_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
-  private static final Pattern ARGS_PATTERN = Pattern.compile("'\\w+'");
+  // Validates JSON path argument when literals are used.
+  private static final Pattern ARGS_PATTERN = Pattern.compile("\\w+");
 
-  private Type type;
+  private final String cast;
+  private final String transformFunction;
+  private final Collector<CharSequence, ?, String> collectPath;
 
-  private String name;
+  protected AbstractJsonExtractFunction(String name, BasicTypeReference<?> type, String cast) {
+    this(name, type, cast, null, null);
+  }
 
-  private String cast;
-
-  public AbstractJsonExtractFunction(String name, Type type, String cast) {
-    this.type = type;
-    this.name = name;
+  protected AbstractJsonExtractFunction(
+      String name,
+      BasicTypeReference<?> type,
+      String cast,
+      String transformFunction,
+      Collector<CharSequence, ?, String> collectPath) {
+    super(name, type);
     this.cast = cast;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getCast() {
-    return cast;
-  }
-
-  public Type getType() {
-    return type;
+    this.transformFunction = transformFunction;
+    this.collectPath = collectPath;
   }
 
   @Override
-  public boolean hasArguments() {
-    return true;
-  }
+  public void render(
+      SqlAppender sqlAppender,
+      List<? extends SqlAstNode> sqlAstArguments,
+      ReturnableType<?> returnType,
+      SqlAstTranslator<?> translator) {
 
-  @Override
-  public boolean hasParenthesesIfNoArguments() {
-    return true;
-  }
-
-  @Override
-  public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-    return type == null ? firstArgumentType : type;
-  }
-
-  protected abstract String transformPath(List<String> path);
-
-  protected String transformFunction(String func) {
-    return func;
-  }
-
-  private static String validateField(String name) {
-    if (NAME_PATTERN.matcher(name).matches()) {
-      return name;
+    if (sqlAstArguments.size() < 2) {
+      throw new PersistenceException(
+          "Invalid use of 'json_extract', requires at least 2 arguments.");
     }
-    throw new PersistenceException("Invalid field name: " + name);
+
+    final SqlAstNode field = sqlAstArguments.getFirst();
+    final List<? extends SqlAstNode> pathArgs = sqlAstArguments.subList(1, sqlAstArguments.size());
+
+    if (cast != null) {
+      sqlAppender.appendSql("CAST(NULLIF(");
+    }
+
+    if (transformFunction != null) {
+      sqlAppender.appendSql(transformFunction);
+      sqlAppender.appendSql("(");
+    }
+
+    sqlAppender.appendSql(getName());
+    sqlAppender.appendSql("(");
+    translator.render(field, SqlAstNodeRenderingMode.DEFAULT);
+    sqlAppender.appendSql(", ");
+    renderPath(sqlAppender, pathArgs, returnType, translator);
+    sqlAppender.appendSql(")");
+
+    if (transformFunction != null) {
+      sqlAppender.appendSql(")");
+    }
+
+    if (cast != null) {
+      sqlAppender.appendSql(", '') AS ");
+      sqlAppender.appendSql(cast);
+      sqlAppender.appendSql(")");
+    }
+  }
+
+  /**
+   * Renders the JSON path part.
+   *
+   * <p>Default implementation uses {@link #collectPath}.
+   *
+   * @param sqlAppender The SQL appender to which the rendered SQL will be added.
+   * @param pathArgs A list of SQL AST nodes representing the JSON path components.
+   * @param returnType The return type of the rendered function.
+   * @param translator The SQL AST translator.
+   * @throws NullPointerException if {@link #collectPath} is {@code null}.
+   */
+  public void renderPath(
+      SqlAppender sqlAppender,
+      List<? extends SqlAstNode> pathArgs,
+      ReturnableType<?> returnType,
+      SqlAstTranslator<?> translator) {
+
+    Objects.requireNonNull(collectPath, "Either set collectPath or override renderPath.");
+
+    final String path =
+        pathArgs.stream()
+            .map(arg -> arg instanceof Literal l ? l.getLiteralValue().toString() : arg.toString())
+            .map(AbstractJsonExtractFunction::validateArg)
+            .collect(collectPath);
+    sqlAppender.appendSql(path);
   }
 
   private static String validateArg(String name) {
@@ -91,23 +117,5 @@ public abstract class AbstractJsonExtractFunction implements SQLFunction {
       return name;
     }
     throw new PersistenceException("Invalid json field: " + name);
-  }
-
-  @Override
-  @SuppressWarnings("rawtypes")
-  public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-    final StringBuilder buf = new StringBuilder();
-    final Iterator iter = arguments.iterator();
-    final List<String> path = new ArrayList<>();
-    buf.append(getName()).append("(");
-    buf.append(validateField((String) iter.next()));
-    while (iter.hasNext()) {
-      path.add(validateArg((String) iter.next()));
-    }
-    buf.append(", ");
-    buf.append(transformPath(path));
-    buf.append(")");
-    final String func = transformFunction(buf.toString());
-    return cast == null ? func : String.format("cast(nullif(%s, '') as %s)", func, cast);
   }
 }

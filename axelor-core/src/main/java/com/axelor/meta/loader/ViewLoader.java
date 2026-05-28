@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -58,30 +44,30 @@ import com.axelor.meta.schema.views.Selection;
 import com.axelor.meta.service.MetaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,9 +126,8 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!unresolved.isEmpty()) {
       LOG.error("Found {} unresolved item(s): {}", unresolved.size(), unresolved);
       throw new PersistenceException(
-          String.format(
-              "Found %d unresolved item(s). Please check the logs for details.",
-              unresolved.size()));
+          "Found %d unresolved item(s). Please check the logs for details."
+              .formatted(unresolved.size()));
     }
 
     migrateViews();
@@ -266,8 +251,7 @@ public class ViewLoader extends AbstractParallelLoader {
       return;
     }
 
-    if (view instanceof ExtendableView) {
-      final ExtendableView extendableView = (ExtendableView) view;
+    if (view instanceof ExtendableView extendableView) {
       final boolean isExtension = Boolean.TRUE.equals(view.getExtension());
 
       if (isExtension || computedViews.contains(name)) {
@@ -309,9 +293,10 @@ public class ViewLoader extends AbstractParallelLoader {
           views
               .all()
               .filter(
-                  "self.name = ? AND self.module = ? "
-                      + "AND self.xmlId IS NULL "
-                      + "AND COALESCE(self.computed, FALSE) = FALSE",
+                  """
+                  self.name = ? AND self.module = ? \
+                  AND self.xmlId IS NULL \
+                  AND COALESCE(self.computed, FALSE) = FALSE""",
                   name,
                   module.getName())
               .fetchOne();
@@ -332,7 +317,9 @@ public class ViewLoader extends AbstractParallelLoader {
             .computeIfAbsent(view.getName(), k -> Collections.synchronizedList(new ArrayList<>()))
             .add(view.getXmlId());
       }
-    } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    } else if (entity.getId() == null
+        && other != null
+        && !Objects.equals(xmlId, other.getXmlId())) {
       // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }
@@ -358,6 +345,7 @@ public class ViewLoader extends AbstractParallelLoader {
     entity.setType(type);
     entity.setModel(modelName);
     entity.setModule(module.getName());
+    entity.setJsonModel(view.getJsonModel());
     entity.setXml(xml);
     entity.setComputed(null);
     final Set<String> missingGroups = addGroups(entity::addGroup, view.getGroups());
@@ -376,7 +364,7 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   private static String getName(String name, String xmlId) {
-    return xmlId == null ? name : String.format("%s(id=%s)", name, xmlId);
+    return xmlId == null ? name : "%s(id=%s)".formatted(name, xmlId);
   }
 
   @Transactional
@@ -411,7 +399,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing view
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -444,7 +432,7 @@ public class ViewLoader extends AbstractParallelLoader {
         continue;
       }
 
-      Map<String, Object> data = Maps.newHashMap();
+      Map<String, Object> data = new HashMap<>();
       for (QName param : opt.getDataAttributes().keySet()) {
         String paramName = param.getLocalPart();
         if (paramName.startsWith("data-")) {
@@ -539,7 +527,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -559,8 +547,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String type = klass.getSimpleName().replaceAll("([a-z\\d])([A-Z]+)", "$1-$2").toLowerCase();
     entity.setType(type);
 
-    if (action instanceof ActionView) {
-      ActionView view = (ActionView) action;
+    if (action instanceof ActionView view) {
       Boolean home = view.getHome();
       if (home == null) {
         for (ActionView.View item : view.getViews()) {
@@ -627,7 +614,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -721,7 +708,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -797,7 +784,7 @@ public class ViewLoader extends AbstractParallelLoader {
       try {
         LOG.debug("Creating default views: {}", out);
         Files.createParentDirs(out);
-        Files.asCharSink(out, Charsets.UTF_8).write(xml);
+        Files.asCharSink(out, StandardCharsets.UTF_8).write(xml);
       } catch (IOException e) {
         LOG.error("Unable to create: {}", out);
       }
@@ -889,7 +876,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   // Fields names are not in ordered but some JVM implementation can.
   private List<String> fieldNames(Class<?> klass) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     for (java.lang.reflect.Field field : klass.getDeclaredFields()) {
       if (!field.getName().matches("id|version|selected|created(By|On)|updated(By|On)")) {
         result.add(field.getName());

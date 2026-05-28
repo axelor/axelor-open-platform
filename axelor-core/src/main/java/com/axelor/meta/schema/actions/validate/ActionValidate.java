@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.actions.validate;
 
@@ -28,14 +14,13 @@ import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.actions.validate.validator.Notify;
 import com.axelor.meta.schema.actions.validate.validator.Validator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionValidate extends ActionResumable {
@@ -71,8 +56,8 @@ public class ActionValidate extends ActionResumable {
   public Object evaluate(ActionHandler handler) {
 
     Map<String, String> info = null;
-    final List<Map<String, String>> notify = Lists.newArrayList();
-    final Map<String, Object> result = Maps.newHashMap();
+    final List<Map<String, String>> notify = new ArrayList<>();
+    final Map<String, Object> result = new HashMap<>();
 
     for (int i = getIndex(); i < validators.size(); i++) {
 
@@ -103,7 +88,7 @@ public class ActionValidate extends ActionResumable {
       result.put(key, value);
 
       if (i + 1 < validators.size() && validator instanceof Alert) {
-        result.put("pending", String.format("%s[%d]", getName(), i + 1));
+        result.put("pending", "%s[%d]".formatted(getName(), i + 1));
       }
 
       if (info != null) {

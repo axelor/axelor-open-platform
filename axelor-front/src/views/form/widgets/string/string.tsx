@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Fragment, useCallback, useMemo } from "react";
+import { Fragment, useCallback, useId, useMemo, type JSX } from "react";
 
 import { AdornedInput, clsx } from "@axelor/ui";
 
@@ -24,7 +24,7 @@ export function String({
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, placeholder, translatable } = schema;
+  const { placeholder, translatable } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
@@ -38,6 +38,9 @@ export function String({
   } = useInput(valueAtom, {
     schema,
   });
+
+
+  const id = useId();
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,20 +76,21 @@ export function String({
   }, [inputEndAdornment, translatableAdornment]);
 
   return (
-    <FieldControl {...props} className={clsx(styles.container)}>
+    <FieldControl {...props} inputId={id} className={clsx(styles.container)}>
       {readonly || trValue ? (
         <ViewerInput
+          id={id}
           name={schema.name}
           {...(inputProps?.type === "password" && { type: "password" })}
           value={trValue ?? text}
-          endAdornment={translatableAdornment}
+          endAdornment={endAdornment}
         />
       ) : (
         <AdornedInput
           key={focus ? "focused" : "normal"}
           data-input
           type="text"
-          id={uid}
+          id={id}
           autoFocus={focus}
           placeholder={placeholder}
           value={text}

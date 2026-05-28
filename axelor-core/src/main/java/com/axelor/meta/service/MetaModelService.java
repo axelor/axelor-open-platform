@@ -1,26 +1,11 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.service;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
-import com.axelor.db.annotations.Widget;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaField;
@@ -28,44 +13,53 @@ import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.repo.MetaFieldRepository;
 import com.axelor.meta.db.repo.MetaModelRepository;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** API for MetaModel and MetaField entity. */
+/**
+ * Keeps {@link MetaModel} and {@link MetaField} records in sync with the registered JPA entity
+ * classes.
+ */
 public class MetaModelService {
 
-  private static Logger log = LoggerFactory.getLogger(MetaModelService.class);
+  private static final Logger log = LoggerFactory.getLogger(MetaModelService.class);
 
   @Inject private MetaModelRepository models;
 
   @Inject private MetaFieldRepository fields;
 
-  /**
-   * Process to create all MetaModel with MetaField.
-   *
-   * @see MetaModel
-   * @see MetaField
-   */
+  /** Synchronizes meta records for every registered entity class. */
   @Transactional
   public void process() {
+    final Set<String> existing =
+        models.all().select("fullName").fetch(0, 0).stream()
+            .map(m -> (String) m.get("fullName"))
+            .collect(Collectors.toSet());
     for (Class<?> klass : JPA.models()) {
-      process(klass);
+      final MetaModel entity =
+          existing.contains(klass.getName()) ? updateEntity(klass) : createEntity(klass);
+      models.save(entity);
     }
   }
 
+  /** Synchronizes the meta record for a single entity class. */
   @Transactional
   public void process(Class<?> klass) {
     if (Modifier.isAbstract(klass.getModifiers())) return;
@@ -78,13 +72,7 @@ public class MetaModelService {
     models.save(entity);
   }
 
-  /**
-   * Create MetaModel from Class.
-   *
-   * @param klass Class to load.
-   * @return
-   * @see MetaModel
-   */
+  /** Builds a new {@link MetaModel} with its fields for the given entity class. */
   private MetaModel createEntity(Class<?> klass) {
 
     log.trace("Create entities : {}", klass.getName());
@@ -98,33 +86,31 @@ public class MetaModelService {
       metaModel.setTableName(klass.getAnnotation(Table.class).name());
     }
 
-    metaModel.setMetaFields(new ArrayList<MetaField>());
+    metaModel.setMetaFields(new ArrayList<>());
     metaModel.getMetaFields().addAll(this.createFields(metaModel, klass));
 
     return metaModel;
   }
 
   /**
-   * Create MetaModel from Class.
-   *
-   * @param klass Class to load.
-   * @return
-   * @see MetaModel
+   * Refreshes an existing {@link MetaModel}: appends new fields and updates label/description on
+   * already-known ones. Fields removed from the class are left in place.
    */
   private MetaModel updateEntity(Class<?> klass) {
     MetaModel metaModel = getMetaModel(klass);
     Mapper mapper = Mapper.of(klass);
 
+    Map<String, MetaField> existing =
+        fields.all().filter("self.metaModel = ?1", metaModel).fetch().stream()
+            .collect(Collectors.toMap(MetaField::getName, Function.identity()));
+
     for (Property property : mapper.getProperties()) {
-      final MetaField field =
-          fields
-              .all()
-              .filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName())
-              .fetchOne();
+      final MetaField field = existing.get(property.getName());
       if (field == null) {
-        metaModel
-            .getMetaFields()
-            .add(createField(metaModel, getField(klass, property.getName()), property));
+        MetaField created = createField(metaModel, property);
+        if (created != null) {
+          metaModel.getMetaFields().add(created);
+        }
       } else {
         field.setLabel(property.getTitle());
         field.setDescription(property.getHelp());
@@ -135,20 +121,16 @@ public class MetaModelService {
   }
 
   /**
-   * Create MetaField from Field for one MetaModel.
-   *
-   * @param metaModel MetaModel attachment.
-   * @param field Field to load.
-   * @param property The property
-   * @return
-   * @see MetaModel
-   * @see MetaField
+   * Builds a {@link MetaField} for the given property. Returns {@code null} when the backing field
+   * is missing, synthetic, transient, or annotated with {@link Formula}.
    */
-  private MetaField createField(MetaModel metaModel, Field field, Property property) {
+  private MetaField createField(MetaModel metaModel, Property property) {
 
+    Field field = getField(property.getEntity(), property.getName());
     MetaField metaField = null;
 
-    if (!field.isSynthetic()
+    if (field != null
+        && !field.isSynthetic()
         && !field.isAnnotationPresent(Formula.class)
         && !Modifier.isTransient(field.getModifiers())) {
 
@@ -165,14 +147,8 @@ public class MetaModelService {
         metaField.setPackageName(field.getType().getPackage().getName());
       }
 
-      if (field.getType().isEnum()) {
-        metaField.setTypeName(field.getType().getSimpleName());
-      }
-
-      if (field.isAnnotationPresent(Widget.class)) {
-        metaField.setLabel(field.getAnnotation(Widget.class).title());
-        metaField.setDescription(field.getAnnotation(Widget.class).help());
-      }
+      metaField.setLabel(property.getTitle());
+      metaField.setDescription(property.getHelp());
 
       if (field.isAnnotationPresent(ManyToOne.class)) {
         metaField.setRelationship(ManyToOne.class.getSimpleName());
@@ -201,23 +177,14 @@ public class MetaModelService {
     return metaField;
   }
 
-  /**
-   * Create all ModelFields from Class for one MetaModel.
-   *
-   * @param metaModel MetaModel attachment.
-   * @param klass Class to load.
-   * @return
-   * @see MetaModel
-   * @see MetaField
-   */
+  /** Builds all {@link MetaField} rows backing the given entity class. */
   private List<MetaField> createFields(MetaModel metaModel, Class<?> klass) {
 
-    List<MetaField> modelFields = new ArrayList<MetaField>();
+    List<MetaField> modelFields = new ArrayList<>();
     Mapper mapper = Mapper.of(klass);
 
     for (Property property : mapper.getProperties()) {
-      MetaField metaField =
-          this.createField(metaModel, getField(klass, property.getName()), property);
+      MetaField metaField = this.createField(metaModel, property);
       if (metaField != null) {
         modelFields.add(metaField);
       }
@@ -227,19 +194,16 @@ public class MetaModelService {
   }
 
   /**
-   * Get canonical name from generic type in field.
-   *
-   * @param field One field with generic type.
-   * @return The canonical name of the generic type.
+   * Returns the raw {@code Type.toString()} of the field's last generic type argument (e.g. {@code
+   * "class com.example.Foo"}), or {@code null} if the field is not parameterized.
    */
   private String getGenericCanonicalName(Field field) {
 
     Type type = field.getGenericType();
     String typeName = null;
 
-    if (type instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType) type;
-      for (Type t : pt.getActualTypeArguments()) {
+    if (type instanceof ParameterizedType parameterizedType) {
+      for (Type t : parameterizedType.getActualTypeArguments()) {
         typeName = t.toString();
       }
     }
@@ -247,12 +211,7 @@ public class MetaModelService {
     return typeName;
   }
 
-  /**
-   * Get class name from generic type in field.
-   *
-   * @param field One field with generic type.
-   * @return The class name of the generic type.
-   */
+  /** Returns the simple class name of the field's generic type argument (e.g. {@code "Foo"}). */
   private String getGenericClassName(Field field) {
 
     String typeName = this.getGenericCanonicalName(field);
@@ -266,12 +225,7 @@ public class MetaModelService {
     return typeName;
   }
 
-  /**
-   * Get package name from generic type in field.
-   *
-   * @param field One field with generic type.
-   * @return The package name of the generic type.
-   */
+  /** Returns the package of the field's generic type argument (e.g. {@code "com.example"}). */
   private String getGenericPackageName(Field field) {
 
     String typeName = this.getGenericCanonicalName(field);
@@ -285,7 +239,11 @@ public class MetaModelService {
     return typeName;
   }
 
+  /** Walks the class hierarchy to find a declared field by name. */
   private Field getField(Class<?> klass, String name) {
+    if (klass == null) {
+      return null;
+    }
     try {
       return klass.getDeclaredField(name);
     } catch (NoSuchFieldException e) {
@@ -293,12 +251,7 @@ public class MetaModelService {
     }
   }
 
-  /**
-   * Get metaModel from Class
-   *
-   * @param klass
-   * @return
-   */
+  /** Returns the {@link MetaModel} record for the given entity class. */
   public static MetaModel getMetaModel(Class<?> klass) {
     return Query.of(MetaModel.class).filter("self.fullName = ?1", klass.getName()).fetchOne();
   }

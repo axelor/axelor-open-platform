@@ -18,14 +18,28 @@
   position: relative;
 }
 
-.translatable textarea {
+.translatable textarea,
+.translatable pre {
   padding-right: 1.75rem !important;
+  [dir="rtl"] & {
+    padding-right: unset !important;
+    padding-left: 1.75rem !important;
+  }
+}
+
+.translatable textarea {
   overflow: hidden;
   &[readonly] {
     text-overflow: ellipsis;
   }
+}
+
+.translatableButton {
+  position: absolute;
+  top: 0.25rem;
+  right: 0;
   [dir="rtl"] & {
-    padding-right: unset !important;
-    padding-left: 1.75rem !important;
+    right: unset;
+    left: 0;
   }
 }

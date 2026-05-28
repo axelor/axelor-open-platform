@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common;
 
@@ -41,7 +27,7 @@ public class Inflections {
   private Inflections() {}
 
   /**
-   * Get the default instance of {@link Inflections} for the English.
+   * Get the default instance of {@link Inflections} for the English language.
    *
    * @return an instance of {@link Inflections}
    */
@@ -56,12 +42,7 @@ public class Inflections {
    * @return an instance of {@link Inflections}
    */
   public static Inflections getInstance(String language) {
-    Inflections instance = INSTANCES.get(language);
-    if (instance == null) {
-      instance = new Inflections();
-      INSTANCES.put(language, instance);
-    }
-    return instance;
+    return INSTANCES.computeIfAbsent(language, key -> new Inflections());
   }
 
   private String capitalize(String word) {
@@ -88,10 +69,10 @@ public class Inflections {
    * @param plural the plural word
    */
   public void irregular(String singular, String plural) {
-    plurals.add(0, new Rule(singular.toLowerCase(), plural.toLowerCase(), true));
-    plurals.add(0, new Rule(capitalize(singular), capitalize(plural), true));
-    singulars.add(0, new Rule(plural.toLowerCase(), singular.toLowerCase(), true));
-    singulars.add(0, new Rule(capitalize(plural), capitalize(singular), true));
+    plurals.addFirst(new Rule(singular.toLowerCase(), plural.toLowerCase(), true));
+    plurals.addFirst(new Rule(capitalize(singular), capitalize(plural), true));
+    singulars.addFirst(new Rule(plural.toLowerCase(), singular.toLowerCase(), true));
+    singulars.addFirst(new Rule(capitalize(plural), capitalize(singular), true));
   }
 
   /**
@@ -101,7 +82,7 @@ public class Inflections {
    * @param replacement the replacement text
    */
   public void singular(String pattern, String replacement) {
-    singulars.add(0, new Rule(pattern, replacement, false));
+    singulars.addFirst(new Rule(pattern, replacement, false));
   }
 
   /**
@@ -111,7 +92,7 @@ public class Inflections {
    * @param replacement the replacement text
    */
   public void plural(String pattern, String replacement) {
-    plurals.add(0, new Rule(pattern, replacement, false));
+    plurals.addFirst(new Rule(pattern, replacement, false));
   }
 
   /**
@@ -188,7 +169,7 @@ public class Inflections {
     public boolean equals(Object obj) {
       if (obj == this) return true;
       if (obj == null) return false;
-      if (obj instanceof Rule && pattern.equals(((Rule) obj).pattern)) {
+      if (obj instanceof Rule rule && pattern.equals(rule.pattern)) {
         return true;
       }
       return false;

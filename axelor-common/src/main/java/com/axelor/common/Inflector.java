@@ -1,27 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Preconditions;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.Objects;
 
 /**
  * The {@link Inflector} provides various methods to transform words to plural, singular, titles,
@@ -121,7 +107,7 @@ public final class Inflector {
    * @return converted string
    */
   public String underscore(String camelCase) {
-    Preconditions.checkNotNull(camelCase);
+    Objects.requireNonNull(camelCase);
     return camelCase
         .trim()
         .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
@@ -143,7 +129,7 @@ public final class Inflector {
    * @return converted string
    */
   public String humanize(String word) {
-    Preconditions.checkNotNull(word);
+    Objects.requireNonNull(word);
     String result =
         underscore(word).replaceAll("_id$", "").replaceAll("\\A_+", "").replaceAll("[_\\s]+", " ");
     return capitalize(result);
@@ -216,7 +202,7 @@ public final class Inflector {
    * @return converted string
    */
   public String capitalize(String word) {
-    Preconditions.checkNotNull(word);
+    Objects.requireNonNull(word);
     return Character.toUpperCase(word.charAt(0)) + word.substring(1);
   }
 
@@ -259,7 +245,7 @@ public final class Inflector {
    * @return shortened text
    */
   public String ellipsize(String text, int length) {
-    Preconditions.checkNotNull(text);
+    Objects.requireNonNull(text);
     if (text.length() <= length) return text;
     if (length < 4) return "...";
     return text.substring(0, length - 3) + "...";
@@ -276,7 +262,7 @@ public final class Inflector {
    * @return normalized text
    */
   public String simplify(String text) {
-    Preconditions.checkNotNull(text);
+    Objects.requireNonNull(text);
     return Normalizer.normalize(text, Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}", "");
   }
 

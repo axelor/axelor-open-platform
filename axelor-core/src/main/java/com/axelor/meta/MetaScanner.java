@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -33,7 +19,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -128,7 +113,7 @@ public final class MetaScanner {
 
     final Path file;
     try {
-      file = Paths.get(new URI(fileName));
+      file = Path.of(new URI(fileName));
     } catch (URISyntaxException e) {
       // this should never happen
       throw new RuntimeException(e);
@@ -166,7 +151,7 @@ public final class MetaScanner {
 
     for (URL url : findClassPathURLs(loader)) {
       try {
-        Path next = Paths.get(url.toURI());
+        Path next = Path.of(url.toURI());
         if (Files.isDirectory(next) && outputs.contains(next)) {
           paths.add(url);
         }
@@ -179,8 +164,8 @@ public final class MetaScanner {
   }
 
   private static List<URL> findClassPathURLs(ClassLoader loader) {
-    return loader instanceof URLClassLoader
-        ? Arrays.asList(((URLClassLoader) loader).getURLs())
+    return loader instanceof URLClassLoader urlcl
+        ? Arrays.asList(urlcl.getURLs())
         : Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
             .map(
                 item -> {
@@ -199,7 +184,7 @@ public final class MetaScanner {
    *
    * @return list of class path entry urls of the modules.
    */
-  private static List<URL> findClassPath() {
+  public static List<URL> findClassPath() {
     return findModuleFiles().stream()
         .flatMap(file -> findClassPath(file).stream())
         .collect(Collectors.toList());
@@ -260,7 +245,7 @@ public final class MetaScanner {
    */
   public static List<Properties> findModuleProperties() {
     return findModuleFiles().stream()
-        .map(file -> findProperties(file))
+        .map(MetaScanner::findProperties)
         .filter(p -> StringUtils.notBlank(p.getProperty("name")))
         .collect(Collectors.toList());
   }

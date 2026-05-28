@@ -3,7 +3,7 @@
 :toc-title:
 
 :url-guice: https://github.com/google/guice
-:url-groovy: http://www.groovy-lang.org/
+:url-groovy: https://docs.groovy-lang.org/docs/groovy-4.0.30/html/documentation/
 :url-scala: http://www.scala-lang.org/
 :url-kotlin: https://kotlinlang.org/
 :url-apidoc: http://docs.axelor.com/{page-component-name}/{page-component-version}/javadoc
@@ -90,7 +90,7 @@ The controllers are intermediary between views & service layer.
 -----
 package com.axelor.contact.web;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
 
 import com.axelor.contact.db.Contact;

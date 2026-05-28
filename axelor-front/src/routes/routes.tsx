@@ -3,18 +3,29 @@ import {
   Navigate,
   RouterProvider,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
+import { lazy, type JSX } from "react";
 
 import { useSession } from "@/hooks/use-session";
-import { Swagger } from "@/routes/swagger";
 
-import { ChangePassword } from "./change-password";
 import { ErrorPage } from "./error";
-import { ForgotPassword } from "./forgot-password";
-import { Login } from "./login";
-import { ResetPassword } from "./reset-password";
-import { Root } from "./root";
 import { View } from "./view";
+
+const Root = lazy(() => import("./root").then((m) => ({ default: m.Root })));
+const Login = lazy(() => import("./login").then((m) => ({ default: m.Login })));
+const MFA = lazy(() => import("./mfa").then((m) => ({ default: m.MFA })));
+const ChangePassword = lazy(() =>
+  import("./change-password").then((m) => ({ default: m.ChangePassword })),
+);
+const ForgotPassword = lazy(() =>
+  import("./forgot-password").then((m) => ({ default: m.ForgotPassword })),
+);
+const ResetPassword = lazy(() =>
+  import("./reset-password").then((m) => ({ default: m.ResetPassword })),
+);
+const Swagger = lazy(() =>
+  import("./swagger").then((m) => ({ default: m.Swagger })),
+);
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { state, data } = useSession();
@@ -30,6 +41,10 @@ const router = createHashRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/mfa",
+    element: <MFA />,
   },
   {
     path: "/change-password",
@@ -66,23 +81,8 @@ const router = createHashRouter([
       },
     ],
   },
-], {
-  future: {
-    v7_relativeSplatPath: true,
-    v7_skipActionErrorRevalidation: true,
-    v7_fetcherPersist: true,
-    v7_normalizeFormMethod: true,
-    v7_partialHydration: true,
-  }
-});
+]);
 
 export function Routes() {
-  return (
-    <RouterProvider
-      router={router}
-      future={{
-        v7_startTransition: true,
-      }}
-    />
-  );
+  return <RouterProvider router={router} />;
 }

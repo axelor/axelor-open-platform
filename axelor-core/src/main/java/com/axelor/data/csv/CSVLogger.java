@@ -1,39 +1,24 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.data.csv;
 
 import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +43,7 @@ public class CSVLogger {
 
   private File configFile;
 
-  private List<String> filesName = Lists.newArrayList();
+  private List<String> filesName = new ArrayList<>();
 
   private boolean inputExported;
 
@@ -130,11 +115,11 @@ public class CSVLogger {
     try {
       if (!this.currentFile.exists()) {
         Files.createParentDirs(this.currentFile);
-        Files.asCharSink(this.currentFile, Charsets.UTF_8, FileWriteMode.APPEND)
+        Files.asCharSink(this.currentFile, StandardCharsets.UTF_8, FileWriteMode.APPEND)
             .write(Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(this.header)));
         this.filesName.add(this.currentFile.getName());
       }
-      Files.asCharSink(this.currentFile, Charsets.UTF_8, FileWriteMode.APPEND)
+      Files.asCharSink(this.currentFile, StandardCharsets.UTF_8, FileWriteMode.APPEND)
           .write("\n" + Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(values)));
     } catch (IOException e) {
     }
@@ -147,15 +132,7 @@ public class CSVLogger {
    * @return list of the quoted row values
    */
   private Collection<String> transformLine(String[] values) {
-    return Collections2.transform(
-        Arrays.asList(values),
-        new Function<String, String>() {
-
-          @Override
-          public String apply(String value) {
-            return "\"" + value + "\"";
-          }
-        });
+    return Arrays.stream(values).map(value -> "\"" + value + "\"").collect(Collectors.toList());
   }
 
   /**
@@ -219,7 +196,7 @@ public class CSVLogger {
    * @throws IOException if unable to read config file
    */
   private void computeBindings() throws IOException {
-    List<String> lines = Lists.newArrayList();
+    List<String> lines = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
     XStream xStream = XStreamUtils.createXStream();
     xStream.processAnnotations(CSVConfig.class);
@@ -232,7 +209,7 @@ public class CSVLogger {
         sb.append(xStream.toXML(adapter));
       }
     } else {
-      lines = Files.readLines(this.configFile, Charsets.UTF_8);
+      lines = Files.readLines(this.configFile, StandardCharsets.UTF_8);
 
       for (int i = 0; i < lines.size() - 1; i++) {
         if (i == 0 || i == 1 || i == (lines.size() - 1)) {
@@ -251,7 +228,7 @@ public class CSVLogger {
     sb.append(xStream.toXML(this.csvInput));
     this.csvInput.setFileName(originalFileName);
 
-    Files.asCharSink(this.configFile, Charsets.UTF_8).write(this.prepareXML(sb.toString()));
+    Files.asCharSink(this.configFile, StandardCharsets.UTF_8).write(this.prepareXML(sb.toString()));
   }
 
   /**

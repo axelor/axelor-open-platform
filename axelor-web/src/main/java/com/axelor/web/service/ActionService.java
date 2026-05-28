@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web.service;
 
@@ -31,15 +17,15 @@ import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -112,9 +98,10 @@ public class ActionService extends AbstractService {
   @Operation(
       summary = "Execute an action",
       description =
-          "Execute an action along with the provided data context. "
-              + "The action can be single or list of comma-separated actions. "
-              + "An action can be either an xml action or a method call.")
+          """
+          Execute an action along with the provided data context. \
+          The action can be single or list of comma-separated actions. \
+          An action can be either an xml action or a method call.""")
   public Response execute(ActionRequest request) {
     return actionExecutor.execute(request);
   }
@@ -124,9 +111,10 @@ public class ActionService extends AbstractService {
   @Operation(
       summary = "Execute an action",
       description =
-          "Execute an action along with the provided data context. "
-              + "The action can be single or list of comma-separated actions. "
-              + "An action can be either an xml action or a method call.")
+          """
+          Execute an action along with the provided data context. \
+          The action can be single or list of comma-separated actions. \
+          An action can be either an xml action or a method call.""")
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
     return actionExecutor.execute(request);

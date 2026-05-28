@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
 
   <module name="axelor-core" package="com.axelor.meta.db"/>
 
-  <entity name="MetaSequence" table="META_SEQUENCE" sequential="false">
+  <entity name="MetaSequence" table="META_SEQUENCE">
     <![CDATA[
     This object stores custom sequences.
     ]]>

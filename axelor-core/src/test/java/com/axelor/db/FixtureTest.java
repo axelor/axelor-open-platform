@@ -1,0 +1,86 @@
+/*
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+package com.axelor.db;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.axelor.JpaTestModule;
+import com.axelor.test.GuiceExtension;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.db.FieldTypes;
+import com.axelor.test.fixture.Fixture;
+import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@ExtendWith(GuiceExtension.class)
+@GuiceModules({JpaTestModule.class})
+@TestMethodOrder(MethodOrderer.MethodName.class)
+public class FixtureTest extends JpaSupport {
+
+  @Inject private Fixture fixture;
+
+  private FieldTypes fieldTypes;
+
+  @BeforeEach
+  @Transactional
+  public void setUp() throws IOException {
+    if (all(FieldTypes.class).count() == 0) {
+      fixture.load("demo-field-types.yml", JPA::model, bean -> JPA.manage((Model) bean));
+    }
+  }
+
+  @Test
+  public void testString() {
+    whenLoadTypeFields();
+    expectString();
+  }
+
+  private void expectString() {
+    assertEquals("Hello, Axelor!", fieldTypes.getString());
+  }
+
+  @Test
+  public void testLocalDate() {
+    whenLoadTypeFields();
+    expectLocalDate();
+  }
+
+  private void expectLocalDate() {
+    assertEquals(LocalDate.parse("2021-04-29"), fieldTypes.getLocalDate());
+  }
+
+  @Test
+  public void testLocalDateTime() {
+    whenLoadTypeFields();
+    expectLocalDateTime();
+  }
+
+  private void expectLocalDateTime() {
+    assertEquals(LocalDateTime.of(2021, 4, 29, 7, 57, 0), fieldTypes.getLocalDateTime());
+  }
+
+  @Test
+  public void testLocalTime() {
+    whenLoadTypeFields();
+    expectLocalTime();
+  }
+
+  private void expectLocalTime() {
+    assertEquals(LocalTime.of(7, 57), fieldTypes.getLocalTime());
+  }
+
+  private void whenLoadTypeFields() {
+    fieldTypes = all(FieldTypes.class).fetchOne();
+  }
+}

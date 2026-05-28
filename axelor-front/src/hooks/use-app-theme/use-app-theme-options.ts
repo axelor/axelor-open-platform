@@ -18,27 +18,27 @@ const get = async (url: string) => {
   return res.status === 200 ? res.json() : Promise.reject(res.status);
 };
 
+export function loadThemeOptions(theme: string) {
+  return cache.get(theme, async () => {
+    let themeContent: ThemeOptions = {};
+    let baseTheme = defaultTheme;
+    try {
+      themeContent = await get(
+        `ws/public/app/theme?name=${encodeURIComponent(theme)}`,
+      );
+    } catch {
+      // ignore
+    }
+    if (theme === "dark" || themeContent?.palette?.mode === "dark") {
+      baseTheme = merge(cloneDeep(defaultTheme), darkTheme);
+    }
+    return validateThemeOptions(merge(cloneDeep(baseTheme), themeContent));
+  });
+}
+
 export function useAppThemeOption() {
   const theme = useAppTheme();
-  const { state, data } = useAsync(async () => {
-    const options = await cache.get(theme, async () => {
-      let themeContent: ThemeOptions = {};
-      let baseTheme = defaultTheme;
-      try {
-        themeContent = await get(
-          `ws/public/app/theme?name=${encodeURIComponent(theme)}`,
-        );
-      } catch {
-        // ignore
-      }
-      if (theme === "dark" || themeContent?.palette?.mode === "dark") {
-        baseTheme = merge(cloneDeep(defaultTheme), darkTheme);
-      }
-      return merge(cloneDeep(baseTheme), themeContent);
-    });
-    return validateThemeOptions(options);
-  }, [theme]);
-
+  const { state, data } = useAsync(() => loadThemeOptions(theme), [theme]);
   return {
     theme,
     loading: state === "loading",

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -28,7 +14,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +58,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
 
     // Filtered by paths
     return lists.parallelStream()
-        .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Paths.get(toUri(url))))
+        .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Path.of(toUri(url))))
         .collect(Collectors.toList());
   }
 
@@ -107,7 +92,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
   }
 
   private long getLastModifiedTimeMillis(FileSystem fs, URL url) {
-    final Path path = fs.getPath(Paths.get(toUri(url)).toString());
+    final Path path = fs.getPath(Path.of(toUri(url)).toString());
     try {
       return Files.getLastModifiedTime(path).toMillis();
     } catch (IOException e) {

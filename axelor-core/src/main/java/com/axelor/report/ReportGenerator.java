@@ -1,27 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.report;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
-import com.axelor.meta.MetaFiles;
-import com.google.common.base.Preconditions;
+import com.axelor.file.temp.TempFiles;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,18 +16,15 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.data.oda.jdbc.IConnectionFactory;
 import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.IPDFRenderOption;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -107,10 +90,6 @@ public class ReportGenerator {
       opts.setOutputFormat(format);
       opts.setOutputStream(output);
 
-      if (IRenderOption.OUTPUT_FORMAT_PDF.equals(format)) {
-        opts.setOption(IPDFRenderOption.PDF_HYPHENATION, true);
-      }
-
       task.setLocale(locale);
       task.setRenderOption(opts);
       task.setParameterValues(params);
@@ -120,18 +99,14 @@ public class ReportGenerator {
       task.getAppContext().put(IConnectionFactory.CLOSE_PASS_IN_CONNECTION, Boolean.FALSE);
 
       JPA.jdbcWork(
-          new JPA.JDBCWork() {
-
-            @Override
-            public void execute(Connection connection) throws SQLException {
-              task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
-              try {
-                task.run();
-              } catch (EngineException e) {
-                throw new RuntimeException(e);
-              } finally {
-                task.close();
-              }
+          connection -> {
+            task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
+            try {
+              task.run();
+            } catch (EngineException e) {
+              throw new RuntimeException(e);
+            } finally {
+              task.close();
             }
           });
     }
@@ -165,8 +140,8 @@ public class ReportGenerator {
    */
   public File generate(String designName, String format, Map<String, Object> params, Locale locale)
       throws IOException, BirtException {
-    Preconditions.checkNotNull(designName, "no report design name given");
-    final Path tmpFile = MetaFiles.createTempFile(null, "");
+    Objects.requireNonNull(designName, "no report design name given");
+    final Path tmpFile = TempFiles.createTempFile(null, "");
     try (FileOutputStream stream = new FileOutputStream(tmpFile.toFile())) {
       generate(stream, designName, format, params, locale);
     }

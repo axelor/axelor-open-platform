@@ -121,8 +121,7 @@ export const ReportTable = forwardRef(function ReportTable(
         });
       content += row.join(";") + "\n";
     });
-    const name = (gridView.title || "export").toLowerCase().replace(/ /g, "_");
-    download(encodeURI(content), name + ".csv");
+    download(encodeURI(content), `${gridView.title || "export"}.csv`);
   }, [records, gridView]);
 
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());

@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.team.web;
 
@@ -24,28 +10,28 @@ import com.axelor.db.JpaSupport;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
+import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.TypedQuery;
 
 public class TaskController extends JpaSupport {
 
   private static final String SQL_TASKS_DUE =
-      ""
-          + "SELECT tt FROM TeamTask tt "
-          + "LEFT JOIN tt.assignedTo u "
-          + "WHERE "
-          + "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
-          + " (tt.taskDeadline <= current_date)";
+      """
+      SELECT tt FROM TeamTask tt \
+      LEFT JOIN tt.assignedTo u \
+      WHERE \
+      	(tt.status NOT IN :closed_status AND u.id = :uid) AND \
+       (tt.taskDeadline <= current_date)""";
 
   private static final String SQL_TASKS_TODO =
-      ""
-          + "SELECT tt FROM TeamTask tt "
-          + "LEFT JOIN tt.assignedTo u "
-          + "WHERE "
-          + "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
-          + "	(tt.taskDeadline <= current_date OR tt.taskDate <= current_date)";
+      """
+      SELECT tt FROM TeamTask tt \
+      LEFT JOIN tt.assignedTo u \
+      WHERE \
+      	(tt.status NOT IN :closed_status AND u.id = :uid) AND \
+      	(tt.taskDeadline <= current_date OR tt.taskDate <= current_date)""";
 
   public void countTasks(ActionRequest request, ActionResponse response) {
     final Map<String, Object> value = new HashMap<>();

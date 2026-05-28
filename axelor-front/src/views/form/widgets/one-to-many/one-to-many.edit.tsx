@@ -8,11 +8,18 @@ import {
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
+import {
+  SetStateAction,
+  useCallback,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
-import { useEditor, useSelector } from "@/hooks/use-relation";
+import { useEditor, useSelector, isPopupMaximized } from "@/hooks/use-relation";
 import { SearchOptions } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -39,9 +46,12 @@ export function OneToManyEdit({
   valueAtom,
   ...props
 }: FieldProps<DataRecord[] | undefined>) {
+  const id = useId();
+  const popupId = `${id}-popup`;
   const [popup, setPopup] = useState(false);
   const [state, setState] = useGridState();
   const [value, setValue] = useAtom(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     useMemo(
       () =>
         atom(
@@ -78,7 +88,7 @@ export function OneToManyEdit({
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputEl, setInputEl] = useState<HTMLInputElement | null>(null);
   const popupRef = useRef(false);
   const [records, setRecords] = useState<DataRecord[]>([]);
 
@@ -115,8 +125,9 @@ export function OneToManyEdit({
 
   const { data: meta } = useAsync(async () => {
     const view = views?.find?.((v: View) => v.type === "grid");
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     if (view && view.items) {
-      const { fields } = await findFields(model);
+      const { fields } = await findFields(model, jsonModel);
       return {
         view,
         fields,
@@ -126,8 +137,9 @@ export function OneToManyEdit({
       type: "grid",
       name: gridView,
       model,
+      jsonModel,
     });
-  }, [views, gridView, model]);
+  }, [views, gridView, model, schema.jsonModel, schema.jsonTarget]);
 
   const columnNames = useGridColumnNames({
     view: meta?.view ?? schema,
@@ -135,6 +147,7 @@ export function OneToManyEdit({
   });
 
   const onSearch = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
       const unsaved = (value || []).filter((x) => !ids.includes(x.id));
@@ -172,9 +185,8 @@ export function OneToManyEdit({
   );
 
   const focusInput = useCallback(() => {
-    const input = inputRef.current;
-    input && input.focus?.();
-  }, []);
+    inputEl && inputEl.focus?.();
+  }, [inputEl]);
 
   const onPopupViewInit = useCallback(() => {
     popupRef.current = true;
@@ -202,15 +214,18 @@ export function OneToManyEdit({
         });
       };
       let form = views?.find?.((v: View) => v.type === "form");
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
       if (form) {
-        const { fields } = await findFields(model);
+        const { fields } = await findFields(model, jsonModel);
         form = { ...form, fields };
       }
       showEditor({
         title: title ?? "",
         model,
+        jsonModel,
         record,
         readonly,
+        maximize: isPopupMaximized(schema, "editor"),
         viewName: formView,
         context: {
           _parent: getContext(),
@@ -227,6 +242,7 @@ export function OneToManyEdit({
       model,
       views,
       formView,
+      schema,
       getContext,
       setValue,
       showEditor,
@@ -257,9 +273,12 @@ export function OneToManyEdit({
       return onEdit({});
     }
     const onClose = onPopupViewInit();
+    const jsonModel = schema.jsonTarget || schema.jsonModel;
     showSelector({
       model,
+      jsonModel,
       multiple: true,
+      maximize: isPopupMaximized(schema, "selector"),
       viewName: gridView,
       domain: domain,
       orderBy: sortBy,
@@ -292,6 +311,7 @@ export function OneToManyEdit({
     gridView,
     domain,
     sortBy,
+    schema,
     getContext,
     searchLimit,
     canNew,
@@ -328,11 +348,14 @@ export function OneToManyEdit({
   return (
     <Box ref={containerRef} d="flex">
       <TextField
-        ref={inputRef}
+        ref={setInputEl}
         readOnly
         autoFocus={focus}
         value={`(${value?.length || 0})`}
         onChange={() => {}}
+        aria-controls={popupId}
+        aria-expanded={popup}
+        aria-haspopup="dialog"
         icons={[
           ...(!readonly && (isManyToMany ? canSelect : canNew)
             ? [
@@ -360,14 +383,23 @@ export function OneToManyEdit({
       <Popper
         className={styles.popper}
         open={popup}
-        target={inputRef.current}
+        target={inputEl}
         placement="bottom-start"
+        role={"presentation"}
       >
         <Box d="flex">
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box d="flex">
               <FocusTrap enabled={popup}>
-                <Box d="flex" flex={1} className={styles.grid}>
+                <Box
+                  id={popupId}
+                  role="dialog"
+                  aria-label={i18n.get("Select items")}
+                  d="flex"
+                  flex={1}
+                  className={styles.grid}
+                  data-testid="select-popup"
+                >
                   {popup && meta && (
                     <GridComponent
                       showEditIcon
@@ -379,6 +411,7 @@ export function OneToManyEdit({
                       setState={setState}
                       onView={onView}
                       onEdit={canEdit ? onEdit : onView}
+                      data-testid="grid"
                     />
                   )}
                 </Box>

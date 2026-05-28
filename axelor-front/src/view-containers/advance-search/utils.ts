@@ -377,6 +377,38 @@ export function findContextField(
   return null;
 }
 
+export function fillArchiveCriteria(
+  archiveType: AdvancedSearchState["archiveType"],
+  criteria: (Criteria | Filter)[],
+  operator: Criteria["operator"],
+): {
+  criteria: (Criteria | Filter)[];
+  operator: Criteria["operator"];
+  _archived: boolean;
+} {
+  const _archived = archiveType !== "default";
+  if (archiveType === "archived") {
+    const archiveCriteria = [
+      { fieldName: "archived", operator: "=", value: true },
+    ] as Filter[];
+
+    return {
+      _archived,
+      criteria: criteria.length
+        ? [
+            { criteria, operator },
+            {
+              criteria: archiveCriteria,
+              operator: "and",
+            },
+          ]
+        : archiveCriteria,
+      operator: "and",
+    };
+  }
+  return { _archived, criteria, operator };
+}
+
 export function prepareAdvanceSearchQuery(
   state: AdvancedSearchState,
   hasEditorApply?: boolean,
@@ -384,7 +416,7 @@ export function prepareAdvanceSearchQuery(
   const {
     domains,
     filters,
-    archived: _archived,
+    archiveType,
     editor,
     contextField,
     fields = {},
@@ -418,11 +450,20 @@ export function prepareAdvanceSearchQuery(
     operator: editorOperator,
     criteria: editorCriteria,
   } = editor ?? {};
-  let operator = editorOperator ?? "and";
-  let criteria: Criteria["criteria"] = getEditorCriteria(editorCriteria);
+  const _operator = editorOperator ?? "and";
+  const _criteria: Criteria["criteria"] = getEditorCriteria(editorCriteria);
+
+  const totalCriteria =
+    _criteria?.filter((c) => (c as Filter).operator)?.length ?? 0;
+
+  const { _archived, ...filterCriteria } = fillArchiveCriteria(
+    archiveType,
+    _criteria,
+    _operator,
+  );
+  let { criteria, operator } = filterCriteria;
 
   const contextFieldFilter = getContextFieldFilter(contextField);
-
   if (contextFieldFilter) {
     criteria = [
       contextFieldFilter,
@@ -449,8 +490,6 @@ export function prepareAdvanceSearchQuery(
 
   const allfilters = [...(_domains || []), ...($filters || [])];
   const totalFilters = allfilters.length;
-  const totalCriteria =
-    criteria?.filter((c) => (c as Filter).operator)?.length ?? 0;
   const filterTitle = id ? title : "";
   const searchTextLabel =
     filterTitle ||

@@ -231,8 +231,8 @@
                     "type": "field",
                     "name": "primary",
                     "widget": "toggle",
-                    "icon": "fa-star-o",
-                    "iconActive": "fa-star",
+                    "icon": "star",
+                    "iconActive": "star-fill",
                     "exclusive": true,
                     "autoTitle": "Primary"
                   }
@@ -436,7 +436,7 @@
             {
               "type": "field",
               "name": "circles",
-              "widget": "TagSelect",
+              "widget": "Tags",
               "target": "com.axelor.contact.db.Circle",
               "targetName": "name",
               "autoTitle": "Circles"

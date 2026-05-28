@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.web;
 
@@ -24,6 +10,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.audit.AuditModule;
 import com.axelor.db.tenants.TenantFilter;
 import com.axelor.meta.MetaScanner;
 import com.axelor.quartz.SchedulerModule;
@@ -33,6 +20,7 @@ import com.axelor.rpc.RequestFilter;
 import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.openapi.OpenApiModule;
+import com.axelor.web.servlet.CacheAssetsFilter;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
 import com.axelor.web.servlet.MaintenanceFilter;
@@ -43,15 +31,13 @@ import com.axelor.web.socket.inject.WebSocketSecurity;
 import com.axelor.web.socket.inject.WebSocketSecurityInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
-import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
-import java.lang.reflect.Method;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.Provider;
 import java.util.Arrays;
 import java.util.List;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 
 /** The main application module. */
@@ -72,9 +58,10 @@ public class AppServletModule extends ServletModule {
   protected List<? extends Module> getModules() {
     final AuthModule authModule = new AuthModule(getServletContext());
     final AppModule appModule = new AppModule();
+    final AuditModule auditModule = new AuditModule();
     final SchedulerModule schedulerModule = new SchedulerModule();
     final WebSocketModule webSocketModule = new WebSocketModule();
-    return Arrays.asList(authModule, appModule, schedulerModule, webSocketModule);
+    return Arrays.asList(authModule, appModule, auditModule, schedulerModule, webSocketModule);
   }
 
   protected void afterConfigureServlets() {
@@ -126,7 +113,10 @@ public class AppServletModule extends ServletModule {
     }
 
     // no-cache filter
-    filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
+    filter(NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
+
+    // cache version/hash-named assets filter
+    filter(CacheAssetsFilter.URL_PATTERN).through(CacheAssetsFilter.class);
 
     // Maintenance mode (503 Service Unavailable)
     filter("/", "/index.html", "/ws/*").through(MaintenanceFilter.class);
@@ -143,16 +133,13 @@ public class AppServletModule extends ServletModule {
     // intercept request accepting methods
     bindInterceptor(
         Matchers.annotatedWith(Path.class),
-        new AbstractMatcher<Method>() {
-          @Override
-          public boolean matches(Method t) {
-            for (Class<?> c : t.getParameterTypes()) {
-              if (Request.class.isAssignableFrom(c)) {
-                return true;
-              }
+        t -> {
+          for (Class<?> c : t.getParameterTypes()) {
+            if (Request.class.isAssignableFrom(c)) {
+              return true;
             }
-            return false;
           }
+          return false;
         },
         new RequestFilter());
 
@@ -172,8 +159,6 @@ public class AppServletModule extends ServletModule {
       bind(type);
     }
 
-    // register the session listener
-    getServletContext().addListener(new AppSessionListener());
     // run additional configuration tasks
     this.afterConfigureServlets();
   }

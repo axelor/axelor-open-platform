@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.tenants;
 
@@ -81,6 +67,30 @@ public class TenantConfigImpl implements TenantConfig {
 
   private TenantConfigImpl() {}
 
+  public static List<TenantConfig> findAll(Map<String, String> props) {
+    final List<TenantConfig> all = new ArrayList<>();
+    for (String key : props.keySet()) {
+      Matcher matcher = PATTERN_DB_NAME.matcher(key);
+      if (matcher.matches()) {
+        final String tenantId = matcher.group(1);
+        all.add(findById(props, tenantId));
+      }
+    }
+    if (all.isEmpty()) {
+      all.add(findById(props, DEFAULT_TENANT_ID));
+    }
+
+    // sort by name
+    try {
+      all.sort((a, b) -> a.getTenantName().compareTo(b.getTenantName()));
+    } catch (Exception e) {
+    }
+
+    all.removeIf(Objects::isNull);
+
+    return all;
+  }
+
   public static List<TenantConfig> findByHost(Map<String, String> props, String host) {
     final List<TenantConfig> all = new ArrayList<>();
     for (String key : props.keySet()) {
@@ -113,38 +123,36 @@ public class TenantConfigImpl implements TenantConfig {
   }
 
   public static TenantConfig findById(Map<String, String> props, String tenantId) {
-    if (CONFIGS.containsKey(tenantId)) {
-      return CONFIGS.get(tenantId);
-    }
+    return CONFIGS.computeIfAbsent(
+        tenantId,
+        id -> {
+          final String prefix = "db." + tenantId;
+          final TenantConfigImpl cfg = new TenantConfigImpl();
 
-    final String prefix = "db." + tenantId;
-    final TenantConfigImpl cfg = new TenantConfigImpl();
+          final String active = get(props, prefix, "active");
+          final String visible = get(props, prefix, "visible");
 
-    final String active = get(props, prefix, "active");
-    final String visible = get(props, prefix, "visible");
+          cfg.active = active == null || "true".equalsIgnoreCase(active);
+          cfg.visible = visible == null || "true".equalsIgnoreCase(visible);
 
-    cfg.active = active == null || "true".equalsIgnoreCase(active);
-    cfg.visible = visible == null || "true".equalsIgnoreCase(visible);
+          cfg.tenantId = tenantId;
+          cfg.tenantName = get(props, prefix, "name");
+          cfg.tenantHosts = get(props, prefix, "hosts");
+          cfg.tenantRoles = get(props, prefix, "roles");
 
-    cfg.tenantId = tenantId;
-    cfg.tenantName = get(props, prefix, "name");
-    cfg.tenantHosts = get(props, prefix, "hosts");
-    cfg.tenantRoles = get(props, prefix, "roles");
+          cfg.jndiDataSource = get(props, prefix, "datasource");
 
-    cfg.jndiDataSource = get(props, prefix, "datasource");
+          cfg.jdbcDriver = get(props, prefix, "driver");
+          cfg.jdbcUrl = get(props, prefix, "url");
+          cfg.jdbcUser = get(props, prefix, "user");
+          cfg.jdbcPassword = get(props, prefix, "password");
 
-    cfg.jdbcDriver = get(props, prefix, "driver");
-    cfg.jdbcUrl = get(props, prefix, "url");
-    cfg.jdbcUser = get(props, prefix, "user");
-    cfg.jdbcPassword = get(props, prefix, "password");
+          if (cfg.jndiDataSource == null && (cfg.jdbcDriver == null || cfg.jdbcUrl == null)) {
+            return null;
+          }
 
-    if (cfg.jndiDataSource == null && (cfg.jdbcDriver == null || cfg.jdbcUrl == null)) {
-      return null;
-    }
-
-    CONFIGS.put(tenantId, cfg);
-
-    return cfg;
+          return cfg;
+        });
   }
 
   private static String getHosts(Map<String, String> props, String tenantId) {

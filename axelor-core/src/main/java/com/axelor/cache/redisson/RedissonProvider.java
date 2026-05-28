@@ -1,0 +1,209 @@
+/*
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+package com.axelor.cache.redisson;
+
+import com.axelor.app.settings.BeanConfigurator;
+import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.CacheProviderInfo;
+import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Redisson client provider
+ *
+ * <p>This provides a {@link RedissonClient} instance based on a configuration file. For the same
+ * configuration file, the same instance is returned.
+ */
+public class RedissonProvider {
+
+  private static final ConcurrentMap<String, RedissonClient> redissonClients =
+      new ConcurrentHashMap<>();
+
+  private static final String DEFAULT_CONFIG_PATH = "redisson.yaml";
+
+  private static final Logger log = LoggerFactory.getLogger(RedissonProvider.class);
+
+  private static class DefaultRedissonHolder {
+    private static final RedissonClient INSTANCE = get(CacheBuilder.getCacheProviderInfo());
+  }
+
+  private RedissonProvider() {}
+
+  /**
+   * Gets default Redisson client.
+   *
+   * @return redisson client
+   */
+  public static RedissonClient get() {
+    return DefaultRedissonHolder.INSTANCE;
+  }
+
+  /**
+   * Gets Redisson client given the `CacheProviderInfo`
+   *
+   * @param info
+   * @return redisson client
+   */
+  public static RedissonClient get(CacheProviderInfo info) {
+    return get(info.getConfig(), info.getConfigPrefix());
+  }
+
+  public static RedissonClient get(Map<String, String> config, String prefix) {
+    var path = config.isEmpty() ? DEFAULT_CONFIG_PATH : config.get("path");
+
+    if (StringUtils.notBlank(path)) {
+      return redissonClients.computeIfAbsent(path, k -> createRedissonClient(path));
+    }
+
+    return redissonClients.computeIfAbsent(prefix, k -> createRedissonClient(config, prefix));
+  }
+
+  protected static RedissonClient createRedissonClient(String path) {
+    Config config;
+
+    try {
+      // Try filesystem, then classpath.
+      var file = new File(path);
+      if (file.exists()) {
+        config = Config.fromYAML(file);
+      } else {
+        var url = ClassUtils.getResource(path);
+        if (url != null) {
+          config = Config.fromYAML(url);
+        } else {
+          throw new IllegalArgumentException("Redisson config not found: " + path);
+        }
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+
+    return createRedissonClient(config, path);
+  }
+
+  protected static RedissonClient createRedissonClient(
+      Map<String, String> properties, String prefix) {
+    var config = createConfig(properties);
+    return createRedissonClient(config, prefix + "*");
+  }
+
+  protected static RedissonClient createRedissonClient(Config config, String configSource) {
+    // Use AxelorKryo5Codec as default codec instead of Kryo5Codec.
+    if (config.getCodec() == null) {
+      config.setCodec(new AxelorKryo5Codec());
+    }
+
+    var redisson = Redisson.create(config);
+
+    log.atInfo()
+        .setMessage("{} connected to {} on {}")
+        .addArgument(
+            () -> "Redisson" + (StringUtils.notBlank(configSource) ? ":" + configSource : ""))
+        .addArgument(
+            () ->
+                RedissonUtils.getValkeyVersion(redisson)
+                    .map(version -> "Valkey " + version)
+                    .orElseGet(() -> "Redis " + RedissonUtils.getRedisVersion(redisson)))
+        .addArgument(
+            () ->
+                RedissonUtils.getRedisAddresses(redisson).stream()
+                    .map(a -> String.format("%s:%d", a.getHostString(), a.getPort()))
+                    .collect(Collectors.joining(", ")))
+        .log();
+
+    return redisson;
+  }
+
+  protected static Config createConfig(Map<String, String> properties) {
+    var config = new Config();
+
+    // Group properties into server and non-server configs
+    var groupedConfigs =
+        properties.entrySet().stream()
+            .collect(
+                Collectors.partitioningBy(
+                    e -> {
+                      var key = e.getKey();
+                      var parts = key.split("\\.", 2);
+                      return parts.length > 1 && parts[0].toLowerCase().endsWith("config");
+                    }));
+
+    // Gather server configs
+    var serverConfigs =
+        groupedConfigs.get(true).stream()
+            .collect(
+                Collectors.groupingBy(
+                    entry -> entry.getKey().split("\\.", 2)[0],
+                    Collectors.toMap(entry -> entry.getKey().split("\\.", 2)[1], Entry::getValue)));
+
+    // Handle server configs
+    serverConfigs.forEach(
+        (type, serverSettings) -> {
+          var serverConfig =
+              switch (type.toLowerCase()) {
+                case String s when s.startsWith("single") -> config.useSingleServer();
+                case String s when s.startsWith("master") -> config.useMasterSlaveServers();
+                case String s when s.startsWith("cluster") -> config.useClusterServers();
+                case String s when s.startsWith("sentinel") -> config.useSentinelServers();
+                case String s when s.startsWith("replicated") -> config.useReplicatedServers();
+                default -> null;
+              };
+
+          if (serverConfig == null) {
+            log.error("Unsupported server config: {}", type);
+            return;
+          }
+
+          // Set properties for the server config
+          serverSettings.forEach(
+              (key, value) -> BeanConfigurator.setField(serverConfig, key, value));
+        });
+
+    // Set properties for the non-server configs
+    groupedConfigs
+        .get(false)
+        .forEach(entry -> BeanConfigurator.setField(config, entry.getKey(), entry.getValue()));
+
+    return config;
+  }
+
+  /** Shuts down all Redisson clients. */
+  public static synchronized void shutdown() {
+    if (redissonClients.isEmpty()) {
+      return;
+    }
+
+    log.info("Shutting down {} Redisson clients...", redissonClients.size());
+
+    try {
+      for (var redisson : redissonClients.values()) {
+        try {
+          redisson.shutdown();
+        } catch (Exception e) {
+          log.error("Error shutting down Redisson client {}: {}", redisson.getId(), e);
+        }
+      }
+    } finally {
+      redissonClients.clear();
+    }
+  }
+
+  public static boolean isActive() {
+    return !redissonClients.isEmpty();
+  }
+}

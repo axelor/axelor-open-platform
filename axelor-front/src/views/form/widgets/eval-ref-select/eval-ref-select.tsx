@@ -9,19 +9,7 @@ import { deepGet, deepSet } from "@/utils/objects";
 import { SuggestBox } from "..";
 import { FieldProps, FormAtom, ValueAtom, WidgetAtom } from "../../builder";
 
-const evalVar = (name: string) => {
-  if (name.startsWith("record.")) {
-    console.warn(
-      "Using `record.` prefix is deprecated for `x-eval-*` attributes of `EvalRefSelect` widget:",
-      name,
-    );
-    return name.substring(7);
-  }
-  return name;
-};
-
-function evalAtom(formAtom: FormAtom, prop: string) {
-  const name = evalVar(prop);
+function evalAtom(formAtom: FormAtom, name: string) {
   return focusAtom(
     formAtom,
     (form) => deepGet(form.record, name),

@@ -39,28 +39,34 @@ export function useCompletion(options: {
         _domain?: string;
         _domainContext?: DataContext;
       },
+      signal?: AbortSignal,
     ) => {
       const { _domain, _domainContext } = opts || {};
-      return dataSource.search({
-        translate: true,
-        sortBy: sortBy?.split?.(","),
-        limit,
-        fields: uniq(["id", ...(fetchFields || []), ...names]),
-        filter: {
-          _domain,
-          _domainContext,
-          ...(term
-            ? {
-                operator: "or",
-                criteria: names.map((name) => ({
-                  fieldName: name,
-                  operator: "like",
-                  value: term,
-                })),
-              }
-            : {}),
+      return dataSource.search(
+        {
+          translate: true,
+          sortBy: sortBy?.split?.(","),
+          limit,
+          fields: uniq(["id", ...(fetchFields || []), ...names]),
+          filter: {
+            _domain,
+            _domainContext,
+            ...(term
+              ? {
+                  operator: "or",
+                  criteria: names.map((name) => ({
+                    fieldName: name,
+                    operator: "like",
+                    value: term,
+                  })),
+                }
+              : {}),
+          },
         },
-      });
+        {
+          signal,
+        },
+      );
     },
     [dataSource, sortBy, limit, names, fetchFields],
   );

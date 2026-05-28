@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.common.logging;
 
@@ -42,7 +28,7 @@ import com.axelor.common.StringUtils;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -91,9 +77,10 @@ public class LoggerConfiguration {
   private static final Pattern LOGGING_LEVEL_PATTERN = Pattern.compile("logging\\.level\\.(.*?)");
 
   private static final String ANSI_LOG_PATTERN =
-      "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) "
-          + "%clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} "
-          + "%clr(:){faint} %m%n";
+      """
+      %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) \
+      %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} \
+      %clr(:){faint} %m%n""";
 
   private static final String FILE_LOG_PATTERN =
       "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n";
@@ -221,7 +208,7 @@ public class LoggerConfiguration {
     // create file appender
     if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_FILE))
         && !StringUtils.isBlank(logPath)) {
-      rootLogger.addAppender(createFileAppender(Paths.get(logPath, "axelor.log").toString()));
+      rootLogger.addAppender(createFileAppender(Path.of(logPath, "axelor.log").toString()));
     }
   }
 
@@ -244,7 +231,7 @@ public class LoggerConfiguration {
   }
 
   private Appender<ILoggingEvent> createConsoleAppender() {
-    final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
+    final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
     final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     final String logPattern = config.getProperty(LOGGING_PATTERN_CONSOLE, ANSI_LOG_PATTERN);
 
@@ -317,8 +304,8 @@ public class LoggerConfiguration {
   }
 
   private void start(LifeCycle lifeCycle) {
-    if (lifeCycle instanceof ContextAware) {
-      ((ContextAware) lifeCycle).setContext(this.context);
+    if (lifeCycle instanceof ContextAware aware) {
+      aware.setContext(this.context);
     }
     lifeCycle.start();
   }

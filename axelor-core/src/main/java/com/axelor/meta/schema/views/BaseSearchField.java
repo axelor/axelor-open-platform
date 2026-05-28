@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.schema.views;
 
@@ -23,13 +9,12 @@ import com.axelor.db.mapper.Adapter;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.google.common.collect.ImmutableMap;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonInclude(Include.NON_NULL)
@@ -56,26 +41,26 @@ public class BaseSearchField extends Field {
   }
 
   private static final Map<String, Class<?>> TYPES =
-      new ImmutableMap.Builder<String, Class<?>>()
-          .put("string", String.class)
-          .put("integer", Integer.class)
-          .put("decimal", BigDecimal.class)
-          .put("date", LocalDate.class)
-          .put("datetime", LocalDateTime.class)
-          .put("boolean", Boolean.class)
-          .build();
+      Map.of(
+          "string", String.class,
+          "integer", Integer.class,
+          "decimal", BigDecimal.class,
+          "date", LocalDate.class,
+          "datetime", LocalDateTime.class,
+          "boolean", Boolean.class);
 
   @SuppressWarnings("rawtypes")
   public Object validate(Object input) {
     try {
-      Class<?> klass = TYPES.get(getServerType());
-      if ("reference".equals(getServerType())) {
+      String serverType = getServerType();
+      Class<?> klass = serverType != null ? TYPES.get(serverType) : null;
+      if ("reference".equals(serverType)) {
         klass = Class.forName(getTarget());
         if (input != null) {
           return JPA.em().find(klass, Long.valueOf(((Map) input).get("id").toString()));
         }
       }
-      if ("enum".equals(getServerType())) {
+      if ("enum".equals(serverType)) {
         return input;
       }
       if (klass != null && BigDecimal.class.isAssignableFrom(klass) && input == null) {

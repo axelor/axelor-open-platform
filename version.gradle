@@ -3,7 +3,7 @@ ext.finalRelease = project.hasProperty("finalRelease")
 ext.versionFile = rootProject.name == "buildSrc" ? "../version.txt" : "version.txt"
 ext.baseVersion = rootProject.file(versionFile).text.trim()
 
-version baseVersion
+version = baseVersion
 
 if (finalRelease) {
   // use base version

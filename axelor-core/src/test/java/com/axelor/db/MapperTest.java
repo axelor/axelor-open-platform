@@ -1,33 +1,20 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,24 +83,24 @@ public class MapperTest extends JpaTest {
 
     assertNotNull(contact.getCircles());
     assertEquals(1, contact.getCircles().size());
-    assertEquals("Business", contact.getCircle(0).getName());
+    assertEquals("Business", contact.getCircles().iterator().next().getName());
   }
 
   private Map<String, Object> getDemoData() {
-    Map<String, Object> values = new HashMap<String, Object>();
+    Map<String, Object> values = new HashMap<>();
     values.put("id", 1L);
     values.put("firstName", "Some");
     values.put("lastName", "Name");
     values.put("fullName", "My Name"); // test readonly
     values.put("dateOfBirth", "1975-02-27");
 
-    Map<String, Object> title = new HashMap<String, Object>();
+    Map<String, Object> title = new HashMap<>();
     title.put("code", "mr");
     title.put("name", "Mr.");
     values.put("title", title);
 
-    Set<Map<String, Object>> groups = new HashSet<Map<String, Object>>();
-    Map<String, Object> family = new HashMap<String, Object>();
+    Set<Map<String, Object>> groups = new HashSet<>();
+    Map<String, Object> family = new HashMap<>();
     family.put("code", "family");
     family.put("title", "Family");
     groups.add(family);
@@ -125,7 +112,7 @@ public class MapperTest extends JpaTest {
   @Test
   @Order(4)
   public void testTypes() {
-    Map<String, Object> values = new HashMap<String, Object>();
+    Map<String, Object> values = new HashMap<>();
     values.put("boolValue", "true");
     values.put("intValue", 121);
     values.put("longValue", 199L);
@@ -145,17 +132,17 @@ public class MapperTest extends JpaTest {
     TypeCheck bean = JPA.edit(TypeCheck.class, values);
 
     assertSame(Boolean.TRUE, bean.getBoolValue());
-    assertTrue(121 == bean.getIntValue());
-    assertTrue(199L == bean.getLongValue());
-    assertTrue(23.12 == bean.getDoubleValue());
+    assertEquals(121, bean.getIntValue());
+    assertEquals(199L, bean.getLongValue());
+    assertEquals(new BigDecimal("23.12"), bean.getDoubleValue());
 
-    assertTrue(false == bean.isBoolValue2());
-    assertTrue(0 == bean.getIntValue2());
-    assertTrue(0L == bean.getLongValue2());
-    assertTrue(0.0 == bean.getDoubleValue2());
+    assertFalse(bean.getBoolValue2());
+    assertEquals(0, bean.getIntValue2());
+    assertEquals(0L, bean.getLongValue2());
+    assertEquals(BigDecimal.ZERO, bean.getDoubleValue2());
 
-    assertEquals("123.0123456789", bean.getDecimalValue1().toString());
-    assertTrue(bean.getDateTime1().getYear() == 2011);
-    assertTrue(bean.getLocalDate1().getYear() == 1111);
+    assertEquals(new BigDecimal("123.0123456789"), bean.getDecimalValue1());
+    assertEquals(2011, bean.getDateTime1().getYear());
+    assertEquals(1111, bean.getLocalDate1().getYear());
   }
 }

@@ -1,25 +1,10 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.tools.code.entity.model;
 
 import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
 import java.beans.PropertyDescriptor;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -48,7 +33,7 @@ public class PropertyAttribute {
       PropertyDescriptor descriptor,
       BiConsumer<Object, Object> checkOverride,
       Predicate<Object> isAbsent) {
-    Preconditions.checkNotNull(descriptor);
+    Objects.requireNonNull(descriptor);
     this.name = StringUtils.notBlank(name) ? name : descriptor.getName();
     this.descriptor = descriptor;
     this.checkOverride = checkOverride != null ? checkOverride : (a, b) -> {};

@@ -1,0 +1,114 @@
+= 8.1 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/8.1/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 8.x to 8.1.
+
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.1/CHANGELOG.md[changelog] for a detailed
+list of fixes, changes, and improvements introduced in 8.1.
+
+== Audit tracking
+
+Now, the audit tracking system processes tracking messages asynchronously after the user transaction. This allows
+improving application responsiveness when creating many tracking messages. So tracking messages are not created
+immediately when a record is created/updated. Instead, they appear in the stream after a brief delay till they are
+processed.
+
+`AuditLog` entity for persistent audit event storage with full state capture has been introduced. It supports retry
+logic with max retries and error tracking. Run the following SQL script to create the table :
+
+[source,sql]
+----
+CREATE SEQUENCE audit_log_seq START WITH 1 INCREMENT BY 100;
+CREATE TABLE audit_log
+(
+    id             bigint       not null    primary key,
+    archived       boolean,
+    version        integer,
+    created_on     timestamp(6),
+    updated_on     timestamp(6),
+    current_state  text,
+    error_message  text,
+    event_type     varchar(255) not null,
+    previous_state text,
+    processed      boolean,
+    related_id     bigint       not null,
+    related_model  varchar(255) not null,
+    retry_count    integer,
+    tx_id          varchar(255) not null,
+    created_by     bigint   constraint fk_ru17orlmi6rjhpojmeqrxbiok references auth_user,
+    updated_by     bigint   constraint fk_tbhw331n3l89dk629vmpxg4de references auth_user,
+    user_id        bigint   constraint fk_pyjqqm7hglp6pnwp3h8whian8 references auth_user
+);
+
+CREATE INDEX audit_log_idx_processing
+    ON audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
+----
+
+For security and performance reasons, certain field types are automatically excluded from audit tracking:
+
+* **Security Sensitive**: Passwords and encrypted fields are never tracked.
+* **Large Data**: Binary fields (files, images) are excluded.
+* **Collections**: One-to-Many and Many-to-Many relationships are not supported.
+* **Transient**: Fields that are not persisted to the database.
+
+Adaptive back-pressure mechanism can be controlled with the following properties : `application.audit.logs.flush-threshold`,
+`application.audit.processor.batch-delay`, `application.audit.processor.activity-window`,
+`application.audit.processor.busy-backoff-interval`, `application.audit.processor.busy-backoff-max-retries` and
+`application.audit.processor.batch-size`.
+
+A new field `receivedOn` has been added on `MailMessage`. Run the following SQL script to adjust `mail_message` table
+change :
+
+[source,sql]
+----
+ALTER TABLE mail_message ADD COLUMN received_on timestamp(6);
+CREATE INDEX mail_message_received_on_idx ON mail_message (received_on);
+UPDATE mail_message set received_on = created_on;
+----
+
+More information xref:dev-guide:modules/messaging.adoc[here].
+
+== Dependencies upgrade
+
+Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+-- AuditLog
+CREATE SEQUENCE audit_log_seq START WITH 1 INCREMENT BY 100;
+CREATE TABLE audit_log
+(
+    id             bigint       not null    primary key,
+    archived       boolean,
+    version        integer,
+    created_on     timestamp(6),
+    updated_on     timestamp(6),
+    current_state  text,
+    error_message  text,
+    event_type     varchar(255) not null,
+    previous_state text,
+    processed      boolean,
+    related_id     bigint       not null,
+    related_model  varchar(255) not null,
+    retry_count    integer,
+    tx_id          varchar(255) not null,
+    created_by     bigint   constraint fk_ru17orlmi6rjhpojmeqrxbiok references auth_user,
+    updated_by     bigint   constraint fk_tbhw331n3l89dk629vmpxg4de references auth_user,
+    user_id        bigint   constraint fk_pyjqqm7hglp6pnwp3h8whian8 references auth_user
+);
+
+CREATE INDEX audit_log_idx_processing
+    ON audit_log (processed, tx_id, related_model, related_id, event_type, created_on, retry_count);
+
+-- MailMessage
+ALTER TABLE mail_message ADD COLUMN received_on timestamp(6);
+CREATE INDEX mail_message_received_on_idx ON mail_message (received_on);
+UPDATE mail_message set received_on = created_on;
+----

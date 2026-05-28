@@ -125,6 +125,7 @@ export const DmsTree = memo(function DmsTree({
 }: TreeProps) {
   const recordsRef = useRef<Record<number, TreeRecord>>({});
 
+  /* eslint-disable react-hooks/refs */
   const treeData = useMemo(() => {
     function toTreeNode(record: TreeRecord, level = 0) {
       const _children: TreeRecord[] = data
@@ -150,6 +151,7 @@ export const DmsTree = memo(function DmsTree({
     }
     return data.filter((record) => record.id === root.id).map(toTreeNode);
   }, [data, root, selected, expanded]);
+  /* eslint-enable react-hooks/refs */
 
   return <TreeNodeList {...props} data={treeData} />;
 });

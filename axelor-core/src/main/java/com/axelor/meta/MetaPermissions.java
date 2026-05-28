@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -30,10 +16,10 @@ import com.axelor.meta.db.MetaPermission;
 import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.SimpleWidget;
+import jakarta.inject.Singleton;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Singleton;
 
 @Singleton
 public class MetaPermissions {
@@ -104,23 +90,6 @@ public class MetaPermissions {
     return null;
   }
 
-  @Deprecated
-  public boolean isCollectionReadable(User user, String object, String field) {
-    if (StringUtils.isBlank(object)) return true;
-    final Class<?> klass;
-    try {
-      klass = Class.forName(object);
-    } catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException(e);
-    }
-    final Mapper mapper = Mapper.of(klass);
-    final Property property = mapper.getProperty(field);
-    return property == null
-        || !property.isCollection()
-        || Beans.get(JpaSecurity.class)
-            .isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
-  }
-
   public boolean isRelatedReadable(String object, String field, SimpleWidget widget) {
     if (StringUtils.isBlank(object)) return true;
     final Class<?> klass;
@@ -137,7 +106,7 @@ public class MetaPermissions {
       property = mapper.getProperty(field);
 
       // For editor fields, allow name field only if no read permissions.
-      if (widget instanceof PanelField && ((PanelField) widget).isFromEditor()) {
+      if (widget instanceof PanelField panelField && panelField.isFromEditor()) {
         return Objects.equals(property, mapper.getNameField())
             || Beans.get(JpaSecurity.class)
                 .isPermitted(JpaSecurity.CAN_READ, klass.asSubclass(Model.class));
@@ -157,7 +126,7 @@ public class MetaPermissions {
       property = mapper.getProperty(fieldPart);
       final Optional<Class<?>> target = Optional.ofNullable(property).map(Property::getTarget);
 
-      if (!target.isPresent()) {
+      if (target.isEmpty()) {
         break;
       }
 

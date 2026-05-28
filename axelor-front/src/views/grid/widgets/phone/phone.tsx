@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlagImage, usePhoneInput } from "react-international-phone";
 
 import { Box } from "@axelor/ui";
@@ -11,6 +11,7 @@ import {
   getPhoneInfo,
   useDefaultCountry,
 } from "@/views/form/widgets/phone/utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import "react-international-phone/style.css";
 
@@ -38,10 +39,16 @@ export function Phone(props: GridColumnProps) {
   const { iso2 } = country;
   const show = value && inputValue;
 
-  const numberType = useMemo(
-    () => (show ? getPhoneInfo(phone).getDisplayType() : undefined),
-    [phone, show],
-  );
+  const [numberType, setNumberType] = useState<string | undefined>(undefined);
+
+  useAsyncEffect(async () => {
+    if (show) {
+      const phoneNumber = await getPhoneInfo(phone);
+      setNumberType(phoneNumber.getDisplayType());
+    } else {
+      setNumberType(undefined);
+    }
+  }, [phone, show]);
 
   return (
     show && (

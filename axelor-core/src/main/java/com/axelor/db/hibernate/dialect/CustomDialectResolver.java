@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db.hibernate.dialect;
 
@@ -35,69 +21,36 @@ public class CustomDialectResolver implements DialectResolver {
 
   @Override
   public Dialect resolveDialect(DialectResolutionInfo info) {
-    final String databaseName = info.getDatabaseName();
-    final int majorVersion = info.getDatabaseMajorVersion();
-    final int minorVersion = info.getDatabaseMinorVersion();
-    final Dialect dialect = resolveDialect(databaseName, majorVersion, minorVersion);
+
+    final Dialect dialect = findDialect(info);
 
     if (dialect != null) {
-      log.info("Database engine: {} {}.{}", databaseName, majorVersion, minorVersion);
-      log.debug("Database dialect: {}", dialect);
+      log.info(
+          "Database dialect: {}, version: {}",
+          dialect.getClass().getSimpleName(),
+          dialect.getVersion());
     }
 
     return dialect;
   }
 
-  private Dialect resolveDialect(String databaseName, int majorVersion, int minorVersion) {
+  private Dialect findDialect(DialectResolutionInfo info) {
+    final String databaseName = info.getDatabaseName();
+
     if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
-      if (majorVersion >= 10) {
-        return new AxelorPostgreSQL10Dialect();
+      if (info.isSameOrAfter(12)) {
+        return new AxelorPostgreSQLDialect(info);
       }
 
-      // Don't support version < 9.4
-      if (majorVersion == 9) {
-        log.warn(
-            "Consider upgrading to 'PostgreSQL >= 10' for better performance and functionality.");
-        if (minorVersion >= 5) {
-          return new AxelorPostgreSQL95Dialect();
-        }
-        if (minorVersion == 4) {
-          return new AxelorPostgreSQL94Dialect();
-        }
-      }
-
-      log.error("PostgreSQL 9.4 or later is required.");
-      return null;
-    }
-
-    if (TargetDatabase.MYSQL.equals(databaseName)) {
-      // There is no MySQL 6 or 7, only MySQL 8.
-      if (majorVersion >= 8) {
-        return new AxelorMySQL8Dialect();
-      }
-
-      // Don't support version < 5.7
-      if (majorVersion == 5 && minorVersion >= 7) {
-        return new AxelorMySQL57Dialect();
-      }
-
-      log.error("MySQL 5.7 or later is required.");
-      return null;
-    }
-
-    if (TargetDatabase.ORACLE.equals(databaseName)) {
-      if (majorVersion >= 12) {
-        return new AxelorOracle12cDialect();
-      }
-      log.error("Oracle 12c or later is required.");
+      log.error("PostgreSQL 12 or later is required.");
       return null;
     }
 
     if (TargetDatabase.HSQLDB.equals(databaseName)) {
-      return new AxelorHSQLDialect();
+      return new AxelorHSQLDialect(info);
     }
 
-    log.error("{} {}.{} is not supported.", databaseName, majorVersion, minorVersion);
+    log.error("{} {} is not supported.", databaseName, info);
     return null;
   }
 }

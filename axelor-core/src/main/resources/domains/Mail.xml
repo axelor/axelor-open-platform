@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
 
   <module name="mail" package="com.axelor.mail.db"/>
 
@@ -45,7 +45,11 @@
 
     <one-to-many name="flags" ref="MailFlags" mappedBy="message" />
 
+    <datetime name="receivedOn" index="true" />
+
     <index columns="relatedModel,relatedId" />
+
+    <entity-listener class="com.axelor.mail.event.MailMessageListener" />
   </entity>
 
   <entity name="MailFlags" table="MAIL_FLAGS" cacheable="true" repository="none">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
 
@@ -29,10 +29,11 @@
     <string name="type" required="true" selection="view.type.selection"/>
     <integer name="priority" required="true" default="20"/>
     <string name="model"/>
+    <string name="jsonModel"/>
     <string name="module"/>
     <string name="xml" required="true" large="true"/>
     <boolean name="computed"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="helpLink" />
     <boolean name="extension" />
     <many-to-many name="groups" table="meta_view_groups" column="meta_view_id" column2="group_id" ref="com.axelor.auth.db.Group"/>
@@ -62,6 +63,7 @@
     <string name="title" required="true" namecolumn="true" />
     <string name="type" required="true" selection="view.type.selection"/>
     <string name="model" />
+    <string name="jsonModel"/>
     <string name="xml" required="true" large="true"/>
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" required="true" />
     <boolean name="shared" />
@@ -78,7 +80,7 @@
 
     <integer name="priority" />
     <integer name="order" column="order_seq" title="aop.meta.order"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="icon"/>
@@ -117,7 +119,7 @@
 
     <integer name="priority" />
     <integer name="order" column="order_seq" title="aop.meta.order"/>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
@@ -137,7 +139,7 @@
     ]]>
 
     <integer name="priority" />
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <string name="type" required="true" selection="action.type.selection"/>
     <boolean name="home" title="Used as home action" help="Specify whether this action can be used as home action."/>
@@ -161,7 +163,7 @@
     <![CDATA[
     This object stores the selects.
     ]]>
-    <string name="xmlId" unique="true" />
+    <string name="xmlId" unique="true" title="Unique ID"/>
     <string name="name" required="true"/>
     <integer name="priority" required="true" default="20"/>
     <string name="module"/>
@@ -253,6 +255,7 @@
     ]]>
     <string name="fileName" required="true" namecolumn="true"/>
     <string name="filePath" required="true"/>
+    <integer name="storeType" title="Store type" default="" required="true" selection="file.storage.store.selection"/>
     <long name="fileSize" title="Size in bytes" readonly="true"/>
     <string name="fileType" title="File type"/>
     <string name="description" multiline="true"/>

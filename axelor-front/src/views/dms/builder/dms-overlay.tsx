@@ -30,7 +30,14 @@ export function DmsOverlay({
   const showOverlay = canDrop && isOver;
 
   return (
-    <Box ref={drop} className={className}>
+    <Box
+      ref={(node: HTMLDivElement | null) => {
+        if (node) {
+          drop(node);
+        }
+      }}
+      className={className}
+    >
       {showOverlay && (
         <Box className={styles.container}>
           <Box

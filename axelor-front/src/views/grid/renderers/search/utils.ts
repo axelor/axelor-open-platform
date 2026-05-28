@@ -51,7 +51,7 @@ function stripOperator(
 
 function toMoment(val: string, field: Field) {
   let granularity: OpUnitType = "month";
-  let monthFirst = /M+.+D+/.test(getDateFormat(field));
+  const monthFirst = /M+.+D+/.test(getDateFormat(field));
   let format = monthFirst ? "MM/DD" : "MM/YYYY";
   let operator;
 
@@ -106,7 +106,7 @@ function getSearchCriteria(
 
   const getFilterCriteria = (_field: Field, value: any) => {
     const item = (items || []).find((item) => item?.name === _field?.name);
-    const field = { ...item, ..._field } as Field;
+    const field = { ...item, ..._field, widget: item?.widget ?? _field.widget } as Field;
     let type = toKebabCase(field.type || "");
     let op = "like";
     let options = {};
@@ -217,6 +217,7 @@ function getSearchCriteria(
         }
         break;
       }
+      case "uuid":
       case "enum":
       case "selection":
         if (!(field.widget || "").toLowerCase().startsWith("multi")) {

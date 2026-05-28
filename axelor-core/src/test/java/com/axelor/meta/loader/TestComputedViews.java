@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta.loader;
 
@@ -32,11 +18,11 @@ import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Hilite;
+import jakarta.inject.Inject;
+import jakarta.xml.bind.JAXBException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -68,7 +54,7 @@ public class TestComputedViews extends MetaTest {
 
     MetaView originalView = viewRepository.findByNameAndComputed("base-grid", false);
     MetaView metaView = viewRepository.findByNameAndComputed("base-grid", true);
-    GridView view = (GridView) XMLViews.unmarshal(metaView.getXml()).getViews().get(0);
+    GridView view = (GridView) XMLViews.unmarshal(metaView.getXml()).getViews().getFirst();
 
     assertEquals("bar-module", metaView.getModule());
     assertEquals(originalView.getPriority() + 1, metaView.getPriority());
@@ -97,7 +83,7 @@ public class TestComputedViews extends MetaTest {
 
   Field findFieldInView(GridView view, String field) {
     return view.getItems().stream()
-        .filter(it -> it instanceof Field && ((Field) it).getName().equals(field))
+        .filter(it -> it instanceof Field f && f.getName().equals(field))
         .map(Field.class::cast)
         .findFirst()
         .orElse(null);
@@ -105,7 +91,7 @@ public class TestComputedViews extends MetaTest {
 
   Button findButtonInView(GridView view, String button) {
     return view.getItems().stream()
-        .filter(it -> it instanceof Button && ((Button) it).getName().equals(button))
+        .filter(it -> it instanceof Button b && b.getName().equals(button))
         .map(Button.class::cast)
         .findFirst()
         .orElse(null);

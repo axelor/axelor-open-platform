@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
@@ -16,14 +16,16 @@ import { ActionView, FormView, Schema } from "@/services/client/meta.types";
 import { PopupProps, showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
-import { showErrors } from "@/views/form";
+import { showErrors } from "@/views/form/builder/form-errors";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
-import { initTab } from "../use-tabs";
 import { useSingleClickHandler } from "../use-button";
+import { initTab } from "../use-tabs";
 
 export type EditorOptions = {
+  id?: string;
   model: string;
+  jsonModel?: string;
   title: string;
   record?: DataRecord | null;
   readonly?: boolean;
@@ -55,11 +57,13 @@ export function useEditorInTab(schema: Schema) {
   const handleEdit = useCallback(
     async (record: DataRecord, readonly = false) => {
       const model = target;
+      const jsonModel = schema.jsonTarget || schema.jsonModel;
       const { view } =
         (await findView<FormView>({
           type: "form",
           name: formView,
           model,
+          jsonModel,
         })) || {};
       return openTab({
         title: view?.title || "",
@@ -82,7 +86,14 @@ export function useEditorInTab(schema: Schema) {
         },
       });
     },
-    [formView, gridView, target, tab.action],
+    [
+      formView,
+      gridView,
+      target,
+      schema.jsonModel,
+      schema.jsonTarget,
+      tab.action,
+    ],
   );
 
   if (!tab.popup && (editWindow === "blank" || widget === "ref-link")) {
@@ -95,8 +106,10 @@ export function useEditorInTab(schema: Schema) {
 export function useEditor() {
   return useCallback(async (options: EditorOptions) => {
     const {
+      id,
       title,
       model,
+      jsonModel,
       record,
       view,
       viewName,
@@ -129,6 +142,7 @@ export function useEditor() {
       params: tabParams,
       context: {
         _showRecord: record?.id,
+        jsonModel,
         ...context,
       },
     });
@@ -136,6 +150,7 @@ export function useEditor() {
     if (!tab) return;
 
     await showPopup({
+      id,
       tab,
       open: true,
       maximize,
@@ -174,20 +189,12 @@ function Footer({
   onSelect?: EditorOptions["onSelect"];
   params?: ActionView["params"];
 }) {
-  const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
+  const popupRecord = params?.["_popup-record"];
 
   const hasToMany = Boolean(onSave); // o2m, m2m grid
   const handlerAtom = usePopupHandlerAtom();
-  const [handler, setHandler] = useAtom(handlerAtom);
-
-  const getHandlerState = handler.getState;
-  const handleClose = useCallback(() => {
-    dialogs.confirmDirty(
-      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
-      async () => onClose(false),
-    );
-  }, [getHandlerState, popupCanConfirm, onClose]);
+  const handler = useAtomValue(handlerAtom);
 
   const handleConfirm = useAfterActions(
     useAtomCallback(
@@ -205,10 +212,10 @@ function Footer({
 
           const hasRecordChanged = () => !isEqual(original, record);
 
+          const isNew = popupRecord && !popupRecord?.id;
           const dirtyAtom = handler.dirtyAtom;
           const dirty = (dirtyAtom && get(dirtyAtom)) || state.dirty;
-          const canSave =
-            dirty || !record.id || (hasToMany && hasRecordChanged());
+          const canSave = dirty || isNew || (hasToMany && hasRecordChanged());
 
           try {
             const errors = handler.getErrors?.();
@@ -236,26 +243,12 @@ function Footer({
             console.error(e);
           }
         },
-        [handler, hasToMany, onClose, onSave, onSelect],
+        [handler, hasToMany, popupRecord, onClose, onSave, onSelect],
       ),
     ),
   );
 
   const handleOk = useSingleClickHandler(handleConfirm);
-
-  useEffect(() => {
-    setHandler((popup) => ({ ...popup, close: handleClose }));
-  }, [setHandler, handleClose]);
-
-  useEffect(() => {
-    return handler.actionHandler?.subscribe(async (data) => {
-      const { actionExecutor } = handler;
-      await actionExecutor?.wait();
-      if (data.type === "close") {
-        onClose(true);
-      }
-    });
-  }, [handler, onClose]);
 
   const { attachmentItem } = handler;
 
@@ -267,11 +260,19 @@ function Footer({
       <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
         {FooterComp && <FooterComp close={onClose} />}
         <Box d="flex" g={2}>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button
+            variant="secondary"
+            onClick={() => handler.close?.()}
+            data-testid={"btn-cancel"}
+          >
             {i18n.get("Close")}
           </Button>
           {hasOk && popupCanSave && (
-            <Button variant="primary" onClick={handleOk}>
+            <Button
+              variant="primary"
+              onClick={handleOk}
+              data-testid={"btn-confirm"}
+            >
               {i18n.get("OK")}
             </Button>
           )}
@@ -309,7 +310,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
     ),
   );
 
-  const parentId = useRef<string | null>(null);
+  const parentId = useRef<string>(null);
 
   useEffect(() => {
     if (!parentId.current) {

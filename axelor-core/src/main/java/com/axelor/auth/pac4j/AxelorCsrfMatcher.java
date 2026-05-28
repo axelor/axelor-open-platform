@@ -1,26 +1,13 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.auth.pac4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
@@ -28,6 +15,7 @@ import org.pac4j.core.matching.matcher.csrf.CsrfTokenGenerator;
 import org.pac4j.core.matching.matcher.csrf.CsrfTokenGeneratorMatcher;
 import org.pac4j.jee.context.JEEContext;
 
+/** CSRF matcher with custom cookie name and header name. */
 @Singleton
 public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   public static final String CSRF_MATCHER_NAME = "axelorCsrfToken";
@@ -48,15 +36,25 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   }
 
   @Override
-  public boolean matches(WebContext context, SessionStore sessionStore) {
+  public boolean matches(CallContext ctx) {
     // No CSRF cookie/header for native clients
-    if (!AuthPac4jInfo.isNativeClient(context)) {
-      addResponseCookieAndHeader(context, sessionStore);
+    if (!AuthPac4jInfo.isNativeClient(ctx.webContext())) {
+      addResponseCookieAndHeader(ctx);
     }
     return true;
   }
 
-  protected void addResponseCookieAndHeader(WebContext context, SessionStore sessionStore) {
+  /**
+   * Adds the CSRF cookie and header to the response.
+   *
+   * <p>Dynamic secure/samePolicy based on request.isSecure() and uses path from request context
+   * path. Those are not supported by default CSRF matcher that uses static config.
+   *
+   * @param ctx the call context
+   */
+  protected void addResponseCookieAndHeader(CallContext ctx) {
+    final WebContext context = ctx.webContext();
+    final SessionStore sessionStore = ctx.sessionStore();
     final String token = getCsrfTokenGenerator().get(context, sessionStore);
     final JEEContext jeeContext = ((JEEContext) context);
     final HttpServletRequest request = jeeContext.getNativeRequest();
@@ -73,6 +71,5 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
 
     context.addResponseCookie(cookie);
     context.setResponseHeader(headerName, token);
-    //    context.setRequestAttribute(Pac4jConstants.CSRF_TOKEN, token); // XXX
   }
 }

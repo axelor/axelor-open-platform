@@ -21,7 +21,7 @@ type Config = {
 
 const typesConfig: Config[] = [
   {
-    types: ["enum"],
+    types: ["enum", "uuid"],
     operators: ["=", "!=", "isNull", "notNull"],
   },
   {

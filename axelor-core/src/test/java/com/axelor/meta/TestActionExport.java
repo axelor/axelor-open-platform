@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.meta;
 
@@ -23,13 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestActionExport extends MetaTest {
@@ -40,7 +25,7 @@ public class TestActionExport extends MetaTest {
 
     ActionRequest request = new ActionRequest();
 
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
     request.setData(data);
     request.setModel("com.axelor.test.db.Contact");
 
@@ -51,21 +36,18 @@ public class TestActionExport extends MetaTest {
   }
 
   private Map<String, Object> prepareContext() {
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("name", "SO001");
     context.put("orderDate", LocalDate.now());
-    context.put("customer", ImmutableMap.of("name", "John Smith"));
+    context.put("customer", Map.of("name", "John Smith"));
 
-    List<Object> items = Lists.newArrayList();
+    List<Object> items = new ArrayList<>();
     context.put("items", items);
 
-    items.add(
-        ImmutableMap.of("product", ImmutableMap.of("name", "PC1"), "price", 250, "quantity", 1));
-    items.add(
-        ImmutableMap.of("product", ImmutableMap.of("name", "PC2"), "price", 550, "quantity", 1));
-    items.add(
-        ImmutableMap.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "PC1"), "price", 250, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "PC2"), "price", 550, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "Laptop"), "price", 690, "quantity", 1));
 
     return context;
   }
@@ -74,7 +56,7 @@ public class TestActionExport extends MetaTest {
   public void test_export() throws Exception {
     ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
 
-    MetaStore.resister(views);
+    MetaStore.register(views);
 
     Action action = MetaStore.getAction("export.sale.order");
     assertNotNull(action);

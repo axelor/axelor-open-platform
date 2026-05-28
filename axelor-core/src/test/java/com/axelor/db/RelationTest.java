@@ -1,20 +1,6 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
@@ -28,11 +14,11 @@ import com.axelor.test.db.Move;
 import com.axelor.test.db.MoveLine;
 import com.axelor.test.db.repo.InvoiceRepository;
 import com.axelor.test.db.repo.MoveRepository;
-import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +40,7 @@ public class RelationTest extends JpaTest {
     Invoice invoice = invoices.all().fetchOne();
 
     Move move = new Move();
-    move.setMoveLines(Lists.<MoveLine>newArrayList());
+    move.setMoveLines(new ArrayList<>());
     move.setInvoice(invoice);
 
     MoveLine line1 = new MoveLine();
@@ -71,7 +57,7 @@ public class RelationTest extends JpaTest {
     invoices.save(invoice);
 
     assertSame(line1, invoice.getRejectMoveLine());
-    assertSame(line1, move.getMoveLines().get(0));
+    assertSame(line1, move.getMoveLines().getFirst());
 
     assertEquals(new BigDecimal("20"), line1.getCredit());
     assertEquals(BigDecimal.ZERO, line1.getDebit());
@@ -89,7 +75,7 @@ public class RelationTest extends JpaTest {
     assertSame(move, invoice.getMove());
     assertSame(line, invoice.getRejectMoveLine());
 
-    assertSame(line, move.getMoveLines().get(0));
+    assertSame(line, move.getMoveLines().getFirst());
   }
 
   @Transactional

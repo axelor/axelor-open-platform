@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { type JSX } from "react";
 
 import { DataContext } from "@/services/client/data.types";
 

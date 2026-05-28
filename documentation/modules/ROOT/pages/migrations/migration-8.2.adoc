@@ -1,0 +1,257 @@
+= 8.2 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/8.2/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 8.1 to 8.2.
+
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.2/CHANGELOG.md[changelog] for a detailed
+list of fixes, changes, and improvements introduced in 8.2.
+
+== Encrypted fields
+
+=== Stronger key derivation and self-describing ciphertext
+
+Encrypted fields now use `PBKDF2WithHmacSHA256`  with 600,000 iterations (`$AESv1$`) instead of the legacy
+`PBKDF2WithHmacSHA1` with 1,024 iterations (`$AES$`).
+
+Beyond the key derivation function change, the ciphertext format is now self-describing: the iteration count, salt
+size, and IV size are embedded directly in the payload header. This means decryption is always independent of the
+current application defaults — future changes to iteration counts or salt sizes never break existing stored values.
+
+The default operation mode is now *GCM* (authenticated encryption), replacing the previous *CBC* default. GCM provides
+integrity verification in addition to confidentiality, detecting any tampering with the stored value. The mode can
+still be set explicitly via `encryption.algorithm` in `axelor-config.properties` if needed.
+
+CAUTION: If `encryption.algorithm` is not explicitly set in the properties file, the default operation mode has
+changed from *CBC* to *GCM*. After upgrading, the application will attempt to decrypt existing CBC-encrypted values
+using GCM, which will *fail with errors*. Be sure to explicitly set it to *CBC* to be able to decrypt current values.
+
+**No immediate action is required.** The application transparently decrypts legacy `$AES$` ciphertext alongside the
+new `$AESv1$` format. Existing encrypted values continue to be readable as-is, and are re-encrypted with the new
+algorithm on the next writing.
+
+=== Encrypted output size and column limits
+
+The new format embeds additional metadata in the payload (prefix, iteration count, salt size, IV size), and GCM appends
+a 16-byte authentication tag. The encrypted value stored in the database is Base64-encoded, so the total column space
+required is slightly larger than with the legacy encryptor.
+
+The table below gives the maximum plaintext byte count that produces an encrypted value still fitting in a standard
+`VARCHAR(255)` column:
+
+[cols="1,1,1", options="header"]
+|===
+| Encryptor | Mode | Max plaintext bytes
+
+| Legacy `$AES$` (SHA1) | CBC | 175 B
+| Legacy `$AES$` (SHA1) | GCM | 144 B
+| `$AESv1$` (SHA256) | *GCM (default)* | *132 B*
+| `$AESv1$` (SHA256) | CBC | 143 B
+|===
+
+NOTE: "Max plaintext bytes" equals "max characters" only for single-byte encodings (ASCII, Latin digits, symbols).
+Multi-byte UTF-8 characters reduce the effective character limit proportionally: 2-byte characters (e.g. `é`) halve it
+to ~66, and 3-byte characters (e.g. `中`) reduce it to ~44 for the default GCM mode.
+
+If your application stores long values in encrypted fields and the 132-byte limit is too restrictive, consider
+increasing the column size in the database schema rather than switching to CBC mode.
+
+=== Migrating existing encrypted values
+
+To explicitly re-encrypt all `$AES$` values to the new `$AESv1$` format, run the database encryption CLI tool:
+
+[source,sh]
+----
+axelor database encrypt
+----
+
+No `encryption.old-password` or `encryption.old-algorithm` settings are required when coming from the legacy encryptor.
+
+Because `PBKDF2WithHmacSHA256` is significantly more CPU-intensive than the legacy `PBKDF2WithHmacSHA1`, a separate AES
+key must be derived for each encrypted field value, and that derivation dominates the processing time. To keep
+migration throughput acceptable on large datasets, the CLI tool uses **100,000 iterations** instead of the runtime
+default of 600,000. This can be overridden with the `--iteration` flag:
+
+[source,sh]
+----
+axelor database encrypt --iteration 200000
+----
+
+Values written during migration can be re-migrated to a higher count at any time, thanks to the self-describing format.
+
+Approximate cost at 100,000 iterations on typical hardware:
+
+* ~10 ms per encrypted field value
+* ~15 ms fixed overhead per record (batch read/write)
+
+Example: a table with 10,000 records and 6 encrypted fields takes roughly *10,000 × (15 ms + 6 × 10 ms) = ~12 minutes*.
+
+Plan migration windows accordingly for large datasets.
+
+== MySQL and Oracle databases support removed
+
+MySQL and Oracle as database backends are no longer supported. PostgreSQL remains the only supported database for
+production use. The support was always partial and never fully validated in production environments. Over time,
+maintaining this compatibility became an ongoing source of complexity with no real benefit:
+
+* *Development overhead*: A lot of features involving database-specific behavior had to be implemented separately for
+each database engine. This made the codebase harder to maintain and slowed down development.
+
+* *Missing features*: MySQL and Oracle lack or differ on several PostgreSQL capabilities that the platform relies on,
+such as advisory locks (used for leader election), `SKIP LOCKED`, advanced JSON operators, and unaccent support.
+Keeping workarounds alive for features that could not be fully supported was not sustainable.
+
+* *No known production users*: To our knowledge, no production deployment ran on MySQL or Oracle. The support existed
+on paper but was never exercised in real conditions.
+
+If you are running PostgreSQL, no action is required. If you are running MySQL or Oracle, you will need to migrate your
+data to PostgreSQL before upgrading to 8.2. Standard database migration tools such as https://pgloader.io/[pgloader]
+can help automate the data transfer.
+
+== Password reset token expiry unit changed to minutes
+
+The `application.reset-password.max-age` configuration property previously accepted a value in **hours**.
+It now accepts a value in **minutes**, and the default has been reduced from 24 hours to **30 minutes**.
+
+If you have customized this setting, update your configuration accordingly.
+
+If you were relying on the default, no action is strictly required, but be aware that the effective
+default validity period has been reduced from 24 hours to 30 minutes.
+
+If you have customized the `PASSWORD_RESET_EMAIL_BODY` translation and your version references the
+token validity as hours (e.g. `valid for \{4} hours`), update it to reflect that `\{4}` now holds a
+value in minutes (e.g. `valid for \{4} minutes`).
+
+== User password policies changed
+
+The user password policy system has been reworked to provide more useful, secure, and customizable built-in policies.
+
+Default behavior changes:
+
+* Minimum password length increased from 4 to 8 characters (mandatory, cannot be disabled).
+* New password must differ from the current one (mandatory, cannot be disabled).
+* Passwords must not contain the user login code (case-insensitive substring check).
+
+Several additional policies are available but disabled by default. They are designed to cover common security
+requirements without imposing them on all deployments. See more details xref:dev-guide:application/config.adoc#password-requirements[here]
+
+`user-form` and `user-preferences-form` forms has been updated to reflect the changes. If any override was made, make
+sure to integrate them.
+
+== User password update flow changed
+
+The password update flow for users has been reworked to improve security. Changing a password now requires the user to
+prove their identity first: either by providing their current password (for local or LDAP-authenticated accounts) or
+by confirming a 2FA code.
+
+NOTE: For users authenticated through an external provider (SSO, OAuth) without a local password or and LDAP connection,
+2FA is the only way to prove their identity for password changes and other sensitive operations. Enabling multi-factor
+authentication on these accounts is strongly recommended.
+
+=== User model change
+
+The `password` field on `User` is no longer required. Users authenticated via external providers no longer receive a
+random UUID password when created — the field is left null, which disables local login for those accounts.
+
+Run the following SQL script to update the table :
+
+[source,sql]
+----
+ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+----
+
+Existing external-provider users created before 8.2 still carry the random UUID password assigned at creation time in
+the database. These values are unguessable, so leaving them as-is is not a security risk. If you want to explicitly
+disable local login for these accounts, clear the `password` column for the concerned users:
+
+[source,sql]
+----
+UPDATE auth_user SET password = NULL WHERE code IN ('sso-user1', 'sso-user2', ...);
+----
+
+=== Change password flow from the UI
+
+The inline password change panel on `user-form` and `user-preferences-form` has been replaced with a new flow:
+
+1. The user clicks *Change Password*.
+2. If the session is not already identity-checked, an identity verification dialog asks for the current password or a
+2FA code. On success, the session is flagged as identity-checked for 10 minutes.
+3. A popup is shown where the user enters and confirms the new password.
+
+The same identity check is now required before sensitive MFA operations.
+
+Non-admin users can change only their own password through the UI. Admins can change the password of any user.
+
+If any override was made on `user-form` or `user-preferences-form`, make sure to integrate the changes.
+
+=== CRUD endpoint changes
+
+Non-admin users can no longer change their own password through the standard `User` CRUD endpoint. Password changes must
+go through the UI flow described above.
+
+Admins can still change any user's password through the CRUD endpoint. The call has been simplified: only the new
+`password` value needs to be provided in the context — `oldPassword`/`newPassword` and `chkPassword` are no longer used.
+
+In addition, non-admin users are now blocked from modifying a set of restricted fields on any user record via the `User`
+CRUD endpoint: `code`, `group`, `blocked`, `activateOn`, `expiresOn`, `password`, `passwordUpdatedOn`, `roles`,
+`permissions`, `metaPermissions`. The `password` field is blocked from mass-updates for every user, including admins.
+
+== MFA and users token records are now private
+
+Multi-factor authentication records (`MFA`) and personal API tokens (`UserToken`) hold sensitive authentication
+material. To prevent a user from reaching another user's secrets through generic data access — and to guard against
+misconfigured permission rules that could otherwise expose this data — these records are now treated as private:
+
+* Non-admin users can only see and manage their own records. Listings, form views, and related-field lookups no longer
+expose records belonging to other users.
+* Creation, update, duplication, export, and mass-update through the generic data layer are disabled for everyone,
+including administrators. These records are managed exclusively through the dedicated MFA and user-token screens and
+services.
+
+== Query Selector `values()` row shape changed for many-to-one fields
+
+`Query.Selector` no longer fetches the full referenced entity for many-to-one fields included in a `select()`. Only the
+`id`, `version` and name-field scalars are now queried, avoiding a needless full-entity load at the database level.
+
+As a consequence, the raw row shape returned by `Selector.values(int, int)` has changed for any `select()` that
+includes a many-to-one field. Where a single slot used to hold the fully materialized referenced entity (e.g. a `Title`
+instance), three scalar slots for `id`, `version` and the name field now appear in its place.
+
+For example, with `select("firstName", "title", "title.code")` the row layout is now:
+
+[source]
+----
+[ id, version, firstName, title.id, title.version, title.name, title.code ]
+----
+
+whereas previously it was:
+
+[source]
+----
+[ id, version, firstName, <Title entity>, title.id, title.version, title.name, title.code ]
+----
+
+Callers that iterate `values()` by index and expected the m2o entity at a specific position must be updated to read the
+three scalars instead.
+
+NOTE: Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is unchanged, with the
+reference key still carrying the same `{id, $version, <nameField>}` compact map as before.
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+ALTER TABLE meta_json_model ADD is_delegated boolean;
+
+ALTER TABLE meta_view ADD json_model varchar(255);
+ALTER TABLE meta_view_custom ADD json_model varchar(255);
+
+ALTER TABLE auth_user ALTER COLUMN password DROP NOT NULL;
+
+DELETE FROM meta_action WHERE name = 'action.view.show.active.tokens';
+DELETE FROM meta_view WHERE name = 'user-token-grid';
+----

@@ -1,26 +1,15 @@
 /*
- * Axelor Business Solutions
- *
- * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 package com.axelor.db;
 
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.meta.MetaScanner;
 import com.axelor.rpc.ContextHandlerFactory;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MappedSuperclass;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,9 +17,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import org.hibernate.boot.archive.internal.StandardArchiveDescriptorFactory;
 import org.hibernate.boot.archive.scan.internal.ClassDescriptorImpl;
 import org.hibernate.boot.archive.scan.internal.ScanResultImpl;
@@ -206,7 +192,7 @@ public class JpaScanner extends AbstractScannerImpl {
         executor.shutdown();
       }
     }
-    return new HashSet<Class<?>>(modelCache.values());
+    return new HashSet<>(modelCache.values());
   }
 
   private static void register(Class<?> model) {
