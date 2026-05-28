@@ -369,6 +369,24 @@ public final class MetaStore {
     return applyUserContext(raw, jsonModel, null);
   }
 
+  /** Checks JSON field existence. */
+  public static boolean hasJsonField(String modelName, String fieldName, String jsonFieldName) {
+    final Map<String, FieldEntry> raw =
+        JSON_FIELDS.get(
+            ModelFieldKey.of(modelName, fieldName), MetaStore::loadJsonFieldsByModelField);
+    return raw != null && raw.containsKey(jsonFieldName);
+  }
+
+  /** Checks JSON field existence. */
+  public static boolean hasJsonField(String jsonModel, String jsonFieldName) {
+    if (StringUtils.isBlank(jsonModel)) {
+      return false;
+    }
+    final Map<String, FieldEntry> raw =
+        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+    return raw != null && raw.containsKey(jsonFieldName);
+  }
+
   @Nullable
   private static Map<String, FieldEntry> loadJsonFieldsByModelField(ModelFieldKey key) {
     String modelName = key.modelName();

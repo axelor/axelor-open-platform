@@ -86,8 +86,6 @@ public class Context extends SimpleBindings {
 
   private Context parent;
 
-  private Map<String, Object> jsonFields;
-
   /**
    * Create a new {@link Context} for the given bean class using the given context values.
    *
@@ -125,16 +123,6 @@ public class Context extends SimpleBindings {
 
   public void addChangeListener(PropertyChangeListener listener) {
     getContextHandler().addChangeListener(listener);
-  }
-
-  private Map<String, Object> jsonFields() {
-    if (jsonFields == null) {
-      jsonFields =
-          MetaJsonRecord.class.isAssignableFrom(beanClass)
-              ? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
-              : MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
-    }
-    return jsonFields;
   }
 
   private ContextHandler<?> getContextHandler() {
@@ -218,10 +206,12 @@ public class Context extends SimpleBindings {
   }
 
   private boolean hasJsonField(String name) {
-    return !KEY_JSON_MODEL.equals(name)
-        && !KEY_JSON_ATTRS.equals(name)
-        && jsonFields() != null
-        && jsonFields().containsKey(name);
+    if (KEY_JSON_MODEL.equals(name) || KEY_JSON_ATTRS.equals(name)) {
+      return false;
+    }
+    return MetaJsonRecord.class.isAssignableFrom(beanClass)
+        ? MetaStore.hasJsonField((String) values.get(KEY_JSON_MODEL), name)
+        : MetaStore.hasJsonField(beanClass.getName(), KEY_JSON_ATTRS, name);
   }
 
   private boolean isJsonField(String name) {

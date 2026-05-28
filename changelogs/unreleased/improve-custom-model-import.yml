@@ -6,3 +6,5 @@ description: |
   This improves custom model data import performance and other JSON fields operations.
 
   `JsonProperty.getTitle()` now returns untranslated title, to realign consistency with `Property.getTitle()`.
+
+  `Context` no longer applies user permission/visibility filtering when checking whether a JSON field exists, to realign consistency with how regular (non-JSON) fields are resolved.
