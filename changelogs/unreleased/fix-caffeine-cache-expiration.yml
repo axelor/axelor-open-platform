@@ -13,3 +13,5 @@ description: |
   Added dedicated regions for frequently-read, rarely-changed User/Group/Permission/Role,
   with access-based expiration (`after-access = 24h`) so actively-used entries stay cached
   while idle ones are evicted.
+
+  `Role` is now `cacheable="true"`, consistent with User/Group/Permission.

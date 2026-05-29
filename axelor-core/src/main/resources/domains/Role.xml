@@ -5,7 +5,7 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="Role">
+  <entity name="Role" cacheable="true">
     <![CDATA[
     This object stores the roles.
     ]]>
