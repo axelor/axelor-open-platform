@@ -26,6 +26,8 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.7.1"
 
+versions.swagger = "2.2.49"
+
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
@@ -175,7 +177,7 @@ libs.resteasy_server = [
 ]
 
 libs.swagger_jaxrs2 = [
-    dependencies.create("io.swagger.core.v3:swagger-jaxrs2:2.2.49") {
+    dependencies.create("io.swagger.core.v3:swagger-jaxrs2:${versions.swagger}") {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
         exclude group: "com.fasterxml.jackson.jaxrs", module: "jackson-jaxrs-json-provider"
