@@ -5,6 +5,7 @@
 package com.axelor.db.mapper;
 
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.annotations.EqualsInclude;
 import com.axelor.db.annotations.NameColumn;
@@ -164,7 +165,7 @@ public class Property {
       if (annotation instanceof OneToOne oneToOne) {
         type = PropertyType.ONE_TO_ONE;
         target = (Class<? extends Model>) javaType;
-        mappedBy = oneToOne.mappedBy();
+        mappedBy = StringUtils.emptyToNull(oneToOne.mappedBy());
         orphan = !oneToOne.orphanRemoval();
       }
 
@@ -177,7 +178,7 @@ public class Property {
         type = PropertyType.ONE_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = oneToMany.mappedBy();
+        mappedBy = StringUtils.emptyToNull(oneToMany.mappedBy());
         orphan = !oneToMany.orphanRemoval();
       }
 
@@ -185,7 +186,7 @@ public class Property {
         type = PropertyType.MANY_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = manyToMany.mappedBy();
+        mappedBy = StringUtils.emptyToNull(manyToMany.mappedBy());
       }
 
       if (annotation instanceof Id) {
