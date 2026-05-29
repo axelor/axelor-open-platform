@@ -7,6 +7,7 @@ package com.axelor.common;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.base.Joiner;
@@ -27,6 +28,14 @@ public class TestStringUtils {
     assertTrue(StringUtils.isBlank(""));
     assertTrue(StringUtils.isBlank(" "));
     assertFalse(StringUtils.isBlank("some value"));
+  }
+
+  @Test
+  public void testEmptyToNull() {
+    assertNull(StringUtils.emptyToNull(null));
+    assertNull(StringUtils.emptyToNull(""));
+    assertEquals(" ", StringUtils.emptyToNull(" "));
+    assertEquals("some value", StringUtils.emptyToNull("some value"));
   }
 
   static final String text1 =

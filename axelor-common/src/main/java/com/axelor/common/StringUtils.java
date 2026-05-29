@@ -66,6 +66,17 @@ public final class StringUtils {
   }
 
   /**
+   * Return {@code null} if the given string value is empty, otherwise the value itself. The value
+   * is empty if null or length is 0.
+   *
+   * @param value the string value
+   * @return {@code null} if empty, the value otherwise
+   */
+  public static String emptyToNull(String value) {
+    return isEmpty(value) ? null : value;
+  }
+
+  /**
    * Remove diacritics (accents) from a {@link CharSequence}.
    *
    * @param value the string to be stripped
