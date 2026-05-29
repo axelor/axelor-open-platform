@@ -749,9 +749,7 @@ public class Query<T extends Model> {
    */
   public class Selector {
 
-    /**
-     * Descriptor for one selected column, aligned 1:1 with {@code selects}.
-     */
+    /** Descriptor for one selected column, aligned 1:1 with {@code selects}. */
     private final class Entry {
       private final String name;
       private final String parent;
@@ -759,10 +757,10 @@ public class Query<T extends Model> {
 
       /**
        * @param name map key for a flat field (e.g. {@code "firstName"}, {@code "title.code"})
-       * @param parent m2o reference name to group scalars under (e.g. {@code "title"});
-       * {@code null} for flat fields
-       * @param key key inside the compact parent map for m2o scalars ({@code "id"},
-       * {@code "$version"} or the nameField)
+       * @param parent m2o reference name to group scalars under (e.g. {@code "title"}); {@code
+       *     null} for flat fields
+       * @param key key inside the compact parent map for m2o scalars ({@code "id"}, {@code
+       *     "$version"} or the nameField)
        */
       public Entry(String name, String parent, String key) {
         this.name = name;
@@ -794,9 +792,9 @@ public class Query<T extends Model> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Entry entry = (Entry) o;
-        return Objects.equals(name, entry.name) &&
-                Objects.equals(parent, entry.parent) &&
-                Objects.equals(key, entry.key);
+        return Objects.equals(name, entry.name)
+            && Objects.equals(parent, entry.parent)
+            && Objects.equals(key, entry.key);
       }
 
       @Override
@@ -806,11 +804,17 @@ public class Query<T extends Model> {
 
       @Override
       public String toString() {
-        return "Entry[" +
-                "name='" + name + '\'' +
-                ", parent='" + parent + '\'' +
-                ", key='" + key + '\'' +
-                ']';
+        return "Entry["
+            + "name='"
+            + name
+            + '\''
+            + ", parent='"
+            + parent
+            + '\''
+            + ", key='"
+            + key
+            + '\''
+            + ']';
       }
     }
 

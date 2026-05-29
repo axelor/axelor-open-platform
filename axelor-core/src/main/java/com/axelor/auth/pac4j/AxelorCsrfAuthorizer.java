@@ -78,8 +78,7 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
           (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
       final boolean hasSessionData = sessionToken.isPresent();
       final String token = sessionToken.orElse(null);
-      final boolean isGoodToken =
-          strEquals(token, parameterToken) | strEquals(token, headerToken);
+      final boolean isGoodToken = strEquals(token, parameterToken) | strEquals(token, headerToken);
       if (!hasSessionData | !isGoodToken) {
         return false;
       }
