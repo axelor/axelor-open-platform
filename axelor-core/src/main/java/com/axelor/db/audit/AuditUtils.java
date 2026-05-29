@@ -7,32 +7,27 @@ package com.axelor.db.audit;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import java.util.Optional;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
+import org.apache.shiro.subject.Subject;
 import org.hibernate.engine.spi.SessionImplementor;
 
 final class AuditUtils {
 
-  static User findUser(SessionImplementor session, String code) {
-    return session
-        .createQuery("SELECT self FROM User self WHERE self.code = :code", User.class)
-        .setParameter("code", code)
-        .setCacheable(true)
-        .setCacheRegion("audit.user.byCode")
-        .setCacheMode(CacheMode.NORMAL)
-        .setHibernateFlushMode(FlushMode.MANUAL)
-        .uniqueResult();
+  static User findUser(SessionImplementor session, Long id) {
+    if (id == null) {
+      return null;
+    }
+    return session.find(User.class, id);
   }
 
   static User currentUser(SessionImplementor session) {
     User user = AuthUtils.getCurrentUser();
     if (user == null) {
-      String code =
+      Long userId =
           Optional.ofNullable(AuthUtils.getSubject())
-              .map(x -> x.getPrincipal())
-              .map(x -> x.toString())
+              .map(Subject::getPrincipals)
+              .map(x -> x.oneByType(Long.class))
               .orElse(null);
-      user = findUser(session, code);
+      user = findUser(session, userId);
     }
 
     if (user == null) return null;
@@ -40,6 +35,6 @@ final class AuditUtils {
       return user;
     }
 
-    return findUser(session, user.getCode());
+    return findUser(session, user.getId());
   }
 }

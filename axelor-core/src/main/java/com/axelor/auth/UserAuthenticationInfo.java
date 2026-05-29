@@ -5,14 +5,16 @@
 package com.axelor.auth;
 
 import com.axelor.auth.db.User;
+import java.util.List;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 
 public class UserAuthenticationInfo extends SimpleAuthenticationInfo {
   private static final long serialVersionUID = 2404918058754102269L;
   private final transient User user;
 
   public UserAuthenticationInfo(Object principal, Object credentials, String realmName, User user) {
-    super(principal, credentials, realmName);
+    super(new SimplePrincipalCollection(List.of(principal, user.getId()), realmName), credentials);
     this.user = user;
   }
 

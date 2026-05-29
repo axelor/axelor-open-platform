@@ -52,6 +52,8 @@ public class AuthPac4jRealm extends Pac4jRealm {
       }
     }
 
+    // No valid active user: returns a plain AuthenticationInfo (without user).
+    // AuthPac4jListener#onSuccess detects this and rejects the login.
     return super.doGetAuthenticationInfo(token);
   }
 }

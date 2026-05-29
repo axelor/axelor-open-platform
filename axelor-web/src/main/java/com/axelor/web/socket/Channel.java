@@ -4,12 +4,13 @@
  */
 package com.axelor.web.socket;
 
-import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
 import jakarta.websocket.EncodeException;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.Session;
 import java.io.IOException;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 public abstract class Channel {
@@ -46,17 +47,37 @@ public abstract class Channel {
 
   /** Gets the user from the subject associated with the session. */
   protected User getUser(Session session) {
-    String code = getUserCode(session);
-    return code == null ? null : AuthUtils.getUser(code);
+    Long userId = getUserId(session);
+    return userId == null ? null : JPA.find(User.class, userId);
+  }
+
+  /** Gets the user ID from the subject associated with the session. */
+  protected Long getUserId(Session session) {
+    PrincipalCollection principals = getPrincipals(session);
+    if (principals == null) {
+      return null;
+    }
+
+    return principals.oneByType(Long.class);
   }
 
   /** Gets the user code from the subject associated with the session. */
   protected String getUserCode(Session session) {
+    PrincipalCollection principals = getPrincipals(session);
+    if (principals == null) {
+      return null;
+    }
+
+    return principals.getPrimaryPrincipal().toString();
+  }
+
+  /** Gets principals from the subject associated with the session. */
+  private PrincipalCollection getPrincipals(Session session) {
     if (session.getUserPrincipal() == null) {
       return null;
     }
 
     final Subject subject = (Subject) session.getUserProperties().get(Subject.class.getName());
-    return subject.getPrincipal().toString();
+    return subject.getPrincipals();
   }
 }

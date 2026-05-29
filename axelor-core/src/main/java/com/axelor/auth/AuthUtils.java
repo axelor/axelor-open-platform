@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 public class AuthUtils {
@@ -59,11 +60,18 @@ public class AuthUtils {
   public static User getUser() {
     final User currentUser = CURRENT_USER.get();
     if (currentUser != null) {
-      return getUser(currentUser.getCode());
+      return currentUser.getId() != null ? JPA.find(User.class, currentUser.getId()) : null;
     }
     try {
-      return getUser(getSubject().getPrincipal().toString());
-    } catch (NullPointerException | InvalidSessionException e) {
+      final Subject subject = getSubject();
+      final PrincipalCollection principals = subject != null ? subject.getPrincipals() : null;
+      if (principals != null) {
+        final Long id = principals.oneByType(Long.class);
+        if (id != null) {
+          return JPA.find(User.class, id);
+        }
+      }
+    } catch (InvalidSessionException e) {
       // ignore
     }
     return null;
@@ -113,7 +121,8 @@ public class AuthUtils {
       (\
         (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR \
         (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))\
-      )""";
+      )\
+      """;
 
   public static boolean hasRole(final User user, final String... roles) {
     Preconditions.checkArgument(user != null, "user not provided.");

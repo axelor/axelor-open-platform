@@ -6,6 +6,8 @@ package com.axelor.auth;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
+import java.util.Collection;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -70,9 +72,19 @@ public class AuthRealm extends AuthorizingRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    Collection<?> principalsFromRealm = principals.fromRealm(getName());
+    Long userId =
+        principalsFromRealm.stream()
+            .filter(Long.class::isInstance)
+            .map(Long.class::cast)
+            .findFirst()
+            .orElse(null);
 
-    final String code = (String) principals.fromRealm(getName()).iterator().next();
-    final User user = AuthUtils.getUser(code);
+    if (userId == null) {
+      return null;
+    }
+
+    final User user = JPA.find(User.class, userId);
 
     if (user == null) {
       return null;

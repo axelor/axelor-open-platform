@@ -4,6 +4,7 @@
  */
 package com.axelor.auth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -132,6 +133,10 @@ public class AuthTest extends JpaTest {
 
   @Transactional
   public void superUserTest() {
+    var user = AuthUtils.getUser();
+    assertNotNull(user);
+    assertEquals("admin", user.getCode());
+
     // ensure has super user role
     assertTrue(authSecurity.hasRole("super.user"));
 
