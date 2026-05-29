@@ -378,8 +378,49 @@ Following keys can be used :
 
 `jcache` is used as second-level cache provider (default value for `hibernate.cache.region.factory_class`).
 
-By default `Caffeine` implementation is used with pre-configured settings. If you need more control on caching,
-add and edit `application.conf`. See `Caffeine` configs and settings.
+By default, the `Caffeine` implementation is used with pre-configured settings defined in `application.conf`. If you need to customize or override these settings, you can add and edit `application.conf` in your application resources.
+
+The default configuration defines the following cache regions and settings:
+
+[cols="3,1,1,1"]
+|===
+| Region Name | Max Size | Expire After Write | Expire After Access
+
+| `default` (fallback for all other regions)
+| 1000
+| 10m
+| -
+
+| `default-update-timestamps-region`
+| Unbounded
+| -
+| -
+
+| `default-query-results-region`
+| 100
+| -
+| -
+
+| `com.axelor.auth.db.User`
+| 500
+| -
+| 24h
+
+| `com.axelor.auth.db.Group`
+| 200
+| -
+| 24h
+
+| `com.axelor.auth.db.Role`
+| 200
+| -
+| 24h
+
+| `com.axelor.auth.db.Permission`
+| 10000
+| -
+| 24h
+|===
 
 There are also popular caching libraries such as {url-ehcache}[Ehcache],
 {url-hazelcast}[Hazelcast], {url-redis}[Redis] or {url-infinispan}[Infinispan] that can be used instead of
