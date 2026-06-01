@@ -6,15 +6,16 @@ package com.axelor.data.xml;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaRepository;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.JsonProperty;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,18 +57,31 @@ public class XMLBindJson extends XMLBind {
           Arrays.asList(
               getField().substring(JsonProperty.KEY_JSON_PREFIX.length()).split("\\.", 2));
 
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> jsonField =
-          (Map<String, Object>)
-              Optional.ofNullable(
-                      parentJsonModel.isPresent()
-                          ? MetaStore.findJsonFields(parentJsonModel.get())
-                          : MetaStore.findJsonFields(parent.getTypeName(), fieldParts.getFirst()))
-                  .map(fields -> fields.get(fieldParts.get(1)))
-                  .orElse(Collections.emptyMap());
-      jsonModel = (String) jsonField.get("jsonTarget");
-      setTypeName((String) jsonField.get("target"));
-      domain = (String) jsonField.get("domain");
+      final MetaJsonField metaJsonField =
+          parentJsonModel.isPresent()
+              ? MetaStore.findJsonField(parentJsonModel.get(), fieldParts.get(1))
+              : MetaStore.findJsonField(
+                  parent.getTypeName(), fieldParts.getFirst(), fieldParts.get(1));
+
+      if (metaJsonField == null) {
+        return;
+      }
+
+      final JsonReferenceFieldDTO field = JsonReferenceFieldDTO.from(metaJsonField);
+      final String type = field.type();
+
+      if (type != null && type.startsWith("json-")) {
+        setTypeName(MetaJsonRecord.class.getName());
+        if (field.targetJsonModel() != null) {
+          jsonModel = field.targetJsonModel();
+          domain = "self.jsonModel = '%s'".formatted(jsonModel);
+          if (StringUtils.notBlank(metaJsonField.getDomain())) {
+            domain = "(%s) AND (%s)".formatted(domain, metaJsonField.getDomain());
+          }
+        }
+      } else if (StringUtils.notBlank(field.targetModel())) {
+        setTypeName(field.targetModel());
+      }
     } finally {
       initialized = true;
     }
