@@ -1,0 +1,11 @@
+---
+title: Improve translation lookup performance with distributed cache providers
+type: change
+description: |
+  Translation lookups no longer fetch the whole translation bundle from the
+  (possibly distributed) cache on every key access. A node-local cache now
+  fronts the shared `messages` cache. This can noticeably speed up translation-heavy paths
+  when using a distributed cache provider.
+
+  With a distributed cache provider, translation changes now propagate to other
+  nodes within the local cache TTL (1 minute) instead of immediately.

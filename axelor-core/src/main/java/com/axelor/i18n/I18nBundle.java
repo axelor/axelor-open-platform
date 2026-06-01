@@ -14,6 +14,7 @@ import jakarta.persistence.TypedQuery;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,6 +36,12 @@ public class I18nBundle extends ResourceBundle {
       CacheBuilder.newBuilder("messages").build(I18nBundle::loadMessages);
   private static final AxelorCache<String, String> hashes =
       CacheBuilder.newBuilder("hashes").build(I18nBundle::computeHash);
+
+  /** Local cache in front of the possibly distributed {@link #messages} cache */
+  private static final AxelorCache<String, Map<String, String>> localMessages =
+      CacheBuilder.newInMemoryBuilder()
+          .expireAfterWrite(Duration.ofMinutes(10))
+          .build(messages::get);
 
   private static final Logger log = LoggerFactory.getLogger(I18nBundle.class);
 
@@ -70,7 +77,7 @@ public class I18nBundle extends ResourceBundle {
   }
 
   private Map<String, String> getMessages() {
-    return messages.get(languageTag);
+    return localMessages.get(languageTag);
   }
 
   private static Map<String, String> loadMessages(String languageTag) {
@@ -126,7 +133,7 @@ public class I18nBundle extends ResourceBundle {
       throw new RuntimeException(e);
     }
 
-    messages.get(languageTag).entrySet().stream()
+    localMessages.get(languageTag).entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
         .forEach(
             entry -> {
@@ -149,6 +156,7 @@ public class I18nBundle extends ResourceBundle {
 
   public static void invalidate() {
     ResourceBundle.clearCache();
+    localMessages.invalidateAll();
     messages.invalidateAll();
     hashes.invalidateAll();
   }
