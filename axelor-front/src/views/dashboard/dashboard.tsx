@@ -340,7 +340,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
       dragConfig: {
         enabled: hasViewCustomize,
         bounded: true,
-        handle: `.${dashletStyles.header}`,
+        handle: `.${dashletStyles.panelHeaderTitle}`,
       },
       resizeConfig: {
         handles: ["se" as ResizeHandleAxis],
