@@ -66,6 +66,11 @@ const getHeight = (span: number, fixedHeight?: string) => {
   return (50 * span) / CARD_HEIGHT;
 };
 
+const getDefaultWidth = (span: number, type: MEDIA_TYPE) => {
+  if (type === "sm" || type === "xs" || type === "xxs") return COLS[type];
+  return Math.max(1, Math.round((span * COLS[type]) / 12));
+};
+
 const getAttrs = (item: PanelDashlet, type: MEDIA_TYPE) => {
   const { colOffset = "", rowOffset = "", colSpan = "", rowSpan = "" } = item;
 
@@ -201,8 +206,10 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           (acc, item, index) => {
             const span = Number(item.colSpan || 6);
             const attrs = getAttrs(item, type);
+            const defaultW = getDefaultWidth(span, type);
+            const effectiveW = attrs.w ?? defaultW;
 
-            if (acc.x + span > 12) {
+            if (acc.x + effectiveW > COLS[type]) {
               acc.x = 0;
               acc.y += 1;
             }
@@ -210,14 +217,14 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             (acc.layout as any).push({
               x: attrs.x ?? acc.x,
               y: attrs.y ?? acc.y,
-              w: attrs.w ?? span,
+              w: effectiveW,
               h: attrs.h ?? getHeight(6),
               minH: (item as any)?.minH || getHeight(3),
               minW: (item as any)?.minW || 1,
               i: `${index}`,
             });
 
-            acc.x += span;
+            acc.x += effectiveW;
 
             return acc;
           },
