@@ -4,6 +4,7 @@
  */
 package com.axelor.cache;
 
+import com.axelor.db.tenants.TenantResolver;
 import java.util.concurrent.locks.Lock;
 
 public class DistributedFactory {
@@ -23,7 +24,7 @@ public class DistributedFactory {
    * @return distributed-aware reentrant lock
    */
   public static Lock getLock(String name) {
-    return distributedService.getLock(stackWalker.getCallerClass().getName() + ":" + name);
+    return distributedService.getLock(scopedName(stackWalker.getCallerClass(), name));
   }
 
   /**
@@ -35,8 +36,7 @@ public class DistributedFactory {
    * @return distributed reentrant lock or no-op lock if cache is not distributed
    */
   public static Lock getLockIfDistributed(String name) {
-    return distributedService.getLockIfDistributed(
-        stackWalker.getCallerClass().getName() + ":" + name);
+    return distributedService.getLockIfDistributed(scopedName(stackWalker.getCallerClass(), name));
   }
 
   /**
@@ -46,6 +46,13 @@ public class DistributedFactory {
    * @return distributed-aware atomic long
    */
   public static DistributedAtomicLong getAtomicLong(String name) {
-    return distributedService.getAtomicLong(stackWalker.getCallerClass().getName() + ":" + name);
+    return distributedService.getAtomicLong(scopedName(stackWalker.getCallerClass(), name));
+  }
+
+  /** Builds the backing key for the given caller and name, scoped to the current tenant. */
+  private static String scopedName(Class<?> caller, String name) {
+    final String base = caller.getName() + ":" + name;
+    final String tenantId = TenantResolver.currentTenantIdentifier();
+    return tenantId == null ? base : tenantId + ":" + base;
   }
 }

@@ -81,7 +81,7 @@ For example, when using Redisson, keys/values should be serializable by its code
 
 == DistributedFactory
 
-`DistributedFactory` is a utility class that facilitates concurrency control in distributed cache environments. It provides static methods to access distributed-aware synchronization primitives, ensuring thread safety across multiple application instances when using distributed caching systems.
+`DistributedFactory` is a utility class that facilitates concurrency control in distributed cache environments. It provides static methods to access distributed-aware synchronization primitives, ensuring thread safety across multiple application instances when using distributed caching systems. These primitives are scoped to the current tenant context when multi-tenancy is enabled.
 
 - `getLock(name)`: Returns a distributed-aware reentrant lock for the specified name, prefixed with the caller class name for uniqueness. This lock can be used to synchronize access to shared resources or cache entries in a distributed setup.
 - `getLockIfDistributed(name)`: Returns a lock only if the cache is configured for distribution; otherwise, it provides a no-op lock, avoiding unnecessary synchronization overhead in single-instance setups.

@@ -1,0 +1,8 @@
+---
+title: Scope distributed locks and atomic longs by tenant
+type: fix
+description: |
+  Distributed locks and atomic longs obtained from `DistributedFactory` are now
+  scoped to the current tenant when multi-tenancy is enabled. The distributed
+  backend (e.g. Redis) is shared across tenants, but the resources these guard
+  (such as module initialization and meta restore) act on per-tenant databases.
