@@ -30,6 +30,7 @@
   }
 }
 
+/* Used as drag handle selector in dashboard.tsx — renaming requires updating the handle config there. */
 .title {
   flex: 1;
   padding: var(--ax-theme-panel-header-title-padding, 0.5rem);

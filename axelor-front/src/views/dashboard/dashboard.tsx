@@ -351,7 +351,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
               resizeHandles={["se"]}
               breakpoints={BREAKPOINTS}
               cols={COLS}
-              draggableHandle={`.${dashletStyles.header}`}
+              draggableHandle={`.${dashletStyles.title}`}
               onLayoutChange={handleLayoutChange}
               onDragStart={handleDragStart}
               onDragStop={handleDragStop}
