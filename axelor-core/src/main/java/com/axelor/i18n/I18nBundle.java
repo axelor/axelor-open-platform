@@ -5,7 +5,9 @@
 package com.axelor.i18n;
 
 import com.axelor.cache.AxelorCache;
+import com.axelor.cache.AxelorTopic;
 import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.DistributedFactory;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import jakarta.persistence.EntityManager;
@@ -42,6 +44,13 @@ public class I18nBundle extends ResourceBundle {
       CacheBuilder.newInMemoryBuilder()
           .expireAfterWrite(Duration.ofMinutes(10))
           .build(messages::get);
+
+  /** Topic used to notify other instances to invalidate their local caches. */
+  private static final AxelorTopic invalidationTopic = DistributedFactory.getTopic("invalidation");
+
+  static {
+    invalidationTopic.addListener(String.class, msg -> invalidateLocal());
+  }
 
   private static final Logger log = LoggerFactory.getLogger(I18nBundle.class);
 
@@ -155,9 +164,17 @@ public class I18nBundle extends ResourceBundle {
   }
 
   public static void invalidate() {
-    ResourceBundle.clearCache();
-    localMessages.invalidateAll();
     messages.invalidateAll();
     hashes.invalidateAll();
+    invalidateLocal();
+
+    // Notify all instances to invalidate their local caches.
+    invalidationTopic.publish("invalidate");
+  }
+
+  /** Invalidates local caches in response to a translation invalidation. */
+  private static void invalidateLocal() {
+    ResourceBundle.clearCache();
+    localMessages.invalidateAll();
   }
 }

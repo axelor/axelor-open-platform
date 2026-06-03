@@ -7,5 +7,6 @@ description: |
   fronts the shared `messages` cache. This can noticeably speed up translation-heavy paths
   when using a distributed cache provider.
 
-  With a distributed cache provider, translation changes now propagate to other
-  nodes within the local cache TTL (1 minute) instead of immediately.
+  Translation changes are propagated to other nodes immediately through a distributed
+  topic that invalidates their node-local caches, with the local cache TTL (10 minute)
+  acting as a fallback.
