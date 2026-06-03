@@ -4,6 +4,7 @@
  */
 package com.axelor.cache.redisson;
 
+import com.axelor.cache.AxelorTopic;
 import com.axelor.cache.DistributedAtomicLong;
 import com.axelor.cache.DistributedService;
 import java.util.concurrent.locks.Lock;
@@ -12,6 +13,7 @@ public class RedissonDistributedService implements DistributedService {
 
   protected static final String LOCK_PREFIX = "axelor-lock:";
   protected static final String ATOMIC_PREFIX = "axelor-atomic:";
+  protected static final String TOPIC_PREFIX = "axelor-topic:";
 
   @Override
   public Lock getLock(String name) {
@@ -22,5 +24,10 @@ public class RedissonDistributedService implements DistributedService {
   public DistributedAtomicLong getAtomicLong(String name) {
     return new RedissonAtomicLongAdapter(
         RedissonProvider.get().getAtomicLong(ATOMIC_PREFIX + name));
+  }
+
+  @Override
+  public AxelorTopic getTopic(String name) {
+    return new RedissonTopicAdapter(RedissonProvider.get().getTopic(TOPIC_PREFIX + name));
   }
 }

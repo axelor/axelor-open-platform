@@ -4,6 +4,7 @@
  */
 package com.axelor.cache.caffeine;
 
+import com.axelor.cache.AxelorTopic;
 import com.axelor.cache.DistributedAtomicLong;
 import com.axelor.cache.DistributedService;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -20,6 +21,9 @@ public class CaffeineDistributedService implements DistributedService {
   private static LoadingCache<String, DistributedAtomicLong> atomics =
       Caffeine.newBuilder().weakValues().build(k -> new AtomicLongAdapter(new AtomicLong()));
 
+  private static LoadingCache<String, AxelorTopic> topics =
+      Caffeine.newBuilder().build(k -> new LocalTopic());
+
   private static final NoOpLock NO_OP_LOCK = new NoOpLock();
 
   @Override
@@ -35,5 +39,10 @@ public class CaffeineDistributedService implements DistributedService {
   @Override
   public DistributedAtomicLong getAtomicLong(String name) {
     return atomics.get(name);
+  }
+
+  @Override
+  public AxelorTopic getTopic(String name) {
+    return topics.get(name);
   }
 }

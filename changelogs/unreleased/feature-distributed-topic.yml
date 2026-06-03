@@ -1,0 +1,11 @@
+---
+title: Add distributed publish/subscribe topic
+type: feature
+description: |
+  `DistributedFactory.getTopic(name)` now provides an `AxelorTopic`, a publish/subscribe
+  primitive for broadcasting messages to all application instances. Messages are delivered
+  to every listener, including those registered on the publishing instance.
+
+  In a distributed setup, messages are broadcast through the cache backend (e.g. Redis when
+  using Redisson); in a single-instance setup they are dispatched in-process. The current
+  tenant is carried with each message and restored before the listener runs.

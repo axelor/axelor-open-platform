@@ -86,5 +86,6 @@ For example, when using Redisson, keys/values should be serializable by its code
 - `getLock(name)`: Returns a distributed-aware reentrant lock for the specified name, prefixed with the caller class name for uniqueness. This lock can be used to synchronize access to shared resources or cache entries in a distributed setup.
 - `getLockIfDistributed(name)`: Returns a lock only if the cache is configured for distribution; otherwise, it provides a no-op lock, avoiding unnecessary synchronization overhead in single-instance setups.
 - `getAtomicLong(name)`: Returns a distributed-aware atomic long for the specified name, useful for maintaining counters or sequence numbers across distributed instances.
+- `getTopic(name)`: Returns a publish/subscribe topic for broadcasting messages to all instances. In a single-instance setup, messages are dispatched in-process only. The current tenant context is carried with each message, so listeners observe the same tenant as the publisher.
 
 These utilities are essential for applications leveraging distributed caches, as they ensure consistent and safe access to cached data in multi-node deployments.

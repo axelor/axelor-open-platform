@@ -36,4 +36,12 @@ public interface DistributedService {
    * @return distributed-aware atomic long
    */
   DistributedAtomicLong getAtomicLong(String name);
+
+  /**
+   * Returns a publish/subscribe topic.
+   *
+   * @param name name of the topic
+   * @return topic
+   */
+  AxelorTopic getTopic(String name);
 }
