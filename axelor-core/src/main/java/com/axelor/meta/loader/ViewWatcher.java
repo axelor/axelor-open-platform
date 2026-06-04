@@ -99,7 +99,6 @@ public final class ViewWatcher {
       instance.start();
 
       moduleManager = Beans.get(ModuleManager.class);
-      moduleManager.setLoadData(false);
 
       moduleNames = new HashSet<>();
       ModuleManager.getAll().stream()

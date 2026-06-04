@@ -40,8 +40,6 @@ public class ModuleManager {
 
   private static final ModuleResolver RESOLVER = ModuleResolver.scan();
 
-  private boolean loadData = true;
-
   private final AuthService authService;
 
   private final MetaModuleRepository modules;
@@ -127,15 +125,9 @@ public class ModuleManager {
   public void update(Set<String> moduleNames, Set<Path> paths) {
     final long startTime = System.currentTimeMillis();
 
-    final List<Module> moduleList =
-        RESOLVER.all().stream()
-            .filter(m -> moduleNames.contains(m.getName()))
-            .peek(m -> m.setPending(true))
-            .collect(Collectors.toList());
-
     try {
       pathsToRestore.addAll(paths);
-      loadModules(moduleList, true, false);
+      update(false, moduleNames.toArray(String[]::new));
     } finally {
       pathsToRestore.clear();
       doCleanUp(startTime);
@@ -150,15 +142,17 @@ public class ModuleManager {
             I18n.get(
                 "A views restoring is already in progress. Please wait until it ends and try again."));
       }
-      loadData = false;
       update(false);
     } finally {
       busy.set(0);
-      loadData = true;
     }
   }
 
   private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
+    if (ObjectUtils.isEmpty(moduleList)) {
+      return;
+    }
+
     viewLoader.initialize();
     try {
       ContextAware.of()
@@ -173,14 +167,6 @@ public class ModuleManager {
     } finally {
       viewLoader.terminate();
     }
-  }
-
-  public boolean isLoadData() {
-    return loadData;
-  }
-
-  public void setLoadData(boolean loadData) {
-    this.loadData = loadData;
   }
 
   static long getLastRestored() {
@@ -229,7 +215,7 @@ public class ModuleManager {
     installMeta(module, update);
 
     // load data (runs in it's own transaction)
-    if (loadData) {
+    if (!module.isInstalled()) {
       dataLoader.load(module, update);
       if (withDemo) {
         demoLoader.load(module, update);
@@ -277,8 +263,6 @@ public class ModuleManager {
       } else {
         module.setInstalled(true);
       }
-
-      module.setVersion(version);
 
       if (stored.getId() == null || update) {
         stored.setTitle(title);
