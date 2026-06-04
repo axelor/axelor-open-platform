@@ -1426,7 +1426,9 @@ public class Resource<T extends Model> {
   }
 
   private void checkRelationalPermissions(Map<String, Object> recordMap, Mapper mapper) {
-    for (final Entry<String, Object> entry : recordMap.entrySet()) {
+    for (final Iterator<Entry<String, Object>> it = recordMap.entrySet().iterator();
+        it.hasNext(); ) {
+      final Entry<String, Object> entry = it.next();
       final String name = entry.getKey();
       final Class<? extends Model> target =
           Optional.ofNullable(mapper.getProperty(name))
@@ -1443,15 +1445,41 @@ public class Resource<T extends Model> {
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> valueMap = (Map<String, Object>) value;
+        if (User.class.isAssignableFrom(target)) {
+          if (!reduceToUserReference(valueMap)) {
+            it.remove();
+          }
+          continue;
+        }
         checkRelationalPermissions(valueMap, target);
       } else if (value instanceof Collection) {
         @SuppressWarnings("unchecked")
         final Collection<Map<String, Object>> values = ((Collection<Map<String, Object>>) value);
+        if (User.class.isAssignableFrom(target)) {
+          values.removeIf(valueMap -> !reduceToUserReference(valueMap));
+          continue;
+        }
         for (final Map<String, Object> valueMap : values) {
           checkRelationalPermissions(valueMap, target);
         }
       }
     }
+  }
+
+  /**
+   * Reduces a nested User record to a bare {@code id} reference, in place.
+   *
+   * @return {@code true} if the record is a reference to an existing user and should be kept,
+   *     {@code false} if it carries no usable id and should be dropped
+   */
+  private boolean reduceToUserReference(Map<String, Object> recordMap) {
+    final Long id = findId(recordMap);
+    recordMap.clear();
+    if (id == null || id <= 0L) {
+      return false;
+    }
+    recordMap.put("id", id);
+    return true;
   }
 
   private void checkRelationalPermissions(

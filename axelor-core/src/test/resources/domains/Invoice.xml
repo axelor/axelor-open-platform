@@ -10,6 +10,8 @@
     <many-to-one name="move" ref="Move"/>
     <many-to-one name="oldMove" ref="Move"/>
     <many-to-one name="rejectMoveLine" ref="MoveLine"/>
+    <many-to-one name="saleUser" ref="com.axelor.auth.db.User"/>
+    <many-to-many name="members" ref="com.axelor.auth.db.User"/>
 
     <date name="date" column="invoice_date"/>
     <date name="dueDate"/>
