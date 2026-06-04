@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
  * <p>Topology: {@code Product} is the inverse side; {@code ProductConfig} / {@code
  * ProductConfigRequiredProduct} are the owning sides holding the foreign key back to {@code
  * Product}. The owning side declares {@code cascade = {PERSIST, MERGE}}, which is what makes
- * deleting the inverse side tricky: on flush the cascade can re-persist (resurrect) the entity being
- * deleted unless its link to the owning side is broken first.
+ * deleting the inverse side tricky: on flush the cascade can re-persist (resurrect) the entity
+ * being deleted unless its link to the owning side is broken first.
  *
  * <p>{@code JpaRepository#detachChildren} breaks that link in one of two ways: null the owning-side
- * back-reference when it is optional, or detach the loaded owning-side entity when the back-reference
- * is required (and therefore cannot be nulled).
+ * back-reference when it is optional, or detach the loaded owning-side entity when the
+ * back-reference is required (and therefore cannot be nulled).
  */
 class OneToOneRemoveTest extends JpaTest {
 
