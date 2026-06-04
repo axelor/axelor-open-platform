@@ -96,7 +96,7 @@ public class DatabaseCommand extends AbstractCliCommand {
             boolean demo =
                 AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
             ModuleManager manager = Beans.get(ModuleManager.class);
-            manager.initialize(false, demo);
+            manager.initialize(demo);
           });
     }
   }

@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -72,23 +73,27 @@ public class ModuleManager {
     metaLoaders = List.of(modelLoader, viewLoader, i18nLoader);
   }
 
-  public void initialize(final boolean update, final boolean withDemo) {
+  /**
+   * Initialize the application by loading the pending modules.
+   *
+   * <p>Called on application start: only pending (i.e. new, not-yet-installed) modules are loaded,
+   * so already-installed modules are left untouched.
+   *
+   * @param withDemo whether to load demo data for the newly installed modules
+   */
+  public void initialize(final boolean withDemo) {
     var lock = DistributedFactory.getLockIfDistributed("initialize");
     lock.lock();
     try {
-      createDefault();
-      resolve(update);
-      final List<Module> moduleList =
-          RESOLVER.all().stream()
-              .peek(m -> log.info("Loading package {}...", m.getName()))
-              .filter(Module::isPending)
-              .collect(Collectors.toList());
-      if (ObjectUtils.notEmpty(moduleList)) {
-        evictAllCacheRegions();
-      }
-      loadModules(moduleList, withDemo);
+      load(
+          false,
+          withDemo,
+          () ->
+              RESOLVER.all().stream()
+                  .peek(m -> log.info("Loading package {}...", m.getName()))
+                  .filter(Module::isPending)
+                  .collect(Collectors.toList()));
     } finally {
-      doCleanUp();
       lock.unlock();
     }
   }
@@ -104,33 +109,47 @@ public class ModuleManager {
     }
   }
 
+  /**
+   * Update the modules of the database.
+   *
+   * <p>When no module name is given, all modules are updated and any new (not-yet-installed) module
+   * is installed; otherwise only the given modules are updated, if they exist.
+   *
+   * @param withDemo whether to load demo data for the newly installed modules
+   * @param moduleNames the modules to update; if empty, all modules are updated
+   */
   public void update(boolean withDemo, String... moduleNames) {
-    final List<Module> moduleList = new ArrayList<>();
-
-    try {
-      resolve(true);
-      if (ObjectUtils.isEmpty(moduleNames)) {
-        RESOLVER.all().stream().filter(Module::isInstalled).forEach(moduleList::add);
-      } else {
-        RESOLVER.all().stream()
-            .filter(m -> Arrays.asList(moduleNames).contains(m.getName()))
-            .forEach(moduleList::add);
-      }
-      loadModules(moduleList, withDemo);
-    } finally {
-      this.doCleanUp();
-    }
+    load(
+        true,
+        withDemo,
+        () ->
+            ObjectUtils.isEmpty(moduleNames)
+                ? new ArrayList<>(RESOLVER.all())
+                : RESOLVER.all().stream()
+                    .filter(m -> Arrays.asList(moduleNames).contains(m.getName()))
+                    .collect(Collectors.toList()));
   }
 
+  /**
+   * Reload the given paths of the given modules.
+   *
+   * <p>Only the resources matching {@code paths} are processed, restricted to the given modules.
+   * Used to hot-reload changed files, e.g. by the view watcher.
+   *
+   * @param moduleNames the names of the modules to reload
+   * @param paths the resource paths to reload
+   */
   public void update(Set<String> moduleNames, Set<Path> paths) {
     final long startTime = System.currentTimeMillis();
 
     try {
       pathsToRestore.addAll(paths);
-      update(false, moduleNames.toArray(String[]::new));
+      process(
+          false,
+          () -> RESOLVER.all().stream().filter(m -> moduleNames.contains(m.getName())).toList());
     } finally {
       pathsToRestore.clear();
-      doCleanUp(startTime);
+      updateLastRestored(startTime);
     }
   }
 
@@ -142,13 +161,53 @@ public class ModuleManager {
             I18n.get(
                 "A views restoring is already in progress. Please wait until it ends and try again."));
       }
-      update(false);
+      // Restore meta of installed modules only.
+      process(false, () -> RESOLVER.all().stream().filter(Module::isInstalled).toList());
     } finally {
       busy.set(0);
     }
   }
 
-  private void loadModules(List<Module> moduleList, boolean withDemo) {
+  /**
+   * Create the default data, resolve the modules, then load the selected ones.
+   *
+   * <p>The selection is deferred until after resolve so it can rely on the up-to-date
+   * install/pending state.
+   *
+   * @param forceResolve whether to refresh module metadata and re-mark all modules as pending
+   * @param withDemo whether to load demo data for the newly installed modules
+   * @param moduleSelector supplies the modules to load, evaluated after resolve
+   */
+  private void load(boolean forceResolve, boolean withDemo, Supplier<List<Module>> moduleSelector) {
+    createDefault();
+    resolve(forceResolve);
+    process(withDemo, moduleSelector);
+  }
+
+  /**
+   * Select the modules, evict the cache when any of them is new, install them and clean up.
+   *
+   * <p>The selection is deferred (a {@link Supplier}) so it can rely on the up-to-date
+   * install/pending state, e.g. right after a {@link #resolve(boolean)}. Unlike {@link #load}, it
+   * neither creates the default data nor resolves, so it is suited to callers with a known state
+   * (e.g. {@link #restoreMeta()}).
+   *
+   * @param withDemo whether to load demo data for the newly installed modules
+   * @param moduleSelector supplies the modules to load
+   */
+  private void process(boolean withDemo, Supplier<List<Module>> moduleSelector) {
+    try {
+      final List<Module> moduleList = moduleSelector.get();
+      if (moduleList.stream().anyMatch(m -> !m.isInstalled())) {
+        evictAllCacheRegions();
+      }
+      installModules(moduleList, withDemo);
+    } finally {
+      doCleanUp();
+    }
+  }
+
+  private void installModules(List<Module> moduleList, boolean withDemo) {
     if (ObjectUtils.isEmpty(moduleList)) {
       return;
     }
@@ -161,7 +220,7 @@ public class ModuleManager {
           .build(
               () -> {
                 moduleList.forEach(m -> installOne(m.getName(), withDemo));
-                moduleList.forEach(m -> viewLoader.doLast(m));
+                moduleList.forEach(viewLoader::doLast);
               })
           .run();
     } finally {
@@ -190,21 +249,17 @@ public class ModuleManager {
   }
 
   private void doCleanUp() {
-    doCleanUp(0);
-  }
-
-  private void doCleanUp(long time) {
     AbstractLoader.doCleanUp();
-    updateLastRestored(time);
+    updateLastRestored(0);
   }
 
-  private boolean installOne(String moduleName, boolean withDemo) {
+  private void installOne(String moduleName, boolean withDemo) {
     final Module module = RESOLVER.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
 
     if (metaModule == null) {
       log.error("Trying to install an nonexistent module {}. Skipping...", moduleName);
-      return false;
+      return;
     }
 
     final String message =
@@ -214,7 +269,7 @@ public class ModuleManager {
     // load meta
     installMeta(module);
 
-    // load data (runs in it's own transaction)
+    // load data
     if (!module.isInstalled()) {
       dataLoader.load(module);
       if (withDemo) {
@@ -225,8 +280,6 @@ public class ModuleManager {
     // finally update install state
     module.setPending(false);
     module.setInstalled(true);
-
-    return true;
   }
 
   private void installMeta(Module module) {
@@ -329,6 +382,7 @@ public class ModuleManager {
       createdBy.set(userGroup, admin);
       createdBy.set(admin, admin);
     } catch (Exception e) {
+      // ignore
     }
 
     admin = users.save(admin);

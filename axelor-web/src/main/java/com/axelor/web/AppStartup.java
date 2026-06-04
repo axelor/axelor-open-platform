@@ -41,7 +41,7 @@ public class AppStartup extends HttpServlet {
     log.info("Initializing...");
     try {
       moduleManager.initialize(
-          false, AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
+          AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

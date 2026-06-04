@@ -102,6 +102,7 @@ public final class ViewWatcher {
 
       moduleNames = new HashSet<>();
       ModuleManager.getAll().stream()
+          .filter(Module::isInstalled)
           .forEach(
               module -> {
                 final String name = module.getName();
