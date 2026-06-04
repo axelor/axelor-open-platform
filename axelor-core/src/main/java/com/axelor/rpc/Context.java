@@ -64,6 +64,7 @@ import javax.script.SimpleBindings;
 @JsonSerialize(using = Context.Serializer.class)
 public class Context extends SimpleBindings {
 
+
   static class Serializer extends JsonSerializer<Context> {
 
     @Override
@@ -85,10 +86,12 @@ public class Context extends SimpleBindings {
   private static final String KEY_PARENT = "_parent";
   private static final String KEY_PARENT_CONTEXT = "parentContext";
 
+
   static final String KEY_ID = "id";
   static final String KEY_JSON_ATTRS = "attrs";
   static final String KEY_JSON_MODEL = "jsonModel";
   static final String KEY_JSON_PREFIX = "$";
+
 
   private final Map<String, Object> values;
 

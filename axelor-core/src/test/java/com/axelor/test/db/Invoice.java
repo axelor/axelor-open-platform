@@ -18,11 +18,15 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.auth.db.User;
 import com.axelor.db.JpaModel;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -44,6 +48,16 @@ public class Invoice extends JpaModel {
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private MoveLine rejectMoveLine;
+
+  @ManyToOne(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  private User saleUser;
+
+  @ManyToMany(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  private Set<User> members;
 
   private LocalDate date;
 
@@ -71,6 +85,42 @@ public class Invoice extends JpaModel {
 
   public void setRejectMoveLine(MoveLine rejectMoveLine) {
     this.rejectMoveLine = rejectMoveLine;
+  }
+
+  public User getSaleUser() {
+    return saleUser;
+  }
+
+  public void setSaleUser(User saleUser) {
+    this.saleUser = saleUser;
+  }
+
+  public Set<User> getMembers() {
+    return members;
+  }
+
+  public void setMembers(Set<User> members) {
+    this.members = members;
+  }
+
+  public void addMember(User item) {
+    if (getMembers() == null) {
+      setMembers(new HashSet<>());
+    }
+    getMembers().add(item);
+  }
+
+  public void removeMember(User item) {
+    if (getMembers() == null) {
+      return;
+    }
+    getMembers().remove(item);
+  }
+
+  public void clearMembers() {
+    if (getMembers() != null) {
+      getMembers().clear();
+    }
   }
 
   public LocalDate getDate() {

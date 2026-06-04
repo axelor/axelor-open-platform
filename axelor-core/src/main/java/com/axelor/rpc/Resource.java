@@ -134,6 +134,19 @@ public class Resource<T extends Model> {
 
   private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\.]+");
 
+  private static final Set<String> USER_RESTRICTED_FIELDS =
+      Set.of(
+          "code",
+          "group",
+          "blocked",
+          "activateOn",
+          "expiresOn",
+          "password",
+          "passwordUpdatedOn",
+          "roles",
+          "permissions",
+          "metaPermissions");
+
   private static JpaSecurity securityWarner;
 
   @Inject
@@ -1218,6 +1231,24 @@ public class Resource<T extends Model> {
     return response;
   }
 
+  private void handleUserSave(Map<String, Object> values) {
+    final User currentUser = AuthUtils.getUser();
+
+    if (currentUser != null && !AuthUtils.isAdmin(currentUser)) {
+      enforceRestrictedFields(values);
+    }
+  }
+
+  /** Throws an error if a non-admin user attempts to modify restricted fields on a user record. */
+  private void enforceRestrictedFields(Map<String, Object> values) {
+    for (String field : USER_RESTRICTED_FIELDS) {
+      if (values.containsKey(field)) {
+        final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+        throw new UnauthorizedException(cause.getMessage(), cause);
+      }
+    }
+  }
+
   private User changeUserPassword(User user, Map<String, Object> values) {
     final String oldPassword = (String) values.get("oldPassword");
     final String newPassword = (String) values.get("newPassword");
@@ -1301,6 +1332,11 @@ public class Resource<T extends Model> {
               security.get().check(accessType, model, id);
             }
 
+            // Handle restricted field enforcement for non-admins on User
+            if (User.class.isAssignableFrom(model)) {
+              handleUserSave((Map) record);
+            }
+
             // Check for permissions on relational fields
             checkRelationalPermissions((Map<String, Object>) record, mapper);
 
@@ -1340,7 +1376,9 @@ public class Resource<T extends Model> {
   }
 
   private void checkRelationalPermissions(Map<String, Object> recordMap, Mapper mapper) {
-    for (final Entry<String, Object> entry : recordMap.entrySet()) {
+    for (final Iterator<Entry<String, Object>> it = recordMap.entrySet().iterator();
+        it.hasNext(); ) {
+      final Entry<String, Object> entry = it.next();
       final String name = entry.getKey();
       final Class<? extends Model> target =
           Optional.ofNullable(mapper.getProperty(name))
@@ -1357,15 +1395,41 @@ public class Resource<T extends Model> {
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> valueMap = (Map<String, Object>) value;
+        if (User.class.isAssignableFrom(target)) {
+          if (!reduceToUserReference(valueMap)) {
+            it.remove();
+          }
+          continue;
+        }
         checkRelationalPermissions(valueMap, target);
       } else if (value instanceof Collection) {
         @SuppressWarnings("unchecked")
         final Collection<Map<String, Object>> values = ((Collection<Map<String, Object>>) value);
+        if (User.class.isAssignableFrom(target)) {
+          values.removeIf(valueMap -> !reduceToUserReference(valueMap));
+          continue;
+        }
         for (final Map<String, Object> valueMap : values) {
           checkRelationalPermissions(valueMap, target);
         }
       }
     }
+  }
+
+  /**
+   * Reduces a nested User record to a bare {@code id} reference, in place.
+   *
+   * @return {@code true} if the record is a reference to an existing user and should be kept,
+   *     {@code false} if it carries no usable id and should be dropped
+   */
+  private boolean reduceToUserReference(Map<String, Object> recordMap) {
+    final Long id = findId(recordMap);
+    recordMap.clear();
+    if (id == null || id <= 0L) {
+      return false;
+    }
+    recordMap.put("id", id);
+    return true;
   }
 
   private void checkRelationalPermissions(
@@ -1417,6 +1481,21 @@ public class Resource<T extends Model> {
         throw new UnauthorizedException(cause.getMessage(), cause);
       }
     }
+
+    if (User.class.isAssignableFrom(model)) {
+      final User currentUser = AuthUtils.getUser();
+
+      if (currentUser != null && !AuthUtils.isAdmin(currentUser)) {
+        enforceRestrictedFields(values);
+      }
+
+      // Never allow mass update password
+      if (values.containsKey("password")) {
+        final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+        throw new UnauthorizedException(cause.getMessage(), cause);
+      }
+    }
+
     final int total = JPA.withTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
