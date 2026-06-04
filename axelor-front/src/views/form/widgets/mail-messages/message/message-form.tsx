@@ -26,6 +26,7 @@ export function useMessagePopup() {
       noTitle,
       onSave,
       showRecipients = true,
+      canAttach = true,
     }: {
       title: string;
       record: Message;
@@ -33,6 +34,7 @@ export function useMessagePopup() {
       noTitle?: string;
       onSave: (record: Message) => void;
       showRecipients?: boolean;
+      canAttach?: boolean;
     }) => {
       let formData = { ...record };
       const formAtom = atom<Message>(formData);
@@ -55,6 +57,7 @@ export function useMessagePopup() {
               formAtom={formAtom}
               yesTitle={yesTitle}
               noTitle={noTitle}
+              canAttach={canAttach}
               onClose={async (result) => {
                 if (
                   result &&
@@ -233,11 +236,13 @@ function FormFooter({
   noTitle,
   formAtom,
   onClose,
+  canAttach = true,
 }: {
   yesTitle?: string;
   noTitle?: string;
   formAtom: PrimitiveAtom<Message>;
   onClose?: (isOk: boolean) => void;
+  canAttach?: boolean;
 }) {
   const showDMSPopup = useDMSPopup();
   const setFormValues = useSetAtom(formAtom);
@@ -268,18 +273,20 @@ function FormFooter({
   return (
     <Box d="flex" flex={1}>
       <Box d="flex" flex={1}>
-        <Box flex={1}>
-          <Button
-            outline
-            variant="primary"
-            size="sm"
-            onClick={handleAttachment}
-          >
-            <Box d="flex" as="span">
-              <MaterialIcon icon="attach_file" />
-            </Box>
-          </Button>
-        </Box>
+        {canAttach && (
+          <Box flex={1}>
+            <Button
+              outline
+              variant="primary"
+              size="sm"
+              onClick={handleAttachment}
+            >
+              <Box d="flex" as="span">
+                <MaterialIcon icon="attach_file" />
+              </Box>
+            </Button>
+          </Box>
+        )}
       </Box>
       <Box d="flex">
         <Button
