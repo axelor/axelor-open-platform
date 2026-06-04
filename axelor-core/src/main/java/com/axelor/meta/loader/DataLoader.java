@@ -39,7 +39,7 @@ class DataLoader extends AbstractLoader {
   private static Pattern patXml = Pattern.compile("^\\<\\s*xml-inputs");
 
   @Override
-  protected void doLoad(Module module, boolean update) {
+  protected void doLoad(Module module) {
 
     File tmp = null;
 

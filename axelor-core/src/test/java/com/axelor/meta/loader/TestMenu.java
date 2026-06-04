@@ -48,7 +48,7 @@ public class TestMenu extends MetaTest {
     }
     if (metaMenuRepository.all().count() == 0) {
       final URL url = ResourceUtils.getResource("com/axelor/meta/Menu.xml");
-      loader.process(url, new Module("test"), false);
+      loader.process(url, new Module("test"));
 
       MetaMenu menu = metaMenuRepository.findByName("menu-root-3-2");
       menu.addRole(roles.findByName("guest.user"));

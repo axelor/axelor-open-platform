@@ -102,7 +102,7 @@ public class TestViews extends MetaTest {
   public void testInclude() throws Exception {
 
     final URL url = ResourceUtils.getResource("com/axelor/meta/Include.xml");
-    loader.process(url, new Module("test"), false);
+    loader.process(url, new Module("test"));
 
     final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
     final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");

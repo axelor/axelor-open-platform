@@ -39,8 +39,8 @@ public class TestComputedViews extends MetaTest {
           final URL url = ResourceUtils.getResource("com/axelor/meta/extends/Base.xml");
           final URL urlExtends = ResourceUtils.getResource("com/axelor/meta/extends/Extends.xml");
           try {
-            loader.process(url, new Module("foo-module"), false);
-            loader.process(urlExtends, new Module("bar-module"), false);
+            loader.process(url, new Module("foo-module"));
+            loader.process(urlExtends, new Module("bar-module"));
           } catch (Exception e) {
             throw new RuntimeException(e);
           }

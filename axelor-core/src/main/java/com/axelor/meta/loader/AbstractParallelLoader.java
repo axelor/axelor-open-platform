@@ -23,21 +23,18 @@ abstract class AbstractParallelLoader extends AbstractLoader {
 
   protected abstract List<URL> findFiles(Module module);
 
-  protected abstract void doLoad(URL file, Module module, boolean update);
+  protected abstract void doLoad(URL file, Module module);
 
   @Override
-  protected void doLoad(Module module, boolean update) {
-    findFiles(module).forEach(file -> doLoad(file, module, update));
+  protected void doLoad(Module module) {
+    findFiles(module).forEach(file -> doLoad(file, module));
   }
 
   protected void feedTransactionExecutor(
-      ParallelTransactionExecutor transactionExecutor,
-      Module module,
-      boolean update,
-      Set<Path> paths) {
+      ParallelTransactionExecutor transactionExecutor, Module module, Set<Path> paths) {
 
     for (URL file : findFiles(module, paths)) {
-      transactionExecutor.add(() -> doLoad(file, module, update));
+      transactionExecutor.add(() -> doLoad(file, module));
     }
   }
 

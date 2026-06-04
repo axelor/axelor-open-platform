@@ -151,18 +151,16 @@ abstract class AbstractLoader {
    * Implement this method the load the data.
    *
    * @param module the module for which to load the data
-   * @param update whether to force update while loading
    */
-  protected abstract void doLoad(Module module, boolean update);
+  protected abstract void doLoad(Module module);
 
   /**
    * This method is called by the module installer as last step when loading of all modules is
    * complete.
    *
    * @param module the module the process
-   * @param update whether to update
    */
-  void doLast(Module module, boolean update) {}
+  void doLast(Module module) {}
 
   static void doCleanUp() {
     visited.clear();
@@ -171,7 +169,7 @@ abstract class AbstractLoader {
     resolveTasks.clear();
   }
 
-  public final void load(Module module, boolean update) {
-    doLoad(module, update);
+  public final void load(Module module) {
+    doLoad(module);
   }
 }

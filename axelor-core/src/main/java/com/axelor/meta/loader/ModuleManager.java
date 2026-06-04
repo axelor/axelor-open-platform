@@ -86,7 +86,7 @@ public class ModuleManager {
       if (ObjectUtils.notEmpty(moduleList)) {
         evictAllCacheRegions();
       }
-      loadModules(moduleList, update, withDemo);
+      loadModules(moduleList, withDemo);
     } finally {
       doCleanUp();
       lock.unlock();
@@ -116,7 +116,7 @@ public class ModuleManager {
             .filter(m -> Arrays.asList(moduleNames).contains(m.getName()))
             .forEach(moduleList::add);
       }
-      loadModules(moduleList, true, withDemo);
+      loadModules(moduleList, withDemo);
     } finally {
       this.doCleanUp();
     }
@@ -148,7 +148,7 @@ public class ModuleManager {
     }
   }
 
-  private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
+  private void loadModules(List<Module> moduleList, boolean withDemo) {
     if (ObjectUtils.isEmpty(moduleList)) {
       return;
     }
@@ -160,8 +160,8 @@ public class ModuleManager {
           .withUser(AuthUtils.getUser("admin"))
           .build(
               () -> {
-                moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
-                moduleList.forEach(m -> viewLoader.doLast(m, update));
+                moduleList.forEach(m -> installOne(m.getName(), withDemo));
+                moduleList.forEach(m -> viewLoader.doLast(m));
               })
           .run();
     } finally {
@@ -198,7 +198,7 @@ public class ModuleManager {
     updateLastRestored(time);
   }
 
-  private boolean installOne(String moduleName, boolean update, boolean withDemo) {
+  private boolean installOne(String moduleName, boolean withDemo) {
     final Module module = RESOLVER.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
 
@@ -212,13 +212,13 @@ public class ModuleManager {
     log.info(message, moduleName);
 
     // load meta
-    installMeta(module, update);
+    installMeta(module);
 
     // load data (runs in it's own transaction)
     if (!module.isInstalled()) {
-      dataLoader.load(module, update);
+      dataLoader.load(module);
       if (withDemo) {
-        demoLoader.load(module, update);
+        demoLoader.load(module);
       }
     }
 
@@ -229,12 +229,11 @@ public class ModuleManager {
     return true;
   }
 
-  private void installMeta(Module module, boolean update) {
+  private void installMeta(Module module) {
     final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
     metaLoaders.forEach(
         metaLoader ->
-            metaLoader.feedTransactionExecutor(
-                transactionExecutor, module, update, pathsToRestore));
+            metaLoader.feedTransactionExecutor(transactionExecutor, module, pathsToRestore));
     transactionExecutor.run();
     JPA.em().clear();
   }

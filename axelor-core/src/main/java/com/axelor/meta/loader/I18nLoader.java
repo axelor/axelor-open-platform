@@ -41,7 +41,7 @@ public class I18nLoader extends AbstractParallelLoader {
   private static final String FILE_PATTERN = ".*(?:messages_|custom_)([a-zA-Z_-]+)\\.csv$";
 
   @Override
-  protected void doLoad(URL file, Module module, boolean update) {
+  protected void doLoad(URL file, Module module) {
     LOG.debug("Load translation: {}", file.getFile());
 
     try (InputStream is = file.openStream()) {
@@ -52,25 +52,22 @@ public class I18nLoader extends AbstractParallelLoader {
   }
 
   @Override
-  protected void doLoad(Module module, boolean update) {
-    splitFiles(findFiles(module)).forEach(files -> doLoad(files, module, update));
+  protected void doLoad(Module module) {
+    splitFiles(findFiles(module)).forEach(files -> doLoad(files, module));
   }
 
-  protected void doLoad(List<URL> files, Module module, boolean update) {
+  protected void doLoad(List<URL> files, Module module) {
     for (URL file : files) {
-      doLoad(file, module, update);
+      doLoad(file, module);
     }
   }
 
   @Override
   protected void feedTransactionExecutor(
-      ParallelTransactionExecutor transactionExecutor,
-      Module module,
-      boolean update,
-      Set<Path> paths) {
+      ParallelTransactionExecutor transactionExecutor, Module module, Set<Path> paths) {
 
     for (List<URL> files : splitFiles(findFiles(module, paths))) {
-      transactionExecutor.add(() -> doLoad(files, module, update));
+      transactionExecutor.add(() -> doLoad(files, module));
     }
   }
 

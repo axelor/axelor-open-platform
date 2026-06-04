@@ -47,17 +47,17 @@ public class ModelLoader extends AbstractParallelLoader {
       XMLUtils.createDocumentBuilderFactory(false);
 
   @Override
-  protected void doLoad(URL url, Module module, boolean update) {
+  protected void doLoad(URL url, Module module) {
     LOG.debug("Importing: {}", url.getFile());
 
     try (InputStream is = url.openStream()) {
-      process(is, update);
+      process(is);
     } catch (IOException | SAXException | ParserConfigurationException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void process(InputStream stream, boolean update)
+  private void process(InputStream stream)
       throws IOException, SAXException, ParserConfigurationException {
     Document doc;
     synchronized (DOCUMENT_BUILDER_FACTORY_MONITOR) {
@@ -70,9 +70,9 @@ public class ModelLoader extends AbstractParallelLoader {
       if (node instanceof Element) {
         final Element element = (Element) elements.item(i);
         final String name = element.getTagName();
-        if ("enum".equals(name)) importEnums(element, update);
-        if ("entity".equals(name)) importModels(element, update);
-        if ("sequence".equals(name)) importSequences(element, update);
+        if ("enum".equals(name)) importEnums(element);
+        if ("entity".equals(name)) importModels(element);
+        if ("sequence".equals(name)) importSequences(element);
       }
     }
   }
@@ -109,7 +109,7 @@ public class ModelLoader extends AbstractParallelLoader {
     return names;
   }
 
-  private void importModels(Element element, boolean update) {
+  private void importModels(Element element) {
     final String name = element.getAttribute("name");
     if ("Model".equals(name)) {
       return;
@@ -118,7 +118,7 @@ public class ModelLoader extends AbstractParallelLoader {
     service.process(JPA.model(name));
   }
 
-  private void importEnums(Element element, boolean update) {
+  private void importEnums(Element element) {
     final Element module =
         (Element) element.getOwnerDocument().getElementsByTagName("module").item(0);
     final String packageName = module.getAttribute("package");
@@ -136,7 +136,7 @@ public class ModelLoader extends AbstractParallelLoader {
     enums.save(found);
   }
 
-  private void importSequences(Element element, boolean update) {
+  private void importSequences(Element element) {
     String name = element.getAttribute("name");
 
     if (isVisited(MetaSequence.class, name, null)) {
