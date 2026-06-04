@@ -75,6 +75,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       yesTitle: i18n.get("Add"),
       record: { subject: getRecordTitle() } as Message,
       onSave: handleFollow,
+      canAttach: false,
     });
   }, [getRecordTitle, handleFollow, showMessagePopup]);
 
