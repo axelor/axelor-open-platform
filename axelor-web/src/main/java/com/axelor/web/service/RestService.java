@@ -27,6 +27,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
 import com.axelor.db.EntityHelper;
@@ -908,9 +909,40 @@ public class RestService extends ResourceService {
       return followers(entity);
     }
 
-    final MailMessage message = Mapper.toBean(MailMessage.class, request.getData());
-    if (message == null || message.getRecipients() == null || message.getRecipients().isEmpty()) {
+    Map<String, Object> data = request.getData();
+    List<?> recipientMaps =
+        (data.get("recipients") instanceof List<?>
+            ? (List<?>) data.get("recipients")
+            : Collections.emptyList());
+
+    if (ObjectUtils.isEmpty(recipientMaps)) {
       return followers(entity);
+    }
+
+    MailMessage message = new MailMessage();
+    if (data.get("subject") instanceof String) {
+      String subject = (String) data.get("subject");
+      message.setSubject(subject);
+    }
+    if (data.get("body") instanceof String) {
+      String body = (String) data.get("body");
+      message.setBody(body);
+    }
+
+    for (Object recipientObj : recipientMaps) {
+      if (recipientObj instanceof Map<?, ?>) {
+        Map<?, ?> recipientMap = (Map<?, ?>) recipientObj;
+        MailAddress recipient = new MailAddress();
+        if (recipientMap.get("address") instanceof String) {
+          String address = (String) recipientMap.get("address");
+          recipient.setAddress(address);
+        }
+        if (recipientMap.get("personal") instanceof String) {
+          String personal = (String) recipientMap.get("personal");
+          recipient.setPersonal(personal);
+        }
+        message.addRecipient(recipient);
+      }
     }
 
     for (MailAddress address : message.getRecipients()) {
