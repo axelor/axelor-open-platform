@@ -5,17 +5,28 @@
 package com.axelor.auth.pac4j.local;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.AxelorUrlResolver;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Optional;
 import org.pac4j.core.context.CallContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.UnauthorizedAction;
 import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
+import org.pac4j.core.http.url.UrlResolver;
 import org.pac4j.core.redirect.RedirectionActionBuilder;
 
 @Singleton
 public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
+
+  private final UrlResolver urlResolver;
+
+  @Inject
+  public AxelorAjaxRequestResolver(AxelorUrlResolver urlResolver) {
+    this.urlResolver = urlResolver;
+  }
 
   @Override
   public boolean isAjax(CallContext ctx) {
@@ -27,7 +38,7 @@ public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
       CallContext ctx, RedirectionActionBuilder redirectionActionBuilder) {
     if (isAjax(ctx)
         && getUrl(ctx, redirectionActionBuilder)
-            .filter(url -> url.endsWith(AxelorFormClient.LOGIN_URL))
+            .filter(url -> url.equals(getFormLoginUrl(ctx.webContext())))
             .isPresent()) {
       return new UnauthorizedAction();
     }
@@ -40,5 +51,9 @@ public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
         .getRedirectionAction(ctx)
         .filter(WithLocationAction.class::isInstance)
         .map(action -> ((WithLocationAction) action).getLocation());
+  }
+
+  protected String getFormLoginUrl(WebContext context) {
+    return urlResolver.compute(AxelorFormClient.LOGIN_URL, context);
   }
 }

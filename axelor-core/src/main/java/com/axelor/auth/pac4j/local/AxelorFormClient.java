@@ -30,7 +30,7 @@ import org.pac4j.http.client.indirect.FormClient;
 
 public class AxelorFormClient extends FormClient {
 
-  public static final String LOGIN_URL = "/index.html";
+  public static final String LOGIN_URL = "/";
 
   private CredentialsHandler credentialsHandler;
 

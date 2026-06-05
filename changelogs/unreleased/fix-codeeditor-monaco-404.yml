@@ -1,0 +1,12 @@
+---
+title: Fix Monaco Editor when redirecting from /index.html
+type: fix
+description: |
+  When deployed with a context path (e.g. `/axelor-erp`), the CodeEditor widget
+  failed to load Monaco assets because `location.pathname` included `/index.html`
+  after the auth redirect, producing a wrong base URL for the Monaco loader.
+
+  Fixed by changing login URL from `/index.html` to `/`.
+  As a failsafe measure in case the `index.html` endpoint is still used,
+  the Monaco base URL computation now also strips `/index.html`
+  from `location.pathname` if present.

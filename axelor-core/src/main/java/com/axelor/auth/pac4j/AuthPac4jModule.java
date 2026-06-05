@@ -88,6 +88,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     addFilterChain("/css/**", ANON);
     addFilterChain("/js/**", ANON);
     addFilterChain("/assets/**", ANON);
+    addFilterChain("/", ANON);
     addFilterChain("/index.html", ANON);
     addFilterChain("/manifest.json", ANON);
     addFilterChain("/favicon.ico", ANON);
