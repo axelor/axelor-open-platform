@@ -27,8 +27,6 @@ import org.hibernate.persister.entity.EntityPersister;
 public class AuditListener
     implements PreDeleteEventListener, PreInsertEventListener, PreUpdateEventListener {
 
-  private static final long serialVersionUID = 1L;
-
   private static final String UPDATED_BY = "updatedBy";
   private static final String UPDATED_ON = "updatedOn";
   private static final String CREATED_BY = "createdBy";
