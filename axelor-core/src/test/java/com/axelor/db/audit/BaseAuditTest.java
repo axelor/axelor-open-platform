@@ -14,6 +14,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
+import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
@@ -108,5 +109,20 @@ public class BaseAuditTest extends JpaTest {
   @Transactional
   protected void deleteUser(User entity) {
     getEntityManager().remove(entity);
+  }
+
+  @Transactional
+  protected Contact createContact(String firstName, String lastName) {
+    var user = new Contact(firstName, lastName);
+    getEntityManager().persist(user);
+    return user;
+  }
+
+  @Transactional
+  protected Contact updateContact(Contact entity, String firstName, String lastName) {
+    entity.setFirstName(firstName);
+    entity.setLastName(lastName);
+    getEntityManager().persist(entity);
+    return entity;
   }
 }

@@ -24,13 +24,12 @@ import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
+/**
+ * Hibernate listener handling audit concerns: creation field stamping, sequence generation, change
+ * tracking and admin access control on insert, update and delete.
+ */
 public class AuditListener
     implements PreDeleteEventListener, PreInsertEventListener, PreUpdateEventListener {
-
-  private static final String UPDATED_BY = "updatedBy";
-  private static final String UPDATED_ON = "updatedOn";
-  private static final String CREATED_BY = "createdBy";
-  private static final String CREATED_ON = "createdOn";
 
   private static final String ADMIN_USER = "admin";
   private static final String ADMIN_GROUP = "admins";
@@ -141,6 +140,13 @@ public class AuditListener
     }
   }
 
+  /**
+   * Stamps the creation audit fields, assigns sequence values and records change tracking.
+   *
+   * <p>The {@code createdOn}/{@code createdBy} fields are stamped here (only when not already set),
+   * unlike their update counterparts: {@code PRE_INSERT} runs before Hibernate builds the {@code
+   * INSERT} statement, so the values are picked up even for {@code @DynamicInsert} entities.
+   */
   @Override
   public boolean onPreInsert(PreInsertEvent event) {
     final SessionImplementor session = event.getSession();
@@ -154,8 +160,8 @@ public class AuditListener
       final String[] names = persister.getPropertyNames();
       final Object[] state = event.getState();
 
-      setProperty(persister, entity, names, state, CREATED_ON, now, true);
-      setProperty(persister, entity, names, state, CREATED_BY, user, true);
+      setProperty(persister, entity, names, state, AuditUtils.CREATED_ON, now, true);
+      setProperty(persister, entity, names, state, AuditUtils.CREATED_BY, user, true);
     }
 
     // set sequence field if any
@@ -167,22 +173,18 @@ public class AuditListener
     return false;
   }
 
+  /**
+   * Handles update access control and change tracking.
+   *
+   * <p>The {@code updatedOn}/{@code updatedBy} audit fields are intentionally <strong>not</strong>
+   * stamped here. {@code PRE_UPDATE} fires after Hibernate has frozen the {@code UPDATE} column
+   * set, so writing them at this point would be silently dropped for {@code @DynamicUpdate}
+   * entities. They are stamped earlier, during dirty checking, by {@link AuditUpdateListener}.
+   */
   @Override
   public boolean onPreUpdate(PreUpdateEvent event) {
-    final SessionImplementor session = event.getSession();
-    final Object entity = event.getEntity();
-
-    if (entity instanceof AuditableModel && canUpdate(event)) {
-      final LocalDateTime now = LocalDateTime.now();
-      final User user = AuditUtils.currentUser(session);
-
-      final EntityPersister persister = event.getPersister();
-      final String[] names = persister.getPropertyNames();
-      final Object[] state = event.getState();
-
-      setProperty(persister, entity, names, state, UPDATED_ON, now);
-      setProperty(persister, entity, names, state, UPDATED_BY, user);
-    }
+    // Check if entity can be updated
+    canUpdate(event);
 
     // handle tracks
     auditTrail.onPreUpdate(event);
@@ -190,6 +192,12 @@ public class AuditListener
     return false;
   }
 
+  /**
+   * Enforces delete access control and records change tracking.
+   *
+   * @throws PersistenceException if the entity is not allowed to be deleted (e.g. the {@code admin}
+   *     user or {@code admins} group)
+   */
   @Override
   public boolean onPreDelete(PreDeleteEvent event) {
     final Object id = event.getId();

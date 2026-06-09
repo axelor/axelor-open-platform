@@ -29,6 +29,7 @@ public class AuditIntegrator implements Integrator {
     registry.appendListeners(EventType.PRE_INSERT, auditListener);
     registry.appendListeners(EventType.PRE_UPDATE, auditListener);
     registry.appendListeners(EventType.PRE_DELETE, auditListener);
+    registry.setListeners(EventType.FLUSH_ENTITY, new AuditUpdateListener());
 
     final JsonReferenceListener jsonListener = new JsonReferenceListener();
     registry.appendListeners(EventType.PRE_INSERT, jsonListener);

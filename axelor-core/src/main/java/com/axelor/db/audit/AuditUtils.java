@@ -12,6 +12,11 @@ import org.hibernate.engine.spi.SessionImplementor;
 
 final class AuditUtils {
 
+  static final String UPDATED_BY = "updatedBy";
+  static final String UPDATED_ON = "updatedOn";
+  static final String CREATED_BY = "createdBy";
+  static final String CREATED_ON = "createdOn";
+
   static User findUser(SessionImplementor session, Long id) {
     if (id == null) {
       return null;
