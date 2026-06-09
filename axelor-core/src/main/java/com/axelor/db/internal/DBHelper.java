@@ -11,6 +11,13 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.XMLUtils;
+import com.axelor.db.tenants.TenantConnectionProvider;
+import com.axelor.db.tenants.TenantModule;
+import com.axelor.db.tenants.TenantResolver;
+import com.axelor.inject.Beans;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.SharedCacheMode;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -25,6 +32,9 @@ import javax.xml.xpath.XPath;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -38,6 +48,10 @@ public class DBHelper {
 
   private static final int DEFAULT_BATCH_SIZE = 20;
   private static final int DEFAULT_FETCH_SIZE = 20;
+
+  // Ratio to reduce the maximum number of workers
+  private static final int WORKERS_RESERVE_RATIO_NUMERATOR = 3;
+  private static final int WORKERS_RESERVE_RATIO_DENOMINATOR = 4;
 
   private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
   private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
@@ -327,8 +341,12 @@ public class DBHelper {
   /**
    * Returns maximum number of workers.
    *
-   * <p>Return the minimum between the JDBC connection max pool size and the number of processors
-   * available to the Java virtual machine.
+   * <p>Calculates the number of workers based on the available pool size (maximum pool size minus
+   * active connections), clamped between 1 and the number of processors available to the Java
+   * virtual machine.
+   *
+   * <p>Furthermore, because of the point-in-time nature of the number of currently active
+   * connections, a reserve margin is applied.
    *
    * @return maximum number of workers
    */
@@ -336,7 +354,52 @@ public class DBHelper {
     final AppSettings settings = AppSettings.get();
     final int maxPoolSize =
         settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, 20);
-    int maxWorkers = Runtime.getRuntime().availableProcessors();
-    return Math.min(maxPoolSize, maxWorkers);
+    final int activeConnections = getActiveConnections();
+    final int availablePoolSize = maxPoolSize - activeConnections;
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+    // Use a reserve margin
+    final int targetWorkers =
+        availablePoolSize * WORKERS_RESERVE_RATIO_NUMERATOR / WORKERS_RESERVE_RATIO_DENOMINATOR;
+
+    return Math.clamp(targetWorkers, 1, availableProcessors);
+  }
+
+  /**
+   * Gets the number of currently active connections in the pool.
+   *
+   * <p>The return value is extremely transient and is a point-in-time measurement.
+   *
+   * @return number of active connections
+   */
+  private static int getActiveConnections() {
+    try {
+      EntityManagerFactory emf = Beans.get(EntityManagerFactory.class);
+      SessionFactoryImplementor sessionFactory = emf.unwrap(SessionFactoryImplementor.class);
+
+      if (TenantModule.isEnabled()) {
+        MultiTenantConnectionProvider<?> multiProvider =
+            sessionFactory.getServiceRegistry().getService(MultiTenantConnectionProvider.class);
+        if (multiProvider instanceof TenantConnectionProvider tenantProvider) {
+          String tenantId = TenantResolver.currentTenantIdentifier();
+          return tenantProvider.getActiveConnections(tenantId);
+        }
+      } else {
+        ConnectionProvider provider =
+            sessionFactory.getServiceRegistry().getService(ConnectionProvider.class);
+        if (provider.isUnwrappableAs(DataSource.class)
+            && provider.unwrap(DataSource.class) instanceof HikariDataSource hikariDs) {
+          HikariPoolMXBean pool = hikariDs.getHikariPoolMXBean();
+          if (pool != null) {
+            return pool.getActiveConnections();
+          }
+        }
+      }
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+    }
+
+    // Fallback if JPA or context is not yet initialized
+    return 0;
   }
 }

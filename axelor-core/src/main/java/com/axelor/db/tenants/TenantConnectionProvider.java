@@ -12,6 +12,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import java.time.Duration;
 import java.util.Objects;
 import javax.sql.DataSource;
@@ -92,6 +93,19 @@ public class TenantConnectionProvider
     Preconditions.checkState(config.getJdbcDriver() != null, "no jdbc driver specified.");
     Preconditions.checkState(config.getJdbcUrl() != null, "no jdbc url specified.");
     return config;
+  }
+
+  public int getActiveConnections(String tenantId) {
+    DataSource ds = selectDataSource(tenantId);
+
+    if (ds instanceof HikariDataSource hikariDs) {
+      HikariPoolMXBean pool = hikariDs.getHikariPoolMXBean();
+      if (pool != null) {
+        return pool.getActiveConnections();
+      }
+    }
+
+    return 0;
   }
 
   @Override
