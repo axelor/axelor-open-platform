@@ -119,9 +119,23 @@ public class AuditListener
       Object[] state,
       String name,
       Object value) {
+    setProperty(persister, entity, names, state, name, value, false);
+  }
+
+  private void setProperty(
+      EntityPersister persister,
+      Object entity,
+      String[] names,
+      Object[] state,
+      String name,
+      Object value,
+      boolean onlyIfAbsent) {
     if (value == null) return;
     for (int i = 0; i < names.length; i++) {
       if (names[i].equals(name)) {
+        if (onlyIfAbsent && state[i] != null) {
+          break;
+        }
         state[i] = value;
         persister.setValue(entity, i, value);
         break;
@@ -142,8 +156,8 @@ public class AuditListener
       final String[] names = persister.getPropertyNames();
       final Object[] state = event.getState();
 
-      setProperty(persister, entity, names, state, CREATED_ON, now);
-      setProperty(persister, entity, names, state, CREATED_BY, user);
+      setProperty(persister, entity, names, state, CREATED_ON, now, true);
+      setProperty(persister, entity, names, state, CREATED_BY, user, true);
     }
 
     // set sequence field if any
