@@ -58,6 +58,7 @@ public class DBManager {
     boolean demo = AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
     final String[] modules = System.getProperty("axelor.task.database.modules", "").split(",");
     final ModuleManager manager = Beans.get(ModuleManager.class);
+    manager.setLoadData(false);
     manager.update(demo, modules);
   }
 
