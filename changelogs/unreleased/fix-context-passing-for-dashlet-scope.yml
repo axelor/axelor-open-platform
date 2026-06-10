@@ -1,7 +1,0 @@
----
-title: Fix context passing for dashlet scope
-type: fix
-description: |
-  Form view context should be merged with action-view context of dashlet for domain action, relative view fetching and 
-  search of dashlet. For dashlet actions (such as toolbar/menubar actions), form view context should pass _parent and 
-  action-view context of dashlet will be passed in top level domain context.

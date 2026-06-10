@@ -1,9 +1,0 @@
----
-title: Fix onClick context data for line, area, scatter, radar, funnel, and gauge charts
-type: fix
-description: |
-  Line, area, scatter, radar, funnel, and gauge charts were not passing the
-  clicked record's data to onClick actions, so the action context was always
-  empty. Each chart type now correctly passes the original record as context
-  when clicked, consistent with bar and pie charts. The funnel chart type is
-  also added to the supported chart types documentation.

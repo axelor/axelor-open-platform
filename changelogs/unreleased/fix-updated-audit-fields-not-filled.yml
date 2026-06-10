@@ -1,7 +1,0 @@
----
-title: Fix `updatedOn`/`updatedBy` audit fields not being filled on update
-type: fix
-description: |
-  The `updatedOn` and `updatedBy` audit fields were not populated when updating records of entities
-  mapped with `@DynamicUpdate`, leaving them empty in the database. They are now correctly filled on
-  every update.

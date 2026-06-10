@@ -1,6 +1,0 @@
----
-title: Load data init only on non-installed modules
-type: fix
-description: |
-  `database update` re-imported the `data-init` files of every installed module on each run. Data init (and demo data) 
-  are now loaded only for modules that are not yet installed.

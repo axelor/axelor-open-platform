@@ -1,6 +1,0 @@
----
-title: Allow CLI `database update` to load all modules, not only installed ones
-type: fix
-description: |
-  `database update` (without -m) previously updated only already-installed modules, silently skipping newly added ones. 
-  Now, all modules are loaded regardless of their installation status. 

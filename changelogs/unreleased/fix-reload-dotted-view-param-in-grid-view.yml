@@ -1,7 +1,0 @@
----
-title: Fix reload-dotted view param support in grid view
-type: fix
-description: |
-  Grid view now bypasses the data cache when navigating back from a form view
-  with the reload-dotted action param set, ensuring the grid data is refreshed
-  on the switch from form to grid even when no field has changed.

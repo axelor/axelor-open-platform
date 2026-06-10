@@ -1,3 +1,164 @@
+## 8.2.1 (2026-06-10)
+
+#### Feature
+
+* Resolve current user by ID instead of code
+
+  <details>
+  
+  The current user is now resolved by its User ID (primary key) rather than its
+  user code. Fetching by primary key is more efficient, as it can be served directly
+  from the L2 entity cache and avoids the query cache.
+  
+  To support this, the Shiro subject principals now carry the User ID as a second
+  principal, alongside the user code which remains the primary principal. All
+  current-user lookups read this ID and load the user by primary key.
+  
+  Migration: backward compatibility for sessions without a User ID principal has been
+  removed. Any pre-existing user session is rejected and the user must log in again,
+  after which the session carries the required ID principal. This only affects
+  deployments with sessions that persist across server restarts.
+  
+  </details>
+
+#### Fix
+
+* Fix onClick context data for line, area, scatter, radar, funnel, and gauge charts
+
+  <details>
+  
+  Line, area, scatter, radar, funnel, and gauge charts were not passing the
+  clicked record's data to onClick actions, so the action context was always
+  empty. Each chart type now correctly passes the original record as context
+  when clicked, consistent with bar and pie charts. The funnel chart type is
+  also added to the supported chart types documentation.
+  
+  </details>
+
+* Fix reload-dotted view param support in grid view
+
+  <details>
+  
+  Grid view now bypasses the data cache when navigating back from a form view
+  with the reload-dotted action param set, ensuring the grid data is refreshed
+  on the switch from form to grid even when no field has changed.
+  
+  </details>
+
+* Fix silent failure when removing an entity referenced through a bidirectional @OneToOne
+
+  <details>
+  
+  Removing an entity could silently succeed without issuing any `DELETE` SQL when the target entity was on the
+  inverse side of a bidirectional `@OneToOne` whose owning side declared `cascade = {PERSIST, MERGE}`.
+  
+  Two Hibernate behaviors combined to cause the issue :
+  
+  - The inverse `@OneToOne` is eagerly loaded despite `FetchType.LAZY` (Hibernate cannot build a proxy
+    without a foreign-key column), so `EntityManager#find` pulls the owning-side entity into the
+    persistence context.
+  - During flush, the owning-side entity cascades a persist event back onto the deleted target via
+    `cascade = PERSIST`. Per JPA spec, persisting a removed entity returns it to the managed state,
+    so it cancels the deletion before any SQL is emitted.
+  
+  `JpaRepository#remove` now detaches the loaded inverse `@OneToOne` value when its back-reference is
+  required (and therefore cannot be nulled) before delegating to `JPA.remove`, breaking the cascade
+  graph that resurrected the entity. The actual `DELETE` reaches the database, and any foreign-key
+  constraint is enforced normally. When the back-reference is optional, it is nulled as before so the
+  referencing entity is preserved.
+  
+  </details>
+
+* Preserve existing `createdOn`/`createdBy` values on insert
+
+  <details>
+  
+  On insert, `AuditListener` always overwrote the `createdOn` and `createdBy` fields. These fields are now
+  populated only when they are not already set, preserving any values explicitly provided on the entity. This restores 
+  the behavior from before v8, prior to the migration from a Hibernate interceptor to an event listener.
+  
+  </details>
+
+* Fix Caffeine L2 cache expiration configuration
+
+  <details>
+  
+  In `application.conf` Caffeine L2 cache configuration, durations without a unit are interpreted
+  as milliseconds. The intended 1 hour expiration was 3.6 seconds instead.
+  
+  Expiration is now set to 10 minutes: `policy.eager-expiration.after-write = 10m`
+  
+  Removed `default-update-timestamps-region` expiration as per Hibernate recommendation:
+  https://docs.hibernate.org/stable/orm/userguide/html_single/#caching-query-region
+  
+  Added dedicated regions for frequently-read, rarely-changed User/Group/Permission/Role,
+  with access-based expiration (`after-access = 24h`) so actively-used entries stay cached
+  while idle ones are evicted.
+  
+  `Role` is now `cacheable="true"`, consistent with User/Group/Permission.
+  
+  </details>
+
+* Fix `updatedOn`/`updatedBy` audit fields not being filled on update
+
+  <details>
+  
+  The `updatedOn` and `updatedBy` audit fields were not populated when updating records of entities
+  mapped with `@DynamicUpdate`, leaving them empty in the database. They are now correctly filled on
+  every update.
+  
+  </details>
+
+* Allow CLI `database update` to load all modules, not only installed ones
+
+  <details>
+  
+  `database update` (without -m) previously updated only already-installed modules, silently skipping newly added ones. 
+  Now, all modules are loaded regardless of their installation status.
+  
+  </details>
+
+* Fix phone widget paste truncating last digit when country prefix is set
+
+  <details>
+  
+  When a country was pre-filled on a phone field (e.g. France, +33), pasting a
+  national-format number such as 0608691275 caused the last digit to be dropped.
+  The trunk prefix (leading 0) was counted against the country's digit mask, leaving
+  only 9 of the 10 significant digits.
+  
+  Paste events are now intercepted and the pasted text is parsed with libphonenumber-js
+  in the context of the selected country. If a valid number is recognized, it is
+  converted to E.164 format before being handed to the input, bypassing the mask
+  conflict. Pasting a full international number for a different country (e.g.
+  +447700900123 into a French field) also correctly switches the country flag.
+  
+  </details>
+
+* Load data init only on non-installed modules
+
+  <details>
+  
+  `database update` re-imported the `data-init` files of every installed module on each run. Data init (and demo data) 
+  are now loaded only for modules that are not yet installed.
+  
+  </details>
+
+* Fix broken drag and drop in dashboards
+* Fix context passing for dashlet scope
+
+  <details>
+  
+  Form view context should be merged with action-view context of dashlet for domain action, relative view fetching and 
+  search of dashlet. For dashlet actions (such as toolbar/menubar actions), form view context should pass _parent and 
+  action-view context of dashlet will be passed in top level domain context.
+  
+  </details>
+
+#### Security
+
+* Restrict nested references on save
+
 ## 8.2.0 (2026-05-20)
 
 #### Feature

@@ -1,8 +1,0 @@
----
-title: Preserve existing `createdOn`/`createdBy` values on insert
-type: fix
-description: |
-  On insert, `AuditListener` always overwrote the `createdOn` and `createdBy` fields. These fields are now
-  populated only when they are not already set, preserving any values explicitly provided on the entity. This restores 
-  the behavior from before v8, prior to the migration from a Hibernate interceptor to an event listener.
-  
