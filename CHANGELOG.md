@@ -1,3 +1,30 @@
+## 7.4.12 (2026-06-10)
+
+#### Fix
+
+* Fix Caffeine L2 cache expiration configuration
+
+  <details>
+  
+  In `application.conf` Caffeine L2 cache configuration, durations without a unit are interpreted
+  as milliseconds. The intended 1 hour expiration was 3.6 seconds instead.
+  
+  Expiration is now set to 10 minutes: `policy.eager-expiration.after-write = 10m`
+  
+  Removed `default-update-timestamps-region` expiration as per Hibernate recommendation:
+  https://docs.hibernate.org/stable/orm/userguide/html_single/#caching-query-region
+  
+  Added dedicated regions for frequently-read, rarely-changed User/Group/Permission/Role,
+  with access-based expiration (`after-access = 24h`) so actively-used entries stay cached
+  while idle ones are evicted.
+  
+  `Role` is now `cacheable="true"`, consistent with User/Group/Permission.
+  
+  </details>
+
+* Fix broken drag and drop in dashboards
+* Move to perform early
+
 ## 7.4.11 (2026-05-20)
 
 #### Change
