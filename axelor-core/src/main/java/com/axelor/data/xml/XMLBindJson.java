@@ -75,9 +75,6 @@ public class XMLBindJson extends XMLBind {
         if (field.targetJsonModel() != null) {
           jsonModel = field.targetJsonModel();
           domain = "self.jsonModel = '%s'".formatted(jsonModel);
-          if (StringUtils.notBlank(metaJsonField.getDomain())) {
-            domain = "(%s) AND (%s)".formatted(domain, metaJsonField.getDomain());
-          }
         }
       } else if (StringUtils.notBlank(field.targetModel())) {
         setTypeName(field.targetModel());

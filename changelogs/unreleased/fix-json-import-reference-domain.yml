@@ -1,0 +1,7 @@
+---
+title: Do not apply field domain when searching JSON relational references on import
+type: fix
+description: |
+  When importing data (CSV/XML), searching for an existing custom (JSON) record to
+  reference is now scoped only by `self.jsonModel`, no longer by the JSON field's
+  `domain`. The field domain should be a UI selectability constraint only.
