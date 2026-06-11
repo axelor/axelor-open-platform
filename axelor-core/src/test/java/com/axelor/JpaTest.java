@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -68,5 +69,11 @@ public abstract class JpaTest extends JpaSupport {
       users.save(user);
     }
     login(username, password);
+  }
+
+  /** Makes sure any user is logged out to prevent leak into other test classes */
+  @AfterAll
+  static void failSafeLogout() {
+    TestingHelpers.logout();
   }
 }

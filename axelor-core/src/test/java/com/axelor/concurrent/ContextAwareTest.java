@@ -57,63 +57,65 @@ public class ContextAwareTest extends JpaTest {
     // Log as admin user
     login("admin", "admin1234");
 
-    assertEquals("admin", AuthUtils.getUser().getCode());
+    try {
 
-    // Check is admin is also the user in threads
+      assertEquals("admin", AuthUtils.getUser().getCode());
 
-    Runnable runnableAdmin =
-        () -> {
-          User user = AuthUtils.getUser();
-          assertEquals(
-              "admin",
-              user.getCode(),
-              "AuthUtils.getUser() doesn't return admin user but " + user.getCode());
-        };
+      // Check is admin is also the user in threads
 
-    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-      executorService.submit(ContextAware.of().build(runnableAdmin)).get();
+      Runnable runnableAdmin =
+          () -> {
+            User user = AuthUtils.getUser();
+            assertEquals(
+                "admin",
+                user.getCode(),
+                "AuthUtils.getUser() doesn't return admin user but " + user.getCode());
+          };
+
+      try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+        executorService.submit(ContextAware.of().build(runnableAdmin)).get();
+      }
+
+      try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+        assertEquals(
+            "admin",
+            executorService
+                .submit(ContextAware.of().build(() -> AuthUtils.getUser()))
+                .get()
+                .getCode());
+      }
+
+      // Run thread as demo user
+
+      Runnable runnableDemo =
+          () -> {
+            User user = AuthUtils.getUser();
+            assertEquals(
+                "demo",
+                user.getCode(),
+                "AuthUtils.getUser() doesn't return demo user but " + user.getCode());
+          };
+
+      try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+        executorService
+            .submit(ContextAware.of().withUser(AuthUtils.getUser("demo")).build(runnableDemo))
+            .get();
+      }
+
+      try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+        assertEquals(
+            "demo",
+            executorService
+                .submit(
+                    ContextAware.of()
+                        .withUser(AuthUtils.getUser("demo"))
+                        .build(() -> AuthUtils.getUser()))
+                .get()
+                .getCode());
+      }
+    } finally {
+      TestingHelpers.logout();
     }
-
-    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-      assertEquals(
-          "admin",
-          executorService
-              .submit(ContextAware.of().build(() -> AuthUtils.getUser()))
-              .get()
-              .getCode());
-    }
-
-    // Run thread as demo user
-
-    Runnable runnableDemo =
-        () -> {
-          User user = AuthUtils.getUser();
-          assertEquals(
-              "demo",
-              user.getCode(),
-              "AuthUtils.getUser() doesn't return demo user but " + user.getCode());
-        };
-
-    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-      executorService
-          .submit(ContextAware.of().withUser(AuthUtils.getUser("demo")).build(runnableDemo))
-          .get();
-    }
-
-    try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-      assertEquals(
-          "demo",
-          executorService
-              .submit(
-                  ContextAware.of()
-                      .withUser(AuthUtils.getUser("demo"))
-                      .build(() -> AuthUtils.getUser()))
-              .get()
-              .getCode());
-    }
-
-    // log out admin user
-    TestingHelpers.logout();
 
     // Check on recycled threads, all will be executed on same thread
     try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
@@ -134,34 +136,38 @@ public class ContextAwareTest extends JpaTest {
       // re log user
       login("admin", "admin1234");
 
-      Runnable myRunnable =
-          ContextAware.of()
-              .withUser(AuthUtils.getUser("demo"))
-              .build(
-                  () -> {
-                    User user = AuthUtils.getUser();
-                    assertEquals(
-                        "demo",
-                        user.getCode(),
-                        "AuthUtils.getUser() doesn't return demo user but " + user.getCode());
-                  });
+      try {
+        Runnable myRunnable =
+            ContextAware.of()
+                .withUser(AuthUtils.getUser("demo"))
+                .build(
+                    () -> {
+                      User user = AuthUtils.getUser();
+                      assertEquals(
+                          "demo",
+                          user.getCode(),
+                          "AuthUtils.getUser() doesn't return demo user but " + user.getCode());
+                    });
 
-      // run as demo
-      executorService.submit(myRunnable).get();
+        // run as demo
+        executorService.submit(myRunnable).get();
 
-      // run as admin
-      Runnable onCurrentAdminUser =
-          ContextAware.of()
-              .build(
-                  () -> {
-                    User user = AuthUtils.getUser();
-                    assertEquals(
-                        "admin",
-                        user.getCode(),
-                        "AuthUtils.getUser() should be admin but " + user.getCode());
-                  });
+        // run as admin
+        Runnable onCurrentAdminUser =
+            ContextAware.of()
+                .build(
+                    () -> {
+                      User user = AuthUtils.getUser();
+                      assertEquals(
+                          "admin",
+                          user.getCode(),
+                          "AuthUtils.getUser() should be admin but " + user.getCode());
+                    });
 
-      executorService.submit(onCurrentAdminUser).get();
+        executorService.submit(onCurrentAdminUser).get();
+      } finally {
+        TestingHelpers.logout();
+      }
     }
   }
 
