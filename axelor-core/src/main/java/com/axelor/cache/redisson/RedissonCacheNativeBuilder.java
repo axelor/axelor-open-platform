@@ -6,6 +6,7 @@ package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.CacheLoader;
 import com.axelor.cache.event.RemovalListener;
 import org.redisson.api.RMapCacheNative;
 import org.redisson.api.options.MapOptions;
@@ -39,6 +40,12 @@ public class RedissonCacheNativeBuilder<K, V>
   @Override
   protected RedissonCacheNative<K, V> newRedissonCache(RMapCacheNative<K, V> cache) {
     return new RedissonCacheNative<>(cache);
+  }
+
+  @Override
+  protected AbstractRedissonCache<K, V, RMapCacheNative<K, V>> newRedissonCache(
+      RMapCacheNative<K, V> cache, CacheLoader<K, V> loader) {
+    return new RedissonLoadingCacheNative<>(cache, loader);
   }
 
   /**

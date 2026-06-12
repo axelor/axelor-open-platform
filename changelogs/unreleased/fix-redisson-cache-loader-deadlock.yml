@@ -1,0 +1,13 @@
+---
+title: Fix potential connection pool deadlock with Redisson cache loader
+type: fix
+description: |
+  Redisson caches no longer rely on Redisson MapLoader for read-through loading.
+  With MapLoader, the loader runs on Redisson threads while the caller blocks on
+  `RedissonMap.get` → `CompletableFuture.get` without timeout. A loader that
+  accesses the database consumes an extra connection, which could deadlock when
+  the connection pool is exhausted, for example by ParallelTransactionExecutor
+  already consuming all connections.
+
+  The cache loader is now relying on `RMap.computeIfAbsent`, which executes
+  on the caller thread.

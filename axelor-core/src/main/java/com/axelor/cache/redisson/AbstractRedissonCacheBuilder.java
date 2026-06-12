@@ -11,7 +11,6 @@ import com.axelor.cache.TenantAwareCache;
 import com.axelor.cache.TenantAwareDistributedCache;
 import java.util.function.Function;
 import org.redisson.api.RMap;
-import org.redisson.api.map.MapLoader;
 import org.redisson.api.options.ExMapOptions;
 
 /*
@@ -53,10 +52,10 @@ public abstract class AbstractRedissonCacheBuilder<
   @Override
   public <K1 extends K, V1 extends V> AxelorCache<K1, V1> buildCache(
       String name, CacheLoader<? super K1, V1> loader) {
-    var cache = newMapCache(name, loader);
+    var cache = newMapCache(name);
 
     @SuppressWarnings("unchecked")
-    var redissonCache = (AxelorCache<K1, V1>) newConfiguredCache(cache);
+    var redissonCache = (AxelorCache<K1, V1>) newConfiguredCache(cache, (CacheLoader<K, V>) loader);
 
     return redissonCache;
   }
@@ -77,35 +76,21 @@ public abstract class AbstractRedissonCacheBuilder<
 
   protected abstract AbstractRedissonCache<K, V, M> newRedissonCache(M cache);
 
+  protected abstract AbstractRedissonCache<K, V, M> newRedissonCache(
+      M cache, CacheLoader<K, V> loader);
+
   private M newMapCache(String name) {
     return newMapCache(newPrefixedOptions(name));
   }
 
-  private <K1 extends K, V1 extends V> MapLoader<K, V> newMapLoader(
-      CacheLoader<? super K1, V1> loader) {
-    return new MapLoader<>() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public V load(K key) {
-        return loader.load((K1) key);
-      }
-
-      @Override
-      public Iterable<K> loadAllKeys() {
-        throw new UnsupportedOperationException();
-      }
-    };
-  }
-
-  private <K1 extends K, V1 extends V> M newMapCache(
-      String name, CacheLoader<? super K1, V1> loader) {
-    var options = newPrefixedOptions(name);
-    options.loader(newMapLoader(loader));
-    return newMapCache(options);
-  }
-
   private AbstractRedissonCache<K, V, M> newConfiguredCache(M cache) {
     var redissonCache = newRedissonCache(cache);
+    configureCache(redissonCache);
+    return redissonCache;
+  }
+
+  private AbstractRedissonCache<K, V, M> newConfiguredCache(M cache, CacheLoader<K, V> loader) {
+    var redissonCache = newRedissonCache(cache, loader);
     configureCache(redissonCache);
     return redissonCache;
   }
