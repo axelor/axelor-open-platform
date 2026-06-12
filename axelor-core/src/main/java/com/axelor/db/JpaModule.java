@@ -7,6 +7,7 @@ package com.axelor.db;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.cache.CacheConfig;
+import com.axelor.cache.redisson.RedissonCacheDefaults;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -241,6 +242,7 @@ public class JpaModule extends AbstractModule {
     } else {
       properties.put(CacheSettings.CACHE_REGION_FACTORY, cacheRegionFactory);
       log.info("Cache region factory: {}", cacheRegionFactory);
+      RedissonCacheDefaults.applyHibernateRegionDefaults(cacheRegionFactory, properties);
     }
 
     if (StringUtils.notBlank(cacheRegionPrefix)) {

@@ -461,6 +461,10 @@ hibernate.cache.redisson.entity.expiration.time_to_live = 600000
 hibernate.cache.redisson.entity.expiration.max_idle_time = 300000
 ----
 
+When a Redisson-based region factory is used (`RedissonRegionFactory`), default cache region settings equivalent to the Caffeine defaults above are applied.
+With the native eviction version (`RedissonRegionNativeFactory`), only time-to-live settings are supported, so it is applied in place of the max idle time.
+Any `hibernate.cache.redisson.*` settings defined in the application configuration take precedence over these defaults.
+
 More details on https://redisson.org/docs/cache-api-implementations/#hibernate-cache[Redisson Hibernate Cache documentation].
 
 [NOTE]

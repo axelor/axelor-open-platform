@@ -1,0 +1,13 @@
+---
+title: Apply default Hibernate second-level cache region settings with Redisson
+type: feature
+description: |
+  When using a Redisson-based Hibernate cache region factory, default cache
+  region settings equivalent to the built-in Caffeine defaults are now applied:
+  max entries and time-to-live for the entity/collection/naturalid and query
+  regions, plus dedicated settings for the frequently-read User, Group, Role,
+  and Permission regions. With the native region factory, only time-to-live
+  settings are applied, as it doesn't support max entries and max idle time.
+
+  Any `hibernate.cache.redisson.*` settings defined in the application
+  configuration take precedence over these defaults.
