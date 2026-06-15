@@ -196,7 +196,6 @@ public class ActionResponse extends Response {
     setError(message, null);
   }
 
-
   /**
    * Set an error message.
    *
@@ -208,7 +207,6 @@ public class ActionResponse extends Response {
   public void setError(String message, String title) {
     setError(message, title, null, null);
   }
-
 
   /**
    * Set an error message.
@@ -224,7 +222,6 @@ public class ActionResponse extends Response {
   public void setError(String message, String title, String confirmBtnTitle, String action) {
     setMessage(Error.KEY, message, title, confirmBtnTitle, null, action);
   }
-
 
   /**
    * Set a message on the client screen
@@ -261,7 +258,6 @@ public class ActionResponse extends Response {
     set(type, map);
   }
 
-
   /**
    * Set the comma separated list of pending actions.
    *
@@ -273,7 +269,6 @@ public class ActionResponse extends Response {
     set("pending", actions);
   }
 
-
   /**
    * Set the file path relative to the data export directory.
    *
@@ -284,7 +279,6 @@ public class ActionResponse extends Response {
   public void setExportFile(String path) {
     set("exportFile", path);
   }
-
 
   /**
    * Set record values.
@@ -334,7 +328,6 @@ public class ActionResponse extends Response {
     values.put(fieldName, permittedValue);
   }
 
-
   /**
    * Turns given bean into map of id, $version, and namecolumn if user has no read permission.
    *
@@ -365,7 +358,6 @@ public class ActionResponse extends Response {
     return map;
   }
 
-
   /**
    * Inform the client to open the given view.
    *
@@ -374,7 +366,6 @@ public class ActionResponse extends Response {
   public void setView(Map<String, Object> view) {
     set("view", view);
   }
-
 
   /**
    * Inform the client to open a view for the given model.
@@ -393,7 +384,6 @@ public class ActionResponse extends Response {
     setView(view);
   }
 
-
   /**
    * Send an arbitrary signal to the client view with the specified data.
    *
@@ -405,7 +395,6 @@ public class ActionResponse extends Response {
     set("signal-data", data);
   }
 
-
   /**
    * Set field attributes.
    *
@@ -416,7 +405,6 @@ public class ActionResponse extends Response {
   public void setAttrs(Map<String, Map<String, Object>> attrs) {
     set("attrs", attrs);
   }
-
 
   /**
    * Set an attribute of a field.
@@ -449,7 +437,6 @@ public class ActionResponse extends Response {
     setAttrs(attrs);
   }
 
-
   /**
    * Set the <code>required</code> attribute for the given field.
    *
@@ -459,7 +446,6 @@ public class ActionResponse extends Response {
   public void setRequired(String fieldName, boolean required) {
     setAttr(fieldName, "required", required);
   }
-
 
   /**
    * Set the <code>readonly</code> attribute for the given field.
@@ -471,7 +457,6 @@ public class ActionResponse extends Response {
     setAttr(fieldName, "readonly", readonly);
   }
 
-
   /**
    * Set the <code>hidden</code> attribute for the given field.
    *
@@ -482,7 +467,6 @@ public class ActionResponse extends Response {
     setAttr(fieldName, "hidden", hidden);
   }
 
-
   /**
    * Set the <code>color</code> attribute for the given field.
    *
@@ -492,5 +476,4 @@ public class ActionResponse extends Response {
   public void setColor(String fieldName, String color) {
     setAttr(fieldName, "color", color);
   }
-
 }

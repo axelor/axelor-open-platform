@@ -64,7 +64,6 @@ public class ContextHandler<T> {
   private static final String FIELD_VERSION = "version";
   private static final String FIELD_SELECTED = "selected";
 
-
   private static final Logger log = LoggerFactory.getLogger(ContextHandler.class);
 
   private final PropertyChangeSupport changeListeners;
@@ -90,7 +89,6 @@ public class ContextHandler<T> {
     this.beanMapper = Mapper.of(beanClass);
     this.changeListeners = new PropertyChangeSupport(this);
   }
-
 
   public void addChangeListener(PropertyChangeListener listener) {
     changeListeners.addPropertyChangeListener(listener);
