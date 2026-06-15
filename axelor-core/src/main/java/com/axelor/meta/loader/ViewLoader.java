@@ -15,7 +15,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
-import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
@@ -224,12 +223,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     getList(all.getSelections()).forEach(selection -> importSelection(selection, module));
 
-    getList(all.getActions())
-        .forEach(
-            action -> {
-              importAction(action, module);
-              MetaStore.invalidate(action.getName());
-            });
+    getList(all.getActions()).forEach(action -> importAction(action, module));
 
     getList(all.getMenus()).forEach(item -> importMenu(item, module));
 
