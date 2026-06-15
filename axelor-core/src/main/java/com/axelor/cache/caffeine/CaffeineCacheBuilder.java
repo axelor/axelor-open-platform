@@ -55,7 +55,7 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V, CaffeineCache
     @SuppressWarnings("unchecked")
     var cache = (LoadingCache<K1, V1>) caffeine.build(loader::load);
 
-    return new CaffeineLoadingCache<>(cache, loader);
+    return new CaffeineLoadingCache<>(cache);
   }
 
   protected boolean isWeakKeys() {

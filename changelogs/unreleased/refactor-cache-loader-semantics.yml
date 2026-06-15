@@ -1,0 +1,14 @@
+---
+title: Use cache loader only for read-through access
+type: change
+description: |
+  The cache loader used to be forced on `get(key, mappingFunction)` and the
+  `asMap()` view as well, so that loading behaved consistently with the Redisson
+  MapLoader. Now that the Redisson MapLoader is no longer used, that consistency
+  layer is unnecessary and has been removed.
+
+  The loader is therefore consulted only on read-through access through
+  `get(key)` and `getAll(keys)`. The `get(key, mappingFunction)` method and the
+  `asMap()` view follow standard Caffeine/Redisson semantics and no longer invoke
+  the loader: the mapping function is used as-is and the map view does not trigger
+  loading.

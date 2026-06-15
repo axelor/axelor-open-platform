@@ -5,12 +5,10 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.cache.CacheLoader;
-import com.google.common.collect.ForwardingConcurrentMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import org.redisson.api.RMapCacheNative;
 
@@ -25,42 +23,11 @@ import org.redisson.api.RMapCacheNative;
  */
 public class RedissonLoadingCacheNative<K, V> extends RedissonCacheNative<K, V> {
 
-  protected final ConcurrentMap<K, V> map;
   private final CacheLoader<K, V> loader;
 
   public RedissonLoadingCacheNative(RMapCacheNative<K, V> cache, CacheLoader<K, V> loader) {
     super(cache);
     this.loader = loader;
-
-    // Map view that uses cache loader.
-    this.map =
-        new ForwardingConcurrentMap<>() {
-
-          @Override
-          protected ConcurrentMap<K, V> delegate() {
-            return cache;
-          }
-
-          @Override
-          @SuppressWarnings("unchecked")
-          public V get(Object key) {
-            try {
-              return RedissonLoadingCacheNative.this.get((K) key);
-            } catch (ClassCastException e) {
-              return super.get(key);
-            }
-          }
-
-          @Override
-          public boolean containsKey(Object key) {
-            return get(key) != null;
-          }
-
-          @Override
-          public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-            return RedissonLoadingCacheNative.this.get(key, mappingFunction);
-          }
-        };
   }
 
   @Override
@@ -81,16 +48,6 @@ public class RedissonLoadingCacheNative<K, V> extends RedissonCacheNative<K, V> 
 
   @Override
   public V get(K key, Function<? super K, ? extends V> mappingFunction) {
-    return cache.computeIfAbsent(
-        key,
-        k -> {
-          var value = loader.load(k);
-          return value != null ? value : mappingFunction.apply(k);
-        });
-  }
-
-  @Override
-  public ConcurrentMap<K, V> asMap() {
-    return map;
+    return cache.computeIfAbsent(key, mappingFunction);
   }
 }

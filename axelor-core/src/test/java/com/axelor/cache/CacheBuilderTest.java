@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.caffeine.CaffeineCache;
@@ -171,32 +170,26 @@ class CacheBuilderTest {
           assertEquals("loaded-key", cache.get("key"), "Should reload for invalidated key");
 
           assertEquals(
-              "loaded-key-function",
+              "computed-key-function",
               cache.get("key-function", k -> "computed-" + k),
-              "Should not call mapping function if loader returns value");
+              "Should call mapping function instead of loader");
 
           assertEquals(
               "computed-key-function-null",
               cache.get("key-function-null", k -> "computed-" + k),
-              "Should call mapping function if loader returns null");
+              "Should call mapping function");
 
           var map = cache.asMap();
 
-          assertTrue(map.containsKey("contains-key-map"), "Should call loader returning value");
           assertFalse(
-              map.containsKey("contains-key-map-null"), "Should call loader returning null");
+              map.containsKey("contains-key-map"), "Should not call loader when using map view");
 
-          assertEquals("loaded-key-map", map.get("key-map"), "Should call loader for map get");
+          assertNull(map.get("key-map"), "Should not call loader for map get");
 
           assertEquals(
-              "loaded-key-function-map",
+              "computed-key-function-map",
               map.computeIfAbsent("key-function-map", k -> "computed-" + k),
-              "Should not call mapping function if loader returns value");
-
-          assertEquals(
-              "computed-key-function-map-null",
-              map.computeIfAbsent("key-function-map-null", k -> "computed-" + k),
-              "Should call mapping function if loader returns null");
+              "Should call mapping function");
 
           @SuppressWarnings("unlikely-arg-type")
           var wrongKeyTypeResult = map.get(8);
