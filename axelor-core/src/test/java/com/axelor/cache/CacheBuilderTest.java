@@ -96,6 +96,26 @@ class CacheBuilderTest {
     doExpireAfterAccess(cacheType::getCacheBuilder);
   }
 
+  // redisson-native with expireAfterWrite requires HPEXPIRE command introduced in Redis 7.4
+  @ParameterizedTest(name = "{0} - Expire After Write Loader Operations")
+  @EnumSource(value = CacheType.class)
+  void testExpireAfterWriteLoaderOperations(CacheType cacheType) {
+    assumeTrue(
+        hasHPExpire || cacheType != CacheType.REDISSON_NATIVE,
+        "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
+    doExpireAfterWriteLoader(cacheType::getCacheBuilder);
+  }
+
+  // redisson-native does not support expireAfterAccess (it behaves like expireAfterWrite)
+  @ParameterizedTest(name = "{0} - Expire After Access Loader Operations")
+  @EnumSource(
+      value = CacheType.class,
+      mode = EnumSource.Mode.EXCLUDE,
+      names = {"REDISSON_NATIVE"})
+  void testExpireAfterAccessLoaderOperations(CacheType cacheType) {
+    doExpireAfterAccessLoader(cacheType::getCacheBuilder);
+  }
+
   @ParameterizedTest(name = "{0} - Map Operations")
   @EnumSource(CacheType.class)
   void testMapOperations(CacheType cacheType) {
@@ -257,6 +277,72 @@ class CacheBuilderTest {
               .pollDelay(TTL)
               .untilAsserted(
                   () -> assertNull(cache.get("key1"), "Should expire after last access timeout"));
+        });
+  }
+
+  private void doExpireAfterWriteLoader(
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory
+            .apply("test-write-expiry-loader")
+            .expireAfterWrite(TTL)
+            .build(key -> "loaded-" + key),
+        cache -> {
+          // Read-through load should store the value with the configured TTL.
+          assertEquals("loaded-key1", cache.get("key1"), "Should load value on read-through");
+
+          // Probe storage via asMap() to avoid the loader reloading on expiry.
+          await()
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
+              .untilAsserted(
+                  () ->
+                      assertEquals(
+                          "loaded-key1",
+                          cache.asMap().get("key1"),
+                          "Loaded entry should not expire before write timeout"));
+
+          await()
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
+              .untilAsserted(
+                  () ->
+                      assertNull(
+                          cache.asMap().get("key1"),
+                          "Loaded entry should expire after write timeout"));
+        });
+  }
+
+  private void doExpireAfterAccessLoader(
+      Function<String, CacheBuilder<String, Object, ?>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory
+            .apply("test-access-expiry-loader")
+            .expireAfterAccess(TTL)
+            .build(key -> "loaded-" + key),
+        cache -> {
+          assertEquals("loaded-key1", cache.get("key1"), "Should load value on read-through");
+
+          // Repeated read-through access should refresh the last access timeout.
+          await()
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
+              .untilAsserted(
+                  () ->
+                      assertEquals(
+                          "loaded-key1",
+                          cache.get("key1"),
+                          "Read-through access should refresh last access timeout"));
+
+          // Probe storage via asMap() to avoid the loader reloading on expiry.
+          await()
+              .atMost(TTL.multipliedBy(2))
+              .pollDelay(TTL)
+              .untilAsserted(
+                  () ->
+                      assertNull(
+                          cache.asMap().get("key1"),
+                          "Loaded entry should expire after last access timeout"));
         });
   }
 

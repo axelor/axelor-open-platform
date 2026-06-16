@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import org.redisson.api.RMapCache;
 
 /**
@@ -32,7 +31,7 @@ public class RedissonLoadingCache<K, V> extends RedissonCache<K, V> {
 
   @Override
   public V get(K key) {
-    return cache.computeIfAbsent(key, loader::load);
+    return get(key, loader::load);
   }
 
   @Override
@@ -44,10 +43,5 @@ public class RedissonLoadingCache<K, V> extends RedissonCache<K, V> {
     }
 
     return Collections.unmodifiableMap(result);
-  }
-
-  @Override
-  public V get(K key, Function<? super K, ? extends V> mappingFunction) {
-    return cache.computeIfAbsent(key, mappingFunction);
   }
 }

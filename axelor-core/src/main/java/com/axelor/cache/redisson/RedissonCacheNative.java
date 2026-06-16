@@ -6,6 +6,7 @@ package com.axelor.cache.redisson;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Function;
 import org.redisson.api.RMapCacheNative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,15 @@ public class RedissonCacheNative<K, V> extends AbstractRedissonCache<K, V, RMapC
       LOGGER.warn("RMapCacheNative does not support maximumSize, using 1 hour TTL as fallback");
       setExpireAfterWrite(Duration.ofHours(1));
     }
+  }
+
+  @Override
+  public V get(K key, Function<? super K, ? extends V> mappingFunction) {
+    if (ttl != null && !ttl.isZero()) {
+      return cache.computeIfAbsent(key, ttl, mappingFunction);
+    }
+
+    return cache.computeIfAbsent(key, mappingFunction);
   }
 
   @Override

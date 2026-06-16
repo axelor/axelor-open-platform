@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import org.redisson.RedissonMapCache;
 import org.redisson.api.RMapCache;
 import org.redisson.api.map.event.MapEntryListener;
 
@@ -47,6 +50,57 @@ public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K
   @Override
   public void setMaximumSize(int maximumSize) {
     cache.setMaxSize(maximumSize);
+  }
+
+  @Override
+  public V get(K key, Function<? super K, ? extends V> mappingFunction) {
+    if (maxIdleTime != 0) {
+      return computeIfAbsent(key, mappingFunction);
+    } else if (ttl != 0) {
+      return cache.computeIfAbsent(key, Duration.of(ttl, TTL_UNIT.toChronoUnit()), mappingFunction);
+    }
+
+    return cache.computeIfAbsent(key, mappingFunction);
+  }
+
+  /**
+   * Computes if absent with applied ttl and maxIdleTime
+   *
+   * <p>The code follows {@link RedissonMapCache#computeIfAbsent(K key, Duration ttl, Function mappingFunction)
+   * behavior.
+   *
+   * @param key key with which the specified value is to be associated
+   * @param mappingFunction mapping function to compute a value
+   * @return existing or computed value
+   */
+  protected V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+    V value = cache.get(key);
+
+    if (value != null) {
+      return value;
+    }
+
+    var lock = getLock(key);
+    lock.lock();
+
+    try {
+      value = cache.get(key);
+
+      if (value == null) {
+        value = mappingFunction.apply(key);
+
+        if (value != null) {
+          V result = cache.putIfAbsent(key, value, ttl, TTL_UNIT, maxIdleTime, MAX_IDLE_TIME_UNIT);
+          if (result != null) {
+            value = result;
+          }
+        }
+      }
+
+      return value;
+    } finally {
+      lock.unlock();
+    }
   }
 
   @Override
