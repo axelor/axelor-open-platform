@@ -61,11 +61,6 @@ public abstract class AbstractBaseCache extends JpaTest {
           .getInternalProperties()
           .put(AvailableSettings.GENERATE_STATISTICS, Boolean.TRUE.toString());
 
-      // Avoid warning `created-on-the-fly`
-      AppSettings.get()
-          .getInternalProperties()
-          .put("hibernate.javax.cache.missing_cache_strategy", "create");
-
       super.configure();
     }
   }

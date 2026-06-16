@@ -58,6 +58,36 @@ class RedissonCacheDefaultsTest {
         "10000",
         properties.get(
             "hibernate.cache.redisson.com.axelor.auth.db.Permission.eviction.max_entries"));
+
+    // Auth association collection regions, sized to mirror their owning entity
+    assertEquals(
+        "500",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.User.roles.eviction.max_entries"));
+    assertEquals(
+        "0",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.User.roles.expiration.time_to_live"));
+    assertEquals(
+        "86400000",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.User.roles.expiration.max_idle_time"));
+    assertEquals(
+        "500",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.User.permissions.eviction.max_entries"));
+    assertEquals(
+        "200",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.Group.roles.eviction.max_entries"));
+    assertEquals(
+        "200",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.Group.permissions.eviction.max_entries"));
+    assertEquals(
+        "200",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.Role.permissions.eviction.max_entries"));
   }
 
   @Test
@@ -74,6 +104,10 @@ class RedissonCacheDefaultsTest {
     assertEquals(
         "86400000",
         properties.get("hibernate.cache.redisson.com.axelor.auth.db.User.expiration.time_to_live"));
+    assertEquals(
+        "86400000",
+        properties.get(
+            "hibernate.cache.redisson.com.axelor.auth.db.User.roles.expiration.time_to_live"));
 
     // The native region factory rejects non-zero max_entries and max_idle_time settings.
     assertTrue(

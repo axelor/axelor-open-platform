@@ -35,9 +35,24 @@ public final class RedissonCacheDefaults {
   // Mirror of "default-query-results-region"
   private static final String QUERY_RESULTS_MAX_ENTRIES = "100";
 
-  // Dedicated regions for the frequently-read, rarely-changed entities,
-  // expiring on 24-hour idle time instead of time-to-live
+  // Dedicated regions for the frequently-read, rarely-changed auth entities and
+  // their cached association collections, expiring on 24-hour idle time instead of
+  // time-to-live.
   private static final String AUTH_MAX_IDLE = String.valueOf(TimeUnit.HOURS.toMillis(24));
+
+  private static final List<AuthRegion> AUTH_REGIONS =
+      List.of(
+          new AuthRegion(User.class.getName(), "500"),
+          new AuthRegion(Group.class.getName(), "200"),
+          new AuthRegion(Role.class.getName(), "200"),
+          new AuthRegion(Permission.class.getName(), "10000"),
+          new AuthRegion(User.class.getName() + ".roles", "500"),
+          new AuthRegion(User.class.getName() + ".permissions", "500"),
+          new AuthRegion(Group.class.getName() + ".roles", "200"),
+          new AuthRegion(Group.class.getName() + ".permissions", "200"),
+          new AuthRegion(Role.class.getName() + ".permissions", "200"));
+
+  private record AuthRegion(String name, String maxEntries) {}
 
   private RedissonCacheDefaults() {}
 
@@ -84,10 +99,9 @@ public final class RedissonCacheDefaults {
     putDefault(
         properties, RedissonRegionFactory.QUERY_DEF, RedissonRegionFactory.TTL_SUFFIX, DEFAULT_TTL);
 
-    putAuthEntityDefaults(properties, User.class.getName(), "500");
-    putAuthEntityDefaults(properties, Group.class.getName(), "200");
-    putAuthEntityDefaults(properties, Role.class.getName(), "200");
-    putAuthEntityDefaults(properties, Permission.class.getName(), "10000");
+    for (AuthRegion region : AUTH_REGIONS) {
+      putAuthRegionDefaults(properties, region.name(), region.maxEntries());
+    }
   }
 
   /**
@@ -104,20 +118,15 @@ public final class RedissonCacheDefaults {
     putDefault(
         properties, RedissonRegionFactory.QUERY_DEF, RedissonRegionFactory.TTL_SUFFIX, DEFAULT_TTL);
 
-    for (String region :
-        List.of(
-            User.class.getName(),
-            Group.class.getName(),
-            Role.class.getName(),
-            Permission.class.getName())) {
-      putDefault(properties, region, RedissonRegionFactory.TTL_SUFFIX, AUTH_MAX_IDLE);
+    for (AuthRegion region : AUTH_REGIONS) {
+      putDefault(properties, region.name(), RedissonRegionFactory.TTL_SUFFIX, AUTH_MAX_IDLE);
     }
   }
 
-  private static void putAuthEntityDefaults(
+  private static void putAuthRegionDefaults(
       Properties properties, String region, String maxEntries) {
     putDefault(properties, region, RedissonRegionFactory.MAX_ENTRIES_SUFFIX, maxEntries);
-    // No time-to-live: a zero value prevents falling back to the entity group default
+    // No time-to-live: a zero value prevents falling back to the entity/collection group default
     putDefault(properties, region, RedissonRegionFactory.TTL_SUFFIX, "0");
     putDefault(properties, region, RedissonRegionFactory.MAX_IDLE_SUFFIX, AUTH_MAX_IDLE);
   }
