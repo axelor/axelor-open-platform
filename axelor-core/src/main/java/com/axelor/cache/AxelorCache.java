@@ -113,6 +113,14 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
    * <p>In case of tenant-aware cache, the returned map view is for current tenant: you must use
    * this on demand for correct tenant resolution, not on static initialization.
    *
+   * @apiNote Depending on the backing implementation, the returned map is either a wrapping view or
+   *     the underlying cache implementation itself. In the latter case its operations follow the
+   *     <b>native</b> behavior of that implementation and may bypass the configured cache policies.
+   *     In particular, writes through the map (such as {@code put}, {@code putIfAbsent} or {@code
+   *     compute}) may not apply the configured {@code expireAfterWrite} / {@code expireAfterAccess}
+   *     expiry. Prefer the first-class methods of this interface (such as {@link #put(Object,
+   *     Object)} and {@link #get(Object, Function)}) when the configured eviction policies must be
+   *     honored.
    * @return a thread-safe view of this cache supporting {@link ConcurrentMap} operations
    */
   ConcurrentMap<K, V> asMap();

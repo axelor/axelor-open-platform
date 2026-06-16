@@ -71,7 +71,7 @@ public class PendingExportService {
     var token = UUID.randomUUID().toString();
     var tempFilePath = tempFile.normalize().toAbsolutePath().toString();
 
-    if (pendingExports.asMap().putIfAbsent(token, tempFilePath) != null) {
+    if (!tempFilePath.equals(pendingExports.get(token, key -> tempFilePath))) {
       // Should never happen.
       throw new IllegalStateException("Duplicate token: " + token);
     }
