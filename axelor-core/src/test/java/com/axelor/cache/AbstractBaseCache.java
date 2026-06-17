@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.stat.CacheRegionStatistics;
 import org.hibernate.stat.EntityStatistics;
@@ -61,12 +60,6 @@ public abstract class AbstractBaseCache extends JpaTest {
       AppSettings.get()
           .getInternalProperties()
           .put(AvailableSettings.GENERATE_STATISTICS, Boolean.TRUE.toString());
-      // Use `read-write` cache strategy
-      AppSettings.get()
-          .getInternalProperties()
-          .put(
-              AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY,
-              AccessType.READ_WRITE.getExternalName());
 
       // Avoid warning `created-on-the-fly`
       AppSettings.get()
