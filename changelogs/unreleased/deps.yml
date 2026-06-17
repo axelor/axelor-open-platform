@@ -8,3 +8,4 @@ description: |
   - Upgrade Jackson from 2.21.3 to 2.21.4
   - Upgrade ByteBuddy from 1.18.8 to 1.18.10
   - Upgrade Hibernate from 6.6.50 to 6.6.53
+  - Upgrade Pac4j from 6.5.1 to 6.5.3
