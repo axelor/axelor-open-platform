@@ -23,6 +23,7 @@ import com.axelor.web.openapi.OpenApiModule;
 import com.axelor.web.servlet.CacheAssetsFilter;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
+import com.axelor.web.servlet.IndexRedirectFilter;
 import com.axelor.web.servlet.MaintenanceFilter;
 import com.axelor.web.servlet.NoCacheFilter;
 import com.axelor.web.servlet.ProxyFilter;
@@ -117,6 +118,9 @@ public class AppServletModule extends ServletModule {
 
     // cache version/hash-named assets filter
     filter(CacheAssetsFilter.URL_PATTERN).through(CacheAssetsFilter.class);
+
+    // redirect /index.html to the context root
+    filter("/index.html").through(IndexRedirectFilter.class);
 
     // Maintenance mode (503 Service Unavailable)
     filter("/", "/index.html", "/ws/*").through(MaintenanceFilter.class);
