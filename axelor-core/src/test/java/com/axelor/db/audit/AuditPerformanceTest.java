@@ -12,12 +12,14 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
 import com.axelor.test.db.AuditCheckNoTracking;
 import jakarta.persistence.EntityManager;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
+@GuiceModules(BaseAuditTest.AuditTestModuleWithAudit.class)
 public class AuditPerformanceTest extends BaseAuditTest {
 
   private static final int MAX_SIZE = 5000;

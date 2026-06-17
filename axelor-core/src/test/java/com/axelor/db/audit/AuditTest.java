@@ -18,6 +18,7 @@ import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
+import com.axelor.test.GuiceModules;
 import com.axelor.test.db.AuditCheck;
 import com.axelor.test.db.Contact;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,7 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
+@GuiceModules(BaseAuditTest.AuditTestModule.class)
 public class AuditTest extends BaseAuditTest {
 
   @Test
