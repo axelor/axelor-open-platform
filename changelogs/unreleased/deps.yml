@@ -1,0 +1,7 @@
+---
+title: Upgrade backend dependencies
+type: change
+description: |
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Logback from 1.5.32 to 1.5.34
