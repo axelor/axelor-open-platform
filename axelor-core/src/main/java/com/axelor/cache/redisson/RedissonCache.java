@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-
 import org.redisson.RedissonMapCache;
 import org.redisson.api.RMapCache;
 import org.redisson.api.map.event.MapEntryListener;
@@ -66,7 +65,8 @@ public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K
   /**
    * Computes if absent with applied ttl and maxIdleTime
    *
-   * <p>The code follows {@link RedissonMapCache#computeIfAbsent(Object, Duration, Function)} behavior.
+   * <p>The code follows {@link RedissonMapCache#computeIfAbsent(Object, Duration, Function)}
+   * behavior.
    *
    * @param key key with which the specified value is to be associated
    * @param mappingFunction mapping function to compute a value
