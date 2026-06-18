@@ -63,9 +63,9 @@ public final class ClassUtils {
     ClassLoader loader = getContextClassLoader();
     if (loader == null) {
       loader = ClassUtils.class.getClassLoader();
-    }
-    if (loader == null) {
-      loader = ClassLoader.getSystemClassLoader();
+      if (loader == null) {
+        loader = ClassLoader.getSystemClassLoader();
+      }
     }
     return loader;
   }
@@ -144,14 +144,9 @@ public final class ClassUtils {
    * @return the real super class of the given proxy class, or itself if it's not a proxy class
    */
   public static <T> Class<? super T> getRealClass(Class<T> proxyClass) {
-    if (!isProxyClass(proxyClass)) {
-      return proxyClass;
-    }
-    Class<? super T> zuper = proxyClass.getSuperclass();
-    while (isProxyClass(zuper)) {
-      zuper = getRealClass(zuper);
-    }
-    return zuper;
+      return isProxyClass(proxyClass)
+	      ? getRealClass(proxyClass.getSuperclass())
+	      : proxyClass;
   }
 
   /**
