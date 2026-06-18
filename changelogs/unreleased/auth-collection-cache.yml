@@ -1,9 +1,0 @@
----
-title: Enable L2 collection cache for auth association collections
-type: feature
-description: |
-  The auth association collections `User.roles`, `User.permissions`, `Group.roles`,
-  `Group.permissions` and `Role.permissions` are now stored in the second-level
-  collection cache (`READ_WRITE`). Their target entities are already cacheable, so
-  reading these collections no longer issues a SQL query against the link table on
-  every load.

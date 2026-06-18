@@ -1,9 +1,0 @@
----
-title: Apply configured expiry to computed values in Redisson caches
-type: fix
-description: |
-  Values populated into a Redisson cache through `get(key, mappingFunction)` —
-  including read-through `get(key)` and `getAll(keys)` loading — were stored
-  without the configured `expireAfterWrite` / `expireAfterAccess`, so those
-  entries never expired. The configured expiry is now applied on these paths
-  for both loading and non-loading Redisson caches.

@@ -1,3 +1,160 @@
+## 8.2.2 (2026-06-18)
+
+#### Feature
+
+* Apply default Hibernate second-level cache region settings with Redisson
+
+  <details>
+  
+  When using a Redisson-based Hibernate cache region factory, default cache
+  region settings equivalent to the built-in Caffeine defaults are now applied:
+  max entries and time-to-live for the entity/collection/naturalid and query
+  regions, plus dedicated settings for the frequently-read User, Group, Role,
+  and Permission regions. With the native region factory, only time-to-live
+  settings are applied, as it doesn't support max entries and max idle time.
+  
+  Any `hibernate.cache.redisson.*` settings defined in the application
+  configuration take precedence over these defaults.
+  
+  </details>
+
+* Enable L2 collection cache for auth association collections
+
+  <details>
+  
+  The auth association collections `User.roles`, `User.permissions`, `Group.roles`,
+  `Group.permissions` and `Role.permissions` are now stored in the second-level
+  collection cache (`READ_WRITE`). Their target entities are already cacheable, so
+  reading these collections no longer issues a SQL query against the link table on
+  every load.
+  
+  </details>
+
+* Add distributed publish/subscribe topic
+
+  <details>
+  
+  `DistributedFactory.getTopic(name)` now provides an `AxelorTopic`, a publish/subscribe
+  primitive for broadcasting messages to all application instances. Messages are delivered
+  to every listener, including those registered on the publishing instance.
+  
+  In a distributed setup, messages are broadcast through the cache backend (e.g. Redis when
+  using Redisson); in a single-instance setup they are dispatched in-process. The current
+  tenant is carried with each message and restored before the listener runs.
+  
+  </details>
+
+#### Change
+
+* Use cache loader only for read-through access
+
+  <details>
+  
+  The cache loader used to be forced on `get(key, mappingFunction)` and the
+  `asMap()` view as well, so that loading behaved consistently with the Redisson
+  MapLoader. Now that the Redisson MapLoader is no longer used, that consistency
+  layer is unnecessary and has been removed.
+  
+  The loader is therefore consulted only on read-through access through
+  `get(key)` and `getAll(keys)`. The `get(key, mappingFunction)` method and the
+  `asMap()` view follow standard Caffeine/Redisson semantics and no longer invoke
+  the loader: the mapping function is used as-is and the map view does not trigger
+  loading.
+  
+  </details>
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Logback from 1.5.32 to 1.5.34
+  - Upgrade Jackson from 2.21.3 to 2.21.4
+  - Upgrade ByteBuddy from 1.18.8 to 1.18.10
+  - Upgrade Hibernate from 6.6.50 to 6.6.53
+  - Upgrade Pac4j from 6.5.1 to 6.5.3
+  
+  </details>
+
+* Improve translation lookup performance with distributed cache providers
+
+  <details>
+  
+  Translation lookups no longer fetch the whole translation bundle from the
+  (possibly distributed) cache on every key access. A node-local cache now
+  fronts the shared `messages` cache. This can noticeably speed up translation-heavy paths
+  when using a distributed cache provider.
+  
+  Translation changes are propagated to other nodes immediately through a distributed
+  topic that invalidates their node-local caches, with the local cache TTL (10 minute)
+  acting as a fallback.
+  
+  </details>
+
+#### Fix
+
+* Fix potential connection pool deadlock with Redisson cache loader
+
+  <details>
+  
+  Redisson caches no longer rely on Redisson MapLoader for read-through loading.
+  With MapLoader, the loader runs on Redisson threads while the caller blocks on
+  `RedissonMap.get` → `CompletableFuture.get` without timeout. A loader that
+  accesses the database consumes an extra connection, which could deadlock when
+  the connection pool is exhausted, for example by ParallelTransactionExecutor
+  already consuming all connections.
+  
+  The cache loader is now relying on `RMap.computeIfAbsent`, which executes
+  on the caller thread.
+  
+  </details>
+
+* Set `read-write` as the default second-level cache concurrency strategy
+
+  <details>
+  
+  The default Hibernate second-level cache concurrency strategy is now
+  explicitly set to `read-write` for all cache providers. Entities annotated
+  with `@Cacheable` but without an explicit `@Cache` strategy previously fell
+  back to the strategy reported by the region factory, which differs between
+  providers: Caffeine/JCache defaults to `read-write`, but Redisson defaults to
+  `transactional`.
+  
+  The `transactional` strategy relies on a JTA transaction manager to roll the
+  cache back together with the database. Since the application uses
+  resource-local transactions, a rolled-back update was never undone in the
+  cache, leaving a stale (higher) entity version in Redis. Subsequent updates of
+  the same record then failed with an optimistic-lock error. Forcing
+  `read-write` makes the behavior consistent and correct across all providers.
+  
+  </details>
+
+* Move to perform early
+* Scope distributed locks and atomic longs by tenant
+
+  <details>
+  
+  Distributed locks and atomic longs obtained from `DistributedFactory` are now
+  scoped to the current tenant when multi-tenancy is enabled. The distributed
+  backend (e.g. Redis) is shared across tenants, but the resources these guard
+  (such as module initialization and meta restore) act on per-tenant databases.
+  
+  </details>
+
+* Apply configured expiry to computed values in Redisson caches
+
+  <details>
+  
+  Values populated into a Redisson cache through `get(key, mappingFunction)` —
+  including read-through `get(key)` and `getAll(keys)` loading — were stored
+  without the configured `expireAfterWrite` / `expireAfterAccess`, so those
+  entries never expired. The configured expiry is now applied on these paths
+  for both loading and non-loading Redisson caches.
+  
+  </details>
+
+
 ## 8.2.1 (2026-06-10)
 
 #### Feature
