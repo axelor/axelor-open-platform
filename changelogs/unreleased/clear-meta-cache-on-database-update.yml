@@ -1,0 +1,8 @@
+---
+title: Clear meta caches after database update/init
+type: fix
+description: |
+  The `database update`/`init` CLI commands now invalidate the meta caches
+  (actions, translations, ...) once modules have been loaded. Previously, when a
+  distributed cache was shared with a running instance, the loaded changes were
+  not reflected until the instance was restarted.

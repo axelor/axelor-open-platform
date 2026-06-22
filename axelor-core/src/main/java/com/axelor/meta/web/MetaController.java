@@ -14,7 +14,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.file.temp.TempFiles;
 import com.axelor.i18n.I18n;
-import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
@@ -256,8 +255,6 @@ public class MetaController {
     try {
       final Instant startInstant = Instant.now();
       moduleManager.restoreMeta();
-      MetaStore.clear();
-      I18nBundle.invalidate();
       final Duration duration = Duration.between(startInstant, Instant.now());
       final String durationTime =
           LocalTime.MIN.plusSeconds(duration.getSeconds()).format(DateTimeFormatter.ISO_LOCAL_TIME);

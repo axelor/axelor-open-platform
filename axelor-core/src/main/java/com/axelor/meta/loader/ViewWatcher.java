@@ -10,9 +10,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import com.axelor.common.reflections.Reflections;
-import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaStore;
 import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.io.InputStream;
@@ -257,8 +255,6 @@ public final class ViewWatcher {
                         () -> {
                           moduleManager.update(pendingModules, pendingPaths);
                         });
-                    MetaStore.clear();
-                    I18nBundle.invalidate();
                   } catch (Exception e) {
                     LOG.error(e.getMessage(), e);
                   } finally {

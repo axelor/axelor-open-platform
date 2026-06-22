@@ -17,7 +17,9 @@ import com.axelor.concurrent.ContextAware;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.i18n.I18n;
+import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.google.inject.persist.Transactional;
@@ -109,6 +111,16 @@ public class ModuleManager {
     }
   }
 
+  /** Clears all meta caches. */
+  private void clearMetaCaches() {
+    try {
+      MetaStore.clear();
+      I18nBundle.invalidate();
+    } catch (Exception e) {
+      log.error("Failed to clear meta caches", e);
+    }
+  }
+
   /**
    * Update the modules of the database.
    *
@@ -145,8 +157,7 @@ public class ModuleManager {
     try {
       pathsToRestore.addAll(paths);
       process(
-          false,
-          () -> RESOLVER.all().stream().filter(m -> moduleNames.contains(m.getName())).toList());
+          false, RESOLVER.all().stream().filter(m -> moduleNames.contains(m.getName())).toList());
     } finally {
       pathsToRestore.clear();
       updateLastRestored(startTime);
@@ -162,7 +173,7 @@ public class ModuleManager {
                 "A views restoring is already in progress. Please wait until it ends and try again."));
       }
       // Restore meta of installed modules only.
-      process(false, () -> RESOLVER.all().stream().filter(Module::isInstalled).toList());
+      process(false, RESOLVER.all().stream().filter(Module::isInstalled).toList());
     } finally {
       busy.set(0);
     }
@@ -181,29 +192,27 @@ public class ModuleManager {
   private void load(boolean forceResolve, boolean withDemo, Supplier<List<Module>> moduleSelector) {
     createDefault();
     resolve(forceResolve);
-    process(withDemo, moduleSelector);
+    process(withDemo, moduleSelector.get());
   }
 
   /**
-   * Select the modules, evict the cache when any of them is new, install them and clean up.
-   *
-   * <p>The selection is deferred (a {@link Supplier}) so it can rely on the up-to-date
-   * install/pending state, e.g. right after a {@link #resolve(boolean)}. Unlike {@link #load}, it
-   * neither creates the default data nor resolves, so it is suited to callers with a known state
-   * (e.g. {@link #restoreMeta()}).
+   * Select the modules, evict the cache when any of them is new, install them, then finally clean
+   * up, including cache clearing.
    *
    * @param withDemo whether to load demo data for the newly installed modules
-   * @param moduleSelector supplies the modules to load
+   * @param moduleList the modules to load
    */
-  private void process(boolean withDemo, Supplier<List<Module>> moduleSelector) {
+  private void process(boolean withDemo, List<Module> moduleList) {
     try {
-      final List<Module> moduleList = moduleSelector.get();
       if (moduleList.stream().anyMatch(m -> !m.isInstalled())) {
         evictAllCacheRegions();
       }
       installModules(moduleList, withDemo);
     } finally {
       doCleanUp();
+      if (ObjectUtils.notEmpty(moduleList)) {
+        clearMetaCaches();
+      }
     }
   }
 
