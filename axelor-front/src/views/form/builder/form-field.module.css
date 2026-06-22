@@ -30,6 +30,7 @@
   margin: 0;
   position: relative;
   display: flex;
+  color: inherit;
 }
 
 .label,
