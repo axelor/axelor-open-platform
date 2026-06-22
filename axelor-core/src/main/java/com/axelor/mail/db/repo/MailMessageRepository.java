@@ -192,7 +192,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
               .bind("id", entity.getRelatedId())
               .bind("model", entity.getRelatedModel())
               .order("id")
-              .cacheable()
               .autoFlush(false)
               .fetchOne();
       entity.setParent(parent);

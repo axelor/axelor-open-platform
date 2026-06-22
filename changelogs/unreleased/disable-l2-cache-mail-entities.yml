@@ -1,0 +1,9 @@
+---
+title: Disable L2 cache for volatile mail entities
+type: change
+description: |
+  `MailMessage`, `MailFlags` and `MailFollower` are no longer second-level
+  cacheable. These entities are either fast-growing and reached via scattered
+  queries (`MailMessage`) or hold per-user state (`MailFlags`, `MailFollower`),
+  so the entity cache had a near-zero hit ratio while adding memory and
+  invalidation overhead.
