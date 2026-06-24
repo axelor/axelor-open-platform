@@ -797,16 +797,11 @@ public final class MetaStore {
   }
 
   public static void clear() {
-    invalidateActions();
-    invalidateJsonFields();
+    ACTIONS.invalidateAll();
   }
 
   public static void invalidate(String name) {
     ACTIONS.invalidate(name);
-  }
-
-  public static void invalidateActions() {
-    ACTIONS.invalidateAll();
   }
 
   public static void invalidateJsonFields() {

@@ -31,7 +31,7 @@ class MetaStoreJsonFieldsCacheTest extends JpaTest {
   @BeforeEach
   @Transactional
   void ensureModel() {
-    MetaStore.clear();
+    MetaStore.invalidateJsonFields();
     if (jsonModels.findByName(MODEL) == null) {
       MetaJsonModel model = new MetaJsonModel();
       model.setName(MODEL);
