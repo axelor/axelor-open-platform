@@ -583,6 +583,11 @@ See https://redisson.org/docs/configuration/[Redisson configuration documentatio
 
 See xref:dev-guide:application/cache.adoc[AxelorCache] for cache usage in application code.
 
+[WARNING]
+====
+When using a distributed cache (such as Redisson), cached entity data is stored externally in serialized form. After changing your entities (e.g. installing or upgrading modules, or adding, removing or altering fields) or after editing the database manually, previously cached data may become incompatible or stale. In such cases, you must manually clear the distributed cache (e.g. flush the Redis/Valkey instance) to avoid deserialization errors or inconsistent data.
+====
+
 == Global Context Configuration
 
 Besides the static configuration values, we can also provide configuration for

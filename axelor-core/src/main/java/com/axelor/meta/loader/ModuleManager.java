@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,17 +96,6 @@ public class ModuleManager {
                   .collect(Collectors.toList()));
     } finally {
       lock.unlock();
-    }
-  }
-
-  // When using distributed cache, it may contain incompatible data.
-  // Need to clear it before loading new modules.
-  private void evictAllCacheRegions() {
-    try {
-      var sessionFactory = JPA.em().unwrap(Session.class).getSessionFactory();
-      sessionFactory.getCache().evictAllRegions();
-    } catch (Exception e) {
-      log.error("Failed to evict regions", e);
     }
   }
 
@@ -204,9 +192,6 @@ public class ModuleManager {
    */
   private void process(boolean withDemo, List<Module> moduleList) {
     try {
-      if (moduleList.stream().anyMatch(m -> !m.isInstalled())) {
-        evictAllCacheRegions();
-      }
       installModules(moduleList, withDemo);
     } finally {
       doCleanUp();
