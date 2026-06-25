@@ -5,6 +5,7 @@ import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridState } from "@axelor/ui/grid";
 
 import { PageText } from "@/components/page-text";
+import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { findView } from "@/services/client/meta-cache";
@@ -31,6 +32,7 @@ export type SelectorOptions = {
   domain?: string;
   context?: DataContext;
   limit?: number;
+  additionalFields?: string[];
   onClose?: () => void;
   onCreate?: () => void | Promise<void>;
   onGridSearch?: (
@@ -55,6 +57,7 @@ export function useSelector() {
       domain,
       context,
       limit,
+      additionalFields,
       onClose,
       onGridSearch,
       onCreate,
@@ -114,6 +117,8 @@ export function useSelector() {
           onClose={onClose}
           onCreate={onCreate}
           onSelect={onSelect}
+          model={model}
+          additionalFields={additionalFields}
         />
       ),
       buttons: [],
@@ -128,15 +133,15 @@ function Handler({
 }: {
   multiple?: boolean;
   onClose: (result: boolean) => void;
-  onSelect?: (records: DataRecord[]) => void;
+  onSelect?: (records: DataRecord[]) => Promise<void> | void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
   const onSelectionChange = useCallback(
-    (index: number, records: DataRecord[]) => {
+    async (index: number, records: DataRecord[]) => {
       if (index === 0 && multiple) return;
-      onSelect?.(records);
+      await onSelect?.(records);
       onClose(true);
     },
     [multiple, onClose, onSelect],
@@ -231,18 +236,67 @@ function SelectorHeader({
   );
 }
 
+/**
+ * Fetch missing fields for the given records and merge them back in.
+ *
+ * Records are enriched only for the fields in `additionalFields` that are absent
+ * from at least one record; if every record already has all of them, the
+ * records are returned unchanged. Only saved records (with a positive `id`)
+ * are queried, and each result is merged into its matching record by `id`.
+ *
+ * @param records the records to enrich
+ * @param model the target model name to query
+ * @param additionalFields the field names that should be present on each record
+ * @returns the records with any missing fields merged in
+ */
+async function enrichRecords(
+  records: DataRecord[],
+  model: string,
+  additionalFields: string[],
+): Promise<DataRecord[]> {
+  const ids = records.filter((r) => (r.id ?? 0) > 0).map((r) => r.id as number);
+  if (!ids.length) return records;
+
+  const missing = additionalFields.filter((f) =>
+    records.some((r) => !(f in r)),
+  );
+  if (!missing.length) return records;
+
+  try {
+    const ds = new DataSource(model);
+    const res = await ds.search({
+      fields: missing,
+      limit: ids.length,
+      filter: {
+        _domain: "self.id in (:_field_ids)",
+        _domainContext: { _field_ids: ids },
+      },
+    });
+    return records.map((r) => {
+      const found = res.records.find((fr) => fr.id === r.id);
+      return found ? { ...r, ...found } : r;
+    });
+  } catch {
+    return records;
+  }
+}
+
 function Footer({
   multiple = false,
   close,
   onClose: _onClose,
   onCreate,
   onSelect,
+  model,
+  additionalFields,
 }: {
   multiple?: boolean;
   close: (result: boolean) => void;
   onClose?: () => void;
   onCreate?: () => void;
   onSelect?: (records: DataRecord[]) => void;
+  model: string;
+  additionalFields?: string[];
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const [handler, setHandler] = useAtom(handlerAtom);
@@ -259,13 +313,23 @@ function Footer({
     onClose(false);
   }, [onClose]);
 
+  const enrichAndSelect = useCallback(
+    async (records: DataRecord[]) => {
+      const enriched = additionalFields?.length
+        ? await enrichRecords(records, model, additionalFields)
+        : records;
+      onSelect?.(enriched);
+    },
+    [onSelect, model, additionalFields],
+  );
+
   const handleConfirm = useCallback(async () => {
     const state = handler.data as GridState;
     const records =
       state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
-    onSelect?.(records);
+    await enrichAndSelect(records);
     onClose(true);
-  }, [handler.data, onSelect, onClose]);
+  }, [handler.data, enrichAndSelect, onClose]);
 
   const handleOk = useSingleClickHandler(handleConfirm);
 
@@ -275,7 +339,11 @@ function Footer({
 
   return (
     <Box d="flex" g={2} flex={1}>
-      <Handler multiple={multiple} onClose={onClose} onSelect={onSelect} />
+      <Handler
+        multiple={multiple}
+        onClose={onClose}
+        onSelect={enrichAndSelect}
+      />
       {onCreate && (
         <Box d="flex" flex={1}>
           <Button

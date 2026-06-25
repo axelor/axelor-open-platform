@@ -113,12 +113,17 @@ const NEW_SUBLINE = "add:new:subline";
  *
  * @param {DataRecord} record - The input data record
  * @param {DataRecord} [previousRecord] - The previous data record
+ * @param {string[]} fieldNames - additional field names to include
  * @returns {DataRecord} - The resulting data record with nested fields converted to dotted fields
  */
-function nestedToDotted(record: DataRecord, previousRecord?: DataRecord) {
+function nestedToDotted(
+  record: DataRecord,
+  previousRecord?: DataRecord,
+  fieldNames: string[] = [],
+): DataRecord {
   const result: DataRecord = { ...record };
 
-  Object.keys(record).forEach((key) => {
+  uniq([...Object.keys(record), ...fieldNames]).forEach((key) => {
     const path = key.split(".");
     if (path.length > 1) {
       const value = getNested(record, path);
@@ -1118,13 +1123,17 @@ function OneToManyInner({
           (x) => !prevItems.some((y) => y.id === x.id),
         );
 
-        const nextItems = reorderItems([
-          ...prevItems.map((item) => {
-            const record = items.find((r) => r.id === item.id);
-            return record ? { ...item, ...record } : item;
-          }),
-          ...newItems,
-        ]);
+        const nextItems = reorderItems(
+          [
+            ...prevItems.map((item) => {
+              const record = items.find((r) => r.id === item.id);
+              return record
+                ? nestedToDotted({ ...item, ...record }, item, columnNames)
+                : item;
+            }),
+            ...newItems,
+          ].map((item) => nestedToDotted(item, undefined, columnNames)),
+        );
 
         const changed =
           change ?? (!isManyToMany || prevItems.length !== nextItems.length);
@@ -1136,7 +1145,7 @@ function OneToManyInner({
 
         return setValue(nextItems, changed, dirty);
       },
-      [getItems, reorderItems, valueAtom, isManyToMany, setValue],
+      [getItems, reorderItems, valueAtom, isManyToMany, setValue, columnNames],
     ),
   );
 
@@ -1203,10 +1212,11 @@ function OneToManyInner({
         context: {
           _parent: getContext(),
         },
+        additionalFields: columnNames,
         ...(isManyToMany
           ? { onSelect }
           : {
-              onSave: (record) =>
+              onSave: (record) => {
                 onSave?.({
                   ...record,
                   $id: id,
@@ -1214,7 +1224,8 @@ function OneToManyInner({
                     _changed: true,
                     _original: options?.record || {},
                   }),
-                }),
+                });
+              },
             }),
         ...options,
       });
@@ -1229,6 +1240,7 @@ function OneToManyInner({
       getContext,
       isManyToMany,
       isCollectionTree,
+      columnNames,
     ],
   );
 
@@ -1365,6 +1377,7 @@ function OneToManyInner({
       ...(canNew && {
         onCreate: onAdd,
       }),
+      additionalFields: columnNames,
       onSelect: handleSelect,
     });
   }, [
@@ -1380,6 +1393,7 @@ function OneToManyInner({
     getContext,
     beforeSelect,
     handleSelect,
+    columnNames,
   ]);
 
   const isPermitted = usePermitted(model, perms);

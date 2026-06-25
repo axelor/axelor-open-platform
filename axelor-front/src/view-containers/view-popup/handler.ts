@@ -25,6 +25,7 @@ export type PopupHandler = {
     callOnSave?: boolean;
     callOnRead?: boolean;
     callOnLoad?: boolean;
+    additionalFields?: string[];
   }) => Promise<DataRecord>;
   onSearch?: (options?: SearchOptions) => Promise<SearchResult>;
   onRefresh?: () => Promise<void>;

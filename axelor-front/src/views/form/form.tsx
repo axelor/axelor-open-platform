@@ -24,6 +24,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
+import { getExtraRelated } from "@/hooks/use-relation/use-editor";
 import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
@@ -91,10 +92,19 @@ export const fetchRecord = async (
   dataStore: DataStore,
   id?: string | number,
   select?: Record<string, any>,
+  extraRelated?: Record<string, string[]>,
 ) => {
   if (id && +id > 0) {
     const fields = Object.keys(meta.fields ?? {});
-    const related = meta.related;
+    const related = extraRelated
+      ? Object.entries(extraRelated).reduce(
+          (acc, [name, subFields]) => ({
+            ...acc,
+            [name]: [...new Set([...(acc[name] ?? []), ...subFields])],
+          }),
+          { ...meta.related },
+        )
+      : meta.related;
     return dataStore.read(+id, { fields, related, select });
   }
   return getDefaultValues(meta.fields, meta.view.items);
@@ -358,6 +368,7 @@ export function Form(props: ViewProps<FormView>) {
   const recordId = String(id || "");
 
   const popupRecord = params?.["_popup-record"];
+  const extraRelated = getExtraRelated(action.context);
 
   const { state, data: record = {} } = useAsync(async () => {
     const record = recordRef.current;
@@ -370,7 +381,13 @@ export function Form(props: ViewProps<FormView>) {
     if (popupRecord) {
       if ((popupRecord?.id ?? 0) > 0) {
         if (popupRecord._fetched) return popupRecord;
-        const res = await fetchRecord(meta, dataStore, popupRecord.id);
+        const res = await fetchRecord(
+          meta,
+          dataStore,
+          popupRecord.id,
+          undefined,
+          extraRelated,
+        );
         return {
           _fetched: true,
           ...(popupRecord._dirty ? { ...res, ...popupRecord } : res),
@@ -385,7 +402,7 @@ export function Form(props: ViewProps<FormView>) {
       }
     }
     return await fetchRecord(meta, dataStore, recordId);
-  }, [popupRecord, recordId, meta, dataStore]);
+  }, [popupRecord, recordId, meta, dataStore, extraRelated]);
 
   const [perms, setPerms] = useState(() => meta.perms);
 
@@ -817,6 +834,7 @@ const FormContainer = memo(function FormContainer({
    * @param {boolean} [options.callOnRead] - (default: true) whether it should read the record once save request is done
    * @param {boolean} [options.callOnLoad] - (default: true) whether it should call `onLoad` actions (has effect if `callOnRead` is `true`)
    * @param {boolean} [options.handleErrors] - (default: false) whether it should handle errors upon save request
+   * @param {string[]} [options.additionalFields] - extra field names to include in the requests beyond the form's own fields
    *
    * @return {DataRecord} the record
    */
@@ -831,6 +849,7 @@ const FormContainer = memo(function FormContainer({
           callOnRead?: boolean;
           callOnLoad?: boolean;
           handleErrors?: boolean;
+          additionalFields?: string[];
         },
       ) => {
         const {
@@ -854,8 +873,20 @@ const FormContainer = memo(function FormContainer({
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
         const { select } = formState;
 
+        // Scope fields only when additionalFields is requested; otherwise save/read
+        // without a fields list so fields outside this view (e.g. grid columns) stay in sync.
+        const fields = options?.additionalFields?.length
+          ? [
+              ...new Set([
+                ...Object.keys(meta.fields ?? {}),
+                ...options.additionalFields,
+              ]),
+            ]
+          : undefined;
+
         let res = await dataStore.save(savingRecord, {
           ...opts,
+          ...(fields && { fields, related: meta.related }),
           select,
         });
 
@@ -864,7 +895,15 @@ const FormContainer = memo(function FormContainer({
         );
 
         if (callOnRead) {
-          const fetched = res.id ? await doRead(res.id, select) : res;
+          const fetched = res.id
+            ? fields
+              ? await dataStore.read(res.id, {
+                  fields,
+                  related: meta.related,
+                  select,
+                })
+              : await doRead(res.id, select)
+            : res;
 
           res = restoreDummyValues(res, fetched);
 
@@ -890,6 +929,7 @@ const FormContainer = memo(function FormContainer({
         doValidate,
         readonly,
         prepareRecordForSave,
+        meta,
       ],
     ),
   );

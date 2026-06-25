@@ -135,13 +135,13 @@ export function useEnsureRelated({
             const state = get(formAtom);
             const record = produce(state.record, (draft) => {
               deepSet(draft, name, newValue);
-            })
 
-            // updated reference dotted fields in record
-            Object.keys(record).forEach((fieldName) => {
-              if (fieldName.includes(".") && fieldName.startsWith(name)) {
-                record[fieldName] = deepGet(record, fieldName.split("."));
-              }
+              // updated reference dotted fields in record
+              Object.keys(draft).forEach((fieldName) => {
+                if (fieldName.includes(".") && fieldName.startsWith(name)) {
+                  draft[fieldName] = deepGet(draft, fieldName.split("."));
+                }
+              });
             });
             set(formAtom, {
               ...state,

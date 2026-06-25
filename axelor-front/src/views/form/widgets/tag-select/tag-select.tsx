@@ -219,6 +219,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         context: {
           _parent: getContext(),
         },
+        additionalFields: [targetName, ...fetchFields].filter(Boolean),
         onSelect: handleSelect,
       });
     },
@@ -233,6 +234,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       schema,
       getContext,
       handleSelect,
+      targetName,
+      fetchFields,
     ],
   );
 
@@ -273,10 +276,11 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
+      additionalFields: [targetName, ...fetchFields].filter(Boolean),
       ...(canNew && {
         onCreate: () => showCreate(""),
       }),
-      onSelect: async (records = []) => {
+      onSelect: (records = []) => {
         const all = Array.isArray(value) ? value : [];
         const add = records.filter((x) => !all.some((a) => a.id === x.id));
         handleChange([...all, ...add]);
@@ -294,6 +298,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     sortBy,
     schema,
     searchLimit,
+    targetName,
+    fetchFields,
     value,
     handleChange,
   ]);

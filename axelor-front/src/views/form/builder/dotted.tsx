@@ -7,12 +7,15 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEnsureRelated } from "@/hooks/use-relation";
 import { Schema } from "@/services/client/meta.types";
 
-import { useViewMeta } from "@/view-containers/views/scope";
+import { getExtraRelated } from "@/hooks/use-relation/use-editor";
+import { useViewAction, useViewMeta } from "@/view-containers/views/scope";
 import { FormAtom } from "./types";
 import { isReferenceField } from "./utils";
 
 export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
   const { meta, findItems } = useViewMeta();
+  const { context } = useViewAction();
+  const extraRelated = getExtraRelated(context);
 
   const relations = useMemo(() => {
     const items = findItems();
@@ -70,14 +73,15 @@ export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
             const fieldName = `${name}.${subFieldName}`;
             const subFieldPrefix = `${fieldName}.`;
             const schema = item?.editor?.fields?.[subFieldName];
-            schema &&
-              (mapping[fieldName] ??= {
+            if (schema) {
+              mapping[fieldName] ??= {
                 schema: {
                   ...schema,
                   name: fieldName,
                 },
                 related: getRelatedFieldList(subFieldPrefix),
-              });
+              };
+            }
           });
         }
 
@@ -97,8 +101,30 @@ export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
         }
       }
     }
+    // Merge extra related fields injected by the editor popup (e.g. O2M dotted grid columns)
+    if (extraRelated) {
+      for (const [fieldName, subFields] of Object.entries(extraRelated)) {
+        if (!subFields.length) continue;
+        const fieldSchema = meta.fields?.[fieldName];
+        if (!fieldSchema) continue;
+        if (mapping[fieldName]) {
+          mapping[fieldName] = {
+            ...mapping[fieldName],
+            related: [
+              ...new Set([...mapping[fieldName].related, ...subFields]),
+            ],
+          };
+        } else {
+          mapping[fieldName] = {
+            schema: { ...fieldSchema, name: fieldName } as Schema,
+            related: subFields,
+          };
+        }
+      }
+    }
+
     return Object.entries(mapping);
-  }, [meta, findItems]);
+  }, [meta, findItems, extraRelated]);
 
   return relations.map(([name, { schema, related }]) => (
     <EnsureRelated
@@ -145,7 +171,7 @@ function EnsureRelated({
   const value = useAtomValue(valueAtom);
 
   const ensureRelatedValues = useCallback(async () => {
-    if (value) updateRelated(value);
+    if (value) return updateRelated(value);
   }, [updateRelated, value]);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);

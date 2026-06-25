@@ -22,6 +22,15 @@ import { compactM2MValues } from "@/views/form/builder/utils";
 
 import { initTab } from "../use-tabs";
 import { useSingleClickHandler } from "../use-button";
+import { computeExtraRelated } from "./utils";
+
+const EXTRA_RELATED: unique symbol = Symbol("extraRelated");
+
+export function getExtraRelated(
+  context: Record<string | symbol, unknown> | undefined,
+): Record<string, string[]> | undefined {
+  return context?.[EXTRA_RELATED] as Record<string, string[]> | undefined;
+}
 
 export type EditorOptions = {
   model: string;
@@ -37,6 +46,7 @@ export type EditorOptions = {
   params?: ActionView["params"];
   header?: PopupProps["header"];
   footer?: PopupProps["footer"];
+  additionalFields?: string[];
   onClose?: (result: boolean, record?: DataRecord) => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
@@ -109,6 +119,7 @@ export function useEditor() {
       params,
       header,
       footer,
+      additionalFields,
       onClose,
       onSave,
       onSelect,
@@ -131,6 +142,9 @@ export function useEditor() {
       context: {
         _showRecord: record?.id,
         ...context,
+        ...(additionalFields?.length && {
+          [EXTRA_RELATED]: computeExtraRelated(additionalFields),
+        }),
       },
     });
 
@@ -151,6 +165,7 @@ export function useEditor() {
           onClose={close}
           onSave={onSave}
           onSelect={onSelect}
+          additionalFields={additionalFields}
         />
       ),
       buttons: [],
@@ -166,6 +181,7 @@ function Footer({
   onClose,
   onSave,
   onSelect,
+  additionalFields,
 }: {
   canAttach?: boolean;
   hasOk?: boolean;
@@ -174,6 +190,7 @@ function Footer({
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
   params?: ActionView["params"];
+  additionalFields?: string[];
 }) {
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
@@ -230,6 +247,7 @@ function Footer({
                   shouldSave: true,
                   callOnSave: true,
                   callOnRead: false,
+                  additionalFields: additionalFields,
                 });
                 onSelect(rec);
               }
@@ -241,7 +259,15 @@ function Footer({
             console.error(e);
           }
         },
-        [handler, hasToMany, popupRecord, onClose, onSave, onSelect],
+        [
+          handler,
+          hasToMany,
+          popupRecord,
+          onClose,
+          onSave,
+          onSelect,
+          additionalFields,
+        ],
       ),
     ),
   );

@@ -105,6 +105,14 @@ export function ManyToOne(
 
   const isPermitted = usePermitted(target, perms);
 
+  const related = useFieldRelated({ field: schema });
+  const { updateRelated, valueRef } = useEnsureRelated({
+    field: schema,
+    formAtom,
+    valueAtom,
+    related,
+  });
+
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
       const $record = record ?? value;
@@ -124,6 +132,7 @@ export function ManyToOne(
         context: {
           _parent: getContext(),
         },
+        additionalFields: related,
         onSelect: handleChange,
       });
     },
@@ -138,6 +147,7 @@ export function ManyToOne(
       schema,
       getContext,
       handleChange,
+      related,
     ],
   );
 
@@ -173,14 +183,6 @@ export function ManyToOne(
     getContext,
   );
 
-  const related = useFieldRelated({ field: schema });
-  const { ensureRelated, updateRelated, valueRef } = useEnsureRelated({
-    field: schema,
-    formAtom,
-    valueAtom,
-    related,
-  });
-
   const showSelect = useCallback(async () => {
     const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
@@ -193,12 +195,12 @@ export function ManyToOne(
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
+      additionalFields: related,
       ...(canNew && {
         onCreate: () => showCreate(""),
       }),
-      onSelect: async (records) => {
-        const value = await ensureRelated(records[0]);
-        handleChange(value);
+      onSelect: (records) => {
+        handleChange(records[0]);
       },
     });
   }, [
@@ -213,7 +215,7 @@ export function ManyToOne(
     sortBy,
     schema,
     searchLimit,
-    ensureRelated,
+    related,
     handleChange,
   ]);
 

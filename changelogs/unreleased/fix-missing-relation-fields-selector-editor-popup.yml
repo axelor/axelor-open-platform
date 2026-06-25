@@ -1,0 +1,13 @@
+---
+title: Fetch missing relation fields via selector and editor popups
+type: fix
+description: |
+  When selecting a record from a selector popup or saving via an editor popup
+  in M2O, M2M (tags), or M2M/O2M collection grid widgets, fields required for
+  display (e.g. target-name, colorField, computed grid columns) that were not
+  present in the popup's grid or form view could be missing, causing values to
+  disappear until the page was refreshed.
+
+  Records returned from these popups now always include the fields the widget
+  needs for display, so values no longer disappear after selecting or saving
+  a record.
