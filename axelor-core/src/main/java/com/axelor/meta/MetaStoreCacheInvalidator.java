@@ -9,6 +9,11 @@ import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaView;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import org.hibernate.Transaction;
+import org.hibernate.action.spi.AfterTransactionCompletionProcess;
+import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.PostCommitDeleteEventListener;
 import org.hibernate.event.spi.PostCommitInsertEventListener;
 import org.hibernate.event.spi.PostCommitUpdateEventListener;
@@ -18,15 +23,24 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
- * Invalidates {@link MetaStore} JSON-field caches after the triggering transaction commits.
+ * Invalidates {@link MetaStore} JSON-field caches once per transaction that changes a
+ * cache-affecting entity.
  *
- * <p>Caches are also invalidated when the commit fails: the cache loaders run on the caller's
- * session, so a read performed during the failed transaction may have cached uncommitted state.
+ * <p>The post-commit events fire once per changed row; to avoid invalidating the (possibly
+ * distributed) cache for every row, the first cache-affecting entity of a transaction registers a
+ * single {@link AfterTransactionCompletionProcess} and the remaining rows are deduplicated via
+ * {@link #scheduled}.
+ *
+ * <p>The cache is invalidated on both commit and rollback: the cache loaders run on the caller's
+ * session, so a read performed during a failed transaction may have cached uncommitted state.
  */
 public class MetaStoreCacheInvalidator
     implements PostCommitInsertEventListener,
         PostCommitUpdateEventListener,
         PostCommitDeleteEventListener {
+
+  /** Transactions that already have a pending invalidation scheduled. */
+  private final Set<Transaction> scheduled = ConcurrentHashMap.newKeySet();
 
   @Override
   public boolean requiresPostCommitHandling(EntityPersister persister) {
@@ -35,40 +49,53 @@ public class MetaStoreCacheInvalidator
 
   @Override
   public void onPostInsert(PostInsertEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
   @Override
   public void onPostInsertCommitFailed(PostInsertEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
   @Override
   public void onPostUpdate(PostUpdateEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
   @Override
   public void onPostUpdateCommitFailed(PostUpdateEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
   @Override
   public void onPostDelete(PostDeleteEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
   @Override
   public void onPostDeleteCommitFailed(PostDeleteEvent event) {
-    invalidate(event.getEntity());
+    scheduleInvalidation(event.getSession(), event.getPersister());
   }
 
-  private static void invalidate(Object entity) {
-    // Need to recheck it affects json fields cache,
-    // because `requiresPostCommitHandling()` is an optimization flag only.
-    if (entity != null && affectsJsonFieldsCache(entity.getClass())) {
-      MetaStore.invalidateJsonFields();
+  private void scheduleInvalidation(EventSource session, EntityPersister persister) {
+    if (!affectsJsonFieldsCache(persister.getMappedClass())) {
+      return;
     }
+
+    var transaction = session.accessTransaction();
+    // Register the after-completion hook only once per transaction.
+    if (!scheduled.add(transaction)) {
+      return;
+    }
+
+    session
+        .getActionQueue()
+        .registerProcess(
+            (AfterTransactionCompletionProcess)
+                (success, s) -> {
+                  scheduled.remove(transaction);
+                  MetaStore.invalidateJsonFields();
+                });
   }
 
   private static boolean affectsJsonFieldsCache(Class<?> klass) {
