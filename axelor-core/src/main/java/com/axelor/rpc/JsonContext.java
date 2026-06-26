@@ -10,6 +10,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -56,14 +57,14 @@ public class JsonContext extends SimpleBindings {
   }
 
   private final String jsonField;
-  private final Map<String, Object> fields;
   private final Context context;
+  private final String jsonModel;
 
   public JsonContext(Context context, Property property, String jsonValue) {
     super(fromJson(jsonValue));
     this.context = context;
     this.jsonField = property.getName();
-    this.fields = findFields();
+    this.jsonModel = computeJsonModel();
   }
 
   public JsonContext(MetaJsonRecord record) {
@@ -72,19 +73,26 @@ public class JsonContext extends SimpleBindings {
     this.context.put(Context.KEY_ID, record.getId());
     this.context.put(Context.KEY_JSON_MODEL, record.getJsonModel());
     this.jsonField = Context.KEY_JSON_ATTRS;
-    this.fields = findFields();
+    this.jsonModel = computeJsonModel();
   }
 
-  private Map<String, Object> findFields() {
+  private String computeJsonModel() {
     String jsonModel = (String) context.get(Context.KEY_JSON_MODEL);
-    if (jsonModel == null) {
+    if (StringUtils.isBlank(jsonModel)) {
       jsonModel = (String) super.get(Context.KEY_JSON_MODEL);
     }
-    if (!StringUtils.isBlank(jsonModel)
+    if (StringUtils.notBlank(jsonModel)
         && MetaJsonRecord.class.isAssignableFrom(context.getContextClass())) {
-      return MetaStore.findJsonFields(jsonModel);
+      return jsonModel;
     }
-    return MetaStore.findJsonFields(context.getContextClass().getName(), jsonField);
+    return null;
+  }
+
+  private MetaJsonField findField(String name) {
+    if (jsonModel != null) {
+      return MetaStore.findJsonField(jsonModel, name);
+    }
+    return MetaStore.findJsonField(context.getContextClass().getName(), jsonField, name);
   }
 
   @SuppressWarnings("unchecked")
@@ -113,7 +121,10 @@ public class JsonContext extends SimpleBindings {
   }
 
   public boolean hasField(String name) {
-    return fields.containsKey(name);
+    if (jsonModel != null) {
+      return MetaStore.hasJsonField(jsonModel, name);
+    }
+    return MetaStore.hasJsonField(context.getContextClass().getName(), jsonField, name);
   }
 
   public String getJsonField() {
@@ -125,14 +136,14 @@ public class JsonContext extends SimpleBindings {
   }
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   public Object get(Object key) {
-    final Map<String, Object> field = (Map<String, Object>) fields.get(key);
+    MetaJsonField field = findField(String.valueOf(key));
     if (field == null) {
       return super.get(key);
     }
 
-    final String type = (String) field.getOrDefault("type", "");
+    final String type = (String) Objects.requireNonNullElse(field.getType(), "");
     final Object value = super.get(key);
 
     if (value == null || ObjectUtils.isEmpty(value)) {
@@ -145,12 +156,12 @@ public class JsonContext extends SimpleBindings {
       case "many-to-one":
       case "one-to-many":
       case "many-to-many":
-        target = (String) field.get("target");
+        target = field.getTargetModel();
         break;
       case "json-many-to-one":
       case "json-one-to-many":
       case "json-many-to-many":
-        target = (String) field.get("jsonTarget");
+        target = MetaJsonRecord.class.getName();
         break;
       case "datetime":
         return Adapter.adapt(value, LocalDateTime.class, null, null);
