@@ -1,0 +1,7 @@
+---
+title: Fix add sub-item button shown when canNew is false
+type: fix
+description: |
+  In a tree grid, the sub-tree header (holding the title and the "add sub-item"
+  button) was still displayed for empty nodes even when `canNew` was false,
+  letting users trigger record creation that was not permitted.

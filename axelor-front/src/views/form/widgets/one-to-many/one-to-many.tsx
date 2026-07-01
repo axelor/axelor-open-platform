@@ -1696,7 +1696,10 @@ function OneToManyInner({
   );
   const shouldHideHeaderForSubTree =
     isSubTreeGrid &&
-    (readonly || (value?.length ?? 0) > 0 || (records?.length ?? 0) > 0);
+    (readonly ||
+      !canNew ||
+      (value?.length ?? 0) > 0 ||
+      (records?.length ?? 0) > 0);
   const canExpandAll = isRootTreeGrid && widgetAttrs?.expandAll !== "false";
 
   const selectFieldsAtom = useMemo(() => {
