@@ -6,9 +6,6 @@ package com.axelor.meta;
 
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
-import com.axelor.meta.db.MetaSelect;
-import com.axelor.meta.db.MetaSelectItem;
-import com.axelor.meta.db.MetaView;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.Transaction;
@@ -100,9 +97,6 @@ public class MetaStoreCacheInvalidator
 
   private static boolean affectsJsonFieldsCache(Class<?> klass) {
     return MetaJsonField.class.isAssignableFrom(klass)
-        || MetaJsonModel.class.isAssignableFrom(klass)
-        || MetaSelect.class.isAssignableFrom(klass) // See MetaSelectItem#select
-        || MetaSelectItem.class.isAssignableFrom(klass) // See MetaStore#buildSelectionMap
-        || MetaView.class.isAssignableFrom(klass); // view names in MetaStore#updateJsonFields
+        || MetaJsonModel.class.isAssignableFrom(klass);
   }
 }

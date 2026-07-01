@@ -7,7 +7,6 @@ package com.axelor.meta;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
@@ -21,6 +20,7 @@ import com.axelor.db.Nulls;
 import com.axelor.db.Query;
 import com.axelor.db.ValueEnum;
 import com.axelor.db.annotations.EnumWidget;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -58,6 +58,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,29 +70,22 @@ public final class MetaStore {
   private static final AxelorCache<String, Action> ACTIONS =
       CacheBuilder.newBuilder("actions").maximumSize(1000).build(XMLViews::findAction);
 
-  private static final AxelorCache<ModelFieldKey, Map<String, FieldEntry>> JSON_FIELDS =
+  private static final AxelorCache<ModelFieldKey, Map<String, JsonReferenceFieldDTO>> JSON_FIELDS =
       CacheBuilder.newBuilder("jsonFields")
           .maximumSize(1000)
           .expireAfterAccess(Duration.ofDays(1))
           .build();
 
   /** Key used to store and retrieve JSON fields from the json fields cache. */
-  private record ModelFieldKey(String modelName, String fieldName) implements Serializable {
-    public static ModelFieldKey of(String modelName, String fieldName) {
-      return new ModelFieldKey(modelName, fieldName);
+  private record ModelFieldKey(String modelName, String modelField) implements Serializable {
+    public static ModelFieldKey of(String modelName, String modelField) {
+      return new ModelFieldKey(modelName, modelField);
     }
 
     public static ModelFieldKey of(String jsonModel) {
       return new ModelFieldKey(jsonModel, null);
     }
   }
-
-  /**
-   * Cached, user-agnostic representation of a JSON field. {@code attrs} contains static metadata
-   * with raw (untranslated) title; per-user/per-locale logic is applied on read.
-   */
-  private record FieldEntry(Map<String, Object> attrs, Set<Long> roleIds, String includeIfScript)
-      implements Serializable {}
 
   private MetaStore() {}
 
@@ -332,6 +326,24 @@ public final class MetaStore {
   }
 
   @Nullable
+  public static Map<String, Object> findJsonFields(String modelName, String modelField) {
+    final Map<String, JsonReferenceFieldDTO> raw =
+        JSON_FIELDS.get(
+            ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
+    return raw != null ? toMap(raw.values(), modelName, modelField) : null;
+  }
+
+  @Nullable
+  public static Map<String, Object> findJsonFields(String jsonModel) {
+    if (StringUtils.isBlank(jsonModel)) {
+      return null;
+    }
+    final Map<String, JsonReferenceFieldDTO> raw =
+        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+    return raw != null ? toMap(raw.values(), jsonModel, null) : null;
+  }
+
+  @Nullable
   public static MetaJsonField findJsonField(String modelName, String modelField, String fieldName) {
     return Query.of(MetaJsonField.class)
         .filter("self.model = :model AND self.modelField = :modelField AND self.name = :name")
@@ -352,69 +364,55 @@ public final class MetaStore {
         .fetchOne();
   }
 
-  @Nullable
-  public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
-    final Map<String, FieldEntry> raw =
+  /** Checks if the JSON field exists on model. */
+  public static boolean hasJsonField(String modelName, String modelField, String fieldName) {
+    final Map<String, JsonReferenceFieldDTO> raw =
         JSON_FIELDS.get(
-            ModelFieldKey.of(modelName, fieldName), MetaStore::loadJsonFieldsByModelField);
-    return applyUserContext(raw, modelName, fieldName);
+            ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
+    return raw != null && raw.containsKey(fieldName);
   }
 
-  @Nullable
-  public static Map<String, Object> findJsonFields(String jsonModel) {
-    if (StringUtils.isBlank(jsonModel)) {
-      return null;
-    }
-    final Map<String, FieldEntry> raw =
-        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
-    return applyUserContext(raw, jsonModel, null);
-  }
-
-  /** Checks JSON field existence. */
-  public static boolean hasJsonField(String modelName, String fieldName, String jsonFieldName) {
-    final Map<String, FieldEntry> raw =
-        JSON_FIELDS.get(
-            ModelFieldKey.of(modelName, fieldName), MetaStore::loadJsonFieldsByModelField);
-    return raw != null && raw.containsKey(jsonFieldName);
-  }
-
-  /** Checks JSON field existence. */
+  /** Checks if the JSON field exists on json model. */
   public static boolean hasJsonField(String jsonModel, String jsonFieldName) {
     if (StringUtils.isBlank(jsonModel)) {
       return false;
     }
-    final Map<String, FieldEntry> raw =
+    final Map<String, JsonReferenceFieldDTO> raw =
         JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
     return raw != null && raw.containsKey(jsonFieldName);
   }
 
-  @Nullable
-  private static Map<String, FieldEntry> loadJsonFieldsByModelField(ModelFieldKey key) {
+  private static Map<String, JsonReferenceFieldDTO> loadJsonFieldsByModelField(ModelFieldKey key) {
     String modelName = key.modelName();
-    String fieldName = key.fieldName();
+    String modelField = key.modelField();
 
     try {
-      if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
+      if (!Mapper.of(Class.forName(modelName)).getProperty(modelField).isJson()) {
         return Collections.emptyMap();
       }
     } catch (Exception e) {
       return Collections.emptyMap();
     }
 
-    var fields =
-        Query.of(MetaJsonField.class)
-            .filter("self.model = :model AND self.modelField = :field")
-            .bind("model", modelName)
-            .bind("field", fieldName)
-            .order("sequence", Nulls.FIRST)
-            .order("id")
-            .cacheable()
-            .fetch();
-    return updateJsonFields(fields, fieldName);
+    return Query.of(MetaJsonField.class)
+        .filter("self.model = :model AND self.modelField = :modelField")
+        .bind("model", modelName)
+        .bind("modelField", modelField)
+        .order("sequence", Nulls.FIRST)
+        .order("id")
+        .cacheable()
+        .fetch()
+        .stream()
+        .map(JsonReferenceFieldDTO::from)
+        .collect(
+            Collectors.toMap(
+                JsonReferenceFieldDTO::name,
+                Function.identity(),
+                (existing, replacement) -> existing,
+                LinkedHashMap::new));
   }
 
-  @Nullable
-  private static Map<String, FieldEntry> loadJsonFieldsByJsonModel(ModelFieldKey key) {
+  private static Map<String, JsonReferenceFieldDTO> loadJsonFieldsByJsonModel(ModelFieldKey key) {
     final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
     final MetaJsonModel found = forms.findByName(key.modelName());
 
@@ -422,7 +420,20 @@ public final class MetaStore {
       return Collections.emptyMap();
     }
 
-    return updateJsonFields(found.getFields(), "attrs");
+    return found.getFields().stream()
+        .map(JsonReferenceFieldDTO::from)
+        .collect(
+            Collectors.toMap(
+                JsonReferenceFieldDTO::name,
+                Function.identity(),
+                (existing, replacement) -> existing,
+                LinkedHashMap::new));
+  }
+
+  private static Map<String, Object> toMap(
+      Collection<JsonReferenceFieldDTO> records, String object, String jsonField) {
+    var jsonFields = updateJsonFields(records);
+    return applyUserContext(jsonFields, object, jsonField);
   }
 
   /**
@@ -430,42 +441,18 @@ public final class MetaStore {
    * (role, includeIf, permissions) and per-locale (title) logic is applied later by {@link
    * #applyUserContext}.
    */
-  private static Map<String, FieldEntry> updateJsonFields(
-      List<MetaJsonField> records, String fieldName) {
-    final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
-    final Mapper mapper = Mapper.of(MetaJsonField.class);
-    final Map<String, FieldEntry> fields = new LinkedHashMap<>();
-    final List<MetaJsonField> jsonFields = new ArrayList<>(records);
+  private static Map<String, Object> updateJsonFields(Collection<JsonReferenceFieldDTO> records) {
+    final Map<String, Object> fields = new LinkedHashMap<>();
+    final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
 
-    jsonFields.sort(
-        (a, b) -> {
-          int x = a.getSequence() == null ? 0 : a.getSequence();
-          int y = b.getSequence() == null ? 0 : b.getSequence();
-          return Integer.compare(x, y);
-        });
-
-    for (MetaJsonField record : jsonFields) {
+    for (JsonReferenceFieldDTO record : records) {
       final Map<String, Object> attrs = new HashMap<>();
 
-      for (java.lang.reflect.Field field : declaredFields) {
-        final Property prop = mapper.getProperty(field.getName());
-        if (prop == null || prop.isPrimary() || prop.isReference() || prop.isCollection()) {
-          continue;
-        }
-        final Object value = prop.get(record);
-        if (value == null || Boolean.FALSE.equals(value)) continue;
-        if ("regex".equals(prop.getName())) {
-          // XXX: rename regex to pattern to be aligned with pattern attribute used with normal
-          // fields.
-          attrs.put("pattern", value);
-          continue;
-        }
-        attrs.put(prop.getName(), value);
-      }
+      attrs.putAll(record.toMap());
 
-      String type = record.getType() == null ? "" : record.getType();
-      Integer min = record.getMinSize();
-      Integer max = record.getMaxSize();
+      String type = record.type() == null ? "" : record.type();
+      Integer min = record.minSize();
+      Integer max = record.maxSize();
       if (min != null && max != null) {
         if (max <= min) {
           attrs.remove("maxSize");
@@ -480,21 +467,22 @@ public final class MetaStore {
         attrs.remove("minSize");
       }
 
-      if ("ref-select".equalsIgnoreCase(record.getType())
-          || "ref-select".equalsIgnoreCase(record.getWidget())
-          || "RefSelect".equalsIgnoreCase(record.getWidget())) {
+      if ("ref-select".equalsIgnoreCase(record.type())
+          || "ref-select".equalsIgnoreCase(record.widget())
+          || "RefSelect".equalsIgnoreCase(record.widget())) {
         attrs.put("widget", "json-ref-select");
       }
 
-      if (!StringUtils.isBlank(record.getTargetModel())) {
-        attrs.put("target", record.getTargetModel());
+      if (!StringUtils.isBlank(record.targetModel())) {
+        attrs.put("target", record.targetModel());
         attrs.remove("targetModel");
         try {
-          Property nameField = Mapper.of(Class.forName(record.getTargetModel())).getNameField();
+          Property nameField = Mapper.of(Class.forName(record.targetModel())).getNameField();
           if (nameField != null) {
             attrs.put("targetName", nameField.getName());
           }
         } catch (ClassNotFoundException e) {
+          log.warn("Target model not found: {}", record.targetModel());
         }
       }
 
@@ -502,11 +490,15 @@ public final class MetaStore {
         type = type.substring(5);
         attrs.put("type", type);
         attrs.put("target", MetaJsonRecord.class.getName());
-        if (record.getTargetJsonModel() != null) {
-          final MetaJsonModel targetModel = record.getTargetJsonModel();
+        if (record.targetJsonModel() != null) {
+          final MetaJsonModel targetModel = forms.findByName(record.targetJsonModel());
+          if (targetModel == null) {
+            log.warn("Target json model not found: {}", record.targetJsonModel());
+            continue;
+          }
           String domain = "self.jsonModel = '%s'".formatted(targetModel.getName());
-          if (!StringUtils.isBlank(record.getDomain())) {
-            domain = "(%s) AND (%s)".formatted(domain, record.getDomain());
+          if (!StringUtils.isBlank(record.domain())) {
+            domain = "(%s) AND (%s)".formatted(domain, record.domain());
           }
           attrs.put("domain", domain);
           if (targetModel.getGridView() != null) {
@@ -520,31 +512,33 @@ public final class MetaStore {
         }
       }
 
-      if (StringUtils.notBlank(record.getSelection())) {
-        attrs.put("selectionList", getSelectionList(record.getSelection()));
+      if (StringUtils.notBlank(record.selection())) {
+        attrs.put("selectionList", getSelectionList(record.selection()));
       }
 
-      if (StringUtils.notBlank(record.getEnumType())) {
+      if (StringUtils.notBlank(record.enumType())) {
         try {
-          attrs.put("selectionList", getSelectionList(Class.forName(record.getEnumType())));
+          attrs.put("selectionList", getSelectionList(Class.forName(record.enumType())));
         } catch (ClassNotFoundException e) {
-          log.error("No such enum type found: {}", record.getEnumType());
+          log.error("No such enum type found: {}", record.enumType());
         }
       }
 
-      attrs.put("jsonField", fieldName);
-      attrs.put("jsonPath", record.getName());
+      attrs.put("jsonField", record.modelField());
+      attrs.put("jsonPath", record.name());
       if (type.matches("integer|decimal|boolean")) {
         attrs.put("jsonType", type);
       }
 
-      Set<Long> roleIds = null;
-      if (ObjectUtils.notEmpty(record.getRoles())) {
-        roleIds =
-            record.getRoles().stream().map(Role::getId).collect(Collectors.toUnmodifiableSet());
+      if (ObjectUtils.notEmpty(record.roleIds())) {
+        attrs.put("roleIds", record.roleIds());
       }
 
-      fields.put(record.getName(), new FieldEntry(attrs, roleIds, record.getIncludeIf()));
+      if (StringUtils.notBlank(record.includeIf())) {
+        attrs.put("includeIf", record.includeIf());
+      }
+
+      fields.put(record.name(), attrs);
     }
     return fields;
   }
@@ -555,7 +549,7 @@ public final class MetaStore {
    */
   @Nullable
   private static Map<String, Object> applyUserContext(
-      Map<String, FieldEntry> raw, String object, String jsonField) {
+      Map<String, Object> raw, String object, String jsonField) {
     if (ObjectUtils.isEmpty(raw)) return null;
 
     final User user = AuthUtils.getUser();
@@ -565,10 +559,10 @@ public final class MetaStore {
 
     ScriptHelper scriptHelper = null;
     final Map<String, Object> result = new LinkedHashMap<>();
-    for (Map.Entry<String, FieldEntry> rawEntry : raw.entrySet()) {
+    for (Map.Entry<String, Object> rawEntry : raw.entrySet()) {
       final String name = rawEntry.getKey();
-      final FieldEntry entry = rawEntry.getValue();
-      final Map<String, Object> attrs = new HashMap<>(entry.attrs());
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> attrs = new HashMap<>((Map<String, Object>) rawEntry.getValue());
 
       // localized title (per-locale, applied on read)
       String rawTitle = (String) attrs.get("title");
@@ -580,20 +574,24 @@ public final class MetaStore {
       }
 
       boolean hasAccess = true;
+      Set<Long> roleIds = (Set<Long>) attrs.get("roleIds");
 
-      // role check
-      if (userRoleIds != null
-          && entry.roleIds() != null
-          && Collections.disjoint(userRoleIds, entry.roleIds())) {
-        hasAccess = false;
+      if (roleIds != null) {
+        // role check
+        if (userRoleIds != null && Collections.disjoint(userRoleIds, roleIds)) {
+          hasAccess = false;
+        }
+        attrs.remove("roleIds");
       }
 
+      String includeIf = (String) attrs.get("includeIf");
+
       // server condition
-      if (hasAccess && StringUtils.notBlank(entry.includeIfScript())) {
+      if (hasAccess && StringUtils.notBlank(includeIf)) {
         if (scriptHelper == null) {
           scriptHelper = new CompositeScriptHelper(null);
         }
-        if (!scriptHelper.test(entry.includeIfScript())) {
+        if (!scriptHelper.test(includeIf)) {
           hasAccess = false;
         }
       }
