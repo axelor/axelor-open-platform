@@ -88,6 +88,20 @@ class MetaStoreJsonFieldsCacheTest extends JpaTest {
     assertNull(MetaStore.findJsonFields("__nope__"));
   }
 
+  @Test
+  @Transactional
+  void hasJsonField_checksCorrectly() {
+    assertTrue(MetaStore.hasJsonField(MODEL, "name"));
+    assertTrue(MetaStore.hasJsonField(MODEL, "status"));
+    assertFalse(MetaStore.hasJsonField(MODEL, "extra"));
+    assertFalse(MetaStore.hasJsonField("__nope__", "name"));
+
+    assertTrue(MetaStore.hasJsonField(MetaJsonRecord.class.getName(), "attrs", "name"));
+    assertTrue(MetaStore.hasJsonField(MetaJsonRecord.class.getName(), "attrs", "status"));
+    assertFalse(MetaStore.hasJsonField(MetaJsonRecord.class.getName(), "attrs", "extra"));
+    assertFalse(MetaStore.hasJsonField("__nope__", "attrs", "name"));
+  }
+
   private MetaJsonField stringField(String name, boolean nameField) {
     MetaJsonField f = new MetaJsonField();
     f.setName(name);

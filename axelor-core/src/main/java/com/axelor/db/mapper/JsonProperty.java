@@ -9,7 +9,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
 import jakarta.annotation.Nullable;
@@ -79,7 +78,7 @@ public class JsonProperty extends Property {
         fieldName.startsWith(KEY_JSON_PREFIX)
             ? fieldName.substring(KEY_JSON_PREFIX.length())
             : fieldName;
-    final MetaJsonField jsonField =
+    final JsonReferenceFieldDTO jsonField =
         jsonModel != null
             ? MetaStore.findJsonField(jsonModel, subFieldName)
             : MetaStore.findJsonField(beanClass.getName(), propertyName, subFieldName);
@@ -91,8 +90,7 @@ public class JsonProperty extends Property {
     final Mapper mapper = Mapper.of(beanClass);
     final Property property = mapper.getProperty(propertyName);
 
-    return new JsonProperty(
-        property, JsonReferenceFieldDTO.from(jsonField), fieldName, subFieldName);
+    return new JsonProperty(property, jsonField, fieldName, subFieldName);
   }
 
   @Override

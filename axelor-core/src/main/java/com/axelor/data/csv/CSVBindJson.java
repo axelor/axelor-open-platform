@@ -9,7 +9,6 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.JsonProperty;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -75,16 +74,15 @@ public class CSVBindJson extends CSVBind {
           Arrays.asList(
               getField().substring(JsonProperty.KEY_JSON_PREFIX.length()).split("\\.", 2));
 
-      final MetaJsonField metaJsonField =
+      final JsonReferenceFieldDTO field =
           parentJsonModel.isPresent()
               ? MetaStore.findJsonField(parentJsonModel.get(), fieldParts.get(1))
               : MetaStore.findJsonField(parentType, fieldParts.getFirst(), fieldParts.get(1));
 
-      if (metaJsonField == null) {
+      if (field == null) {
         return;
       }
 
-      final JsonReferenceFieldDTO field = JsonReferenceFieldDTO.from(metaJsonField);
       final String type = field.type();
 
       if (type != null && type.startsWith("json-")) {

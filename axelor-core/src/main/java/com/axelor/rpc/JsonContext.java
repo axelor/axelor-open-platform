@@ -7,10 +7,10 @@ package com.axelor.rpc;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -88,7 +88,7 @@ public class JsonContext extends SimpleBindings {
     return null;
   }
 
-  private MetaJsonField findField(String name) {
+  private JsonReferenceFieldDTO findField(String name) {
     if (jsonModel != null) {
       return MetaStore.findJsonField(jsonModel, name);
     }
@@ -136,14 +136,13 @@ public class JsonContext extends SimpleBindings {
   }
 
   @Override
-  @SuppressWarnings({"unchecked"})
   public Object get(Object key) {
-    MetaJsonField field = findField(String.valueOf(key));
+    JsonReferenceFieldDTO field = findField(String.valueOf(key));
     if (field == null) {
       return super.get(key);
     }
 
-    final String type = (String) Objects.requireNonNullElse(field.getType(), "");
+    final String type = Objects.requireNonNullElse(field.type(), "");
     final Object value = super.get(key);
 
     if (value == null || ObjectUtils.isEmpty(value)) {
@@ -156,7 +155,7 @@ public class JsonContext extends SimpleBindings {
       case "many-to-one":
       case "one-to-many":
       case "many-to-many":
-        target = field.getTargetModel();
+        target = field.targetModel();
         break;
       case "json-many-to-one":
       case "json-one-to-many":

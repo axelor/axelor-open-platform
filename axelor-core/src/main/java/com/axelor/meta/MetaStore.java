@@ -327,59 +327,56 @@ public final class MetaStore {
 
   @Nullable
   public static Map<String, Object> findJsonFields(String modelName, String modelField) {
-    final Map<String, JsonReferenceFieldDTO> raw =
-        JSON_FIELDS.get(
-            ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(modelName, modelField);
     return raw != null ? toMap(raw.values(), modelName, modelField) : null;
   }
 
   @Nullable
   public static Map<String, Object> findJsonFields(String jsonModel) {
-    if (StringUtils.isBlank(jsonModel)) {
-      return null;
-    }
-    final Map<String, JsonReferenceFieldDTO> raw =
-        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(jsonModel);
     return raw != null ? toMap(raw.values(), jsonModel, null) : null;
   }
 
+  /** Finds the JSON field metadata on model. */
   @Nullable
-  public static MetaJsonField findJsonField(String modelName, String modelField, String fieldName) {
-    return Query.of(MetaJsonField.class)
-        .filter("self.model = :model AND self.modelField = :modelField AND self.name = :name")
-        .bind("model", modelName)
-        .bind("modelField", modelField)
-        .bind("name", fieldName)
-        .cacheable()
-        .fetchOne();
+  public static JsonReferenceFieldDTO findJsonField(
+      String modelName, String modelField, String fieldName) {
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(modelName, modelField);
+    return raw != null ? raw.get(fieldName) : null;
   }
 
+  /** Finds the JSON field metadata on json model. */
   @Nullable
-  public static MetaJsonField findJsonField(String jsonModelName, String fieldName) {
-    return Query.of(MetaJsonField.class)
-        .filter("self.jsonModel.name = :jsonModelName AND self.name = :name")
-        .bind("jsonModelName", jsonModelName)
-        .bind("name", fieldName)
-        .cacheable()
-        .fetchOne();
+  public static JsonReferenceFieldDTO findJsonField(String jsonModel, String fieldName) {
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(jsonModel);
+    return raw != null ? raw.get(fieldName) : null;
   }
 
   /** Checks if the JSON field exists on model. */
   public static boolean hasJsonField(String modelName, String modelField, String fieldName) {
-    final Map<String, JsonReferenceFieldDTO> raw =
-        JSON_FIELDS.get(
-            ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(modelName, modelField);
     return raw != null && raw.containsKey(fieldName);
   }
 
   /** Checks if the JSON field exists on json model. */
-  public static boolean hasJsonField(String jsonModel, String jsonFieldName) {
+  public static boolean hasJsonField(String jsonModel, String fieldName) {
+    final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(jsonModel);
+    return raw != null && raw.containsKey(fieldName);
+  }
+
+  @Nullable
+  private static Map<String, JsonReferenceFieldDTO> getJsonFields(
+      String modelName, String modelField) {
+    return JSON_FIELDS.get(
+        ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
+  }
+
+  @Nullable
+  private static Map<String, JsonReferenceFieldDTO> getJsonFields(String jsonModel) {
     if (StringUtils.isBlank(jsonModel)) {
-      return false;
+      return null;
     }
-    final Map<String, JsonReferenceFieldDTO> raw =
-        JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
-    return raw != null && raw.containsKey(jsonFieldName);
+    return JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
   }
 
   private static Map<String, JsonReferenceFieldDTO> loadJsonFieldsByModelField(ModelFieldKey key) {
