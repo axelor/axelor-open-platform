@@ -17,6 +17,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
+import com.axelor.db.Nulls;
 import com.axelor.db.Query;
 import com.axelor.db.ValueEnum;
 import com.axelor.db.annotations.EnumWidget;
@@ -405,7 +406,7 @@ public final class MetaStore {
             .filter("self.model = :model AND self.modelField = :field")
             .bind("model", modelName)
             .bind("field", fieldName)
-            .order("sequence")
+            .order("sequence", Nulls.FIRST)
             .order("id")
             .cacheable()
             .fetch();

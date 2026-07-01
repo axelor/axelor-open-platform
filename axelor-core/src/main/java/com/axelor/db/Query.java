@@ -192,7 +192,8 @@ public class Query<T extends Model> {
    * Set order by clause for the query. This method can be chained to provide multiple fields.
    *
    * <p>The {@code spec} is just a field name for {@code ASC} or should be prefixed with {@code -}
-   * for {@code DESC} clause.
+   * for {@code DESC} clause. The {@code nullPrecedence} specifies whether null values are ordered
+   * first or last.
    *
    * <p>For example:
    *
@@ -201,19 +202,20 @@ public class Query<T extends Model> {
    * query = query.filter(&quot;name =&quot;, &quot;some&quot;).filter(&quot;age &gt;=&quot;, 20)
    *        .filter(&quot;lang in&quot;, &quot;en&quot;, &quot;hi&quot;);
    *
-   * query = query.order(&quot;name&quot;).order(&quot;-age&quot;);
+   * query = query.order(&quot;name&quot;).order(&quot;-age&quot;, Nulls.LAST);
    * </pre>
    *
    * <p>This is equivalent to:
    *
    * <pre>
-   * SELECT p from Person p WHERE (p.name = ?1) AND (p.age &gt;= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC
+   * SELECT p from Person p WHERE (p.name = ?1) AND (p.age &gt;= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC NULLS LAST
    * </pre>
    *
    * @param spec order spec
+   * @param nullPrecedence null precedence
    * @return the same query instance
    */
-  public Query<T> order(String spec) {
+  public Query<T> order(String spec, Nulls nullPrecedence) {
     if (!orderBy.isEmpty()) {
       orderBy += ", ";
     } else {
@@ -235,9 +237,46 @@ public class Query<T extends Model> {
       orderBy += name;
     }
 
+    if (nullPrecedence != null && nullPrecedence != Nulls.NONE) {
+      orderBy += " NULLS " + nullPrecedence.name();
+    }
+
     orderNames.add(name);
 
     return this;
+  }
+
+  /**
+   * Set order by clause for the query. This method can be chained to provide multiple fields.
+   *
+   * <p>The {@code spec} is just a field name for {@code ASC} or should be prefixed with {@code -}
+   * for {@code DESC} clause.
+   *
+   * <p>The default precedence of null values is database-dependent. For reference, in PostgreSQL,
+   * null values are sorted last for ascending order ({@code ASC}) and sorted first for descending
+   * order ({@code DESC}). Use {@link #order(String, Nulls)} to specify null precedence explicitly.
+   *
+   * <p>For example:
+   *
+   * <pre>
+   * Query&lt;Person&gt; query = Query.of(Person);
+   * query = query.filter(&quot;name =&quot;, &quot;some&quot;).filter(&quot;age &gt;=&quot;, 20)
+   *        .filter(&quot;lang in&quot;, &quot;en&quot;, &quot;hi&quot;);
+   *
+   * query = query.order(&quot;name&quot;).order(&quot;-age&quot;);
+   * </pre>
+   *
+   * <p>This is equivalent to:
+   *
+   * <pre>
+   * SELECT p from Person p WHERE (p.name = ?1) AND (p.age &gt;= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC
+   * </pre>
+   *
+   * @param spec order spec
+   * @return the same query instance
+   */
+  public Query<T> order(String spec) {
+    return order(spec, Nulls.NONE);
   }
 
   /**
