@@ -160,7 +160,9 @@ public class ModuleManager {
             I18n.get(
                 "A views restoring is already in progress. Please wait until it ends and try again."));
       }
-      // Restore meta of installed modules only.
+      // Refresh the MetaModule informations
+      resolve(true);
+      // Restore meta of installed modules only (i.e., all pending).
       process(false, RESOLVER.all().stream().filter(Module::isInstalled).toList());
     } finally {
       busy.set(0);

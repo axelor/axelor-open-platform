@@ -1,0 +1,3 @@
+---
+title: Fix MetaModule data not refreshed when restoring views
+type: fix
