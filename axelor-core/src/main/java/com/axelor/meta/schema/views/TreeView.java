@@ -5,6 +5,7 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
@@ -18,7 +19,6 @@ import jakarta.xml.bind.annotation.XmlElements;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @XmlType
 @JsonTypeName("tree")
@@ -206,17 +206,13 @@ public class TreeView extends AbstractView {
           Property jsonProperty = mapper.getProperty(jsonField);
 
           if (jsonProperty != null && jsonProperty.isJson()) {
-            Map<String, Object> jsonFields =
+            JsonReferenceFieldDTO jsonFieldInfo =
                 StringUtils.notBlank(nodeJsonModel)
-                    ? MetaStore.findJsonFields(nodeJsonModel)
-                    : MetaStore.findJsonFields(modelClass.getName(), jsonField);
+                    ? MetaStore.findJsonField(nodeJsonModel, fieldName)
+                    : MetaStore.findJsonField(modelClass.getName(), jsonField, fieldName);
 
-            if (jsonFields != null && jsonFields.containsKey(fieldName)) {
-              Map<String, Object> attrs = (Map<String, Object>) jsonFields.get(fieldName);
-              String target = (String) attrs.get("target");
-              if (target != null) {
-                return Class.forName(target);
-              }
+            if (jsonFieldInfo != null && jsonFieldInfo.isReference()) {
+              return Class.forName(jsonFieldInfo.resolveTargetModel());
             }
           }
         }

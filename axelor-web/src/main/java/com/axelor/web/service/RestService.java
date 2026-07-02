@@ -22,6 +22,7 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Repository;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.dms.db.DMSFile;
@@ -713,25 +714,29 @@ public class RestService extends ResourceService {
   private boolean checkMetaFileJsonProperty(
       Property property, Long id, Context context, String parentModel)
       throws ClassNotFoundException {
-    final Map<String, Object> jsonFields =
-        MetaStore.findJsonFields(parentModel, property.getName());
+    final Map<String, JsonReferenceFieldDTO> jsonFields =
+        MetaStore.getJsonFields(parentModel, property.getName());
 
-    for (final Entry<String, Object> entry : jsonFields.entrySet()) {
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> value = (Map<String, Object>) entry.getValue();
+    if (jsonFields == null) {
+      return false;
+    }
+
+    for (final Entry<String, JsonReferenceFieldDTO> entry : jsonFields.entrySet()) {
+      final JsonReferenceFieldDTO value = entry.getValue();
 
       if (value == null) {
         continue;
       }
 
-      final String target = (String) value.get("target");
+      final String target = value.targetModel();
 
       if (target != null && MetaFile.class.isAssignableFrom(Class.forName(target))) {
-        final String type = (String) value.getOrDefault("type", "null");
+        final String type = value.type();
 
-        if (type.endsWith("-to-one") && checkMetaFileExists(id, context.get(entry.getKey()))
-            || type.endsWith("-to-many")
-                && checkMetaFileInCollection(id, context.get(entry.getKey()))) {
+        if (type != null
+            && (type.endsWith("-to-one") && checkMetaFileExists(id, context.get(entry.getKey()))
+                || type.endsWith("-to-many")
+                    && checkMetaFileInCollection(id, context.get(entry.getKey())))) {
           return true;
         }
       }

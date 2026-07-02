@@ -6,6 +6,7 @@ package com.axelor.meta.schema.views;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
+import com.axelor.db.json.JsonReferenceFieldDTO;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
@@ -16,7 +17,6 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,7 +125,6 @@ public class KanbanView extends CardsView {
 
   @XmlTransient
   @JsonProperty
-  @SuppressWarnings("unchecked")
   public List<Selection.Option> getColumns() {
     Class<?> modelClass = getModelClass();
     Mapper mapper = Mapper.of(modelClass);
@@ -138,15 +137,13 @@ public class KanbanView extends CardsView {
       Property jsonProperty = mapper.getProperty(jsonField);
 
       if (jsonProperty != null && jsonProperty.isJson()) {
-        Map<String, Object> jsonFields =
+        JsonReferenceFieldDTO jsonFieldInfo =
             StringUtils.notBlank(getJsonModel())
-                ? MetaStore.findJsonFields(getJsonModel())
-                : MetaStore.findJsonFields(modelClass.getName(), jsonField);
+                ? MetaStore.findJsonField(getJsonModel(), fieldName)
+                : MetaStore.findJsonField(modelClass.getName(), jsonField, fieldName);
 
-        if (jsonFields != null && jsonFields.containsKey(fieldName)) {
-          Map<String, Object> attrs = (Map<String, Object>) jsonFields.get(fieldName);
-          List<Selection.Option> selectionList =
-              (List<Selection.Option>) attrs.get("selectionList");
+        if (jsonFieldInfo != null) {
+          List<Selection.Option> selectionList = getJsonFieldSelectionList(jsonFieldInfo);
           if (selectionList != null) {
             return selectionList;
           }
@@ -179,5 +176,19 @@ public class KanbanView extends CardsView {
     }
 
     throw new RuntimeException("Invalid columnBy: " + columnBy);
+  }
+
+  private static List<Selection.Option> getJsonFieldSelectionList(JsonReferenceFieldDTO field) {
+    if (StringUtils.notBlank(field.selection())) {
+      return MetaStore.getSelectionList(field.selection());
+    }
+    if (StringUtils.notBlank(field.enumType())) {
+      try {
+        return MetaStore.getSelectionList(Class.forName(field.enumType()));
+      } catch (ClassNotFoundException e) {
+        // no such enum type
+      }
+    }
+    return null;
   }
 }
