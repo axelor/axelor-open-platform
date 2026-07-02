@@ -328,13 +328,13 @@ public final class MetaStore {
   @Nullable
   public static Map<String, Object> findJsonFields(String modelName, String modelField) {
     final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(modelName, modelField);
-    return raw != null ? toMap(raw.values(), modelName, modelField) : null;
+    return raw != null ? resolveJsonFields(raw.values(), modelName, modelField) : null;
   }
 
   @Nullable
   public static Map<String, Object> findJsonFields(String jsonModel) {
     final Map<String, JsonReferenceFieldDTO> raw = getJsonFields(jsonModel);
-    return raw != null ? toMap(raw.values(), jsonModel, null) : null;
+    return raw != null ? resolveJsonFields(raw.values(), jsonModel, null) : null;
   }
 
   /** Finds the JSON field metadata on model. */
@@ -427,18 +427,20 @@ public final class MetaStore {
                 LinkedHashMap::new));
   }
 
-  private static Map<String, Object> toMap(
+  /** Builds the field metadata and overlays user locale/access contexts. */
+  @Nullable
+  private static Map<String, Object> resolveJsonFields(
       Collection<JsonReferenceFieldDTO> records, String object, String jsonField) {
-    var jsonFields = updateJsonFields(records);
-    return applyUserContext(jsonFields, object, jsonField);
-  }
+    if (ObjectUtils.isEmpty(records)) {
+      return null;
+    }
 
-  /**
-   * Builds the raw, user/locale-agnostic field metadata cached by the JSON field caches. Per-user
-   * (role, includeIf, permissions) and per-locale (title) logic is applied later by {@link
-   * #applyUserContext}.
-   */
-  private static Map<String, Object> updateJsonFields(Collection<JsonReferenceFieldDTO> records) {
+    final User user = AuthUtils.getUser();
+    final boolean roleCheckEnabled = user != null && !AuthUtils.isAdmin(user);
+    final Set<Long> userRoleIds = roleCheckEnabled ? collectUserRoleIds(user) : null;
+    final ResourceBundle bundle = I18n.getBundle();
+
+    ScriptHelper scriptHelper = null;
     final Map<String, Object> fields = new LinkedHashMap<>();
     final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
 
@@ -527,61 +529,29 @@ public final class MetaStore {
         attrs.put("jsonType", type);
       }
 
-      if (ObjectUtils.notEmpty(record.roleIds())) {
-        attrs.put("roleIds", record.roleIds());
-      }
-
-      if (StringUtils.notBlank(record.includeIf())) {
-        attrs.put("includeIf", record.includeIf());
-      }
-
-      fields.put(record.name(), attrs);
-    }
-    return fields;
-  }
-
-  /**
-   * Apply per-user (role, includeIf, permission rules) and per-locale (title translation) overlay
-   * to the cached raw field map.
-   */
-  @Nullable
-  private static Map<String, Object> applyUserContext(
-      Map<String, Object> raw, String object, String jsonField) {
-    if (ObjectUtils.isEmpty(raw)) return null;
-
-    final User user = AuthUtils.getUser();
-    final boolean roleCheckEnabled = user != null && !AuthUtils.isAdmin(user);
-    final Set<Long> userRoleIds = roleCheckEnabled ? collectUserRoleIds(user) : null;
-    final ResourceBundle bundle = I18n.getBundle();
-
-    ScriptHelper scriptHelper = null;
-    final Map<String, Object> result = new LinkedHashMap<>();
-    for (Map.Entry<String, Object> rawEntry : raw.entrySet()) {
-      final String name = rawEntry.getKey();
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> attrs = new HashMap<>((Map<String, Object>) rawEntry.getValue());
-
       // localized title (per-locale, applied on read)
-      String rawTitle = (String) attrs.get("title");
+      String rawTitle = record.title();
       if (StringUtils.notBlank(rawTitle)) {
         attrs.put("title", bundle.getString(rawTitle));
       } else {
-        String last = name.substring(name.lastIndexOf('.') + 1);
+        String last = record.name().substring(record.name().lastIndexOf('.') + 1);
         attrs.put("autoTitle", bundle.getString(Inflector.getInstance().humanize(last)));
       }
 
       boolean hasAccess = true;
-      Set<Long> roleIds = (Set<Long>) attrs.get("roleIds");
+      Set<Long> roleIds = record.roleIds();
 
       if (roleIds != null) {
         // role check
-        if (userRoleIds != null && Collections.disjoint(userRoleIds, roleIds)) {
+        if (userRoleIds != null
+            && !roleIds.isEmpty()
+            && Collections.disjoint(userRoleIds, roleIds)) {
           hasAccess = false;
         }
         attrs.remove("roleIds");
       }
 
-      String includeIf = (String) attrs.get("includeIf");
+      String includeIf = record.includeIf();
 
       // server condition
       if (hasAccess && StringUtils.notBlank(includeIf)) {
@@ -600,9 +570,9 @@ public final class MetaStore {
         attrs.put("forceHidden", true);
       }
 
-      result.put(name, attrs);
+      fields.put(record.name(), attrs);
     }
-    return checkPermissions(result, object, jsonField);
+    return checkPermissions(fields, object, jsonField);
   }
 
   private static Set<Long> collectUserRoleIds(User user) {
