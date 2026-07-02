@@ -185,6 +185,113 @@ export function defaultAttrs(schema: Schema): Attrs {
   return attrs;
 }
 
+/**
+ * Collects M2M fields of the given meta, mapped to their targetName (view
+ * item targetName takes precedence over the field one). Built once per meta.
+ */
+const buildM2MFields = (() => {
+  const cache = new WeakMap<
+    NonNullable<FormState["meta"]>,
+    Map<string, string | undefined>
+  >();
+
+  return function buildM2MFields(
+    meta: FormState["meta"] | undefined,
+  ): Map<string, string | undefined> {
+    if (!meta) return new Map();
+
+    const cached = cache.get(meta);
+    if (cached) return cached;
+
+    const m2mFields = new Map<string, string | undefined>();
+    const { fields = {} } = meta;
+
+    for (const field of Object.values(fields)) {
+      if (field.type === "MANY_TO_MANY") {
+        m2mFields.set(field.name, field.targetName);
+      }
+    }
+
+    // Single view traversal: collect view-level targetName overrides, and
+    // dummy M2M fields present in view items but absent from meta.fields
+    // (e.g. a field defined on the view with widget="TagSelect" or
+    // serverType="many-to-many" that isn't part of the model's field list).
+    const viewItems = findViewItems(meta, (item) => Boolean(item.name));
+    for (const item of viewItems) {
+      const name = item.name!;
+      if (m2mFields.has(name)) {
+        if (item.targetName) {
+          m2mFields.set(name, item.targetName);
+        }
+      } else if (
+        !fields[name] &&
+        getFieldServerType(item, undefined) === "MANY_TO_MANY"
+      ) {
+        m2mFields.set(name, item.targetName);
+      }
+    }
+
+    cache.set(meta, m2mFields);
+    return m2mFields;
+  };
+})();
+
+/**
+ * Compacts a persisted M2M item (positive id) to id, $version, selected and
+ * the field targetName when available, so that the backend treats it as a
+ * plain reference instead of a record to update. New (unsaved) items are
+ * passed to the given callback (kept as they are by default).
+ */
+function compactM2MItem(
+  item: DataContext,
+  targetName?: string,
+  processNew: (item: DataContext) => DataContext = (x) => x,
+): DataContext {
+  if (!item || typeof item !== "object") return item;
+  if ((item.id ?? 0) > 0) {
+    return {
+      id: item.id,
+      $version: item.version ?? item.$version,
+      ...(item.selected !== undefined && { selected: item.selected }),
+      ...(targetName &&
+        item[targetName] !== undefined && {
+          [targetName]: item[targetName],
+        }),
+    };
+  }
+  return processNew(item);
+}
+
+/**
+ * Compacts persisted M2M field items of the given record to id, $version and
+ * selected, like processContextValues does for requests. The field targetName
+ * is also kept when available, so widgets don't need to fetch it again for
+ * display. New (unsaved) items are kept as they are.
+ *
+ * This is meant to be applied when a sub-record is committed (editable grid
+ * row commit, popup editor save), so that M2M items filled by actions with
+ * full record objects don't carry edit intent into subsequent save or action
+ * requests made from the parent record.
+ */
+export function compactM2MValues(
+  record: DataRecord,
+  meta?: FormState["meta"],
+): DataRecord {
+  const m2mFields = buildM2MFields(meta);
+
+  let result = record;
+  for (const [name, targetName] of m2mFields) {
+    const value = result[name];
+    if (!Array.isArray(value)) continue;
+
+    const items = value.map((item) => compactM2MItem(item, targetName));
+
+    result = { ...result, [name]: items };
+  }
+
+  return result;
+}
+
 export function processContextValues(
   context: DataContext,
   meta?: FormState["meta"],
@@ -198,6 +305,8 @@ export function processContextValues(
     "__check_version",
     "_showSingle",
   ];
+
+  const m2mFields = buildM2MFields(meta);
 
   function process(_value: DataContext) {
     if (typeof _value !== "object") return _value;
@@ -218,7 +327,9 @@ export function processContextValues(
 
       if (v && typeof v === "object") {
         if (Array.isArray(v)) {
-          value[k] = v.map(process);
+          value[k] = m2mFields.has(k)
+            ? v.map((item) => compactM2MItem(item, m2mFields.get(k), process))
+            : v.map(process);
         } else {
           value[k] = process(v);
         }
@@ -583,7 +694,7 @@ export function createContextParams(
     const _view = _views?.find((x) => x.type === _viewType);
     const _viewName = _view ? (_view.name ?? name) : name;
 
-      // ignore special context names
+    // ignore special context names
     const IGNORE = ["_showRecord", "_showSingle", "__check_version"];
 
     return {

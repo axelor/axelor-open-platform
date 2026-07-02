@@ -18,6 +18,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
 import { showErrors } from "@/views/form";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
+import { compactM2MValues } from "@/views/form/builder/utils";
 
 import { initTab } from "../use-tabs";
 import { useSingleClickHandler } from "../use-button";
@@ -220,7 +221,10 @@ function Footer({
 
             if (canSave) {
               if (onSave) {
-                onSave({ ...record, _dirty: state.dirty });
+                onSave({
+                  ...compactM2MValues(record, state.meta),
+                  _dirty: state.dirty,
+                });
               } else if (onSelect && handler.onSave) {
                 const rec = await handler.onSave({
                   shouldSave: true,

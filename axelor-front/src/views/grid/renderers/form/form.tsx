@@ -51,6 +51,7 @@ import {
 import { ExpandIcon } from "../../builder/expandable";
 import { AUTO_ADD_ROW } from "../../builder/utils";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
+import { compactM2MValues } from "@/views/form/builder/utils";
 import { executeWithoutQueue } from "@/view-containers/action";
 
 import styles from "./form.module.scss";
@@ -500,7 +501,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
           return await onSave?.(
             {
-              ...formState.record,
+              ...compactM2MValues(formState.record, formState.meta),
               _dirty: formState.dirty,
               ...(isTreeGrid && {
                 ...(isLastRow &&
