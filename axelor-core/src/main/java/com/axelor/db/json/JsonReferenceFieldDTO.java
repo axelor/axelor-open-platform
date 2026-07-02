@@ -87,6 +87,15 @@ public record JsonReferenceFieldDTO(
     String trackCondition)
     implements Serializable {
 
+  private static final Set<String> REFERENCE_TYPES =
+      Set.of(
+          "one-to-many",
+          "json-one-to-many",
+          "many-to-one",
+          "json-many-to-one",
+          "many-to-many",
+          "json-many-to-many");
+
   public static JsonReferenceFieldDTO from(MetaJsonField field) {
     return new JsonReferenceFieldDTO(
         // Core & Identity
@@ -159,6 +168,11 @@ public record JsonReferenceFieldDTO(
         field.getTracked(),
         field.getTrackEvent(),
         field.getTrackCondition());
+  }
+
+  /** Whether this custom field is a relational reference to another record. */
+  public boolean isReference() {
+    return type != null && REFERENCE_TYPES.contains(type);
   }
 
   public boolean isJsonModelTarget() {

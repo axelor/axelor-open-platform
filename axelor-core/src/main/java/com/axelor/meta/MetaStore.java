@@ -60,6 +60,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +76,22 @@ public final class MetaStore {
           .maximumSize(1000)
           .expireAfterAccess(Duration.ofDays(1))
           .build();
+
+  private static class NullMap<K, V> extends HashMap<K, V> {}
+
+  private static final Map<String, JsonReferenceFieldDTO> NULL_JSON_FIELD = new NullMap<>();
+
+  /** Reference (relational) custom fields keyed by their owning model or custom model. */
+  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> REFERENCE_JSON_FIELDS =
+      CacheBuilder.newBuilder("referenceJsonFieldCache")
+          .expireAfterWrite(Duration.ofHours(1))
+          .build(MetaStore::loadReferenceJsonFields);
+
+  /** Reverse index: custom fields keyed by the model they reference (their target). */
+  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> TARGET_JSON_FIELDS =
+      CacheBuilder.newBuilder("targetJsonFieldCache")
+          .expireAfterWrite(Duration.ofHours(1))
+          .build(MetaStore::loadTargetJsonFields);
 
   /** Key used to store and retrieve JSON fields from the json fields cache. */
   private record ModelFieldKey(String modelName, String modelField) implements Serializable {
@@ -367,7 +384,7 @@ public final class MetaStore {
   @Nullable
   public static Map<String, JsonReferenceFieldDTO> getJsonFields(
       String modelName, String modelField) {
-    return JSON_FIELDS.get(
+    return getJsonFieldsOrNull(
         ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
   }
 
@@ -376,7 +393,35 @@ public final class MetaStore {
     if (StringUtils.isBlank(jsonModel)) {
       return null;
     }
-    return JSON_FIELDS.get(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+    return getJsonFieldsOrNull(ModelFieldKey.of(jsonModel), MetaStore::loadJsonFieldsByJsonModel);
+  }
+
+  /**
+   * Gets from json fields cache, converting cached null map to null.
+   *
+   * <p>This prevents repeated cache misses when the loader returns actual null.
+   */
+  @Nullable
+  private static Map<String, JsonReferenceFieldDTO> getJsonFieldsOrNull(
+      ModelFieldKey key, Function<ModelFieldKey, Map<String, JsonReferenceFieldDTO>> loader) {
+    var jsonFields = JSON_FIELDS.get(key, loader);
+    return jsonFields instanceof NullMap ? null : jsonFields;
+  }
+
+  /**
+   * Returns the relational (reference) custom fields owned by the given model. The key is a
+   * fully-qualified class name for real models, or a custom model name for {@link MetaJsonModel}s.
+   */
+  public static List<JsonReferenceFieldDTO> getReferenceJsonFields(String modelKey) {
+    return REFERENCE_JSON_FIELDS.get(modelKey);
+  }
+
+  /**
+   * Returns the custom fields whose target (relational reference) is the given model. The key is a
+   * fully-qualified class name for real models, or a custom model name for {@link MetaJsonModel}s.
+   */
+  public static List<JsonReferenceFieldDTO> getTargetJsonFields(String targetModel) {
+    return TARGET_JSON_FIELDS.get(targetModel);
   }
 
   private static Map<String, JsonReferenceFieldDTO> loadJsonFieldsByModelField(ModelFieldKey key) {
@@ -384,11 +429,12 @@ public final class MetaStore {
     String modelField = key.modelField();
 
     try {
-      if (!Mapper.of(Class.forName(modelName)).getProperty(modelField).isJson()) {
-        return Collections.emptyMap();
+      Property property = Mapper.of(Class.forName(modelName)).getProperty(modelField);
+      if (property == null || !property.isJson()) {
+        return NULL_JSON_FIELD;
       }
     } catch (Exception e) {
-      return Collections.emptyMap();
+      return NULL_JSON_FIELD;
     }
 
     return Query.of(MetaJsonField.class)
@@ -414,6 +460,10 @@ public final class MetaStore {
     final MetaJsonModel found = forms.findByName(key.modelName());
 
     if (found == null) {
+      return NULL_JSON_FIELD;
+    }
+
+    if (ObjectUtils.isEmpty(found.getFields())) {
       return Collections.emptyMap();
     }
 
@@ -427,12 +477,52 @@ public final class MetaStore {
                 LinkedHashMap::new));
   }
 
+  private static List<JsonReferenceFieldDTO> loadTargetJsonFields(String targetModel) {
+    final String filter =
+        targetModel.contains(".")
+            ? "self.type = 'many-to-one' AND self.targetModel = :model"
+            : "self.type = 'json-many-to-one' AND self.targetJsonModel.name = :model";
+    return Query.of(MetaJsonField.class)
+        .filter(filter)
+        .bind("model", targetModel)
+        .cacheable()
+        .fetch()
+        .stream()
+        .map(JsonReferenceFieldDTO::from)
+        .toList();
+  }
+
+  private static List<JsonReferenceFieldDTO> loadReferenceJsonFields(String modelKey) {
+    if (modelKey.contains(".")) {
+      final Class<?> modelClass;
+      try {
+        modelClass = Class.forName(modelKey);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Class not found: " + modelKey, e);
+      }
+      return Stream.of(Mapper.of(modelClass).getProperties())
+          .filter(Property::isJson)
+          .map(Property::getName)
+          .map(fieldName -> getJsonFields(modelKey, fieldName))
+          .filter(Objects::nonNull)
+          .flatMap(map -> map.values().stream())
+          .filter(JsonReferenceFieldDTO::isReference)
+          .toList();
+    }
+
+    var jsonFields = getJsonFields(modelKey);
+
+    return jsonFields != null
+        ? jsonFields.values().stream().filter(JsonReferenceFieldDTO::isReference).toList()
+        : Collections.emptyList();
+  }
+
   /** Builds the field metadata and overlays user locale/access contexts. */
-  @Nullable
   private static Map<String, Object> resolveJsonFields(
       Collection<JsonReferenceFieldDTO> records, String object, String jsonField) {
+
     if (ObjectUtils.isEmpty(records)) {
-      return null;
+      return Collections.emptyMap();
     }
 
     final User user = AuthUtils.getUser();
@@ -772,17 +862,54 @@ public final class MetaStore {
 
   public static void invalidateJsonFields() {
     JSON_FIELDS.invalidateAll();
+    REFERENCE_JSON_FIELDS.invalidateAll();
+    TARGET_JSON_FIELDS.invalidateAll();
   }
 
-  public static void invalidateJsonFields(String modelName, String modelField) {
-    if (modelName != null) {
-      JSON_FIELDS.invalidate(ModelFieldKey.of(modelName, modelField));
+  /** Invalidates every cached view affected by a change to the given custom field. */
+  public static void invalidateJsonFields(MetaJsonField field) {
+    if (field == null) {
+      return;
+    }
+    MetaJsonModel jsonModel = field.getJsonModel();
+    final String owner = jsonModel != null ? jsonModel.getName() : field.getModel();
+    if (jsonModel != null) {
+      invalidateOwnerFields(ModelFieldKey.of(jsonModel.getName()));
+    } else {
+      invalidateOwnerFields(ModelFieldKey.of(field.getModel(), field.getModelField()));
+    }
+    invalidateReferenceFields(owner);
+    invalidateTargetFields(
+        Optional.ofNullable(field.getTargetJsonModel())
+            .map(MetaJsonModel::getName)
+            .orElse(field.getTargetModel()));
+  }
+
+  /** Invalidates every cached view affected by a change to the given custom model. */
+  public static void invalidateJsonFields(MetaJsonModel model) {
+    if (model == null) {
+      return;
+    }
+    invalidateOwnerFields(ModelFieldKey.of(model.getName()));
+    invalidateReferenceFields(model.getName());
+    invalidateTargetFields(model.getName());
+  }
+
+  private static void invalidateOwnerFields(ModelFieldKey key) {
+    if (key.modelName() != null) {
+      JSON_FIELDS.invalidate(key);
     }
   }
 
-  public static void invalidateJsonFields(String jsonModel) {
-    if (jsonModel != null) {
-      JSON_FIELDS.invalidate(ModelFieldKey.of(jsonModel));
+  private static void invalidateReferenceFields(String modelKey) {
+    if (modelKey != null) {
+      REFERENCE_JSON_FIELDS.invalidate(modelKey);
+    }
+  }
+
+  private static void invalidateTargetFields(String targetModel) {
+    if (targetModel != null) {
+      TARGET_JSON_FIELDS.invalidate(targetModel);
     }
   }
 }

@@ -4,42 +4,24 @@
  */
 package com.axelor.db.json;
 
-import com.axelor.cache.AxelorCache;
-import com.axelor.cache.CacheBuilder;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Singleton;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Singleton
 class JsonReferenceResolver {
 
   private static final String ONE_TO_MANY = "one-to-many";
   private static final String JSON_ONE_TO_MANY = "json-one-to-many";
-  private static final String MANY_TO_ONE = "many-to-one";
-  private static final String JSON_MANY_TO_ONE = "json-many-to-one";
-  private static final String MANY_TO_MANY = "many-to-many";
-  private static final String JSON_MANY_TO_MANY = "json-many-to-many";
-
-  private static final List<String> ALL_REF_TYPES =
-      List.of(
-          ONE_TO_MANY,
-          JSON_ONE_TO_MANY,
-          MANY_TO_ONE,
-          JSON_MANY_TO_ONE,
-          MANY_TO_MANY,
-          JSON_MANY_TO_MANY);
 
   public record SourceContext(String model, Long id, String jsonModel) {
     public static SourceContext of(Model entity) {
@@ -49,47 +31,9 @@ class JsonReferenceResolver {
     }
   }
 
-  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> referenceFieldCache =
-      CacheBuilder.newBuilder("referenceFieldCache")
-          .expireAfterWrite(Duration.ofHours(1))
-          .build(
-              modelKey -> {
-                // Model
-                if (modelKey.contains(".")) {
-                  var modelClass = findClass(modelKey);
-                  var mapper = Mapper.of(modelClass);
-                  return Stream.of(mapper.getProperties())
-                      .filter(Property::isJson)
-                      .map(Property::getName)
-                      .map(fieldName -> MetaStore.getJsonFields(modelKey, fieldName))
-                      .filter(Objects::nonNull)
-                      .flatMap(map -> map.values().stream())
-                      .filter(JsonReferenceResolver::isReferenceField)
-                      .toList();
-                }
-
-                // JSON Model
-                var jsonFields = MetaStore.getJsonFields(modelKey);
-                return jsonFields != null
-                    ? jsonFields.values().stream()
-                        .filter(JsonReferenceResolver::isReferenceField)
-                        .toList()
-                    : List.of();
-              });
-
-  private static boolean isReferenceField(JsonReferenceFieldDTO field) {
-    return field.type() != null && ALL_REF_TYPES.contains(field.type());
-  }
-
   public List<JsonReferenceFieldDTO> findReferenceFields(SourceContext ctx) {
     var modelKey = ctx.jsonModel() != null ? ctx.jsonModel() : ctx.model();
-    return referenceFieldCache.get(modelKey);
-  }
-
-  static void clearCache(String modelKey) {
-    if (modelKey != null) {
-      referenceFieldCache.invalidate(modelKey);
-    }
+    return MetaStore.getReferenceJsonFields(modelKey);
   }
 
   public Map<String, Object> getJsonValue(Model entity, String jsonField) {
