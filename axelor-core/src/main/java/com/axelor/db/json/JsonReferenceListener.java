@@ -8,6 +8,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import java.util.Objects;
@@ -53,10 +54,14 @@ public class JsonReferenceListener
 
   private void invalidateCaches(Object entity) {
     if (entity instanceof MetaJsonField field) {
-      JsonReferenceResolver.clearCache(
-          Optional.ofNullable(field.getJsonModel())
-              .map(MetaJsonModel::getName)
-              .orElse(field.getModel()));
+      MetaJsonModel jsonModel = field.getJsonModel();
+      if (jsonModel != null) {
+        JsonReferenceResolver.clearCache(jsonModel.getName());
+        MetaStore.invalidateJsonFields(jsonModel.getName());
+      } else {
+        JsonReferenceResolver.clearCache(field.getModel());
+        MetaStore.invalidateJsonFields(field.getModel(), field.getModelField());
+      }
       JsonReferenceUpdater.clearCache(
           Optional.ofNullable(field.getTargetJsonModel())
               .map(MetaJsonModel::getName)
@@ -64,6 +69,7 @@ public class JsonReferenceListener
     } else if (entity instanceof MetaJsonModel model) {
       JsonReferenceResolver.clearCache(model.getName());
       JsonReferenceUpdater.clearCache(model.getName());
+      MetaStore.invalidateJsonFields(model.getName());
     }
   }
 

@@ -365,14 +365,14 @@ public final class MetaStore {
   }
 
   @Nullable
-  private static Map<String, JsonReferenceFieldDTO> getJsonFields(
+  public static Map<String, JsonReferenceFieldDTO> getJsonFields(
       String modelName, String modelField) {
     return JSON_FIELDS.get(
         ModelFieldKey.of(modelName, modelField), MetaStore::loadJsonFieldsByModelField);
   }
 
   @Nullable
-  private static Map<String, JsonReferenceFieldDTO> getJsonFields(String jsonModel) {
+  public static Map<String, JsonReferenceFieldDTO> getJsonFields(String jsonModel) {
     if (StringUtils.isBlank(jsonModel)) {
       return null;
     }
@@ -772,5 +772,17 @@ public final class MetaStore {
 
   public static void invalidateJsonFields() {
     JSON_FIELDS.invalidateAll();
+  }
+
+  public static void invalidateJsonFields(String modelName, String modelField) {
+    if (modelName != null) {
+      JSON_FIELDS.invalidate(ModelFieldKey.of(modelName, modelField));
+    }
+  }
+
+  public static void invalidateJsonFields(String jsonModel) {
+    if (jsonModel != null) {
+      JSON_FIELDS.invalidate(ModelFieldKey.of(jsonModel));
+    }
   }
 }

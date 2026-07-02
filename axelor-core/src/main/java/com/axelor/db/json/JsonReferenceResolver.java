@@ -9,9 +9,10 @@ import com.axelor.cache.CacheBuilder;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Singleton;
@@ -19,6 +20,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Singleton
 class JsonReferenceResolver {
@@ -52,22 +54,32 @@ class JsonReferenceResolver {
           .expireAfterWrite(Duration.ofHours(1))
           .build(
               modelKey -> {
-                var fieldRepository = Beans.get(MetaJsonFieldRepository.class);
-                var filter =
-                    modelKey.contains(".")
-                        ? "self.type IN :types AND self.model = :model"
-                        : "self.type IN :types AND self.jsonModel.name = :model";
-                return fieldRepository
-                    .all()
-                    .filter(filter)
-                    .bind("types", ALL_REF_TYPES)
-                    .bind("model", modelKey)
-                    .cacheable()
-                    .fetch()
-                    .stream()
-                    .map(JsonReferenceFieldDTO::from)
-                    .toList();
+                // Model
+                if (modelKey.contains(".")) {
+                  var modelClass = findClass(modelKey);
+                  var mapper = Mapper.of(modelClass);
+                  return Stream.of(mapper.getProperties())
+                      .filter(Property::isJson)
+                      .map(Property::getName)
+                      .map(fieldName -> MetaStore.getJsonFields(modelKey, fieldName))
+                      .filter(Objects::nonNull)
+                      .flatMap(map -> map.values().stream())
+                      .filter(JsonReferenceResolver::isReferenceField)
+                      .toList();
+                }
+
+                // JSON Model
+                var jsonFields = MetaStore.getJsonFields(modelKey);
+                return jsonFields != null
+                    ? jsonFields.values().stream()
+                        .filter(JsonReferenceResolver::isReferenceField)
+                        .toList()
+                    : List.of();
               });
+
+  private static boolean isReferenceField(JsonReferenceFieldDTO field) {
+    return field.type() != null && ALL_REF_TYPES.contains(field.type());
+  }
 
   public List<JsonReferenceFieldDTO> findReferenceFields(SourceContext ctx) {
     var modelKey = ctx.jsonModel() != null ? ctx.jsonModel() : ctx.model();
