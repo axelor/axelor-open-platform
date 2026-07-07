@@ -1,0 +1,10 @@
+---
+title: Fix validIf state being overridden by other field updates
+type: fix
+description: |
+  A field marked invalid through `validIf` could silently go back to looking
+  valid, even though nothing about that field itself changed. This happened
+  whenever another field elsewhere on the same form reacted to the same
+  change, for example by showing or hiding itself. As a result, an invalid
+  value could go unnoticed, and saving the record could also fail with an
+  unexpected error.

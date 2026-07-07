@@ -410,19 +410,42 @@ function useExpressions({
 
   const handleValidation = useAtomCallback(
     useCallback(
-      (get, set, context: DataContext, expr: string) => {
+      (
+        get,
+        set,
+        context: DataContext,
+        expr: string,
+        updater?: FormStateUpdater,
+      ) => {
         const value = parseExpression(expr)(context);
-        const state = get(widgetAtom);
+        const widgetState = get(widgetAtom);
         const errors = {
-          ...state.errors,
-          invalid: i18n.get("{0} is invalid", state.attrs.title),
+          ...widgetState.errors,
+          invalid: i18n.get("{0} is invalid", widgetState.attrs.title),
         };
         if (value) Reflect.deleteProperty(errors, "invalid");
-        if (!isEqual(state.errors, errors)) {
-          set(widgetAtom, (prev) => ({ ...prev, errors }));
-        }
+        if (isEqual(widgetState.errors, errors)) return;
+
+        const restoreState = pick(widgetState, ["name", "parent"]);
+        updater?.((formState: FormState) => {
+          const { states } = formState;
+          const { uid } = schema;
+          const state = states[uid];
+          return {
+            ...formState,
+            states: {
+              ...states,
+              [uid]: {
+                ...restoreState,
+                ...state,
+                attrs: state?.attrs ?? {},
+                errors,
+              },
+            },
+          };
+        });
       },
-      [widgetAtom],
+      [schema, widgetAtom],
     ),
   );
 
@@ -485,7 +508,7 @@ function useExpressions({
         if (readonlyIf) handleIf("readonly", readonlyIf);
         if (requiredIf) handleIf("required", requiredIf);
         if (collapseIf) handleIf("collapse", collapseIf);
-        if (validIf) handleValidation(ctx, validIf);
+        if (validIf) handleValidation(ctx, validIf, updater);
 
         if (isExpr(canNew)) handleIf("canNew", canNew);
         if (isExpr(canEdit)) handleIf("canEdit", canEdit);
