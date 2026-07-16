@@ -2,9 +2,14 @@
 
 import os
 import sys
+import filecmp
+import shutil
 import requests
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Directory holding custom override SVGs, in the "custom" folder alongside this script.
+CUSTOM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custom")
 
 
 def download_image(url, directory, timeout=10):
@@ -18,6 +23,19 @@ def download_image(url, directory, timeout=10):
 
     filename = url.split("/")[-1]  # Extract filename from URL
     filepath = os.path.join(directory, filename)
+
+    custom_svg = os.path.join(CUSTOM_DIR, filename)
+    if os.path.exists(custom_svg):
+        if os.path.exists(filepath) and filecmp.cmp(
+            custom_svg, filepath, shallow=False
+        ):
+            print(
+                f"Custom {filename} already up-to-date in {directory}; skipping copy."
+            )
+        else:
+            shutil.copyfile(custom_svg, filepath)
+            print(f"Copied custom {filename} to {directory}")
+        return True  # Use the custom override instead of downloading
 
     if os.path.exists(filepath):
         print(f"{filename} already exists in {directory}; skipping download.")

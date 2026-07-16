@@ -9,9 +9,17 @@ The main script executes several steps to prepare the combined flags image and C
 
 1. **Country Code Extraction:** Collects a list of country codes from `react-international-phone` dependency.
 2. **Twemoji Conversion:** Transforms each country code into a specific Twemoji image URL.
-3. **Local Download:** Downloads the Twemoji images to a working directory.
+3. **Local Download:** Downloads the Twemoji images to a working directory. If a matching SVG exists in the `custom/` folder, it is used instead of downloading from the CDN (see [Custom Flags](#custom-flags)).
 4. **Image Renaming and Combination:** Renames downloaded SVG files and combines them into a single SVG file (`flags.svg`).
 5. **CSS Generation:** Produces a CSS file (`flags.module.scss`) that maps each country code to its respective background image within the combined SVG.
+
+## Custom Flags
+
+The `custom/` folder holds SVG files that override the Twemoji images downloaded from the CDN.
+
+During the **Local Download** step, before fetching the image, the script checks the `custom/` folder for a file with the same name (e.g. `1f1f2-1f1f6.svg`). If found, that file is copied instead of downloading from the CDN.
+
+To add or replace a custom flag, drop the SVG into `custom/` using the Twemoji filename for the country's code point (e.g. `1f1f2-1f1f6.svg`).
 
 ## Usage
 
