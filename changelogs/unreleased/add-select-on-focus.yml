@@ -1,0 +1,12 @@
+---
+title: Select field content on focus for input widgets
+type: feature
+description: |
+  Numeric (integer, long, decimal), duration, date/datetime/time,
+  selection, and many-to-one fields now automatically select their entire
+  content when the field receives focus — whether via Tab or a mouse click.
+  A second click on an already-focused field places the cursor normally
+  without forcing reselection.
+
+  String fields are excluded, since users editing text most often just want
+  to fix a typo rather than replace the whole value.

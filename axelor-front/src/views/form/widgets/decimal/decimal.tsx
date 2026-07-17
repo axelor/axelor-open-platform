@@ -7,6 +7,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
 import format from "@/utils/format";
+import { useSelectOnFocus } from "@/hooks/use-select-on-focus";
 import { useViewContext } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
@@ -41,6 +42,7 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const selectOnFocus = useSelectOnFocus();
   const timerRef = useRef<number>();
 
   const parse = useCallback(
@@ -225,6 +227,7 @@ export function Decimal(props: FieldProps<string | number>) {
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={handleKeyDown}
+            {...selectOnFocus}
           />
           <div className={styles.buttons}>
             <span

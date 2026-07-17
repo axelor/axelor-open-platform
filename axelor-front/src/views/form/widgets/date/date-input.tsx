@@ -3,6 +3,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { forwardRef, useCallback, useRef } from "react";
 import { MaskedInput } from "./mask-input";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useSelectOnFocus } from "@/hooks/use-select-on-focus";
 
 const CHAR_MASK: Record<string, (RegExp | ((ch: string) => RegExp))[]> = {
   M: [/[0-1]/, (prev) => (prev === "1" ? /[0-2]/ : /\d/)],
@@ -64,6 +65,17 @@ export const DateInput = forwardRef<any, any>(
   ) => {
     const { name, eventOnBlur: onBlur, onChange, onFocus } = props;
     const mountRef = useRef(false);
+
+    const { onFocus: selectFocus } = useSelectOnFocus();
+
+    const handleFocus = useCallback(
+      (e: React.FocusEvent<HTMLInputElement>) => {
+        selectFocus(e);
+        onFocus?.(e);
+      },
+      [selectFocus, onFocus],
+    );
+
     function handleBlur({ target: { name, value } }: any) {
       const changed = value !== inputValue;
       if (open || !changed) return;
@@ -112,7 +124,7 @@ export const DateInput = forwardRef<any, any>(
               className.replace("react-datepicker-ignore-onclickoutside", "")
         }
         onKeyDown={open ? onKeyDown : handleKeyDown}
-        onFocus={onFocus}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         mask={mask}
         ref={ref}

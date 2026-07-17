@@ -269,6 +269,7 @@ export const Select = forwardRef(function Select<
       key={autoFocus ? "focused" : "normal"}
       clearOnBlur
       clearOnEscape
+      selectOnFocus
       {...selectProps}
       ref={selectRef}
       value={value}

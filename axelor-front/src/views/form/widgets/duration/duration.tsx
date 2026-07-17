@@ -6,6 +6,7 @@ import { moment } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { MaskedInput } from "../date/mask-input";
+import { useSelectOnFocus } from "@/hooks/use-select-on-focus";
 import { ViewerInput } from "../string/viewer";
 
 function toText(
@@ -64,6 +65,8 @@ export function Duration(props: FieldProps<string | number>) {
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
+  const selectOnFocus = useSelectOnFocus();
+
   const format = useCallback(
     (value?: string | number | null) => toText(value, { big, seconds }),
     [big, seconds],
@@ -120,6 +123,7 @@ export function Duration(props: FieldProps<string | number>) {
             /\d/,
             ...(seconds ? [":", /[0-5]/, /\d/] : []),
           ]}
+          {...selectOnFocus}
         />
       )}
     </FieldControl>
