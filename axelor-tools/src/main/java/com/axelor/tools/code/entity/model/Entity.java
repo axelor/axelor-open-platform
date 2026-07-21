@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,17 @@ public class Entity implements BaseType<Entity> {
 
   private static Set<String> INTERNAL_PACKAGES =
       Set.of("com.axelor.auth.db", "com.axelor.meta.db", "com.axelor.mail.db", "com.axelor.dms.db");
+
+  /**
+   * Auto-enable `@DynamicUpdate` once an entity declares strictly more than this many column-backed
+   * fields (i.e. {@value} + 1 or more), at which point trimming unchanged columns from the `UPDATE`
+   * statement outweighs the per-flush SQL generation cost.
+   *
+   * <p>Only fields declared on the entity itself are counted (see {@link #getColumnFields()});
+   * columns inherited from a mapped super class — {@code id}, {@code version}, and the audit fields
+   * — are not, so the physical table is a few columns wider than this count.
+   */
+  static final int DYNAMIC_UPDATE_FIELD_THRESHOLD = 30;
 
   @XmlMixed private List<String> comments;
 
@@ -147,6 +159,8 @@ public class Entity implements BaseType<Entity> {
   private String extraImports;
 
   @XmlTransient Entity baseEntity;
+
+  @XmlTransient Entity superEntity;
 
   @XmlTransient boolean isInSingleTableHierarchy;
 
@@ -434,6 +448,14 @@ public class Entity implements BaseType<Entity> {
     this.equalsAll = equalsAll;
   }
 
+  public Boolean getDynamicUpdate() {
+    return dynamicUpdate;
+  }
+
+  public void setDynamicUpdate(Boolean dynamicUpdate) {
+    this.dynamicUpdate = dynamicUpdate;
+  }
+
   public Boolean getCacheable() {
     return cacheable;
   }
@@ -469,6 +491,14 @@ public class Entity implements BaseType<Entity> {
 
   public void setSuperClass(String superClass) {
     this.superClass = superClass;
+  }
+
+  public Entity getSuperEntity() {
+    return superEntity;
+  }
+
+  public void setSuperEntity(Entity superEntity) {
+    this.superEntity = superEntity;
   }
 
   public String computeSuperClassName() {
@@ -639,7 +669,11 @@ public class Entity implements BaseType<Entity> {
    *
    * <ul>
    *   <li>The entity explicitly requests dynamic updates through its `dynamicUpdate` property.
-   *   <li>The entity contains more than 30 fields.
+   *   <li>The entity declares more than {@value #DYNAMIC_UPDATE_FIELD_THRESHOLD} column-backed
+   *       fields. Collection-valued associations (one-to-many, many-to-many), inverse associations
+   *       (with `mappedBy`), transient fields and formula (read-only computed) fields are excluded,
+   *       since they don't map to a settable column in this entity's `UPDATE` statement (see {@link
+   *       #getColumnFields()}).
    *   <li>The entity contains at least one field that is either binary or marked as large.
    * </ul>
    *
@@ -655,13 +689,43 @@ public class Entity implements BaseType<Entity> {
       return null;
     }
 
-    if (isTrue(dynamicUpdate)
-        || getFields().size() > 30
-        || getFields().stream().anyMatch(p -> p.isBinary() || isTrue(p.getLarge()))) {
+    if (isTrue(dynamicUpdate) || shouldDynamicUpdate()) {
       return new JavaAnnotation("org.hibernate.annotations.DynamicUpdate");
     }
 
     return null;
+  }
+
+  private boolean shouldDynamicUpdate() {
+    List<Property> columnFields = getColumnFields();
+    return columnFields.size() > DYNAMIC_UPDATE_FIELD_THRESHOLD
+        || columnFields.stream().anyMatch(p -> p.isBinary() || isTrue(p.getLarge()));
+  }
+
+  /**
+   * Returns fields mapped to a column in this entity's table or inherited from its super entity
+   * hierarchy.
+   *
+   * <p>Excludes collections, inverse associations (with {@code mappedBy}), transient fields, and
+   * formula fields.
+   */
+  private List<Property> getColumnFields() {
+    List<Property> columnFields = new ArrayList<>();
+    Set<Entity> visited = new HashSet<>();
+    Entity current = this;
+    while (current != null && visited.add(current)) {
+      current.getFields().stream()
+          .filter(
+              p ->
+                  !p.isCollection()
+                      && isBlank(p.getMappedBy())
+                      && !isTrue(p.getTransient())
+                      && !isTrue(p.getFormula()))
+          .forEach(columnFields::add);
+      current = current.getSuperEntity();
+    }
+
+    return columnFields;
   }
 
   public List<JavaAnnotation> getAnnotations() {

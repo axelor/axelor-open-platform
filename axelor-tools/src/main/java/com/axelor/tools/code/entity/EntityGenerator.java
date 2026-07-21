@@ -201,6 +201,7 @@ public class EntityGenerator {
   private void lookupSuperClasses(Entity entity) {
     Set<String> visitedClasses = new HashSet<>();
     String className = entity.getSimpleSuperClass();
+    Entity current = entity;
 
     while (className != null) {
       if (!visitedClasses.add(className)) {
@@ -234,6 +235,10 @@ public class EntityGenerator {
                           })
                       .orElse(null));
 
+      if (current.getSuperEntity() == null) {
+        current.setSuperEntity(mergedEntity);
+      }
+      current = mergedEntity;
       className = mergedEntity != null ? mergedEntity.getSimpleSuperClass() : null;
     }
   }
