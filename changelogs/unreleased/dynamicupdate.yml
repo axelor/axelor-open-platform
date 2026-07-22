@@ -12,5 +12,8 @@ description: |
   - tables with large objects (binary/large fields): ensure heavy binary/large data is not re-transmitted unless it is 
   actually changed
   
-  Also, allow enabling/disabling the `@DynamicUpdate` support on demand per entity through the `dynamicUpdate` 
+  Also, allow enabling/disabling the `@DynamicUpdate` support on demand per entity through the `dynamicUpdate`
   attribute for more control.
+
+  JSON fields like `attrs` do not trigger `@DynamicUpdate` automatically because their runtime size is unknown
+  and most entities leave `attrs` empty. Users should set `dynamicUpdate="true"` explicitly on entities with large JSON payloads.
