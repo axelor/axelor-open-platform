@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.2.xsd">
+
+  <module name="test" package="com.axelor.test.db" />
+
+  <!--
+    Entities used by ComputedFieldVersionTest to guard against the historical spurious @Version
+    bump that @DynamicUpdate was originally added to fix.
+
+    Pinned to dynamicUpdate="false" so the annotation cannot mask a regression.
+  -->
+
+  <entity name="ComputedField" dynamicUpdate="false">
+    <string name="firstName" initParam="true" />
+    <string name="lastName" initParam="true" />
+    <string name="fullName">
+      <![CDATA[
+      fullName = firstName + " " + lastName;
+      return fullName;
+      ]]>
+    </string>
+  </entity>
+
+  <entity name="ComputedFieldOwner" dynamicUpdate="false">
+    <string name="name" initParam="true" />
+    <many-to-one name="ref" ref="ComputedField" />
+  </entity>
+
+</domain-models>
