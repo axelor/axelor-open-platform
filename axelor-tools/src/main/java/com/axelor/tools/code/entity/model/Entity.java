@@ -52,15 +52,12 @@ public class Entity implements BaseType<Entity> {
       Set.of("com.axelor.auth.db", "com.axelor.meta.db", "com.axelor.mail.db", "com.axelor.dms.db");
 
   /**
-   * Auto-enable `@DynamicUpdate` once an entity declares strictly more than this many column-backed
-   * fields (i.e. {@value} + 1 or more), at which point trimming unchanged columns from the `UPDATE`
-   * statement outweighs the per-flush SQL generation cost.
+   * Auto-enable {@code @DynamicUpdate} when an entity declares strictly more than this many
+   * XML-declared column-backed fields.
    *
-   * <p>Only fields declared on the entity itself are counted (see {@link #getColumnFields()});
-   * columns inherited from a mapped super class — {@code id}, {@code version}, and the audit fields
-   * — are not, so the physical table is a few columns wider than this count.
+   * <p>This value is conservative (see {@code DynamicUpdateBenchTest}).
    */
-  static final int DYNAMIC_UPDATE_FIELD_THRESHOLD = 30;
+  static final int DYNAMIC_UPDATE_FIELD_THRESHOLD = 100;
 
   @XmlMixed private List<String> comments;
 
@@ -673,11 +670,11 @@ public class Entity implements BaseType<Entity> {
    *
    * <ul>
    *   <li>The entity explicitly requests dynamic updates through its `dynamicUpdate` property.
-   *   <li>The entity declares more than {@value #DYNAMIC_UPDATE_FIELD_THRESHOLD} column-backed
-   *       fields. Collection-valued associations (one-to-many, many-to-many), inverse associations
-   *       (with `mappedBy`), transient fields and formula (read-only computed) fields are excluded,
-   *       since they don't map to a settable column in this entity's `UPDATE` statement (see {@link
-   *       #getColumnFields()}).
+   *   <li>The entity declares more than {@value #DYNAMIC_UPDATE_FIELD_THRESHOLD} XML-declared
+   *       column-backed fields. Collection-valued associations (one-to-many, many-to-many), inverse
+   *       associations (with `mappedBy`), transient fields and formula (read-only computed) fields
+   *       are excluded, since they don't map to a settable column in this entity's `UPDATE`
+   *       statement (see {@link #getColumnFields()}).
    *   <li>The entity contains at least one field that is either binary or marked as large.
    * </ul>
    *
@@ -707,8 +704,8 @@ public class Entity implements BaseType<Entity> {
   }
 
   /**
-   * Returns fields mapped to a column in this entity's table or inherited from its super entity
-   * hierarchy.
+   * Returns XML-declared fields mapped to a column in this entity's table or inherited from its
+   * super entity hierarchy.
    *
    * <p>Excludes collections, inverse associations (with {@code mappedBy}), transient fields, and
    * formula fields.

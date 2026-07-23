@@ -1103,8 +1103,8 @@
           actually changed are included. This can improve performance when few attributes typically change, at the cost
           of generating the SQL at runtime (the cached PreparedStatement can no longer be reused).
 
-          When left unset, it is enabled automatically for entities having more than 30 column-backed fields,
-          or containing binary/large fields.
+          If unset, dynamic updates are enabled automatically for entities having any binary or large field, or more than
+          100 XML-declared column-backed fields. Both conditions are evaluated across the super entity hierarchy.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
