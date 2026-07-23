@@ -266,6 +266,10 @@ public class Entity implements BaseType<Entity> {
       cacheable = other.cacheable;
     }
 
+    if (other.dynamicUpdate != null) {
+      dynamicUpdate = other.dynamicUpdate;
+    }
+
     if (isTrue(other.isAuditable)) {
       isAuditable = true;
     } else if (notFalse(isAuditable) && isFalse(other.isAuditable)) {
