@@ -28,6 +28,7 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
@@ -411,10 +412,25 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   }
 
   public List<DMSFile> findOffline(int limit, int offset) {
-    return all()
-        .filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
-        .bind("user", AuthUtils.getUser())
-        .fetch(limit, offset);
+    return filterOffline().fetch(limit, offset);
+  }
+
+  public long countOffline() {
+    return filterOffline().count();
+  }
+
+  private Query<DMSFile> filterOffline() {
+    Filter filter =
+        new JPQLFilter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user");
+    Filter securityFilter = security.getFilter(JpaSecurity.CAN_READ, DMSFile.class);
+
+    if (securityFilter != null) {
+      filter = Filter.and(securityFilter, filter);
+    } else {
+      security.check(JpaSecurity.CAN_READ, DMSFile.class);
+    }
+
+    return filter.build(DMSFile.class).bind("user", AuthUtils.getUser());
   }
 
   @Override

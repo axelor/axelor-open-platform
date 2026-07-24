@@ -792,6 +792,18 @@ public class RestService extends ResourceService {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_WRITE, entityClass, id);
 
+    Map<String, Object> data = request.getData();
+    MetaFile fileBean = JPA.find(MetaFile.class, Long.valueOf(data.get("id").toString()));
+
+    if (fileBean == null) {
+      throw new IllegalArgumentException();
+    }
+
+    final User user = AuthUtils.getUser();
+    if (!Objects.equals(fileBean.getCreatedBy(), user)) {
+      Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, MetaFile.class, fileBean.getId());
+    }
+
     request.setModel(getModel());
     return service.addAttachment(id, request);
   }

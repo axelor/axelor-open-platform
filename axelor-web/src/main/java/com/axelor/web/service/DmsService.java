@@ -37,6 +37,8 @@ import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableMap;
@@ -62,6 +64,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -85,7 +88,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.csv.CSVPrinter;
-import org.eclipse.persistence.annotations.Transformation;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -101,6 +103,13 @@ public class DmsService {
   private static final Map<String, String> EXTS =
       ImmutableMap.of("html", ".html", "spreadsheet", ".csv");
 
+  /** Download response mode: stream as attachment, stream inline, or check availability. */
+  private enum DownloadMode {
+    ATTACHMENT,
+    INLINE,
+    CHECK
+  }
+
   @GET
   @Path("files")
   @Operation(
@@ -109,22 +118,21 @@ public class DmsService {
   public Response listFiles(
       @QueryParam("parent") Long parentId, @QueryParam("pattern") String pattern) {
     final Response response = new Response();
-    final StringBuilder filter = new StringBuilder("self.parent");
+    final StringBuilder jpql = new StringBuilder("self.parent");
 
     if (parentId == null || parentId <= 0) {
-      filter.append(" is null");
+      jpql.append(" is null");
     } else {
-      filter.append(" = :parent");
+      jpql.append(" = :parent");
     }
     if (!StringUtils.isBlank(pattern)) {
       pattern = "%" + pattern + "%";
-      filter.append(" AND UPPER(self.fileName) like UPPER(:pattern)");
+      jpql.append(" AND UPPER(self.fileName) like UPPER(:pattern)");
     }
 
     final Query<?> query =
-        repository
-            .all()
-            .filter(filter.toString())
+        applySecurityFilter(new JPQLFilter(jpql.toString()))
+            .build(DMSFile.class)
             .bind("parent", parentId)
             .bind("pattern", pattern);
 
@@ -144,14 +152,22 @@ public class DmsService {
       description =
           "This service can be used to find list of files attached to some specific record.")
   public Response attachments(@PathParam("model") String model, @PathParam("id") Long id) {
+    final Class<? extends Model> modelClass = findModelClass(model);
+
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, modelClass, id);
+
+    final Filter filter =
+        applySecurityFilter(
+            new JPQLFilter(
+                "self.relatedId = :id AND self.relatedModel = :model AND"
+                    + " self.metaFile is not null AND self.isDirectory = false"));
+
     final Response response = new Response();
     final List<?> records =
-        repository
-            .all()
-            .filter(
-                "self.relatedId = :id AND self.relatedModel = :model AND self.metaFile is not null AND self.isDirectory = false")
+        filter
+            .build(DMSFile.class)
             .bind("id", id)
-            .bind("model", model)
+            .bind("model", modelClass.getName())
             .select("fileName")
             .fetch(-1, -1);
     response.setStatus(Response.STATUS_SUCCESS);
@@ -166,22 +182,21 @@ public class DmsService {
       summary = "Add attachment",
       description =
           "The MetaFile record obtained with upload service can be used to create attachments.")
-  @Transformation
   public Response addAttachments(
       @PathParam("model") String model, @PathParam("id") Long id, Request request) {
+    JpaSecurity security = Beans.get(JpaSecurity.class);
+    security.check(JpaSecurity.CAN_CREATE, DMSFile.class);
+
     if (request == null || ObjectUtils.isEmpty(request.getRecords())) {
       throw new IllegalArgumentException("No attachment records provided.");
     }
-    final Class<?> modelClass;
-    try {
-      modelClass = Class.forName(model);
-    } catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException("No such model found.");
-    }
+    final Class<? extends Model> modelClass = findModelClass(model);
     final Object entity = JPA.em().find(modelClass, id);
     if (!(entity instanceof Model)) {
       throw new IllegalArgumentException("No such record found.");
     }
+
+    security.check(JpaSecurity.CAN_WRITE, modelClass, id);
 
     final MetaFileRepository filesRepo = Beans.get(MetaFileRepository.class);
     final List<MetaFile> items = new ArrayList<>();
@@ -194,6 +209,16 @@ public class DmsService {
       } else {
         throw new IllegalArgumentException("Invalid list of attachment records.");
       }
+    }
+
+    final User user = AuthUtils.getUser();
+    final Long[] notOwned =
+        items.stream()
+            .filter(file -> !Objects.equals(file.getCreatedBy(), user))
+            .map(MetaFile::getId)
+            .toArray(Long[]::new);
+    if (notOwned.length > 0) {
+      security.check(JpaSecurity.CAN_READ, MetaFile.class, notOwned);
     }
 
     final MetaFiles files = Beans.get(MetaFiles.class);
@@ -218,12 +243,7 @@ public class DmsService {
 
     final Response response = new Response();
     final List<DMSFile> files = repository.findOffline(limit, offset);
-    final long count =
-        repository
-            .all()
-            .filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
-            .bind("user", AuthUtils.getUser())
-            .count();
+    final long count = repository.countOffline();
 
     final List<Object> data = new ArrayList<>();
     for (DMSFile file : files) {
@@ -262,6 +282,9 @@ public class DmsService {
       return response;
     }
 
+    final Long[] idArray = toIdArray(ids);
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, DMSFile.class, idArray);
+
     final List<DMSFile> records =
         repository.all().filter("self.id in :ids").bind("ids", ids).fetch();
 
@@ -297,18 +320,31 @@ public class DmsService {
   @Path("offline/{id}")
   @Hidden
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
-    final DMSFile file = repository.find(id);
-    return !hasFile(file)
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+    return getOfflineDownloadResponse(id, DownloadMode.CHECK);
   }
 
   @GET
   @Path("offline/{id}")
   @Hidden
   public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
+    return getOfflineDownloadResponse(id, DownloadMode.ATTACHMENT);
+  }
+
+  private javax.ws.rs.core.Response getOfflineDownloadResponse(long id, DownloadMode mode) {
+    if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, id)) {
+      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+    }
 
     final DMSFile file = repository.find(id);
+
+    if (!hasFile(file)) {
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
+    if (mode == DownloadMode.CHECK) {
+      return javax.ws.rs.core.Response.ok().build();
+    }
+
     final File path = getFile(file);
     if (path == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
@@ -324,7 +360,7 @@ public class DmsService {
           }
         };
 
-    return stream(so, file.getFileName(), false);
+    return stream(so, file.getFileName(), mode == DownloadMode.INLINE);
   }
 
   @POST
@@ -336,6 +372,12 @@ public class DmsService {
 
     if (ids == null || ids.isEmpty()) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
+    final Long[] idArray = toIdArray(ids);
+
+    if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {
+      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
     final List<DMSFile> records =
@@ -369,11 +411,6 @@ public class DmsService {
     return javax.ws.rs.core.Response.ok(data).build();
   }
 
-  private boolean hasBatchIds(String batchIds) {
-    final HttpSession session = httpRequest.getSession(false);
-    return session != null && ObjectUtils.notEmpty((List<?>) session.getAttribute(batchIds));
-  }
-
   private List<?> findBatchIds(String batchOrId) {
     final HttpSession session = httpRequest.getSession(false);
     List<?> ids = session != null ? (List<?>) session.getAttribute(batchOrId) : null;
@@ -394,12 +431,7 @@ public class DmsService {
       summary = "Check file existence",
       description = "Check that the specified DMS file exists.")
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
-    if (!hasBatchIds(batchOrId) && !hasFile(repository.find(Longs.tryParse(batchOrId)))) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
-    }
-    return findBatchIds(batchOrId) == null
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+    return getAttachmentResponse(batchOrId, DownloadMode.CHECK);
   }
 
   @GET
@@ -410,28 +442,23 @@ public class DmsService {
       description =
           "This service can be used to download a file. It should be used as normal http request.")
   public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
-    return getAttachmentResponse(batchOrId, false);
+    return getAttachmentResponse(batchOrId, DownloadMode.ATTACHMENT);
   }
 
   @GET
   @Path("inline/{id}")
   @Hidden
   public javax.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
-    return getAttachmentResponse(batchOrId, true);
+    return getAttachmentResponse(batchOrId, DownloadMode.INLINE);
   }
 
-  private javax.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
+  private javax.ws.rs.core.Response getAttachmentResponse(String batchOrId, DownloadMode mode) {
     final List<?> ids = findBatchIds(batchOrId);
     if (ids == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
-    final Long[] idArray =
-        ids.stream()
-            .map(
-                id ->
-                    id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString()))
-            .toArray(Long[]::new);
+    final Long[] idArray = toIdArray(ids);
 
     if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {
       return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
@@ -447,12 +474,20 @@ public class DmsService {
     // if file
     final DMSFile record = records.get(0);
     if (records.size() == 1 && !record.getIsDirectory()) {
-      File file = getFile(record);
-      if (file != null && Files.exists(file.toPath())) {
-        return stream(file, getFileName(record), inline);
-      } else {
-        return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      if (hasFile(record)) {
+        if (mode == DownloadMode.CHECK) {
+          return javax.ws.rs.core.Response.ok().build();
+        }
+        File file = getFile(record);
+        if (file != null && Files.exists(file.toPath())) {
+          return stream(file, getFileName(record), mode == DownloadMode.INLINE);
+        }
       }
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
+    if (mode == DownloadMode.CHECK) {
+      return javax.ws.rs.core.Response.ok().build();
     }
 
     final StreamingOutput so =
@@ -469,7 +504,7 @@ public class DmsService {
 
     final String batchName = "documents-" + LocalDate.now() + ".zip";
     try {
-      return stream(so, batchName, inline);
+      return stream(so, batchName, mode == DownloadMode.INLINE);
     } catch (Exception e) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
@@ -551,17 +586,15 @@ public class DmsService {
       childrenQlString += " AND (self.permissions.user = :user OR self.permissions.group = :group)";
     }
 
-    return findFiles(file, base, childrenQlString, user);
+    return findFiles(file, base, applySecurityFilter(new JPQLFilter(childrenQlString)), user);
   }
 
-  private Map<String, File> findFiles(
-      DMSFile file, String base, String childrenQlString, User user) {
+  private Map<String, File> findFiles(DMSFile file, String base, Filter filter, User user) {
     final Map<String, File> files = new LinkedHashMap<>();
     if (Boolean.TRUE.equals(file.getIsDirectory())) {
       final List<DMSFile> children =
-          repository
-              .all()
-              .filter(childrenQlString, file, user, user.getGroup())
+          filter
+              .build(DMSFile.class)
               .bind("parent", file)
               .bind("user", user)
               .bind("group", user.getGroup())
@@ -569,7 +602,7 @@ public class DmsService {
       final String path = base + "/" + file.getFileName();
       files.put(path + "/", null);
       for (DMSFile child : children) {
-        files.putAll(findFiles(child, path, childrenQlString, user));
+        files.putAll(findFiles(child, path, filter, user));
       }
       return files;
     }
@@ -637,5 +670,52 @@ public class DmsService {
             ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
+  }
+
+  /**
+   * Returns the {@code CAN_READ} security filter for {@link DMSFile}.
+   *
+   * <p>If no filter applies, this checks general read permissions directly. A {@code null} filter
+   * indicates unrestricted access.
+   *
+   * @return the security filter, or {@code null} if access is unrestricted
+   */
+  private Filter getSecurityFilter() {
+    final JpaSecurity security = Beans.get(JpaSecurity.class);
+    final Filter securityFilter = security.getFilter(JpaSecurity.CAN_READ, DMSFile.class);
+
+    if (securityFilter == null) {
+      security.check(JpaSecurity.CAN_READ, DMSFile.class);
+    }
+
+    return securityFilter;
+  }
+
+  /**
+   * Combines the given filter with the {@code CAN_READ} security filter for {@link DMSFile}.
+   *
+   * @param filter the base filter
+   * @return the combined filter, or the original filter if no security filter applies
+   */
+  private Filter applySecurityFilter(Filter filter) {
+    final Filter securityFilter = getSecurityFilter();
+    return securityFilter == null ? filter : Filter.and(securityFilter, filter);
+  }
+
+  private Long[] toIdArray(List<?> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return new Long[0];
+    }
+    return ids.stream()
+        .map(id -> id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString()))
+        .toArray(Long[]::new);
+  }
+
+  private Class<? extends Model> findModelClass(String model) {
+    final Class<?> foundModelClass = JPA.model(model);
+    if (foundModelClass == null) {
+      throw new IllegalArgumentException("No such model found.");
+    }
+    return foundModelClass.asSubclass(Model.class);
   }
 }
