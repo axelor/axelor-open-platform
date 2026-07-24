@@ -70,18 +70,22 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const getSearchOptions = useCallback(
     (node: TreeNode): Partial<SearchOptions> => {
-      const { items = [] } = node;
-      if (sortColumns.length === 0) return {};
-      return {
-        sortBy: sortColumns
+      const { items = [], parent } = node;
+      const opts: Partial<SearchOptions> = {};
+      if (parent) {
+        opts.limit = -1;
+      }
+      if (sortColumns.length > 0) {
+        opts.sortBy = sortColumns
           .map((col) => {
             const $item = items.find((item: any) => item.as === col.name);
             return $item
               ? `${col.order === "desc" ? "-" : ""}${$item.name}`
               : null;
           })
-          .filter((c) => c) as string[],
-      };
+          .filter((c) => c) as string[];
+      }
+      return opts;
     },
     [sortColumns],
   );
