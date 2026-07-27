@@ -82,7 +82,11 @@ function toMoment(val: string, field: Field) {
     granularity = "second";
   }
 
-  return [val ? moment(val, format) : moment(), granularity, operator];
+  // dayjs (unlike moment) requires MM/DD to match exactly 2 digits, so
+  // relax them to M/D to accept single-digit user input like "6/2026".
+  const parseFormat = format.replace(/MM/g, "M").replace(/DD/g, "D");
+
+  return [val ? moment(val, parseFormat) : moment(), granularity, operator];
 }
 
 function toTimeMoment(val: any, field: Field) {
