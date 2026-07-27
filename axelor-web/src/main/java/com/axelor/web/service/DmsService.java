@@ -19,6 +19,7 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -29,7 +30,10 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.dms.db.DMSFile;
+import com.axelor.dms.db.DMSPermission;
 import com.axelor.dms.db.repo.DMSFileRepository;
+import com.axelor.dms.db.repo.DMSPermissionRepository;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
@@ -43,6 +47,7 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
+import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,6 +70,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -88,6 +95,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.shiro.authz.UnauthorizedException;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -233,6 +241,178 @@ public class DmsService {
     response.setStatus(Response.STATUS_SUCCESS);
     response.setData(records);
     return response;
+  }
+
+  @PUT
+  @Path("{id}/permissions")
+  @Operation(
+      summary = "Save document permissions",
+      description =
+          "Save the DMS permissions of a document. Permissions that are missing from the given"
+              + " document are removed. Existing permissions can only be removed or added, not"
+              + " updated.")
+  public Response savePermissions(@PathParam("id") Long id, Request request) {
+    if (request == null || request.getRecords() == null) {
+      throw new IllegalArgumentException("No records provided.");
+    }
+
+    DMSFile file = repository.find(id);
+
+    if (file == null) {
+      throw new IllegalArgumentException("No such record found.");
+    }
+
+    if (!repository.canShare(file)) {
+      throw new UnauthorizedException(I18n.get("You are not authorized to perform this action."));
+    }
+
+    List<Map<String, Object>> data = applyPermissions(file, request.getRecords());
+
+    Response response = new Response();
+    response.setData(data);
+    response.setStatus(Response.STATUS_SUCCESS);
+    return response;
+  }
+
+  /**
+   * Updates file permissions by removing omitted entries and saving new ones.
+   *
+   * @param file target file
+   * @param records list of permission records to set
+   * @return list of saved permission entities
+   * @throws IllegalArgumentException if permission is invalid or updating
+   */
+  @Transactional
+  List<Map<String, Object>> applyPermissions(DMSFile file, List<Object> records) {
+    List<DMSPermission> permissions =
+        Optional.ofNullable(file.getPermissions()).orElse(Collections.emptyList());
+    Set<Long> permissionIds =
+        permissions.stream()
+            .map(DMSPermission::getId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    List<Map<String, Object>> recordMaps =
+        records.stream()
+            .map(rec -> checkPermissionRecord(rec, permissionIds))
+            .collect(Collectors.toList());
+
+    Set<Long> recordIds =
+        recordMaps.stream().map(rec -> findId(rec.get("id"))).collect(Collectors.toSet());
+    List<DMSPermission> permissionsToRemove =
+        permissions.stream()
+            .filter(perm -> !recordIds.contains(perm.getId()))
+            .collect(Collectors.toList());
+
+    DMSPermissionRepository permissionRepo = Beans.get(DMSPermissionRepository.class);
+
+    if (!permissionsToRemove.isEmpty()) {
+      permissionsToRemove.forEach(permissionRepo::remove);
+
+      // Permissions are removed with bulk queries, so clear the stale entities and collections
+      // before proceeding to save/update remaining permissions.
+      JPA.flush();
+      JPA.clear();
+      file = JPA.find(DMSFile.class, file.getId());
+    }
+
+    List<Map<String, Object>> results = new ArrayList<>();
+
+    for (Map<String, Object> values : recordMaps) {
+      Long id = findId(values.get("id"));
+
+      if (id != null) {
+        DMSPermission permission = permissionRepo.find(id);
+        checkNotUpdated(permission, values);
+        results.add(Resource.toMapCompact(permission));
+        continue;
+      }
+
+      DMSPermission permission = new DMSPermission();
+
+      Object userObj = values.get("user");
+      User user = null;
+      if (userObj instanceof Map) {
+        Long userId = findId(((Map<?, ?>) userObj).get("id"));
+        user = userId != null ? JPA.find(User.class, userId) : null;
+      }
+
+      Object groupObj = values.get("group");
+      Group group = null;
+      if (groupObj instanceof Map) {
+        Long groupId = findId(((Map<?, ?>) groupObj).get("id"));
+        group = groupId != null ? JPA.find(Group.class, groupId) : null;
+      }
+
+      if (user == null && group == null) {
+        throw new IllegalArgumentException("User or group must be specified.");
+      }
+
+      Object valueObj = values.get("value");
+      if (valueObj instanceof String) {
+        permission.setValue((String) valueObj);
+      } else {
+        throw new IllegalArgumentException("Invalid permission value.");
+      }
+
+      permission.setUser(user);
+      permission.setGroup(group);
+
+      if (!JPA.em().contains(file)) {
+        file = JPA.find(DMSFile.class, file.getId());
+      }
+      permission.setFile(file);
+
+      permission = permissionRepo.save(permission);
+      results.add(Resource.toMapCompact(permission));
+    }
+
+    return results;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> checkPermissionRecord(Object rec, Set<Long> currentPermissionIds) {
+    if (!(rec instanceof Map<?, ?>)) {
+      throw new IllegalArgumentException("Invalid permission record.");
+    }
+
+    final Map<?, ?> recordMap = (Map<?, ?>) rec;
+    Long id = findId(recordMap.get("id"));
+    if (id != null && !currentPermissionIds.contains(id)) {
+      throw new IllegalArgumentException("Permission not found.");
+    }
+
+    return (Map<String, Object>) recordMap;
+  }
+
+  /**
+   * Checks that the given values don't change the existing permission.
+   *
+   * @param permission the existing permission
+   * @param values the permission values sent by the client
+   * @throws IllegalArgumentException if the permission is missing or the values change it
+   */
+  private void checkNotUpdated(DMSPermission permission, Map<String, Object> values) {
+    if (permission == null) {
+      throw new IllegalArgumentException("Permission not found.");
+    }
+
+    if (values.containsKey("value") && !Objects.equals(permission.getValue(), values.get("value"))
+        || values.containsKey("user")
+            && !Objects.equals(findModelId(permission.getUser()), findRelatedId(values.get("user")))
+        || values.containsKey("group")
+            && !Objects.equals(
+                findModelId(permission.getGroup()), findRelatedId(values.get("group")))) {
+      throw new IllegalArgumentException("Existing permission cannot be updated.");
+    }
+  }
+
+  private Long findModelId(Model model) {
+    return model != null ? model.getId() : null;
+  }
+
+  /** Finds the id of the given related value, either a map of values or an id. */
+  private Long findRelatedId(Object value) {
+    return findId(value instanceof Map<?, ?> ? ((Map<?, ?>) value).get("id") : value);
   }
 
   @GET
@@ -700,6 +880,11 @@ public class DmsService {
   private Filter applySecurityFilter(Filter filter) {
     final Filter securityFilter = getSecurityFilter();
     return securityFilter == null ? filter : Filter.and(securityFilter, filter);
+  }
+
+  private Long findId(Object value) {
+    Long id = value != null ? Long.valueOf(value.toString()) : null;
+    return id != null && id > 0 ? id : null;
   }
 
   private Long[] toIdArray(List<?> ids) {

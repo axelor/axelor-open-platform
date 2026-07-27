@@ -364,6 +364,31 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
         > 0;
   }
 
+  /**
+   * Whether the current user can share the given file, ie. manage its {@link DMSPermission} items.
+   *
+   * @param file the file to check
+   * @return true if the current user can manage permissions of the given file
+   */
+  public boolean canShare(DMSFile file) {
+    final User user = AuthUtils.getUser();
+    if (file == null || user == null) {
+      return false;
+    }
+
+    return file.getCreatedBy() == user
+        || security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId())
+        || dmsPermissions
+                .all()
+                .filter(
+                    "self.file = ? AND self.value = 'FULL' AND (self.user = ? OR self.group = ?)",
+                    file,
+                    user,
+                    user.getGroup())
+                .count()
+            > 0;
+  }
+
   private boolean canOffline(DMSFile file, User user) {
     return !Boolean.TRUE.equals(file.getIsDirectory())
         && file.getMetaFile() != null
@@ -476,24 +501,11 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     final User user = AuthUtils.getUser();
     final MetaFile metaFile = file.getMetaFile();
 
-    boolean canShare =
-        file.getCreatedBy() == user
-            || security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId())
-            || dmsPermissions
-                    .all()
-                    .filter(
-                        "self.file = ? AND self.value = 'FULL' AND (self.user = ? OR self.group = ?)",
-                        file,
-                        user,
-                        user.getGroup())
-                    .count()
-                > 0;
-
     json.put("typeIcon", isFile ? "file-earmark" : "folder-fill");
     json.put("downloadIcon", "download");
     json.put("detailsIcon", "info-circle");
 
-    json.put("canShare", canShare);
+    json.put("canShare", canShare(file));
     json.put("canWrite", canCreate(file));
 
     if (canOffline(file, user)) {

@@ -63,6 +63,7 @@ import {
   CONTENT_TYPE,
   downloadAsBatch,
   prepareCustomView,
+  savePermissions,
   toStrongText,
 } from "./builder/utils";
 import { DataStore } from "@/services/client/data-store";
@@ -513,7 +514,6 @@ export function Dms(props: ViewProps<GridView>) {
   const onDocumentPermissions = useCallback(() => {
     const doc = getSelectedDocument();
     if (doc) {
-      // TODO: permissions dialog
       showEditor({
         title: i18n.get("Permissions {0}", doc.fileName),
         model: view.model!,
@@ -523,6 +523,14 @@ export function Dms(props: ViewProps<GridView>) {
         canAttach: false,
         readonly: false,
         onSelect: () => {},
+        onSave: (record) =>
+          savePermissions(
+            doc.id!,
+            ((record.permissions || []) as DataRecord[]).map((item) => {
+              const { id, ...rest } = item;
+              return (id ?? 0) > 0 ? item : rest;
+            }),
+          ),
       });
     }
   }, [view, showEditor, getViewContext, getSelectedDocument]);
@@ -881,7 +889,7 @@ export function Dms(props: ViewProps<GridView>) {
                     key: "permissions",
                     text: i18n.get("Permissions..."),
                     onClick: onDocumentPermissions,
-                    hidden: !selectedRows?.length,
+                    hidden: !getSelectedDocument()?.canShare,
                   },
                   {
                     key: "attached",

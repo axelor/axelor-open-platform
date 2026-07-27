@@ -199,12 +199,12 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     }
 
     entity.setPermission(permission);
-    final int version = entity.getVersion();
+    final Integer version = entity.getVersion();
     entity = super.save(entity);
 
     applyPermissionToParents(entity, __read__);
 
-    if (file.getIsDirectory() && entity.getVersion() > version) {
+    if (file.getIsDirectory() && !Objects.equals(entity.getVersion(), version)) {
       applySamePermissionToChildren(entity);
     }
 
