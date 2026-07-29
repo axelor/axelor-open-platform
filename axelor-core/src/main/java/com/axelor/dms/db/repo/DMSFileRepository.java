@@ -26,7 +26,6 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
-import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.annotations.Track;
@@ -59,6 +58,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -297,7 +297,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     if (Boolean.TRUE.equals(entity.getIsDirectory())) {
       final List<DMSFile> children = all().filter("self.parent.id = ?", entity.getId()).fetch();
       for (DMSFile child : children) {
-        if (child != entity) {
+        if (!Objects.equals(child, entity)) {
           remove(child);
         }
       }
@@ -337,17 +337,20 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     return find(id);
   }
 
-  private boolean canCreate(DMSFile parent) {
+  private boolean canWrite(DMSFile file) {
     final User user = AuthUtils.getUser();
+    if (file == null || user == null) {
+      return false;
+    }
+
     final Group group = user.getGroup();
-    if (parent.getCreatedBy() == user
-        || security.hasRole("role.super")
-        || security.hasRole("role.admin")) {
+    if (Objects.equals(file.getCreatedBy(), user) || AuthUtils.isAdmin(user)) {
       return true;
     }
 
     // allow if the parent folder has no specific dms permissions
-    if (dmsPermissions.all().filter("self.file = :file").bind("file", parent).count() == 0) {
+    if (dmsPermissions.all().filter("self.file = :file").bind("file", file).autoFlush(false).count()
+        == 0) {
       return true;
     }
 
@@ -356,7 +359,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
             .filter(
                 "self.file = :file AND self.permission.canWrite = true AND "
                     + "(self.user = :user OR self.group = :group)")
-            .bind("file", parent)
+            .bind("file", file)
             .bind("user", user)
             .bind("group", group)
             .autoFlush(false)
@@ -376,8 +379,8 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       return false;
     }
 
-    return file.getCreatedBy() == user
-        || security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId())
+    return Objects.equals(file.getCreatedBy(), user)
+        || AuthUtils.isAdmin(user)
         || dmsPermissions
                 .all()
                 .filter(
@@ -385,6 +388,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
                     file,
                     user,
                     user.getGroup())
+                .autoFlush(false)
                 .count()
             > 0;
   }
@@ -466,15 +470,15 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     if (parent == null) {
       return json;
     }
-    if (file != null && file.getParent() == parent) {
+    if (file != null && Objects.equals(file.getParent(), parent)) {
       return json;
     }
 
     // check whether user can create/move document here
-    if (file == null && !canCreate(parent)) {
+    if (file == null && !canWrite(parent)) {
       throw new UnauthorizedException(I18n.get("You can't create document here."));
     }
-    if (file != null && file.getParent() != parent && !canCreate(parent)) {
+    if (file != null && !Objects.equals(file.getParent(), parent) && !canWrite(parent)) {
       throw new UnauthorizedException(I18n.get("You can't move document here."));
     }
 
@@ -506,7 +510,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     json.put("detailsIcon", "info-circle");
 
     json.put("canShare", canShare(file));
-    json.put("canWrite", canCreate(file));
+    json.put("canWrite", canWrite(file));
 
     if (canOffline(file, user)) {
       json.put("offline", true);
