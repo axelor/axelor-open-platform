@@ -15,6 +15,7 @@ import { clsx, Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
 import { GridColumn, GridRow, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { useDataStore } from "@/hooks/use-data-store";
@@ -196,6 +197,31 @@ export function Dms(props: ViewProps<GridView>) {
     return docs! || [node!];
   }, [getSelectedDocuments, getSelectedNode]);
 
+  /**
+   * Whether the current user can create documents under the selected node.
+   *
+   * Only denies when the selected node is known to be read-only, the check is
+   * enforced server side anyway.
+   *
+   * @param {boolean} [notify] - whether to notify the user when denied
+   * @returns {boolean} - `true` if documents can be created
+   */
+  const canCreateDocument = useCallback(
+    (notify?: boolean) => {
+      const parent = getSelectedNode();
+      if (parent?.canWrite === false) {
+        if (notify) {
+          alerts.error({
+            message: i18n.get("You can't create document here."),
+          });
+        }
+        return false;
+      }
+      return true;
+    },
+    [getSelectedNode],
+  );
+
   const supportsSpreadsheet = session?.features?.dmsSpreadsheet;
 
   const openDMSFile = useAtomCallback(
@@ -283,7 +309,22 @@ export function Dms(props: ViewProps<GridView>) {
       })
       .then((result) => {
         const { records } = result;
-        setTreeRecords([ROOT, ...records]);
+        setTreeRecords((_records) => {
+          const rootIds = records.map((rec) => rec.id);
+          return [
+            ROOT,
+            // tree search fetches a restricted set of fields with no populate,
+            // so keep the details already collected by the grid search
+            ...records.map((rec) => ({
+              ..._records.find((r) => r.id === rec.id),
+              ...rec,
+            })),
+            // only root level nodes are fetched, so keep the known children
+            ..._records.filter(
+              (r) => r["parent.id"] && !rootIds.includes(r.id),
+            ),
+          ];
+        });
       });
   }, [ROOT, action.domain, dataStore, popupRecord]);
 
@@ -591,6 +632,8 @@ export function Dms(props: ViewProps<GridView>) {
     async (files: FileList | null) => {
       if (!files) return;
 
+      if (!canCreateDocument(true)) return;
+
       for (let i = 0; i < files.length; i++) {
         const file = files?.[i];
         if (file && uploadSize > 0 && file.size > 1048576 * uploadSize) {
@@ -611,7 +654,7 @@ export function Dms(props: ViewProps<GridView>) {
 
       await uploader.process();
     },
-    [uploadSize, uploader],
+    [canCreateDocument, uploadSize, uploader],
   );
 
   const handleNodeDrop = useCallback(
@@ -844,6 +887,7 @@ export function Dms(props: ViewProps<GridView>) {
                 key: "new",
                 text: i18n.get("New"),
                 hidden: !hasButton("new"),
+                disabled: !canCreateDocument(),
                 iconOnly: false,
                 onClick: onFolderNew,
                 items: [
