@@ -146,7 +146,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
   public DMSPermission save(DMSPermission entity) {
 
     final DMSFile file = entity.getFile();
-    if (file == null) {
+    if (file == null || entity.getValue() == null) {
       throw new PersistenceException(I18n.get("Invalid permission"));
     }
 
@@ -194,6 +194,10 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
       case "READ":
         permission = __read__;
         break;
+      case "OFFLINE":
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid value: " + entity.getValue());
     }
 
     if (permission == null) {
