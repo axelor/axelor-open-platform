@@ -855,8 +855,13 @@ public class DmsService {
   /**
    * Returns the {@code CAN_READ} security filter for {@link DMSFile}.
    *
-   * <p>If no filter applies, this checks general read permissions directly. A {@code null} filter
-   * indicates unrestricted access.
+   * <p>If conditional filters exist, returns them. If no filter applies, checks general read
+   * permissions directly:
+   *
+   * <ul>
+   *   <li>Returns {@code null} if access is unrestricted.
+   *   <li>Returns an allow-nothing filter ({@code 1 = 0}) if access is denied.
+   * </ul>
    *
    * @return the security filter, or {@code null} if access is unrestricted
    */
@@ -864,11 +869,16 @@ public class DmsService {
     final JpaSecurity security = Beans.get(JpaSecurity.class);
     final Filter securityFilter = security.getFilter(JpaSecurity.CAN_READ, DMSFile.class);
 
-    if (securityFilter == null) {
-      security.check(JpaSecurity.CAN_READ, DMSFile.class);
+    if (securityFilter != null) {
+      return securityFilter;
     }
 
-    return securityFilter;
+    if (security.isPermitted(JpaSecurity.CAN_READ, DMSFile.class)) {
+      return null;
+    }
+
+    // Always false filter
+    return new JPQLFilter("1 = 0");
   }
 
   /**
