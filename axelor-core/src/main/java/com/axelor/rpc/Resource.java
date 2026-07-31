@@ -46,6 +46,7 @@ import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.dms.db.DMSFile;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostRequest;
@@ -1376,10 +1377,19 @@ public class Resource<T extends Model> {
   }
 
   private void checkRelationalPermissions(Map<String, Object> recordMap, Mapper mapper) {
+    // DMS permissions are saved with a dedicated endpoint: /ws/dms/{id}/permissions
+    final boolean isDmsFile = DMSFile.class.isAssignableFrom(mapper.getBeanClass());
+
     for (final Iterator<Entry<String, Object>> it = recordMap.entrySet().iterator();
         it.hasNext(); ) {
       final Entry<String, Object> entry = it.next();
       final String name = entry.getKey();
+
+      if (isDmsFile && "permissions".equals(name)) {
+        it.remove();
+        continue;
+      }
+
       final Class<? extends Model> target =
           Optional.ofNullable(mapper.getProperty(name))
               .map(Property::getTarget)
