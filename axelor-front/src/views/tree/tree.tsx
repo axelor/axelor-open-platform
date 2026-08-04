@@ -70,7 +70,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const getSearchOptions = useCallback(
     (node: TreeNode): Partial<SearchOptions> => {
-      const { items = [], parent } = node;
+      const { items = [], parent, orderBy } = node;
       const opts: Partial<SearchOptions> = {};
       if (parent) {
         opts.limit = -1;
@@ -84,6 +84,8 @@ export function Tree({ meta }: ViewProps<TreeView>) {
               : null;
           })
           .filter((c) => c) as string[];
+      } else if (orderBy) {
+        opts.sortBy = orderBy.split(/\s*,\s*/);
       }
       return opts;
     },
