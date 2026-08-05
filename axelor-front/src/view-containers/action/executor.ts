@@ -38,7 +38,11 @@ function mergeValues(
     if (Array.isArray(curr)) {
       return curr.map((v: DataRecord) =>
         merge(
-          prev?.find?.((p: DataRecord) => p.id === v.id),
+          // match saved rows by id and unsaved rows by cid; a row with
+          // neither matches nothing, so distinct new lines never collapse
+          prev?.find?.((p: DataRecord) =>
+            v.id != null ? p.id === v.id : v.cid != null && p.cid === v.cid,
+          ),
           v,
         ),
       );
