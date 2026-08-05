@@ -84,7 +84,7 @@ public class AuditTracker {
     } else {
       query
           .filter("self.model = :model AND self.tracked IS TRUE")
-          .bind("model", model.getClass().getName());
+          .bind("model", EntityHelper.getEntityClass(model).getName());
     }
 
     return query.fetch().stream().map(FieldTracking::new).toList();

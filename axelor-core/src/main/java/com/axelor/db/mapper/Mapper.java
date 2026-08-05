@@ -5,6 +5,7 @@
 package com.axelor.db.mapper;
 
 import com.axelor.common.ResourceUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -226,7 +227,7 @@ public class Mapper {
             () ->
                 bean instanceof MetaJsonRecord metaJsonRecord
                     ? JsonProperty.of(metaJsonRecord.getJsonModel(), name)
-                    : JsonProperty.of(bean.getClass(), name));
+                    : JsonProperty.of(EntityHelper.getEntityClass(bean), name));
   }
 
   /**

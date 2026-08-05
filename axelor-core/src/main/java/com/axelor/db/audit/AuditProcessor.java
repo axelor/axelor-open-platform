@@ -287,7 +287,7 @@ public class AuditProcessor {
 
     // Process with consolidated state
     var entityClass = Class.forName(group.getRelatedModel()).asSubclass(Model.class);
-    var entity = JPA.em().find(entityClass, group.getRelatedId());
+    var entity = JPA.findReferenceById(entityClass, group.getRelatedId());
 
     // If entity is deleted, skip processing
     if (entity != null) {
