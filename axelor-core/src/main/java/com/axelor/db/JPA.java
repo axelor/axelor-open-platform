@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -433,6 +434,7 @@ public final class JPA {
       if (p == null || p.isPrimary() || p.isVersion() || mapper.getSetter(name) == null) continue;
 
       Object value = values.get(name);
+      Object inverseTarget = null;
       Class<Model> target = (Class<Model>) p.getTarget();
 
       if (p.isCollection()) {
@@ -488,10 +490,27 @@ public final class JPA {
         value = items;
       } else if (p.isReference() && value instanceof Map map) {
         value = _edit(target, map, visited, edited);
+        if (p.getType() == PropertyType.ONE_TO_ONE) {
+          inverseTarget = value;
+        }
       }
       Object oldValue = mapper.set(bean, name, value);
       if (p.valueChanged(bean, oldValue)) {
         beanChanged = true;
+      }
+      if (inverseTarget != null) {
+        // Wire the inverse side after checking for changes. The inverse setter updates
+        // the owning side, which would make the old and new values appear identical.
+        Property inverseProperty =
+            Arrays.stream(Mapper.of(p.getTarget()).getProperties())
+                .filter(x -> x.getType() == PropertyType.ONE_TO_ONE)
+                .filter(x -> p.getName().equals(x.getMappedBy()))
+                .filter(x -> x.getTarget().isAssignableFrom(klass))
+                .findFirst()
+                .orElse(null);
+        if (inverseProperty != null) {
+          inverseProperty.set(inverseTarget, bean);
+        }
       }
     }
 

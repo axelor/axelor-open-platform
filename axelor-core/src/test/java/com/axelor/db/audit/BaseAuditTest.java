@@ -4,18 +4,30 @@
  */
 package com.axelor.db.audit;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.axelor.JpaTest;
 import com.axelor.JpaTestModule;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.concurrent.ContextAware;
+import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.test.db.AuditCheck;
 import com.axelor.test.db.Contact;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -133,5 +145,57 @@ public class BaseAuditTest extends JpaTest {
     entity.setLastName(lastName);
     getEntityManager().persist(entity);
     return entity;
+  }
+
+  @Transactional
+  protected Long createTracked(String name) {
+    var entity = new AuditCheck();
+    entity.setName(name);
+    getEntityManager().persist(entity);
+    return entity.getId();
+  }
+
+  protected void processAuditLogs() {
+    JPA.clear();
+    new AuditProcessor().process();
+    JPA.clear();
+  }
+
+  protected MailMessage lastMessage(Long entityId) {
+    return lastMessage(AuditCheck.class, entityId);
+  }
+
+  protected MailMessage lastMessage(Class<?> model, Long entityId) {
+    var message =
+        Query.of(MailMessage.class)
+            .filter("self.relatedModel = :model AND self.relatedId = :id")
+            .bind("model", model.getName())
+            .bind("id", entityId)
+            .order("-id")
+            .fetchOne();
+    assertNotNull(message, "no tracking message was created");
+    return message;
+  }
+
+  protected Map<String, Map<String, String>> tracksOf(MailMessage message) throws Exception {
+    Map<String, Object> body =
+        Beans.get(ObjectMapper.class)
+            .readValue(message.getBody(), new TypeReference<Map<String, Object>>() {});
+
+    @SuppressWarnings("unchecked")
+    var tracks = (List<Map<String, String>>) body.get("tracks");
+    return tracks == null
+        ? Map.of()
+        // Deduplicate fields declared multiple times in <track>.
+        : tracks.stream()
+            .collect(Collectors.toMap(item -> item.get("name"), item -> item, (a, b) -> a));
+  }
+
+  protected <T> T asAdmin(Callable<T> job) throws Exception {
+    return ContextAware.of()
+        .withTransaction(false)
+        .withUser(AuthUtils.getUser("admin"))
+        .build(job)
+        .call();
   }
 }

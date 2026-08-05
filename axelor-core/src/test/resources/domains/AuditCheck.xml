@@ -14,6 +14,7 @@
     <boolean name="confirmed" />
     <datetime name="confirmDate" />
     <decimal name="totalAmount" precision="20" scale="4" />
+    <one-to-one name="primaryEmail" ref="AuditCheckEmail" unique="true" />
 
     <track subscribe="true">
       <field name="name" />
@@ -26,6 +27,7 @@
       <field name="confirmed" on="UPDATE" />
       <field name="confirmDate" on="UPDATE" if="confirmed" />
       <field name="totalAmount" />
+      <field name="primaryEmail" />
 
       <message if="true" on="CREATE">Created</message>
       <message if="confirmed" on="UPDATE">Confirmed</message>
@@ -46,6 +48,27 @@
     <boolean name="confirmed" />
     <datetime name="confirmDate" />
     <decimal name="totalAmount" precision="20" scale="4" />
+  </entity>
+
+  <!--
+    Inverse side of AuditCheck.primaryEmail. The name column is computed
+    from the auditCheck back-reference (AOP-1829).
+  -->
+  <entity name="AuditCheckEmail" table="AUDIT_CHECK_EMAIL">
+    <one-to-one name="auditCheck" ref="AuditCheck" mappedBy="primaryEmail" />
+    <string name="address" />
+    <string name="name" namecolumn="true" readonly="true">
+      <![CDATA[
+      String value = "";
+      if (auditCheck != null && auditCheck.getName() != null) {
+        value += auditCheck.getName() + " ";
+      }
+      if (address != null) {
+        value += "[" + address + "]";
+      }
+      return value;
+      ]]>
+    </string>
   </entity>
 
 </domain-models>

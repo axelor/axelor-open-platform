@@ -1,0 +1,10 @@
+---
+title: Fix detached entity error during audit log processing
+type: fix
+description: |
+  Audit processing rebuilt a ContextHandler proxy for tracked reference
+  fields and computed their name, which re-pointed the managed entity
+  through a bidirectional one-to-one wiring setter and failed to cascade
+  on flush. Read the reference label directly from the stored audit map
+  instead, and wire the inverse side of a one-to-one on edit so the
+  name is computed correctly at save time.

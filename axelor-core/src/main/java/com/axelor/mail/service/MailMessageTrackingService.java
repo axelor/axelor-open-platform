@@ -25,7 +25,6 @@ import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
-import com.axelor.rpc.ContextHandlerFactory;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -122,7 +121,13 @@ public class MailMessageTrackingService {
       final Object value = getValue(values, jsonValues, field, property);
       final Object oldValue = getValue(oldValues, oldJsonValues, field, property);
 
-      if (Objects.equals(value, oldValue)) {
+      // for references, only the target id matters: the compact map also carries the version and
+      // name, so comparing the whole map would flag a spurious change when the same record's
+      // version or name changed elsewhere in the transaction.
+      final Object key = property.isReference() ? referenceId(value) : value;
+      final Object oldKey = property.isReference() ? referenceId(oldValue) : oldValue;
+
+      if (Objects.equals(key, oldKey)) {
         continue;
       }
 
@@ -242,8 +247,8 @@ public class MailMessageTrackingService {
         var nameField = mapper.getNameField();
         var nameKey = nameField == null ? "id" : nameField.getName();
         var nameValue = (Object) "N/A";
-        if (value instanceof Model model) nameValue = mapper.get(model, nameKey);
         if (value instanceof Map map) nameValue = map.get(nameKey);
+        else if (value instanceof String string) nameValue = string;
         if (nameValue != null) return nameValue.toString();
         break;
       case ONE_TO_MANY:
@@ -329,15 +334,15 @@ public class MailMessageTrackingService {
         return Adapter.adapt(value, LocalDateTime.class, null, null);
       case MANY_TO_ONE:
       case ONE_TO_ONE:
-        if (value instanceof Map map) {
-          @SuppressWarnings("unchecked")
-          var handler = ContextHandlerFactory.newHandler(property.getTarget(), map);
-          return handler.getProxy();
-        }
         return value;
       default:
         return value;
     }
+  }
+
+  /** Extracts the target id from a reference value (a compact map), for change detection. */
+  private Object referenceId(Object value) {
+    return value instanceof Map<?, ?> map ? map.get("id") : value;
   }
 
   private String toJSON(Object value) {
