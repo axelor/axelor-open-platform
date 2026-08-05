@@ -48,6 +48,11 @@ function mergeValues(
       );
     }
     if (curr && prev && typeof curr === "object") {
+      // replace as soon as the id changes so stale fields from `prev` don't
+      // leak onto a different record; only merge when both ids are the same
+      if ((prev.id ?? null) !== (curr.id ?? null)) {
+        return curr;
+      }
       return {
         ...Object.keys(curr).reduce(
           (rec, k) => ({ ...rec, [k]: merge(prev[k], curr[k]) }),

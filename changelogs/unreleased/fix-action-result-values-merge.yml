@@ -1,0 +1,18 @@
+---
+title: Fix merging of values returned by chained actions
+type: fix
+description: |
+  When several actions were chained together, the values each of them returned
+  were aggregated before being applied to the record, and that merge could
+  corrupt relational values.
+
+  New (unsaved) collection rows returned by different actions were all matched
+  on their (missing) id and collapsed into a single row, losing data. Such rows
+  are now matched by their client id (cid) instead, so distinct new lines stay
+  separate.
+
+  A many-to-one or one-to-one field pointed at a different record by a later
+  action was deep-merged with the previous value, leaking stale fields from the
+  old record onto the new one. The new value now fully replaces the previous one
+  as soon as the record id changes; values are only merged when they refer to
+  the same record.
