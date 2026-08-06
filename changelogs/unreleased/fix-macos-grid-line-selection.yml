@@ -1,7 +1,0 @@
----
-title: Fix multiple line selection in grid on macOS
-type: fix
-description: |
-  Selecting multiple lines in the grid did not work on macOS because the
-  keyboard event was mapped to the wrong modifier key. The correct key is now
-  used so that range/multi-selection works consistently across platforms.

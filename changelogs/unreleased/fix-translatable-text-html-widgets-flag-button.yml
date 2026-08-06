@@ -1,8 +1,0 @@
----
-title: Fix translatable text/html widgets flag button position and visibility
-type: fix
-description: |
-  In the text widget, the translation flag button was not positioned correctly
-  next to the input. In the html widget, the flag button was hidden entirely
-  when a translation existed. Both widgets now show the flag button at the
-  top-right of the field, consistent with the string widget behavior.

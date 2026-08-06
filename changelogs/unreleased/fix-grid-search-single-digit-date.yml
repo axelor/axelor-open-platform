@@ -1,8 +1,0 @@
----
-title: Fix grid date search not matching single-digit month or day
-type: fix
-description: |
-  Typing a date filter with a single-digit month or day in a grid column
-  search (e.g. `6/2026` for June 2026) produced no results. This was caused
-  by dayjs requiring exactly two digits for `MM`/`DD` format tokens, unlike
-  moment.js which accepted a single digit.

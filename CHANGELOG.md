@@ -1,3 +1,95 @@
+## 7.4.13 (2026-08-06)
+
+#### Fix
+
+* Fix tree node orderBy attribute not being applied
+
+  <details>
+  
+  `orderBy` attribute defined on tree node was not being applied during the search request of the node.
+  
+  </details>
+
+* Fix incorrect country flags in phone widget
+
+  <details>
+  
+  Corrected some country flags that were outdated or incorrect:
+  
+  * France: fixed the flag colors.
+  * Martinique: replaced the obsolete flag with the current one.
+  * Malaysia: fixed the number of stripes.
+  * Syria: updated to the current national flag.
+  
+  </details>
+
+* Fix translatable text/html widgets ignoring translation in readonly
+
+  <details>
+  
+  When a translation exists for the current locale, the text and html widgets
+  now display the translated value in readonly mode, matching the behavior of
+  the string widget. Previously the editable input was shown with the raw
+  stored value instead.
+  
+  </details>
+
+* Fix translatable text/html widgets flag button position and visibility
+
+  <details>
+  
+  In the text widget, the translation flag button was not positioned correctly
+  next to the input. In the html widget, the flag button was hidden entirely
+  when a translation existed. Both widgets now show the flag button at the
+  top-right of the field, consistent with the string widget behavior.
+  
+  </details>
+
+* Fix multiple line selection in grid on macOS
+
+  <details>
+  
+  Selecting multiple lines in the grid did not work on macOS because the
+  keyboard event was mapped to the wrong modifier key. The correct key is now
+  used so that range/multi-selection works consistently across platforms.
+  
+  </details>
+
+* Fix validIf state being overridden by other field updates
+
+  <details>
+  
+  A field marked invalid through `validIf` could silently go back to looking
+  valid, even though nothing about that field itself changed. This happened
+  whenever another field elsewhere on the same form reacted to the same
+  change, for example by showing or hiding itself. As a result, an invalid
+  value could go unnoticed, and saving the record could also fail with an
+  unexpected error.
+  
+  </details>
+
+* Fix panel header color not applied to title text
+* Fix grid date search not matching single-digit month or day
+
+  <details>
+  
+  Typing a date filter with a single-digit month or day in a grid column
+  search (e.g. `6/2026` for June 2026) produced no results. This was caused
+  by dayjs requiring exactly two digits for `MM`/`DD` format tokens, unlike
+  moment.js which accepted a single digit.
+  
+  </details>
+
+* Fix tree view loading all child records
+
+  <details>
+  
+  Expanding a node in the tree view only loaded the first 40 child records.
+  All child records are now loaded so that the full hierarchy is displayed.
+  
+  </details>
+
+
 ## 7.4.12 (2026-06-10)
 
 #### Fix

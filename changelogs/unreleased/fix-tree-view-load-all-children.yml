@@ -1,6 +1,0 @@
----
-title: Fix tree view loading all child records
-type: fix
-description: |
-  Expanding a node in the tree view only loaded the first 40 child records.
-  All child records are now loaded so that the full hierarchy is displayed.
