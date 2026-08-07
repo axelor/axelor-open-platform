@@ -30,39 +30,56 @@ const executeAction: typeof actionRequest = async (options) => {
   return block(() => actionRequest(options).then(processActionResult));
 };
 
+/**
+ * Deeply merges the values returned by chained actions into a single record.
+ *
+ * When several actions are chained, each returns its own values and they are
+ * aggregated so the view can be updated in one pass. The merge is driven by
+ * `incoming` (the later action wins) and follows record identity:
+ *
+ * - Scalars: `incoming` overrides `accumulated`.
+ * - Relational objects (m2o/o2o): merged field-by-field only when both sides
+ *   refer to the same record; as soon as the `id` changes (treating `null` and
+ *   `undefined` as the same "no id"), `incoming` fully replaces the previous
+ *   value so stale fields don't leak onto a different record.
+ * - Collections (o2m/m2m): each row of `incoming` is merged into the matching
+ *   row of `accumulated` — matched by `id`, falling back to `cid` for unsaved
+ *   rows. Rows with neither match nothing and stay distinct, and rows present
+ *   only in `accumulated` are dropped (membership follows the later action).
+ *
+ * @param accumulated the aggregated values from earlier actions
+ * @param incoming the values from the current action
+ * @returns the merged values
+ */
 function mergeValues(
-  prevValues: Partial<DataRecord>,
-  newValues: Partial<DataRecord>,
+  accumulated: Partial<DataRecord>,
+  incoming: Partial<DataRecord>,
 ) {
-  function merge(prev: any, curr: any): any {
-    if (Array.isArray(curr)) {
-      return curr.map((v: DataRecord) =>
+  function merge(acc: any, inc: any): any {
+    if (Array.isArray(inc)) {
+      return inc.map((v: DataRecord) =>
         merge(
-          // match saved rows by id and unsaved rows by cid; a row with
-          // neither matches nothing, so distinct new lines never collapse
-          prev?.find?.((p: DataRecord) =>
+          acc?.find?.((p: DataRecord) =>
             v.id != null ? p.id === v.id : v.cid != null && p.cid === v.cid,
           ),
           v,
         ),
       );
     }
-    if (curr && prev && typeof curr === "object") {
-      // replace as soon as the id changes so stale fields from `prev` don't
-      // leak onto a different record; only merge when both ids are the same
-      if ((prev.id ?? null) !== (curr.id ?? null)) {
-        return curr;
+    if (inc && acc && typeof inc === "object") {
+      if ((acc.id ?? null) !== (inc.id ?? null)) {
+        return inc;
       }
       return {
-        ...Object.keys(curr).reduce(
-          (rec, k) => ({ ...rec, [k]: merge(prev[k], curr[k]) }),
-          prev as DataRecord,
+        ...Object.keys(inc).reduce(
+          (rec, k) => ({ ...rec, [k]: merge(acc[k], inc[k]) }),
+          acc as DataRecord,
         ),
       };
     }
-    return curr;
+    return inc;
   }
-  return merge(prevValues, newValues);
+  return merge(accumulated, incoming);
 }
 
 const processActionResult = (result: ActionResult[]): ActionResult[] => {
