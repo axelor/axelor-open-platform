@@ -13,17 +13,9 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
 } from "react";
 
-import {
-  Box,
-  ClickAwayListener,
-  FocusTrap,
-  clsx,
-  findAriaProp,
-  findDataProp,
-} from "@axelor/ui";
+import { Box, ClickAwayListener, clsx, findAriaProp, findDataProp } from "@axelor/ui";
 import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -51,8 +43,7 @@ import {
 } from "@/views/form/builder";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
 import { compactM2MValues } from "@/views/form/builder/utils";
-import { FormOverlayProvider } from "@/views/form/builder/overlay-scope";
-import { isDatePickerTarget } from "@/views/form/widgets/date/utils";
+import { FormOverlayFocusTrap } from "@/views/form/builder/overlay-scope";
 import {
   useFormEditableScope,
   useFormScope,
@@ -408,8 +399,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const isManyToMany = (view as Schema).serverType === "MANY_TO_MANY";
     const autoAddNewRow = (view as any)[AUTO_ADD_ROW] ?? true;
 
-    const [openPickers, setOpenPickers] = useState(0);
-
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
@@ -670,9 +659,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const handleClickOutside = useCallback(
       (e: Event) => {
         if (e.defaultPrevented) return;
-        if (isDatePickerTarget(e.target)) {
-          return;
-        }
         const parent = getParent();
 
         if (parent && !parent?.contains?.(e.target as Node)) {
@@ -683,14 +669,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       },
       [getParent, handleRecordCommit],
     );
-
-    const handleDatePickerOpen = useCallback(() => {
-      setOpenPickers((count) => count + 1);
-    }, []);
-
-    const handleDatePickerClose = useCallback(() => {
-      setOpenPickers((count) => Math.max(0, count - 1));
-    }, []);
 
     const handleCellClick = useCallback(
       (e: SyntheticEvent, col: GridColumn, colIndex: number) => {
@@ -761,50 +739,40 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const ariaRowIndex = findAriaProp(props, "aria-rowindex");
     const ariaSelected = findAriaProp(props, "aria-selected");
 
-    const overlayValue = useMemo(
-      () => ({
-        onOpenOverlay: handleDatePickerOpen,
-        onCloseOverlay: handleDatePickerClose,
-      }),
-      [handleDatePickerOpen, handleDatePickerClose],
-    );
-
     return (
       <>
         {!(view as Schema).serverType && (
           <MainShortcuts handleSave={handleSave} />
         )}
-        <FormOverlayProvider value={overlayValue}>
-          <FocusTrap enabled={openPickers === 0} initialFocus={false}>
-            <Box
-              ref={containerRef}
-              className={clsx(className, styles.container)}
-              d="flex"
-              onKeyDown={handleKeyDown}
-              role={role}
-              aria-rowindex={ariaRowIndex}
-              aria-selected={ariaSelected}
-              data-testid={testId}
-            >
-              <ClickAwayListener onClickAway={handleClickOutside}>
-                <Box d="flex">
-                  <FormComponent
-                    {...({} as FormProps)}
-                    schema={view}
-                    fields={fields!}
-                    layout={CustomLayout as unknown as FormLayout}
-                    layoutProps={{ columns }}
-                    readonly={false}
-                    formAtom={formAtom}
-                    actionHandler={actionHandler}
-                    actionExecutor={actionExecutor}
-                    recordHandler={recordHandler}
-                  />
-                </Box>
-              </ClickAwayListener>
-            </Box>
-          </FocusTrap>
-        </FormOverlayProvider>
+        <FormOverlayFocusTrap initialFocus={false}>
+          <Box
+            ref={containerRef}
+            className={clsx(className, styles.container)}
+            d="flex"
+            onKeyDown={handleKeyDown}
+            role={role}
+            aria-rowindex={ariaRowIndex}
+            aria-selected={ariaSelected}
+            data-testid={testId}
+          >
+            <ClickAwayListener onClickAway={handleClickOutside}>
+              <Box d="flex">
+                <FormComponent
+                  {...({} as FormProps)}
+                  schema={view}
+                  fields={fields!}
+                  layout={CustomLayout as unknown as FormLayout}
+                  layoutProps={{ columns }}
+                  readonly={false}
+                  formAtom={formAtom}
+                  actionHandler={actionHandler}
+                  actionExecutor={actionExecutor}
+                  recordHandler={recordHandler}
+                />
+              </Box>
+            </ClickAwayListener>
+          </Box>
+        </FormOverlayFocusTrap>
       </>
     );
   },

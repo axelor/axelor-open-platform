@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { Box, FocusTrap, useClassNames } from "@axelor/ui";
+import { Box, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
@@ -54,7 +54,6 @@ export function DateComponent({
   attrs,
   value,
   onChange,
-  trapFocus,
   inputId,
 }: {
   schema: Schema;
@@ -63,7 +62,6 @@ export function DateComponent({
   attrs?: WidgetState["attrs"];
   readonly?: boolean;
   invalid?: boolean;
-  trapFocus?: boolean;
   inputId?: string;
 }) {
   const { focus } = attrs || {};
@@ -347,8 +345,6 @@ export function DateComponent({
 
   return readonly ? (
     <ViewerInput id={inputId} name={schema.name} value={textValue} />
-  ) : trapFocus ? (
-    <FocusTrap enabled={open}>{render()}</FocusTrap>
   ) : (
     render()
   );

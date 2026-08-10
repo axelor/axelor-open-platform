@@ -44,7 +44,7 @@ const TextField = forwardRef<
 
 function DateField(props: ComponentProps<typeof DateComponent>) {
   const schema = useMemo(() => ({ type: "date" }), []);
-  return <DateComponent trapFocus {...props} schema={schema} />;
+  return <DateComponent {...props} schema={schema} />;
 }
 
 function NumberField(props: ComponentProps<typeof TextField>) {

@@ -1,0 +1,6 @@
+---
+title: Fix date widget portal focus handling in advanced search
+type: fix
+description: |
+  Selecting a month or year from the date picker's dropdown on a date field
+  in Advanced Search could freeze or crash the application.

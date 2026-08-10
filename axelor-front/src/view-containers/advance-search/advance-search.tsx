@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { Box, Button, Divider, FocusTrap, TextField, useTheme } from "@axelor/ui";
+import { Box, Button, Divider, TextField, useTheme } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 import {
   MaterialIcon,
@@ -38,6 +38,7 @@ import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { unaccent } from "@/utils/sanitize.ts";
 import { focusAndSelectInput } from "@/views/form";
+import { FormOverlayFocusTrap } from "@/views/form/builder/overlay-scope";
 
 import { ViewPopper } from "../view-popup/view-popper";
 import { useViewAction, useViewTab } from "../views/scope";
@@ -530,7 +531,7 @@ export function AdvanceSearch({
           className={styles.popperContent}
           p={2}
         >
-          <FocusTrap initialFocus={false} enabled={open}>
+          <FormOverlayFocusTrap initialFocus={false} enabled={open}>
             <Box d="flex" flexDirection="column">
               <Box d="flex" alignItems="flex-start" data-testid={"header"}>
                 <Box as="p" mb={0} me={1} p={1} fontWeight="bold">
@@ -608,7 +609,7 @@ export function AdvanceSearch({
                 />
               )}
             </Box>
-          </FocusTrap>
+          </FormOverlayFocusTrap>
         </Box>
       </ViewPopper>
     </Box>
