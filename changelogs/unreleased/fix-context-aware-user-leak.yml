@@ -1,0 +1,7 @@
+---
+title: Fix the user leaking to the next request after a synchronous context-aware run
+type: fix
+description: |
+  Running a `ContextAware` task on the calling request thread no longer leaves the session
+  user in the current-user thread-local. The next request served by the same pooled thread
+  could otherwise run as the previous caller.

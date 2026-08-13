@@ -14,8 +14,8 @@ import java.util.Locale;
  * ContextState represents a snapshot of contextual information associated with the current thread,
  * including tenant and user details, base URL, and language preferences.
  *
- * <p>The class provides functionality to capture the current state, apply a previously captured
- * state to the executing thread, or restore the state to a previous snapshot or a cleared state.
+ * <p>The class provides functionality to capture the current state and apply it to the executing
+ * thread, within a scope that restores the thread's previous state when closed.
  */
 final class ContextState {
 
@@ -57,30 +57,55 @@ final class ContextState {
         AppFilter.getLanguage());
   }
 
-  /** Applies the captured context state to the current thread. */
-  public void apply() {
-    TenantResolver.setCurrentTenant(tenantId);
-    AuthUtils.setCurrentUser(user);
-    AppFilter.setBaseURL(baseUrl);
-    AppFilter.setLanguage(language);
+  /**
+   * Applies the captured context state to the current thread.
+   *
+   * <p>The user found before applying is saved from the thread-local alone, never resolved through
+   * the session, so closing the returned scope puts it back exactly as it was. Restoring the
+   * session-resolved user instead would pin it into a thread-local that was unset, where it
+   * outlives the request on the pooled thread and leaks into the next request that thread serves.
+   *
+   * @return a scope restoring the previous thread-local state when closed
+   */
+  public Scope apply() {
+    final Scope previous = new Scope();
+    try {
+      TenantResolver.setCurrentTenant(tenantId);
+      AuthUtils.setCurrentUser(user);
+      AppFilter.setBaseURL(baseUrl);
+      AppFilter.setLanguage(language);
+    } catch (Throwable e) {
+      previous.close();
+      throw e;
+    }
+    return previous;
   }
 
-  /**
-   * Restores the context state for the current thread. If a previously captured context state is
-   * provided, the state is applied. If the provided state is null, the context is reset to a
-   * cleared state.
-   *
-   * @param previous the previously captured {@code ContextState} to be restored; if null, the
-   *     context will be reset to default values
-   */
-  public static void restore(ContextState previous) {
-    if (previous == null) {
-      TenantResolver.setCurrentTenant(null, null);
-      AuthUtils.setCurrentUser(null);
-      AppFilter.setBaseURL(null);
-      AppFilter.setLanguage(null);
-    } else {
-      previous.apply();
+  /** The thread state saved by {@link #apply()}, restored when closed. */
+  static final class Scope implements AutoCloseable {
+
+    private final String tenantId;
+    private final User user;
+    private final String baseUrl;
+    private final Locale language;
+
+    private Scope() {
+      this.tenantId = TenantResolver.currentTenantIdentifier();
+      this.user = AuthUtils.getCurrentUser();
+      this.baseUrl = AppFilter.getBaseURL();
+      this.language = AppFilter.getLanguage();
+    }
+
+    @Override
+    public void close() {
+      TenantResolver.setCurrentTenant(tenantId);
+      if (user == null) {
+        AuthUtils.removeCurrentUser();
+      } else {
+        AuthUtils.setCurrentUser(user);
+      }
+      AppFilter.setBaseURL(baseUrl);
+      AppFilter.setLanguage(language);
     }
   }
 

@@ -5,6 +5,7 @@
 package com.axelor.concurrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -172,6 +173,73 @@ public class ContextAwareTest extends JpaTest {
       } finally {
         TestingHelpers.logout();
       }
+    }
+  }
+
+  @Test
+  void testRunOnCallerThreadLeavesUserThreadLocalUntouched() {
+    login("admin", "admin1234");
+    try {
+      // Request-thread shape: the user resolves through the subject, the thread-local is unset.
+      assertNull(AuthUtils.getCurrentUser());
+      assertEquals("admin", AuthUtils.getUser().getCode());
+
+      ContextAware.of()
+          .withUser(AuthUtils.getUser("demo"))
+          .withTransaction(false)
+          .build(() -> assertEquals("demo", AuthUtils.getUser().getCode()))
+          .run();
+
+      // Restoring must not pin the session-resolved user into the thread-local: it outlives
+      // the request on the pooled thread and the next caller would run as admin.
+      assertNull(AuthUtils.getCurrentUser());
+      assertEquals("admin", AuthUtils.getUser().getCode());
+    } finally {
+      TestingHelpers.logout();
+    }
+  }
+
+  /**
+   * A run nested in another run on the same thread must restore the outer run's user when it ends.
+   *
+   * <p>Complements {@link #testRunOnCallerThreadLeavesUserThreadLocalUntouched()}, which restores
+   * an unset thread-local: here the thread-local is set by the outer run and must be put back, not
+   * removed nor replaced by the session user.
+   */
+  @Test
+  void testNestedRunRestoresOuterUser() {
+    login("admin", "admin1234");
+    try {
+      ContextAware.of()
+          .withUser(AuthUtils.getUser("demo"))
+          .withTransaction(false)
+          .build(
+              () -> {
+                assertNotNull(AuthUtils.getCurrentUser());
+                assertEquals("demo", AuthUtils.getCurrentUser().getCode());
+
+                ContextAware.of()
+                    .withUser(AuthUtils.getUser("admin"))
+                    .withTransaction(false)
+                    .build(
+                        () -> {
+                          // Check the thread-local: getUser() would also return admin through
+                          // the session fallback.
+                          assertNotNull(AuthUtils.getCurrentUser());
+                          assertEquals("admin", AuthUtils.getCurrentUser().getCode());
+                        })
+                    .run();
+
+                // The inner run must put back the outer thread-local, not clear it.
+                assertEquals("demo", AuthUtils.getCurrentUser().getCode());
+                assertEquals("demo", AuthUtils.getUser().getCode());
+              })
+          .run();
+
+      assertNull(AuthUtils.getCurrentUser());
+      assertEquals("admin", AuthUtils.getUser().getCode());
+    } finally {
+      TestingHelpers.logout();
     }
   }
 

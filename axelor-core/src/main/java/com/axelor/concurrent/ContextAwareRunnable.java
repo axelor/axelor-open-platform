@@ -48,13 +48,9 @@ public final class ContextAwareRunnable implements Runnable {
    */
   @Override
   public void run() {
-    final ContextState previous = ContextState.capture();
-    contextState.apply();
-
-    try (ContextUnitOfWork ignored = ContextUnitOfWork.begin()) {
+    try (ContextState.Scope ignored = contextState.apply();
+        ContextUnitOfWork unitOfWork = ContextUnitOfWork.begin()) {
       task.run();
-    } finally {
-      ContextState.restore(previous);
     }
   }
 

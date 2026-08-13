@@ -60,12 +60,9 @@ public final class ContextAwareCallable<V> implements Callable<V> {
    */
   @Override
   public V call() throws Exception {
-    final ContextState previous = ContextState.capture();
-    contextState.apply();
-    try (ContextUnitOfWork ignored = ContextUnitOfWork.begin()) {
+    try (ContextState.Scope ignored = contextState.apply();
+        ContextUnitOfWork unitOfWork = ContextUnitOfWork.begin()) {
       return task.call();
-    } finally {
-      ContextState.restore(previous);
     }
   }
 
