@@ -84,24 +84,31 @@ export class FormRecordHandler implements RecordHandler {
     };
   }
 
+  #run = () => {
+    const record = this.#record ?? (this.#record = this.#getRecord?.());
+    if (this.#getState && this.#setState && record) {
+      const lastState = this.#getState();
+      let state = lastState;
+      this.#listeners.forEach((fn) =>
+        fn(record, (update) => {
+          state = update(state);
+        }),
+      );
+
+      if (lastState !== state) {
+        this.#setState(state);
+      }
+    }
+  };
+
   notify() {
     this.#clearTimer();
-    this.#setTimer(() => {
-      const record = this.#record ?? (this.#record = this.#getRecord?.());
-      if (this.#getState && this.#setState && record) {
-        const lastState = this.#getState();
-        let state = lastState;
-        this.#listeners.forEach((fn) =>
-          fn(record, (update) => {
-            state = update(state);
-          }),
-        );
+    this.#setTimer(this.#run);
+  }
 
-        if (lastState !== state) {
-          this.#setState(state);
-        }
-      }
-    });
+  flush(): void {
+    this.#clearTimer();
+    this.#run();
   }
 
   completed(): void {

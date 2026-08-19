@@ -1,0 +1,8 @@
+---
+title: Fix grid row saving before validIf validation completes
+type: fix
+description: |
+  In an editable grid, pressing Enter to save a row could commit a field with
+  a `validIf` condition before its validity was re-evaluated. This allowed an
+  invalid value to be saved, or delayed showing the invalid state until a
+  later action.

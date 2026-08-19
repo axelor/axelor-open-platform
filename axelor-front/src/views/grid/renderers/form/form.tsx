@@ -490,6 +490,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             await actionExecutor.wait();
           }
 
+          // validIf/showIf/etc. are applied by recordHandler on a debounced
+          // (requestIdleCallback/timer) schedule, so force it to run now
+          // instead of racing against that timer before reading form errors.
+          recordHandler.flush();
+
           // untouched new row: discard silently, unless explicitly saving (Enter/Ctrl+S/Save)
           if (!forceValidate && !hasSaved) {
             const { record: currentRecord, original } = get(formAtom);
@@ -555,6 +560,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           expand,
           isLastRow,
           actionExecutor,
+          recordHandler,
           formAtom,
           record,
           getErrors,
