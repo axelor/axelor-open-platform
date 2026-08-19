@@ -62,6 +62,7 @@ import com.axelor.meta.service.menu.MenuItemComparator;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
+import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -352,7 +353,7 @@ public class MetaService {
         limit = select.getLimit();
       }
 
-      List<?> items = selector.fetch(limit, request.getOffset());
+      List<Map> items = selector.fetch(limit, request.getOffset());
 
       if (Objects.equals(Boolean.TRUE, select.getDistinct())) {
         items =
@@ -363,24 +364,28 @@ public class MetaService {
 
       LOG.debug("Found : {}", items.size());
 
-      for (Object item : items) {
-        if (item instanceof Map) {
-          Map<String, Object> map = (Map) item;
-          for (SearchSelectField field : select.getFields()) {
-            if (map.containsKey(field.getName())) {
-              map.put(field.getAs(), map.get(field.getName()));
-              map.remove(field.getName());
-            }
+      Class<?> modelClass = select.getModelClass();
+
+      for (Map item : items) {
+        Map<String, Object> map = Resource.removePasswordFields(item, modelClass);
+        item = map;
+
+        for (SearchSelectField field : select.getFields()) {
+          if (field.getAs() != null
+              && !Objects.equals(field.getAs(), field.getName())
+              && map.containsKey(field.getName())) {
+            map.put(field.getAs(), map.get(field.getName()));
+            map.remove(field.getName());
           }
-
-          ((Map) item).put("_model", select.getModel());
-          ((Map) item).put("_modelTitle", select.getLocalizedTitle());
-          ((Map) item).put("_form", select.getFormView());
-          ((Map) item).put("_grid", select.getGridView());
         }
-      }
 
-      data.addAll(items);
+        map.put("_model", select.getModel());
+        map.put("_modelTitle", select.getLocalizedTitle());
+        map.put("_form", select.getFormView());
+        map.put("_grid", select.getGridView());
+
+        data.add(item);
+      }
     }
 
     LOG.debug("Total : {}", data.size());

@@ -25,6 +25,7 @@ import com.axelor.db.converters.EncryptedStringConverter;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +33,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.hibernate.annotations.Type;
@@ -48,8 +50,15 @@ public class SecureEntity extends AuditableModel {
       allocationSize = 1)
   private Long id;
 
+  @Widget(password = true)
   @Convert(converter = EncryptedStringConverter.class)
   private String mySecureString;
+
+  @Widget(password = true)
+  private String code;
+
+  @Convert(converter = EncryptedStringConverter.class)
+  private String myEncryptedString;
 
   private String myString;
 
@@ -61,6 +70,11 @@ public class SecureEntity extends AuditableModel {
   @Lob
   @Basic(fetch = FetchType.LAZY)
   private byte[] myBinary;
+
+  @ManyToOne(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  private SecureEntity parent;
 
   @Widget(title = "Attributes")
   @Basic(fetch = FetchType.LAZY)
@@ -87,6 +101,22 @@ public class SecureEntity extends AuditableModel {
     this.mySecureString = mySecureString;
   }
 
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public String getMyEncryptedString() {
+    return myEncryptedString;
+  }
+
+  public void setMyEncryptedString(String myEncryptedString) {
+    this.myEncryptedString = myEncryptedString;
+  }
+
   public String getMyString() {
     return myString;
   }
@@ -109,6 +139,14 @@ public class SecureEntity extends AuditableModel {
 
   public void setMyBinary(byte[] myBinary) {
     this.myBinary = myBinary;
+  }
+
+  public SecureEntity getParent() {
+    return parent;
+  }
+
+  public void setParent(SecureEntity parent) {
+    this.parent = parent;
   }
 
   public String getAttrs() {
