@@ -70,6 +70,8 @@ export function DetailsForm({
   const handleSave = useAtomCallback(
     useCallback(
       async (get, set, saveAndNew?: boolean) => {
+        recordHandler.flush();
+
         const state = get(formAtom);
         const { record } = state;
         const errors = getErrors(state);
@@ -80,7 +82,7 @@ export function DetailsForm({
         onSave(record);
         saveAndNew && onNew ? onNew() : onClose?.();
       },
-      [formAtom, onSave, getErrors, onNew, onClose],
+      [formAtom, recordHandler, onSave, getErrors, onNew, onClose],
     ),
   );
 
