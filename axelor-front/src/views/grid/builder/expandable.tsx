@@ -269,6 +269,8 @@ export function ExpandableFormView({
   const doValidate = useAtomCallback(
     useCallback(
       (get, set, { silent }: { silent?: boolean } = {}) => {
+        recordHandler.flush();
+
         const formState = get(formAtom);
         const errors = getErrors(formState);
 
@@ -283,7 +285,7 @@ export function ExpandableFormView({
           return Promise.reject();
         }
       },
-      [formAtom, getErrors, onDiscard],
+      [formAtom, recordHandler, getErrors, onDiscard],
     ),
   );
 
