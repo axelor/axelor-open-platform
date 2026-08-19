@@ -134,5 +134,6 @@ export interface RecordHandler {
   ) => void;
   subscribe(subscriber: RecordListener): () => void;
   notify(): void;
+  flush(): void;
   completed?(): void;
 }
