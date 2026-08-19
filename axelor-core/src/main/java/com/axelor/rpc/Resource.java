@@ -86,6 +86,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -524,11 +525,9 @@ public class Resource<T extends Model> {
       if (item instanceof Map) {
         Map<String, Object> map = (Map) item;
         removeNotPermitted(map, dottedFields);
-        if (User.class.isAssignableFrom(model)) {
-          map.remove("password");
-        }
         item = repo.populate(map, request.getContext());
         Translator.applyTranslatables(map, model);
+        item = removePasswordFields((Map<String, Object>) item, model);
       }
       jsonData.add(item);
     }
@@ -823,6 +822,7 @@ public class Resource<T extends Model> {
         }
       }
       if (prop.isTransient()
+          || prop.isPassword()
           || (prop.isCollection() && !EXPORT_COLLECTION_ENABLED)
           || prop.getType() == PropertyType.BINARY) {
         continue;
@@ -865,13 +865,13 @@ public class Resource<T extends Model> {
 
       if (prop.isReference()) {
         prop = Mapper.of(prop.getTarget()).getNameField();
-        if (prop == null) {
+        if (prop == null || prop.isPassword()) {
           continue;
         }
         name = name + '.' + prop.getName();
       } else if (prop.isCollection()) {
         prop = Mapper.of(prop.getTarget()).getNameField();
-        if (prop == null) {
+        if (prop == null || prop.isPassword()) {
           continue;
         }
       } else if (options != null && !options.isEmpty()) {
@@ -1070,7 +1070,9 @@ public class Resource<T extends Model> {
     checkSpecialAllow(entity, AccessType.READ);
 
     if (entity != null) {
-      data.add(repository.populate(toMap(entity, request), request.getContext()));
+      data.add(
+          removePasswordFields(
+              repository.populate(toMap(entity, request), request.getContext()), model));
     }
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
@@ -1099,7 +1101,9 @@ public class Resource<T extends Model> {
 
     final List<Object> data = new ArrayList<>();
 
-    data.add(repository.populate(toMap(entity, request), request.getContext()));
+    data.add(
+        removePasswordFields(
+            repository.populate(toMap(entity, request), request.getContext()), model));
 
     response.setStatus(Response.STATUS_SUCCESS);
     response.setData(data);
@@ -1136,7 +1140,7 @@ public class Resource<T extends Model> {
     if (entity.getCid() != null) result.put("cid", entity.getCid());
     if (Boolean.TRUE.equals(entity.isSelected())) result.put("selected", entity.isSelected());
 
-    if (nameProperty != null) {
+    if (nameProperty != null && !nameProperty.isPassword()) {
       result.put(nameProperty.getName(), nameProperty.get(entity));
     }
 
@@ -1147,6 +1151,10 @@ public class Resource<T extends Model> {
       Property property = mapper.getProperty(name);
 
       if (Boolean.FALSE.equals((selector)) || property == null) {
+        continue;
+      }
+
+      if (property.isPassword()) {
         continue;
       }
 
@@ -1422,7 +1430,9 @@ public class Resource<T extends Model> {
               I18nBundle.invalidate();
             }
 
-            data.add(repository.populate(toMap(bean, request), request.getContext()));
+            data.add(
+                removePasswordFields(
+                    repository.populate(toMap(bean, request), request.getContext()), model));
           }
         });
 
@@ -1769,6 +1779,13 @@ public class Resource<T extends Model> {
       name = "id";
     }
 
+    // never fetch password fields, fall back to the record name
+    final Property requested = findProperty(model, name);
+    if (requested != null && requested.isPassword()) {
+      final Property nameField = mapper.getNameField();
+      name = nameField != null && !nameField.isPassword() ? nameField.getName() : "id";
+    }
+
     Property property = null;
     try {
       property = mapper.getProperty(name);
@@ -1789,6 +1806,9 @@ public class Resource<T extends Model> {
 
     if (property == null && selectName == null) {
       property = mapper.getNameField();
+      if (property != null && property.isPassword()) {
+        property = null;
+      }
     }
 
     if (property != null && selectName == null) {
@@ -1813,7 +1833,7 @@ public class Resource<T extends Model> {
       data.put(name, value);
     }
 
-    response.setData(List.of(data));
+    response.setData(List.of(removePasswordFields(data, model)));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.FETCH_NAME, req, response);
@@ -1823,6 +1843,62 @@ public class Resource<T extends Model> {
 
   public boolean isPermitted(AccessType accessType, Long id) {
     return security.get().isPermitted(accessType, model, id);
+  }
+
+  /**
+   * Removes password field values from the given record map, including dotted field names and
+   * nested record maps of relational fields.
+   *
+   * <p>The given map is not modified, a cleaned copy is returned.
+   *
+   * @param data the record map to clean up
+   * @param modelClass the model class of the record
+   * @return a copy of the given map with password fields removed
+   */
+  public static Map<String, Object> removePasswordFields(
+      Map<String, Object> data, Class<?> modelClass) {
+    if (data == null) {
+      return data;
+    }
+    final Map<String, Object> result = new LinkedHashMap<>();
+    data.forEach(
+        (name, value) -> {
+          final Property property = findProperty(modelClass, name);
+          if (property != null && property.isPassword()) {
+            return;
+          }
+          final Class<?> target = property == null ? null : property.getTarget();
+          result.put(name, target == null ? value : removePasswordFields(value, target));
+        });
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Object removePasswordFields(Object value, Class<?> modelClass) {
+    if (value instanceof Map) {
+      return removePasswordFields((Map<String, Object>) value, modelClass);
+    }
+    if (value instanceof Collection) {
+      return ((Collection<?>) value)
+          .stream()
+              .map(item -> removePasswordFields(item, modelClass))
+              .collect(Collectors.toList());
+    }
+    return value;
+  }
+
+  /** Finds the property of the given simple or dotted field name, or null if it can't resolve. */
+  private static Property findProperty(Class<?> modelClass, String name) {
+    Class<?> target = modelClass;
+    Property property = null;
+    for (String part : name.split("\\.")) {
+      property = target == null ? null : Mapper.of(target).getProperty(part);
+      if (property == null) {
+        return null;
+      }
+      target = property.getTarget();
+    }
+    return property;
   }
 
   /**
@@ -1941,6 +2017,13 @@ public class Resource<T extends Model> {
       Property pn = mapper.getNameField();
       Property pc = mapper.getProperty("code");
 
+      if (pn != null && pn.isPassword()) {
+        pn = null;
+      }
+      if (pc != null && pc.isPassword()) {
+        pc = null;
+      }
+
       result.put("id", mapper.get(bean, "id"));
       result.put("$version", mapper.get(bean, "version"));
 
@@ -1959,6 +2042,10 @@ public class Resource<T extends Model> {
       }
 
       for (String name : fields.keySet()) {
+        Property prop = mapper.getProperty(name);
+        if (prop != null && prop.isPassword()) {
+          continue;
+        }
         Object child = mapper.get(bean, name);
         if (child instanceof Model) {
           child = _toMap(child, (Map) fields.get(name), true, level + 1);

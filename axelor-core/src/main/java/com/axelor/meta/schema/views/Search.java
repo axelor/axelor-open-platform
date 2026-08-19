@@ -185,7 +185,8 @@ public class Search extends AbstractView {
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends Model> getModelClass() {
+    @JsonIgnore
+    public Class<? extends Model> getModelClass() {
       try {
         return (Class<Model>) Class.forName(model);
       } catch (ClassNotFoundException e) {
