@@ -105,13 +105,48 @@ public class TestJavaScript extends ScriptTest {
       // classes from java.lang should be allowed
       assertTrue((Boolean) helper.eval("java.lang.Boolean.TRUE"));
 
-      // but java.lang.{System,Process,Thread} are not allowed
+      // but java.lang.{System,Process,Thread,ThreadGroup,Runtime,ProcessHandle,ClassLoader} are not
+      // allowed
       assertThrows(
           IllegalArgumentException.class,
           () -> helper.eval("java.lang.System.currentTimeMillis()"));
       assertThrows(IllegalArgumentException.class, () -> helper.eval("java.lang.System.exit(-1)"));
       assertThrows(
           IllegalArgumentException.class, () -> helper.eval("java.lang.Thread.sleep(1000)"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("new java.lang.ThreadGroup('test').parent.activeCount()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("java.lang.Runtime.getRuntime().exec('true')"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "java.lang.String.forName('java.lang.Runtime').getMethod('getRuntime').invoke(null).exec('true')"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("java.lang.ProcessHandle.allProcesses()"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "java.lang.ClassLoader.getSystemResourceAsStream('axelor-config.properties')"));
+
+      // java.util.{Properties,ResourceBundle} are not allowed either
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> helper.eval("new java.util.Properties().setProperty('a', 'b')"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              helper.eval(
+                  "java.util.ResourceBundle.getBundle('axelor-config').getString('db.test.url')"));
+
+      // java.util.Timer is not allowed: runs code on a separate
+      // thread outside script timeout and transaction bounds
+      assertThrows(
+          IllegalArgumentException.class, () -> helper.eval("new java.util.Timer().cancel()"));
 
       assertThrows(
           IllegalArgumentException.class,

@@ -130,11 +130,39 @@ public class TestEL extends ScriptTest {
     // classes from java.lang should be allowed
     assertTrue((Boolean) helper.eval("Boolean.TRUE"));
 
-    // but java.lang.{System,Process,Thread} are not allowed
+    // but java.lang.{System,Process,Thread,ThreadGroup,Runtime,ProcessHandle,ClassLoader} are not
+    // allowed
     assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
     assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
     assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
-    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("T('java.lang.ThreadGroup')"));
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("Runtime.getRuntime().exec('true')"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "T('java.lang.String').forName('java.lang.Runtime').getMethod('getRuntime').invoke(null).exec('true')"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("T('java.lang.ProcessHandle').allProcesses()"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "T('java.lang.ClassLoader').getSystemResourceAsStream('axelor-config.properties')"));
+
+    // java.util.{Properties,ResourceBundle} are not allowed either
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("T('java.util.Properties')"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "T('java.util.ResourceBundle').getBundle('axelor-config').getString('db.test.url')"));
+
+    // java.util.Timer is not allowed: runs code on a separate
+    // thread outside script timeout and transaction bounds
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("T('java.util.Timer')"));
 
     // allow models
     assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));

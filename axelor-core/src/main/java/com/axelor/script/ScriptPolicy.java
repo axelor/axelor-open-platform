@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Timer;
 
 class ScriptPolicy {
 
@@ -70,7 +72,18 @@ class ScriptPolicy {
   private static final String[] DENY_PACKAGES = {};
 
   private static final Class<?>[] DENY_CLASSES = {
-    Class.class, System.class, Process.class, ProcessBuilder.class, Thread.class, Properties.class
+    Class.class,
+    ClassLoader.class,
+    Process.class,
+    ProcessBuilder.class,
+    ProcessHandle.class,
+    Runtime.class,
+    System.class,
+    Thread.class,
+    ThreadGroup.class,
+    Properties.class,
+    ResourceBundle.class,
+    Timer.class
   };
 
   private final List<String> allowPackages;

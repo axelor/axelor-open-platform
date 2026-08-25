@@ -138,11 +138,17 @@ These rules are added after any custom configuration.
 === Denied (cannot be overridden)
 
 - `java.lang.Class`
-- `java.lang.System`
+- `java.lang.ClassLoader`
 - `java.lang.Process`
 - `java.lang.ProcessBuilder`
+- `java.lang.ProcessHandle`
+- `java.lang.Runtime`
+- `java.lang.System`
 - `java.lang.Thread`
+- `java.lang.ThreadGroup`
 - `java.util.Properties`
+- `java.util.ResourceBundle`
+- `java.util.Timer`
 
 == `\\__bean__` Helper
 

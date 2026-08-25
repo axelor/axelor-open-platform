@@ -4,6 +4,7 @@
  */
 package com.axelor.script;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -14,16 +15,19 @@ import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.CurrencyRepository;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import javax.script.Bindings;
+import javax.script.SimpleBindings;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestGroovy extends ScriptTest {
-
-  private static final int COUNT = 1000;
 
   private static final String EXPR_INTERPOLATION =
       "\"(${title.name}) = $firstName $lastName ($fullName) = ($__user__)\"";
@@ -161,11 +165,39 @@ public class TestGroovy extends ScriptTest {
     // classes from java.lang should be allowed
     assertTrue((Boolean) helper.eval("Boolean.TRUE"));
 
-    // but java.lang.{System,Process,Thread} are not allowed
+    // but java.lang.{System,Process,Thread,ThreadGroup,Runtime,ProcessHandle,ClassLoader} are not
+    // allowed
     assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
     assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
     assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
-    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("new ThreadGroup('test').parent.activeCount()"));
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("Runtime.getRuntime().exec('true')"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "java.lang.String.forName('java.lang.Runtime').getMethod('getRuntime').invoke(null).exec('true')"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("ProcessHandle.allProcesses()"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("ClassLoader.getSystemResourceAsStream('axelor-config.properties')"));
+
+    // java.util.{Properties,ResourceBundle} are not allowed either
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("new Properties().setProperty('a', 'b')"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("ResourceBundle.getBundle('axelor-config').getString('db.test.url')"));
+
+    // java.util.Timer is not allowed: runs code on a separate
+    // thread outside script timeout and transaction bounds (see testSecurityBackgroundTask)
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("new Timer().scheduleAtFixedRate({} as TimerTask, 0, 1)"));
 
     assertThrows(
         IllegalArgumentException.class,
@@ -232,6 +264,33 @@ public class TestGroovy extends ScriptTest {
         IllegalArgumentException.class,
         () -> helper.eval("{\"${com.axelor.app.AppSettings.get().get('db.test.url')}\"}()"),
         "Should not allow unrestricted AppSettings in Closure");
+  }
+
+  // A scheduled task runs on a separate thread, allowing the script to return before
+  // the task executes. This would bypass the script timeout (`application.script.timeout`)
+  // and request transaction context. If `java.util.Timer` were permitted, the script
+  // would return while `escaped` is still empty and populate it asynchronously.
+  @Test
+  void testSecurityBackgroundTask() {
+    List<String> escaped = Collections.synchronizedList(new ArrayList<>());
+    Bindings bindings = new SimpleBindings();
+    bindings.put("escaped", escaped);
+
+    GroovyScriptHelper helper = new GroovyScriptHelper(bindings);
+
+    IllegalArgumentException denied = null;
+    try {
+      helper.eval("new Timer().schedule({ escaped.add('escaped') } as TimerTask, 50)");
+    } catch (IllegalArgumentException e) {
+      denied = e;
+    }
+
+    // Wait to ensure no background task executed after script completion
+    await().during(Duration.ofMillis(500)).atMost(Duration.ofSeconds(1)).until(escaped::isEmpty);
+
+    // Verify rejection was caused by the policy check, not a script runtime error
+    assertNotNull(denied, "java.util.Timer should not be allowed");
+    assertTrue(denied.getMessage().contains("java.util.Timer"), denied.getMessage());
   }
 
   @Test
