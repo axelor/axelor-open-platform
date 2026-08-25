@@ -12,13 +12,17 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.JavaScriptScriptHelper;
+import com.axelor.script.ScriptAllowed;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.persist.Transactional;
+import jakarta.persistence.EntityManager;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
@@ -60,7 +64,7 @@ public class ActionScript extends Action {
     bindings.put(KEY_RESPONSE, response);
     bindings.put(KEY_JSON, Beans.get(MetaJsonRecordRepository.class));
     if (Boolean.TRUE.equals(script.transactional)) {
-      bindings.put(KEY_EM, JPA.em());
+      bindings.put(KEY_EM, wrap(JPA.em()));
     }
     ScriptHelper helper = getScriptHelper(bindings);
     try {
@@ -87,6 +91,24 @@ public class ActionScript extends Action {
       }
     }
     return response;
+  }
+
+  /**
+   * Wraps the entity manager so the script policy allows it: the proxy implements {@link
+   * ScriptEntityManager}, which carries {@link ScriptAllowed}.
+   */
+  private static EntityManager wrap(EntityManager em) {
+    return (EntityManager)
+        Proxy.newProxyInstance(
+            ScriptEntityManager.class.getClassLoader(),
+            new Class<?>[] {ScriptEntityManager.class},
+            (proxy, method, args) -> {
+              try {
+                return method.invoke(em, args);
+              } catch (InvocationTargetException e) {
+                throw e.getCause();
+              }
+            });
   }
 
   @Override

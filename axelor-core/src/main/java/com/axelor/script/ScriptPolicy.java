@@ -60,9 +60,11 @@ class ScriptPolicy {
     // allow ContextConfig
     ConfigContext.class,
 
-    // allow Context
+    // axelor rpc classes
     com.axelor.rpc.Context.class,
-    com.axelor.rpc.JsonContext.class
+    com.axelor.rpc.JsonContext.class,
+    com.axelor.rpc.ActionRequest.class,
+    com.axelor.rpc.ActionResponse.class
   };
 
   private static final String[] DENY_PACKAGES = {};

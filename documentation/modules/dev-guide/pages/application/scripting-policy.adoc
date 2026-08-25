@@ -97,41 +97,43 @@ These rules are added after any custom configuration.
   ** `java.math`
 
 - Java Core Interfaces
-  ** `java.util.Map`,
-  ** `java.util.Map.Entry`,
-  ** `java.util.Iterator`,
-  ** `java.lang.Iterable`,
-  ** `java.lang.CharSequence`,
+  ** `java.util.Map`
+  ** `java.util.Map.Entry`
+  ** `java.util.Iterator`
+  ** `java.lang.Iterable`
+  ** `java.lang.CharSequence`
 
 - Java Persistence
   ** `jakarta.persistence.Query`
 
 - Hibernate
-  ** `org.hibernate.proxy.HibernateProxy`,
-  ** `org.hibernate.collection.spi.PersistentCollection`,
-  ** `org.hibernate.collection.spi.LazyInitializable`,
+  ** `org.hibernate.proxy.HibernateProxy`
+  ** `org.hibernate.collection.spi.PersistentCollection`
+  ** `org.hibernate.collection.spi.LazyInitializable`
 
 - Axelor Common
-  ** `com.axelor.common.StringUtils`,
-  ** `com.axelor.common.ObjectUtils`,
-  ** `com.axelor.common.HtmlUtils`,
-  ** `com.axelor.common.Inflections`,
-  ** `com.axelor.common.Inflector`,
+  ** `com.axelor.common.StringUtils`
+  ** `com.axelor.common.ObjectUtils`
+  ** `com.axelor.common.HtmlUtils`
+  ** `com.axelor.common.Inflections`
+  ** `com.axelor.common.Inflector`
 
 - Axelor DB
-  ** `com.axelor.db.Model`,
-  ** `com.axelor.db.Query`,
-  ** `com.axelor.db.Repository`,
-  ** `com.axelor.db.ValueEnum`,
-  ** `com.axelor.db.EntityHelper`,
+  ** `com.axelor.db.Model`
+  ** `com.axelor.db.Query`
+  ** `com.axelor.db.Repository`
+  ** `com.axelor.db.ValueEnum`
+  ** `com.axelor.db.EntityHelper`
 
 - Axelor i18n
-  ** `com.axelor.i18n.I18n`,
-  ** `com.axelor.i18n.L10n`,
+  ** `com.axelor.i18n.I18n`
+  ** `com.axelor.i18n.L10n`
 
-- Axelor Context
-  ** `com.axelor.rpc.Context`,
+- Axelor RPC
+  ** `com.axelor.rpc.Context`
   ** `com.axelor.rpc.JsonContext`
+  ** `com.axelor.rpc.ActionRequest`
+  ** `com.axelor.rpc.ActionResponse`
 
 === Denied (cannot be overridden)
 

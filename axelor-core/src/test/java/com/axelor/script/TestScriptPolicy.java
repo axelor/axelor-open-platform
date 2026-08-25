@@ -11,6 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTestModule;
 import com.axelor.common.ObjectUtils;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
+import com.axelor.meta.ActionExecutor;
+import com.axelor.meta.schema.actions.ActionScript;
+import com.axelor.meta.schema.actions.validate.validator.Notify;
+import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Response;
 import com.axelor.script.policy.MyOtherService;
 import com.axelor.script.policy.MyOtherServiceImpl;
 import com.axelor.script.policy.MyOtherServiceImpl2;
@@ -21,8 +29,12 @@ import com.axelor.script.policy.MyYetAnotherService;
 import com.axelor.script.policy.MyYetAnotherServiceImpl;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
 import com.google.inject.AbstractModule;
+import com.google.inject.persist.Transactional;
 import java.util.List;
+import java.util.Map;
 import javax.script.SimpleBindings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -177,6 +189,9 @@ class TestScriptPolicy {
                   // Denied as expected
                 }
                 """));
+
+    // Entity manager
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("com.axelor.db.JPA.em()"));
   }
 
   // Script policy evaluation differs from Groovy and EL:
@@ -307,6 +322,9 @@ class TestScriptPolicy {
                     // Denied as expected
                   }
                   """));
+
+      // Entity manager
+      assertThrows(IllegalArgumentException.class, () -> helper.eval("com.axelor.db.JPA.em()"));
     }
   }
 
@@ -421,5 +439,152 @@ class TestScriptPolicy {
         () ->
             helper.eval(
                 "__bean__(T('com.axelor.script.policy.MyService')).getMyYetAnotherService().MY_CONSTANT"));
+
+    // Entity manager
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("T('com.axelor.db.JPA').em()"));
+  }
+
+  @Test
+  void testGroovyActionScript() {
+    var contact = ensureContact("John", "Doe", "john.doe@axelor.com");
+
+    var action = new ActionScript();
+    var script = new ActionScript.ActScript();
+    script.setLanguage("groovy");
+    action.setScript(script);
+
+    var request = new ActionRequest();
+    request.setModel(Contact.class.getName());
+    request.setData(Map.of("context", Mapper.toMap(contact)));
+    var handler = Beans.get(ActionExecutor.class).newActionHandler(request);
+
+    // Test $request and $response
+    script.setCode(
+        """
+        final firstName = $request.context.firstName;
+        $response.setNotify("Hello, ${firstName}!");
+        """);
+    var response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var data = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var notify = (Map<String, Object>) data.get(Notify.KEY);
+    assertEquals("Hello, %s!".formatted(contact.getFirstName()), notify.get("message"));
+
+    script.setTransactional(true);
+
+    // Test $json
+    script.setCode(
+        """
+        def record = $json.create("custom_model", [name: "Custom JSON Groovy"]);
+        record = $json.save(record);
+        $response.setNotify("Saved ${record.name}");
+        """);
+    response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var jsonData = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var jsonNotify = (Map<String, Object>) jsonData.get(Notify.KEY);
+    assertEquals("Saved Custom JSON Groovy", jsonNotify.get("message"));
+
+    // Test $em
+    script.setCode(
+        """
+        final found = $em.find(Contact, $request.context.id);
+        $response.setNotify("Found ${found.firstName} ${found.lastName}");
+        """);
+    response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var emData = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var emNotify = (Map<String, Object>) emData.get(Notify.KEY);
+    assertEquals(
+        "Found %s %s".formatted(contact.getFirstName(), contact.getLastName()),
+        emNotify.get("message"));
+  }
+
+  @Test
+  void testJavaScriptActionScript() {
+    var contact = ensureContact("John", "Doe", "john.doe@axelor.com");
+
+    var action = new ActionScript();
+    var script = new ActionScript.ActScript();
+    script.setLanguage("js");
+    action.setScript(script);
+
+    var request = new ActionRequest();
+    request.setModel(Contact.class.getName());
+    request.setData(Map.of("context", Mapper.toMap(contact)));
+    var handler = Beans.get(ActionExecutor.class).newActionHandler(request);
+
+    // Test $request and $response
+    script.setCode(
+        """
+        const firstName = $request.context.firstName;
+        $response.setNotify(`Hello, ${firstName}!`);
+        """);
+    var response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var data = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var notify = (Map<String, Object>) data.get(Notify.KEY);
+    assertEquals("Hello, %s!".formatted(contact.getFirstName()), notify.get("message"));
+
+    script.setTransactional(true);
+
+    // Test $json
+    script.setCode(
+        """
+        let record = $json.create("custom_model", {"name": "Custom JSON JS"});
+        record = $json.save(record);
+        $response.setNotify(`Saved ${record.name}`);
+        """);
+    response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var jsonData = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var jsonNotify = (Map<String, Object>) jsonData.get(Notify.KEY);
+    assertEquals("Saved Custom JSON JS", jsonNotify.get("message"));
+
+    // Test $em
+    script.setCode(
+        """
+        const found = $em.find(Contact, $request.context.id);
+        $response.setNotify(`Found ${found.firstName} ${found.lastName}`);
+        """);
+    response = (ActionResponse) action.execute(handler);
+    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
+
+    @SuppressWarnings("unchecked")
+    var emData = ((List<Map<String, Object>>) response.getData()).get(0);
+    @SuppressWarnings("unchecked")
+    var emNotify = (Map<String, Object>) emData.get(Notify.KEY);
+    assertEquals(
+        "Found %s %s".formatted(contact.getFirstName(), contact.getLastName()),
+        emNotify.get("message"));
+  }
+
+  @Transactional
+  Contact ensureContact(String firstName, String lastName, String email) {
+    var repo = Beans.get(ContactRepository.class);
+    var contact = repo.findByEmail(email);
+
+    if (contact == null) {
+      contact = new Contact(firstName, lastName);
+      contact.setEmail(email);
+      contact = repo.save(contact);
+    }
+
+    return contact;
   }
 }

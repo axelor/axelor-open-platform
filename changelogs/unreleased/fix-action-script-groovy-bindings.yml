@@ -1,0 +1,11 @@
+---
+title: Allow built-in helpers in Groovy action scripts
+type: fix
+description: |
+  Groovy `<action-script>` actions threw a `ScriptPolicyException` when
+  using built-in scope variables (`$request`, `$response`, and
+  transactional `$em`).
+
+  `ActionRequest` and `ActionResponse` are now in the default `ScriptPolicy`
+  allow list, and `$em` is wrapped in an allowed `EntityManager` delegate.
+  JavaScript action scripts were not affected.
