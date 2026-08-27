@@ -1,0 +1,14 @@
+---
+title: Give notification popups more time and a way to keep them open
+type: feature
+description: |
+  The notification popups shown in the bottom corner disappeared after three
+  seconds, which left no time to read a long message, let alone copy it, and
+  no way to keep one on screen.
+
+  Popups now last five seconds, and stay for as long as the pointer rests on
+  them or the keyboard focus is inside them. The five seconds start over once
+  the pointer leaves.
+
+  Every popup also carries a close button, so it can be dismissed on the spot
+  instead of waiting for it to fade.

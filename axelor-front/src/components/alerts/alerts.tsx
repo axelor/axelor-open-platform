@@ -1,9 +1,18 @@
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import uniqueId from "lodash/uniqueId";
-import { createRef, useEffect } from "react";
+import { createRef, useEffect, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-import { clsx, Alert, AlertHeader, Fade, Portal, useTheme } from "@axelor/ui";
+import {
+  clsx,
+  Alert,
+  AlertHeader,
+  Box,
+  Fade,
+  Portal,
+  useTheme,
+} from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
 import { SanitizedContent } from "@/utils/sanitize";
@@ -19,6 +28,8 @@ export type AlertProps = {
   title?: string;
   message: React.ReactNode;
 };
+
+const TIMEOUT = 5000;
 
 const alertsAtom = atom<AlertProps[]>([]);
 const alertsStore = createStore();
@@ -109,19 +120,47 @@ function Alerts() {
 }
 
 function AlertContainer({ id, type = "info", title, message }: AlertProps) {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  const paused = hovered || focused;
+
   useEffect(() => {
-    const timer = setTimeout(() => closeAlert(id), 3000);
+    if (paused) return;
+    const timer = setTimeout(() => closeAlert(id), TIMEOUT);
     return () => {
       clearTimeout(timer);
     };
-  }, [id]);
+  }, [id, paused]);
+
   if (typeof message === "string") {
     message = <SanitizedContent content={message} />;
   }
+
   return (
-    <Alert variant={type} shadow className={styles.alert}>
-      <AlertHeader>{title}</AlertHeader>
-      {message}
+    <Alert
+      variant={type}
+      shadow
+      className={styles.alert}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    >
+      <Box className={styles.content}>
+        {title && <AlertHeader>{title}</AlertHeader>}
+        {message}
+      </Box>
+      <button
+        type="button"
+        className={styles.close}
+        title={i18n.get("Close")}
+        aria-label={i18n.get("Close")}
+        data-testid="btn-alert-close"
+        onClick={() => closeAlert(id)}
+      >
+        <MaterialIcon icon="close" />
+      </button>
     </Alert>
   );
 }

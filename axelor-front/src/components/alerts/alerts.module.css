@@ -8,7 +8,32 @@
 }
 
 .alert {
+  position: relative;
   margin: 1rem;
+}
+
+/* Keep the message clear of the close button */
+.content {
+  padding-inline-end: 1rem;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  padding: 0.375rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus-visible {
+  opacity: 1;
 }
 
 /* Avoid empty bottom space on record validation errors */
@@ -29,7 +54,9 @@
 }
 .item-exit-active {
   opacity: 0;
-  transition: transform 500ms ease-in, opacity 500ms ease-in;
+  transition:
+    transform 500ms ease-in,
+    opacity 500ms ease-in;
   transform: translateX(100%);
 }
 
