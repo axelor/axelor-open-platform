@@ -67,6 +67,7 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 
 * `name` - name of the Entity (should begin with upper case letter)
 * `cacheable` - whether to make this entity cacheable (default is false)
+* `dynamicUpdate` - whether SQL update statements are generated dynamically (default is <<dynamicUpdate,auto-detected>>)
 * `repository=[none|default|abstract]` - how to generate repository class
 * `table` - table name for the entity
 * `logUpdates` - whether to enable update logging (default is true)
@@ -185,6 +186,21 @@ CREATE SEQUENCE MY_ENTITY_SEQ START WITH 1 INCREMENT BY 50;
 ALTER SEQUENCE MY_ENTITY_SEQ INCREMENT BY 50;
 ----
 ====
+
+[discrete]
+[#dynamicUpdate]
+=== dynamicUpdate
+
+The `dynamicUpdate` attribute controls whether Hibernate generates SQL update statements dynamically for the entity, using the `@DynamicUpdate` annotation.
+
+By default, Hibernate uses a static `PreparedStatement` that updates all columns in the table, even if only one field changed. Enabling `dynamicUpdate` causes Hibernate to generate the SQL statement at runtime, updating only the columns that actually changed.
+
+This reduces database I/O and network payload when updating wide tables or entities with large text and binary fields. However, generating SQL at runtime adds CPU overhead because Hibernate cannot reuse cached prepared statements across different update operations.
+
+When `dynamicUpdate` is not set explicitly, it is enabled automatically if either of the following conditions is met (evaluated over the XML-declared fields of the entity and of its super entities, excluding collections, inverse associations with `mappedBy`, transient fields, and formula fields):
+
+* The entity contains at least one `binary` field or large field (`large="true"`).
+* The entity has more than 100 column-backed fields.
 
 [discrete]
 === `<module>` tag
