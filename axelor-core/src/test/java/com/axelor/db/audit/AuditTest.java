@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.audit.db.AuditLog;
 import com.axelor.auth.AuthUtils;
@@ -24,6 +25,7 @@ import com.axelor.test.db.Contact;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import java.util.List;
+import org.hibernate.annotations.DynamicUpdate;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -144,10 +146,13 @@ public class AuditTest extends BaseAuditTest {
         });
   }
 
-  /** Test that auditable fields are set on an entity with @DynamicInsert and @DynamicUpdate */
+  /** Test that auditable fields are set on an entity with @DynamicUpdate */
   @Test
   @Order(6)
   void testDynamicUpdate() throws Exception {
+    assertTrue(
+        Contact.class.isAnnotationPresent(DynamicUpdate.class),
+        "Contact must have @DynamicUpdate for this test to be meaningful");
 
     var entity =
         ContextAware.of()

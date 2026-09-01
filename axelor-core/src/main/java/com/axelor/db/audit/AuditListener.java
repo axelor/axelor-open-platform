@@ -144,8 +144,8 @@ public class AuditListener
    * Stamps the creation audit fields, assigns sequence values and records change tracking.
    *
    * <p>The {@code createdOn}/{@code createdBy} fields are stamped here (only when not already set),
-   * unlike their update counterparts: {@code PRE_INSERT} runs before Hibernate builds the {@code
-   * INSERT} statement, so the values are picked up even for {@code @DynamicInsert} entities.
+   * unlike their update counterparts: {@code PRE_INSERT} runs before Hibernate executes the {@code
+   * INSERT} statement, so values written into the event state are included in the insert.
    */
   @Override
   public boolean onPreInsert(PreInsertEvent event) {
