@@ -54,6 +54,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -67,6 +68,8 @@ public class XMLViews {
 
   private static final String LOCAL_SCHEMA = "object-views.xsd";
   private static final String REMOTE_SCHEMA = "object-views_" + ObjectViews.VERSION + ".xsd";
+
+  private static final Class<?>[] BOUND_TYPES = {ObjectViews.class};
 
   private static final Set<String> VIEW_TYPES = new HashSet<>();
 
@@ -103,7 +106,7 @@ public class XMLViews {
       return;
     }
 
-    JAXBContext context = JAXBContext.newInstance(ObjectViews.class);
+    JAXBContext context = JAXBContextFactory.createContext(BOUND_TYPES, null);
     unmarshaller = context.createUnmarshaller();
     marshaller = context.createMarshaller();
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

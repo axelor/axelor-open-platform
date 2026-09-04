@@ -1,0 +1,10 @@
+---
+title: Pin EclipseLink MOXy as JAXB provider
+type: fix
+description: |
+  Call `JAXBContextFactory.createContext` directly instead of
+  `JAXBContext.newInstance` so classpath provider lookup does not pick
+  another implementation (such as Glassfish `jaxb-runtime`).
+
+  Drop `jaxb.properties` files that Jakarta XML Binding 4.0 no longer
+  reads.

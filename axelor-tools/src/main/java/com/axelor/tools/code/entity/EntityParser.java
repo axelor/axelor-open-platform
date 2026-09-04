@@ -15,15 +15,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
 
 public class EntityParser {
+
+  private static final Class<?>[] BOUND_TYPES = {DomainModels.class};
 
   private static final AtomicReference<JAXBContext> CONTEXT = new AtomicReference<>();
 
   private static JAXBContext getContext() throws JAXBException {
     if (CONTEXT.get() == null) {
       synchronized (CONTEXT) {
-        CONTEXT.set(JAXBContext.newInstance(DomainModels.class));
+        CONTEXT.set(JAXBContextFactory.createContext(BOUND_TYPES, null));
       }
     }
     return CONTEXT.get();

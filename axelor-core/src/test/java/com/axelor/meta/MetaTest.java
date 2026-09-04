@@ -20,6 +20,7 @@ import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class MetaTest extends JpaTest {
@@ -38,7 +39,7 @@ public abstract class MetaTest extends JpaTest {
 
   @SuppressWarnings("unchecked")
   protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
-    JAXBContext context = JAXBContext.newInstance(type);
+    JAXBContext context = JAXBContextFactory.createContext(new Class<?>[] {type}, null);
     Unmarshaller unmarshaller = context.createUnmarshaller();
     return (T) unmarshaller.unmarshal(read(resource));
   }
