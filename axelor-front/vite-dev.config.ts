@@ -49,6 +49,23 @@ const proxyWs: ProxyOptions = {
   target: env.VITE_PROXY_TARGET,
   changeOrigin: true,
   ws: true,
+  xfwd: true,
+  configure(proxy) {
+    // The server checks the `Origin` of the websocket handshake against its own origin, so the
+    // dev server has to announce itself as a reverse proxy, like in production. The `xfwd`
+    // option is not enough on upgrade requests: unlike its http counterpart, it doesn't set
+    // `X-Forwarded-Host` and reports the `ws`/`wss` scheme instead of `http`/`https`.
+    proxy.on("proxyReqWs", (proxyReq, req) => {
+      const { host } = req.headers;
+      if (host) {
+        proxyReq.setHeader("X-Forwarded-Host", host);
+      }
+      proxyReq.setHeader(
+        "X-Forwarded-Proto",
+        "encrypted" in req.socket ? "https" : "http",
+      );
+    });
+  },
 };
 
 export default mergeConfig(
