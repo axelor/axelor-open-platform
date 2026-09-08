@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -46,17 +47,19 @@ public class AboutService extends AbstractService {
       final List<Map<String, Object>> users = new ArrayList<>();
 
       for (Session session : sessions) {
+        final String login;
         try {
           if (session == null
-              || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
-              || !Boolean.TRUE.equals(session.getAttribute(AUTHENTICATED_SESSION_KEY))) {
+              || !Boolean.TRUE.equals(session.getAttribute(AUTHENTICATED_SESSION_KEY))
+              || !(session.getAttribute(PRINCIPALS_SESSION_KEY)
+                  instanceof PrincipalCollection principals)) {
             continue;
           }
+          login = principals.oneByType(String.class);
         } catch (IllegalStateException e) {
           // invalid session
           continue;
         }
-        String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
         Map<String, Object> map = new HashMap<>();
         map.put("user", login);
         map.put("loginTime", session.getStartTimestamp());
