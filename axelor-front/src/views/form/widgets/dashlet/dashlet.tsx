@@ -214,7 +214,6 @@ export function DashletComponent({
           render: () => (
             <Box d="flex" alignItems="center">
               {hasSearch && <DashletSearch />}
-              <DashletRefresh count={attrs?.refresh ?? 0} />
               <DashletActions
                 dashboard={dashboard}
                 viewType={viewType}
@@ -234,7 +233,6 @@ export function DashletComponent({
       ],
     };
   }, [
-    attrs?.refresh,
     dashboard,
     hasSearch,
     onViewLoad,
@@ -251,6 +249,7 @@ export function DashletComponent({
     tab && (
       <DashletView>
         <Box className={clsx(classes.container, className)} style={{ height }}>
+          <DashletRefresh count={attrs?.refresh ?? 0} />
           <AxPanel
             header={
               <DashletTitle
@@ -281,17 +280,20 @@ function DashletRefresh({ count }: { count: number }) {
   const initDashlet = useRef(false);
 
   useAsyncEffect(async () => {
-    // Prevent unnecessary dashlet reload during initial grid setup.
-    // The grid initialization itself loads the dashlet data.
-    // Once the grid is fully initialized, mark it as ready (initDashlet = true)
-    // so that subsequent changes to `count` trigger a refresh.
+    // The view loads the dashlet data itself during initialization, so only a
+    // `count` change past that point may reload it. `doRefresh` is therefore
+    // left out of the dependencies: it changes identity every time the view
+    // re-registers its refresh handler (sorting a grid rebuilds `doSearch`),
+    // which would search on top of the grid's own search. `hasGridInitialized`
+    // is a boolean, flipping only once, so it arms `initDashlet` without
+    // re-running on those identity changes.
     if (initDashlet.current && count) {
       doRefresh();
     }
     if (hasGridInitialized) {
       initDashlet.current = true;
     }
-  }, [count, doRefresh]);
+  }, [hasGridInitialized, count]);
 
   return null;
 }
