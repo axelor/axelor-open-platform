@@ -166,9 +166,12 @@ export function DashletComponent({
     // for grid view to update readonly to show edit icon
     const tabProps = { canNew, canEdit, canDelete };
     if (tab && tab?.action?.viewType === "grid") {
+      // In forms `readonly` already accounts for canEdit and the dashlet's
+      // own readonly attribute; dashboards pass no readonly prop, so fall
+      // back to the attribute there only.
       setTabViewProps(tab, "grid", {
         ...tabProps,
-        readonly: Boolean(readonly || schema.readonly),
+        readonly: Boolean(readonly ?? schema.readonly),
       });
     } else if (
       tab &&

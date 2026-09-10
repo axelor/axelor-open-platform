@@ -450,25 +450,19 @@ function GridInner(props: ViewProps<GridView>) {
     (record: DataRecord, context: DataContext, readonly = false) => {
       showEditor({
         model: view.model!,
-        title:
-          (action.params?.["forceTitle"] ? action.title : view.title) ?? "",
+        title: view.title ?? "",
         viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
         maximize: hasPopupMaximize,
         context,
         record,
         readonly,
         onSearch: () => onSearch({}),
-        ...(dashlet && {
-          params: dashletParams,
-        }),
       });
     },
     [
       view,
       action,
       hasPopupMaximize,
-      dashlet,
-      dashletParams,
       showEditor,
       onSearch,
     ],

@@ -351,6 +351,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
   const showEditor = useEditor();
 
   const popup = action.params?.popup;
+  const dashletParams = action.params?.["dashlet.params"];
 
   return useCallback(
     async (options: EditorOptions & { onSearch?: () => void }) => {
@@ -404,11 +405,23 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
 
       return showEditor({
         ...rest,
+        title: action.params?.["forceTitle"]
+          ? (action.title ?? rest.title)
+          : rest.title,
+        ...(dashlet && { params: dashletParams }),
         record,
         readonly,
         ...reloadOptions,
       });
     },
-    [confirmSave, showEditor, popup, dashlet],
+    [
+      confirmSave,
+      showEditor,
+      popup,
+      dashlet,
+      dashletParams,
+      action.title,
+      action.params,
+    ],
   );
 }

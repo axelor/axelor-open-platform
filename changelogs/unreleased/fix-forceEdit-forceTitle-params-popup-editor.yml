@@ -1,0 +1,11 @@
+---
+title: Fix forceTitle view param and canEdit dashlet attribute in popup editor for all views
+type: fix
+description: |
+  The forceTitle action param was only applied when opening records from a
+  grid dashlet popup. It is now applied for all views (grid, cards, kanban,
+  calendar, gantt) opening the popup editor.
+
+  A panel-dashlet declared with both `canEdit="true"` and `readonly="true"`
+  now lets users edit its records, as the canEdit attribute is meant to
+  override the readonly state.
