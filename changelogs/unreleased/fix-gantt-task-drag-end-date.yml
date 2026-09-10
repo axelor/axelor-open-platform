@@ -1,0 +1,12 @@
+---
+title: Fix Gantt tasks collapsing to zero duration when dragged in zoomed-out views
+type: fix
+description: |
+  Dragging a task bar in the Gantt view could inadvertently set its end date equal 
+  to its start date. This occurred when a task was shorter than a single column of 
+  the current zoom level (e.g., a 4-day task in the Month view, or a 3-week task in 
+  the Year view). Because both edges of the bar snapped to the nearest column 
+  independently, they could land on the exact same date.
+
+  The end date is now strictly derived from the snapped start date plus the task's 
+  original duration. Moving a task now reliably preserves its length across all zoom levels.
