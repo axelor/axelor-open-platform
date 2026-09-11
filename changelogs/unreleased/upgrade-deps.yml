@@ -4,6 +4,7 @@ type: change
 description: |
   Here is the list of backend dependencies upgraded:
   
+  - Shiro from 2.1.0 to 2.2.1
   - pac4j from 6.5.3 to 6.5.8
   - buji-pac4j from 9.1.1 to 9.1.2
   - Tomcat from 10.1.57 to 10.1.59
