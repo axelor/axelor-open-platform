@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Tomcat from 10.1.57 to 10.1.59
+  - Jackson from 2.21.5 to 2.21.6
