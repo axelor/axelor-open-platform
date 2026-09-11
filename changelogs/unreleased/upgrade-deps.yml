@@ -2,8 +2,10 @@
 title: Upgrade backend dependencies
 type: change
 description: |
-  Here is the list of backend dependencies upgraded :
+  Here is the list of backend dependencies upgraded:
   
+  - pac4j from 6.5.3 to 6.5.8
+  - buji-pac4j from 9.1.1 to 9.1.2
   - Tomcat from 10.1.57 to 10.1.59
   - Jackson from 2.21.5 to 2.21.6
   - Groovy from 4.0.32 to 4.0.33

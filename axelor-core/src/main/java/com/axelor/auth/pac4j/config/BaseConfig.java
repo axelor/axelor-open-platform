@@ -11,12 +11,12 @@ import com.axelor.auth.pac4j.AxelorLogoutLogic;
 import com.axelor.auth.pac4j.AxelorProfileManager;
 import com.axelor.auth.pac4j.AxelorSecurityLogic;
 import com.axelor.auth.pac4j.AxelorUserAuthorizer;
+import io.buji.pac4j.context.ShiroSessionStore;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.jee.context.JEEContextFactory;
-import org.pac4j.jee.context.session.JEESessionStoreFactory;
 
 @Singleton
 public class BaseConfig extends Config {
@@ -42,7 +42,7 @@ public class BaseConfig extends Config {
     setLogoutLogic(logoutLogic);
 
     setWebContextFactoryIfUndefined(JEEContextFactory.INSTANCE);
-    setSessionStoreFactoryIfUndefined(JEESessionStoreFactory.INSTANCE);
+    setSessionStoreFactoryIfUndefined((parameters) -> ShiroSessionStore.INSTANCE);
     setProfileManagerFactoryIfUndefined(AxelorProfileManager::new);
   }
 }
