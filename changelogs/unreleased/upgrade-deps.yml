@@ -17,3 +17,4 @@ description: |
   - Hibernate from 6.6.53 to 6.6.56
   - Hibernate Validator from 8.0.3 to 8.0.5
   - Jsoup from 1.22.2 to 1.23.2
+  - Redisson from 4.3.1 to 4.7.0
