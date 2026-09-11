@@ -9,3 +9,4 @@ description: |
   - Groovy from 4.0.32 to 4.0.33
   - Slf4j from 2.0.18 to 2.0.19
   - Ldaptive from 2.5.0 to 2.5.1
+  - Jansi from 4.1.0 to 4.1.3
