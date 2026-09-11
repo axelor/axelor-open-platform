@@ -35,6 +35,8 @@ public class AxelorApiKeyClient extends HeaderClient {
       return Optional.empty();
     }
 
+    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+
     return super.getCredentials(ctx);
   }
 
@@ -61,9 +63,6 @@ public class AxelorApiKeyClient extends HeaderClient {
               .map(TokenCredentials::getToken)
               .orElse(null);
       credentialsHandler.handleInvalidCredentials(this, token, error);
-    } else {
-      var context = ctx.webContext();
-      context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
     }
 
     return validatedCredentials;

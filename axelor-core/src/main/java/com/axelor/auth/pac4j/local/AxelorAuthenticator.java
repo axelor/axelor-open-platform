@@ -111,7 +111,11 @@ public class AxelorAuthenticator implements Authenticator {
     if (ctx != null) {
       final var context = ctx.webContext();
       final var sessionStore = ctx.sessionStore();
-      sessionStore.set(context, PENDING_USER_NAME, null);
+
+      // Prevent unwanted session creation.
+      if (sessionStore.getSessionId(context, false).isPresent()) {
+        sessionStore.set(context, PENDING_USER_NAME, null);
+      }
     }
 
     final CommonProfile profile = new CommonProfile();

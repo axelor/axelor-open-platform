@@ -37,6 +37,8 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
       return Optional.empty();
     }
 
+    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+
     return super.getCredentials(ctx);
   }
 
@@ -63,9 +65,6 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
               .map(UsernamePasswordCredentials::getUsername)
               .orElse(null);
       credentialsHandler.handleInvalidCredentials(this, username, error);
-    } else {
-      var context = ctx.webContext();
-      context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
     }
 
     return validatedCredentials;
