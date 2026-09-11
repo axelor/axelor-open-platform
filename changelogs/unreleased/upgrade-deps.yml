@@ -7,3 +7,4 @@ description: |
   - Tomcat from 10.1.57 to 10.1.59
   - Jackson from 2.21.5 to 2.21.6
   - Groovy from 4.0.32 to 4.0.33
+  - Slf4j from 2.0.18 to 2.0.19
