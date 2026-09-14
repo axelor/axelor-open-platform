@@ -6,15 +6,15 @@ package com.axelor.auth.pac4j.local;
 
 import com.google.inject.Inject;
 import java.util.Optional;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.pac4j.core.context.CallContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.TokenCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.http.client.direct.HeaderClient;
 
-public class AxelorApiKeyClient extends HeaderClient {
+public class AxelorApiKeyClient extends HeaderClient implements StatelessClient {
 
   private static final String API_KEY = "API-KEY";
 
@@ -28,14 +28,19 @@ public class AxelorApiKeyClient extends HeaderClient {
   }
 
   @Override
+  public boolean hasCredentials(WebContext context) {
+    return context.getRequestHeader(getHeaderName()).isPresent();
+  }
+
+  @Override
   public Optional<Credentials> getCredentials(CallContext ctx) {
     final var context = ctx.webContext();
 
-    if (context.getRequestHeader(getHeaderName()).isEmpty()) {
+    if (!hasCredentials(context)) {
       return Optional.empty();
     }
 
-    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+    disableSessionCreation(context);
 
     return super.getCredentials(ctx);
   }

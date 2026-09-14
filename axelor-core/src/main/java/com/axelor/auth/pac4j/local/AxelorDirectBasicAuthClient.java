@@ -7,16 +7,16 @@ package com.axelor.auth.pac4j.local;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.inject.Beans;
 import java.util.Optional;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.HttpConstants;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 
-public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
+public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient implements StatelessClient {
 
   private CredentialsHandler credentialsHandler;
 
@@ -30,14 +30,22 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
   }
 
   @Override
+  public boolean hasCredentials(WebContext context) {
+    return context
+        .getRequestHeader(HttpConstants.AUTHORIZATION_HEADER)
+        .filter(header -> header.startsWith(HttpConstants.BASIC_HEADER_PREFIX))
+        .isPresent();
+  }
+
+  @Override
   public Optional<Credentials> getCredentials(CallContext ctx) {
     final var context = ctx.webContext();
 
-    if (context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER).isEmpty()) {
+    if (!hasCredentials(context)) {
       return Optional.empty();
     }
 
-    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
+    disableSessionCreation(context);
 
     return super.getCredentials(ctx);
   }

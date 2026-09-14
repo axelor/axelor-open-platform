@@ -4,9 +4,11 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.pac4j.local.StatelessClient;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
@@ -23,25 +25,42 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   private final String cookieName;
   private final String headerName;
 
+  private final Collection<StatelessClient> statelessClients;
+
   @Inject
-  public AxelorCsrfMatcher(AxelorCsrfGenerator csrfTokenGenerator) {
-    this(csrfTokenGenerator, AuthPac4jModule.CSRF_COOKIE_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
+  public AxelorCsrfMatcher(
+      AxelorCsrfGenerator csrfTokenGenerator, ClientListService clientListService) {
+    this(
+        csrfTokenGenerator,
+        clientListService,
+        AuthPac4jModule.CSRF_COOKIE_NAME,
+        AuthPac4jModule.CSRF_HEADER_NAME);
   }
 
   public AxelorCsrfMatcher(
-      CsrfTokenGenerator csrfTokenGenerator, String cookieName, String headerName) {
+      CsrfTokenGenerator csrfTokenGenerator,
+      ClientListService clientListService,
+      String cookieName,
+      String headerName) {
     super(csrfTokenGenerator);
+    this.statelessClients = clientListService.getStatelessClients();
     this.cookieName = cookieName;
     this.headerName = headerName;
   }
 
   @Override
   public boolean matches(CallContext ctx) {
-    // No CSRF cookie/header for native clients
-    if (!AuthPac4jInfo.isNativeClient(ctx.webContext())) {
+    var context = ctx.webContext();
+
+    // No CSRF cookie/header for native clients nor stateless clients
+    if (!AuthPac4jInfo.isNativeClient(context) && !hasStatelessCredentials(context)) {
       addResponseCookieAndHeader(ctx);
     }
     return true;
+  }
+
+  private boolean hasStatelessCredentials(WebContext context) {
+    return statelessClients.stream().anyMatch(client -> client.hasCredentials(context));
   }
 
   /**

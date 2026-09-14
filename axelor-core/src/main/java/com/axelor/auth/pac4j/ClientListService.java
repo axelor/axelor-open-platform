@@ -8,11 +8,13 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.local.AxelorApiKeyClient;
 import com.axelor.auth.pac4j.local.MfaClient;
+import com.axelor.auth.pac4j.local.StatelessClient;
 import com.axelor.inject.Beans;
 import com.google.inject.ImplementedBy;
 import com.google.inject.Provider;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public abstract class ClientListService implements Provider<List<Client>> {
 
   protected List<Client> clients = new ArrayList<>();
+
+  protected Set<StatelessClient> statelessClients = Collections.emptySet();
 
   protected String defaultClientName;
 
@@ -74,18 +78,18 @@ public abstract class ClientListService implements Provider<List<Client>> {
     final Map<Boolean, List<Client>> grouped =
         clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
 
-    final List<IndirectClient> indirectCients =
+    final List<IndirectClient> indirectClients =
         grouped.getOrDefault(true, Collections.emptyList()).stream()
             .map(IndirectClient.class::cast)
             .collect(Collectors.toList());
 
     final AjaxRequestResolver ajaxRequestResolver = Beans.get(AjaxRequestResolver.class);
-    indirectCients.forEach(client -> client.setAjaxRequestResolver(ajaxRequestResolver));
+    indirectClients.forEach(client -> client.setAjaxRequestResolver(ajaxRequestResolver));
 
     indirectClientNames =
         Collections.unmodifiableSet(
             (Set<String>)
-                indirectCients.stream()
+                indirectClients.stream()
                     .map(Client::getName)
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 
@@ -112,6 +116,13 @@ public abstract class ClientListService implements Provider<List<Client>> {
           .log();
     }
 
+    // Stateless clients
+    statelessClients =
+        grouped.getOrDefault(false, Collections.emptyList()).stream()
+            .filter(StatelessClient.class::isInstance)
+            .map(StatelessClient.class::cast)
+            .collect(Collectors.toUnmodifiableSet());
+
     // LDAP
 
     final String ldapServerUrl = settings.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL, null);
@@ -125,6 +136,10 @@ public abstract class ClientListService implements Provider<List<Client>> {
   @Override
   public List<Client> get() {
     return clients;
+  }
+
+  public Collection<StatelessClient> getStatelessClients() {
+    return statelessClients;
   }
 
   public String getDefaultClientName() {
