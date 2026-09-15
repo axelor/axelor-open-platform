@@ -15,6 +15,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionContext;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
@@ -30,16 +31,17 @@ import org.apache.shiro.web.util.WebUtils;
 @Singleton
 public class AxelorSessionManager extends DefaultWebSessionManager {
 
-  private final Cookie secureSessionIdCookie;
+  private final Cookie httpSessionIdCookie;
   private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
   @Inject
   public AxelorSessionManager(
       SessionDAO sessionDAO,
       @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
-    secureSessionIdCookie = new SimpleCookie(super.getSessionIdCookie());
-    secureSessionIdCookie.setSecure(true);
-    secureSessionIdCookie.setSameSite(SameSiteOptions.NONE);
+    var sessionIdCookie = super.getSessionIdCookie();
+    httpSessionIdCookie = new SimpleCookie(sessionIdCookie);
+    httpSessionIdCookie.setSecure(false);
+    sessionIdCookie.setSameSite(SameSiteOptions.NONE);
 
     setSessionDAO(sessionDAO);
 
@@ -62,6 +64,16 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
   }
 
   @Override
+  protected void onStop(Session session, SessionKey key) {
+    currentRequest.set(WebUtils.getHttpRequest(key));
+    try {
+      super.onStop(session, key);
+    } finally {
+      currentRequest.remove();
+    }
+  }
+
+  @Override
   public Cookie getSessionIdCookie() {
     final var request = currentRequest.get();
 
@@ -69,7 +81,7 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
       return super.getSessionIdCookie();
     }
 
-    var cookie = request.isSecure() ? secureSessionIdCookie : super.getSessionIdCookie();
+    var cookie = request.isSecure() ? super.getSessionIdCookie() : httpSessionIdCookie;
 
     if (request.getContextPath().isEmpty()) {
       cookie = new SimpleCookie(cookie);

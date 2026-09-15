@@ -22,13 +22,14 @@ import org.apache.shiro.web.util.WebUtils;
 @Singleton
 public class AxelorRememberMeManager extends CookieRememberMeManager {
 
-  private final Cookie secureCookie;
+  private final Cookie httpCookie;
   private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
   public AxelorRememberMeManager() {
-    secureCookie = new SimpleCookie(super.getCookie());
-    secureCookie.setSecure(true);
-    secureCookie.setSameSite(SameSiteOptions.NONE);
+    var cookie = super.getCookie();
+    httpCookie = new SimpleCookie(cookie);
+    httpCookie.setSecure(false);
+    cookie.setSameSite(SameSiteOptions.NONE);
   }
 
   @Override
@@ -49,7 +50,7 @@ public class AxelorRememberMeManager extends CookieRememberMeManager {
       return super.getCookie();
     }
 
-    var cookie = request.isSecure() ? secureCookie : super.getCookie();
+    var cookie = request.isSecure() ? super.getCookie() : httpCookie;
 
     if (request.getContextPath().isEmpty()) {
       cookie = new SimpleCookie(cookie);
