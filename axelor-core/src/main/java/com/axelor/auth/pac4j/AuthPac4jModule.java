@@ -30,10 +30,8 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.ServletContext;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -43,14 +41,10 @@ import javax.cache.expiry.AccessedExpiryPolicy;
 import javax.cache.expiry.Duration;
 import javax.cache.spi.CachingProvider;
 import org.apache.shiro.authc.AuthenticationListener;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.cache.jcache.AxelorJCacheManager;
 import org.apache.shiro.guice.web.ShiroWebModule;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
@@ -149,7 +143,7 @@ public class AuthPac4jModule extends ShiroWebModule {
 
   @Override
   protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
-    bind.to(DefaultWebSecurityManager.class);
+    bind.to(AxelorWebSecurityManager.class).asEagerSingleton();
   }
 
   @Override
@@ -217,29 +211,6 @@ public class AuthPac4jModule extends ShiroWebModule {
     }
 
     return cacheConfig;
-  }
-
-  @Provides
-  @Singleton
-  public DefaultWebSecurityManager webSecurityManager(
-      Collection<Realm> realms,
-      Set<AuthenticationListener> authenticationListeners,
-      ModularRealmAuthenticator authenticator,
-      AxelorSessionManager sessionManager,
-      AxelorRememberMeManager rememberMeManager,
-      AxelorJCacheManager cacheManager) {
-
-    final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-
-    securityManager.setCacheManager(cacheManager);
-    securityManager.setRealms(realms);
-    authenticator.setRealms(securityManager.getRealms());
-    authenticator.setAuthenticationListeners(authenticationListeners);
-    securityManager.setAuthenticator(authenticator);
-    securityManager.setSessionManager(sessionManager);
-    securityManager.setRememberMeManager(rememberMeManager);
-
-    return securityManager;
   }
 
   @Provides
