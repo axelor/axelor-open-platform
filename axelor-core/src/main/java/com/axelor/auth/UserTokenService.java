@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,7 +162,7 @@ public class UserTokenService {
       result.put("name", tokenData.get("name"));
       result.put("lastUsed", toEpochMillis(tokenData.get("lastUsedAt")));
       result.put("createdOn", toEpochMillis(tokenData.get("createdOn")));
-      LocalDateTime expiresAt = LocalDateTime.parse(tokenData.get("expiresAt").toString());
+      LocalDateTime expiresAt = parseLocalDateTime(tokenData.get("expiresAt"));
       result.put("expires", toEpochMillis(expiresAt));
       result.put("isActive", expiresAt.isAfter(LocalDateTime.now()));
       result.put(
@@ -176,10 +176,26 @@ public class UserTokenService {
     return data;
   }
 
-  private Long toEpochMillis(Object expiresAt) {
-    if (expiresAt == null) {
+  /**
+   * Parses an object into a LocalDateTime.
+   *
+   * @param dateTime the object to parse
+   * @return the parsed LocalDateTime
+   */
+  private LocalDateTime parseLocalDateTime(Object dateTime) {
+    return dateTime instanceof LocalDateTime ldt ? ldt : LocalDateTime.parse(dateTime.toString());
+  }
+
+  /**
+   * Converts a stored date time to epoch milliseconds.
+   *
+   * @param dateTime the date time to convert
+   * @return the matching epoch milliseconds, or {@code null} if there is no date time
+   */
+  private Long toEpochMillis(Object dateTime) {
+    if (dateTime == null) {
       return null;
     }
-    return LocalDateTime.parse(expiresAt.toString()).toInstant(ZoneOffset.UTC).toEpochMilli();
+    return parseLocalDateTime(dateTime).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
   }
 }

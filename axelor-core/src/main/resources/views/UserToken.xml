@@ -48,18 +48,28 @@
                       >
                         <Box d="flex" alignItems="center" g={2}>
                           <Icon icon="login" />
-                          <span>{_t('Expires on:')} {userToken.expires ? Formatters.datetime(new Date(userToken.expires), { props: { seconds: true } }) : "-"}</span>
+                          <span>{_t('Expires on')}: {userToken.expires ? Formatters.datetime(new Date(userToken.expires), { props: { seconds: true } }) : "-"}</span>
                           {userToken.isActive && userToken.remainingDays >= 0 ? (
                             <Box as="span" color={userToken.remainingDays > 7 ? "primary" : "warning"}>{userToken.remainingDays} {_t('day(s) left')}</Box>
                           ) : null}
                         </Box>
                         <Box d="flex" alignItems="center" g={2}>
                           <Icon icon="schedule" />
-                          <span>{_t('Last used at:')} {userToken.lastUsed ? Formatters.datetime(new Date(userToken.lastUsed), { props: { seconds: true } }) : "-"}</span>
+                          <Box>
+                            <span>{_t('Last used')}: </span>
+                            <span title={userToken.lastUsed ? Formatters.datetime(new Date(userToken.lastUsed), { props: { seconds: true } }) : undefined}>
+                              {userToken.lastUsed ? Formatters['relative-time'](new Date(userToken.lastUsed)) : "-"}
+                            </span>
+                          </Box>
                         </Box>
                         <Box d="flex" alignItems="center" g={2}>
                           <Icon icon="calendar_add_on" />
-                          <span>{_t('Created on:')} {userToken.createdOn ? Formatters.datetime(new Date(userToken.createdOn), { props: { seconds: true } }) : "-"}</span>
+                          <Box>
+                            <span>{_t('Created on')}: </span>
+                            <span title={userToken.createdOn ? Formatters.datetime(new Date(userToken.createdOn), { props: { seconds: true } }) : undefined}>
+                              {userToken.createdOn ? Formatters.date(new Date(userToken.createdOn), { props: { dateFormat: "LL" } }) : "-"}
+                            </span>
+                          </Box>
                         </Box>
                       </Box>
                     </Box>
