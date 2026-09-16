@@ -9,6 +9,32 @@ In this document, we will see the major steps to migrate from 8.2 to 8.3.
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.3/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.3.
 
+== Client IP address read from a single header
+
+The client IP address, ie what `getRemoteAddr()` returns behind the proxy filter, is now the left-most address of a
+single header: the header configured with the new `application.client-ip-header` setting, such as `X-Real-IP`, or
+`X-Forwarded-For` if none is configured. That address is validated and normalized, ie any port suffix is stripped and
+IPv6 addresses are canonicalized, whereas the left-most `X-Forwarded-For` value was previously used as it is.
+
+If that header is missing, or doesn't provide a valid IP address, the address of the direct connection is used. There
+is no fallback to other headers, as the reverse proxy may not overwrite them, so they may have been forged by the
+client.
+
+This header is trusted as it is, so the reverse proxy must overwrite it, and the application must only be reachable
+through the proxy.
+
+WARNING: Previous versions of this guide recommended `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
+for nginx. This keeps the `X-Forwarded-For` value sent by the client, whose left-most address would then be used as the
+client address. Update the nginx configuration:
+
+[source,nginx]
+----
+proxy_set_header X-Forwarded-For $remote_addr;
+----
+
+See xref:dev-guide:application/config.adoc#client-ip-address[Client IP address] for the full requirements, including
+deployments without a reverse proxy or behind a CDN.
+
 == Record user authentications
 
 Successful interactive logins are now recorded as `AuthenticationEvent` records: sign-in with the login form (local

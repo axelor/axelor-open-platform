@@ -294,6 +294,7 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `application.entity.sequence.default_allocation_size` | global default entity allocation size |
 | `application.entity.sequence.<SEQUENCE_NAME>.allocation_size` | per-entity sequence allocation size |
 | `application.polling-interval` | how often client polls in seconds (ie, menu tags fetch), < 1 means disabled | 10
+| `application.client-ip-header` | http header providing the client IP address | `X-Forwarded-For`
 | `application.multi-tenancy` | enable multi-tenancy | false
 | `application.config-provider` | `if-feature` custom class |
 | `application.domain-blocklist-pattern` | pattern to validate domain expressions |
@@ -1041,3 +1042,52 @@ This means:
 - The `application.base-url` configuration is required in most cases.
 - Exception: When multi-tenancy is enabled, the system uses the first host in the `hosts` configuration for each tenant
 instead.
+
+[#client-ip-address]
+== Client IP address
+
+When the application is behind a reverse proxy, the client IP address is read from a single header set by the proxy:
+the left-most address of the header configured with `application.client-ip-header`, or of the `X-Forwarded-For` header
+if none is configured. Other headers, such as `X-Real-IP`, are ignored.
+
+If this header is missing, or doesn't contain a valid IP address, the address of the direct connection is used: no
+other header is tried, as it may not be overwritten by the proxy.
+
+[source,properties]
+----
+# header providing the client IP address, set by the reverse proxy
+application.client-ip-header = X-Real-IP
+----
+
+The resolved address is what `HttpServletRequest#getRemoteAddr()` returns, and is used to restrict
+xref:web-services/auth.adoc#restricting-api-keys-by-ip-address[API keys by IP address].
+
+IMPORTANT: The application trusts this header as it is. Preventing clients from spoofing it is the responsibility of
+the network infrastructure. This also applies when the application isn't behind a reverse proxy: any client can then
+send this header with an allowed address and bypass the IP restriction of an API key.
+
+To make sure the client address can't be spoofed:
+
+* The application must only be reachable through the reverse proxy. Otherwise, anyone connecting directly to the
+application can send this header with any address.
+* The edge proxy, receiving the client connections, must overwrite the header used, so that the value sent by clients
+is never forwarded. With nginx, using the default `X-Forwarded-For` header:
++
+[source,nginx]
+----
+proxy_set_header X-Forwarded-For $remote_addr;
+----
++
+Don't use `$proxy_add_x_forwarded_for`: it keeps the `X-Forwarded-For` value sent by the client, whose left-most
+address would be used.
+* When a CDN or another proxy is in front of nginx, such as Cloudflare, `$remote_addr` is the address of that proxy.
+Either restore the client address in nginx with the `realip` module:
++
+[source,nginx]
+----
+set_real_ip_from 173.245.48.0/20;  # all the Cloudflare IP ranges
+real_ip_header CF-Connecting-IP;
+----
++
+or set `application.client-ip-header` to the header set by the CDN (`CF-Connecting-IP` for Cloudflare). In both cases,
+only accept connections from the CDN IP ranges, otherwise anyone can send this header.

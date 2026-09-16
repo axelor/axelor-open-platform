@@ -4,34 +4,53 @@
  */
 package com.axelor.web.servlet;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
+import com.axelor.common.net.ClientAddressResolver;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wrap the request to reflect the original protocol, scheme, Host and prefix using the
- * "X-Forwarded-*" headers.
+ * Wrap the request to reflect the original protocol, scheme, Host, prefix and client address using
+ * the "X-Forwarded-*" headers.
+ *
+ * <p>The client address is resolved with {@link ClientAddressResolver}, from the header configured
+ * with {@link AvailableAppSettings#APPLICATION_CLIENT_IP_HEADER}, or else from "X-Forwarded-For".
  */
 @Singleton
 public class ProxyFilter implements Filter {
 
   private static final Logger log = LoggerFactory.getLogger(ProxyFilter.class);
 
+  private ClientAddressResolver clientAddressResolver;
+
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
+    final String clientIpHeader =
+        AppSettings.get().get(AvailableAppSettings.APPLICATION_CLIENT_IP_HEADER);
+    clientAddressResolver = new ClientAddressResolver(clientIpHeader);
+  }
+
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
-    chain.doFilter(new ProxyHttpServletRequestWrapper((HttpServletRequest) request), response);
+    chain.doFilter(
+        new ProxyHttpServletRequestWrapper((HttpServletRequest) request, clientAddressResolver),
+        response);
   }
 
   @Override
@@ -52,7 +71,8 @@ public class ProxyFilter implements Filter {
     private String requestUrl;
     private String actualRequestUri;
 
-    public ProxyHttpServletRequestWrapper(HttpServletRequest request) {
+    public ProxyHttpServletRequestWrapper(
+        HttpServletRequest request, ClientAddressResolver clientAddressResolver) {
       super(request);
       this.delegate = () -> (HttpServletRequest) getRequest();
       this.actualRequestUri = this.delegate.get().getRequestURI();
@@ -67,7 +87,7 @@ public class ProxyFilter implements Filter {
               + this.getServerName()
               + ((getServerPort() == 443 || getServerPort() == 80) ? "" : ":" + getServerPort());
 
-      this.forwardedFor = initForwardedFor(request);
+      this.forwardedFor = initForwardedFor(request, clientAddressResolver);
       this.requestUri = initRequestUri();
       this.requestUrl = initRequestUrl();
     }
@@ -173,12 +193,11 @@ public class ProxyFilter implements Filter {
       return null;
     }
 
-    private String initForwardedFor(HttpServletRequest request) {
-      String protoHeader = request.getHeader("X-Forwarded-For");
-      if (StringUtils.notBlank(protoHeader)) {
-        return StringUtils.splitToArray(protoHeader, ",")[0];
-      }
-      return null;
+    private String initForwardedFor(
+        HttpServletRequest request, ClientAddressResolver clientAddressResolver) {
+      String remoteAddr = request.getRemoteAddr();
+      String clientAddr = clientAddressResolver.resolve(request::getHeader, remoteAddr);
+      return Objects.equals(clientAddr, remoteAddr) ? null : clientAddr;
     }
 
     private String initRequestUri() {

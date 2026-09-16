@@ -34,6 +34,7 @@ public interface AvailableAppSettings {
   String APPLICATION_CONFIG_PROVIDER = "application.config-provider";
   String CONFIG_MULTI_TENANCY = "application.multi-tenancy";
   String APPLICATION_POLLING_INTERVAL = "application.polling-interval";
+  String APPLICATION_CLIENT_IP_HEADER = "application.client-ip-header";
 
   @Deprecated
   String APPLICATION_PERMISSION_DISABLE_RELATIONAL_FIELD =

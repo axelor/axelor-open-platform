@@ -1,0 +1,29 @@
+---
+title: Resolve the client IP address from a single trusted header
+type: feature
+description: |
+  Behind the proxy filter, `HttpServletRequest#getRemoteAddr()` now returns the client IP address
+  resolved from a single header: the left-most address of the header configured with the new
+  `application.client-ip-header` setting, or of `X-Forwarded-For` by default. The address is
+  validated and normalized, ie any port suffix is stripped and IPv6 addresses are canonicalized,
+  whereas the left-most `X-Forwarded-For` value was previously used as it is.
+
+  If that header is missing, or doesn't provide a valid IP address, the address of the direct
+  connection is used. No other header is tried, such as `X-Real-IP`, as the reverse proxy may not
+  overwrite it, so it may have been forged by the client.
+
+  ```
+  # header providing the client IP address, set by the reverse proxy
+  application.client-ip-header = X-Real-IP
+  ```
+
+  The configured header is trusted as it is: the reverse proxy must overwrite it, and the
+  application must only be reachable through the proxy. With nginx, using the default
+  `X-Forwarded-For` header:
+
+  ```
+  proxy_set_header X-Forwarded-For $remote_addr;
+  ```
+
+  Don't use `$proxy_add_x_forwarded_for`: it keeps the `X-Forwarded-For` value sent by the client,
+  whose left-most address would then be used as the client address.
