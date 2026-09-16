@@ -6,6 +6,7 @@ package com.axelor.auth.pac4j.local;
 
 import static com.axelor.auth.UserTokenService.TOKEN_KEY_LENGTH;
 
+import com.axelor.auth.ApiKeyLastUsedService;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.UserToken;
@@ -13,7 +14,6 @@ import com.axelor.auth.db.repo.UserTokenRepository;
 import com.axelor.common.StringUtils;
 import com.axelor.common.net.IpAddressMatcher;
 import com.google.inject.Inject;
-import com.google.inject.persist.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.pac4j.core.context.CallContext;
@@ -53,6 +53,7 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
   private static final Logger log = LoggerFactory.getLogger(AxelorApiKeyAuthenticator.class);
 
   @Inject UserTokenRepository userTokenRepository;
+  @Inject ApiKeyLastUsedService apiKeyLastUsedService;
 
   @Override
   public Optional<Credentials> validate(CallContext ctx, Credentials credentials) {
@@ -73,7 +74,7 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
     }
 
     // Update the token last used date
-    setUserTokenLastUsed(userToken);
+    apiKeyLastUsedService.setLastUsed(userToken);
 
     // Create the profile
     CommonProfile profile = new CommonProfile();
@@ -169,11 +170,6 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
         userToken.getOwner().getCode(),
         remoteAddr);
     return false;
-  }
-
-  @Transactional
-  public void setUserTokenLastUsed(UserToken userToken) {
-    userToken.setLastUsedAt(LocalDateTime.now());
   }
 
   /**

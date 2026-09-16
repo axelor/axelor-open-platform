@@ -1,0 +1,16 @@
+---
+title: Throttle refresh of API key `lastUsedAt`
+type: feature
+description: |
+  API key authentication is stateless, so it runs on every single request. The `lastUsedAt` of the
+  API key was written on each of them, turning a read-only workload into one `UPDATE` plus one commit
+  per request, and invalidating the cache regions of `UserToken` just as often.
+
+  `lastUsedAt` is now refreshed at most once every 5 minutes. That interval is wide enough to tell
+  active API keys from unused ones, which is what the field is for, while keeping clients making
+  frequent calls from writing to the database on each of them. Once the interval has elapsed, a 
+  lease of 30 seconds makes sure a single request refreshes the timestamp, instead of every request 
+  that was already in flight.
+
+  Both mechanisms prevent row-level lock contention and API response delay when dozens of concurrent 
+  requests use the same token.

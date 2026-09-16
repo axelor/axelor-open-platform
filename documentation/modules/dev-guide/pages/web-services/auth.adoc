@@ -87,8 +87,11 @@ The API Keys tab displays a list of all tokens for the user with the following i
 
 * Name: A descriptive name for the token
 * Expiration date: When the token will expire
-* Last used: The last time the token was used for authentication
+* Last used: The last time the token was used for authentication, accurate to within 5 minutes
 * Allowed IPs: The IP addresses allowed to use the token, if restricted
+
+NOTE: Because API key authentication happens on every request, `Last used` is refreshed at most once
+every 5 minutes rather than on each request.
 
 The system provides visual indicators for token expiration:
 
