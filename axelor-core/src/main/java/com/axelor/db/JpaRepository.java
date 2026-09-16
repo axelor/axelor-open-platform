@@ -214,6 +214,25 @@ public class JpaRepository<T extends Model> implements Repository<T> {
     return json;
   }
 
+  /**
+   * Whether the current user can read the records of the managed model.
+   *
+   * @return true if reading is permitted
+   */
+  public boolean isPermitted() {
+    return isPermitted(JpaSecurity.CAN_READ);
+  }
+
+  /**
+   * Whether the current user has the given access to the records of the managed model.
+   *
+   * @param type the access type to check
+   * @return true if the access is permitted
+   */
+  public boolean isPermitted(JpaSecurity.AccessType type) {
+    return Beans.get(JpaSecurity.class).isPermitted(type, modelClass);
+  }
+
   @SuppressWarnings("unchecked")
   public static <U extends Model> JpaRepository<U> of(Class<U> type) {
     final Class<?> klass = JpaScanner.findRepository(type.getSimpleName() + "Repository");

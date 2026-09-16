@@ -5,18 +5,12 @@
 package com.axelor.auth.db.repo;
 
 import com.axelor.auth.MFASummaryDTO;
-import com.axelor.auth.db.MFA;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
-import com.axelor.db.JpaSecurity;
-import com.axelor.inject.Beans;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class MFARepository extends AbstractMFARepository {
-  public boolean isPermitted() {
-    return Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, MFA.class);
-  }
 
   public MFASummaryDTO findSummaryByOwner(User owner) {
     TypedQuery<MFASummaryDTO> query =
