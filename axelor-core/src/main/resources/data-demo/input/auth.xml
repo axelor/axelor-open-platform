@@ -36,6 +36,12 @@
     <domain-params>__user__.id</domain-params>
   </permission>
 
+  <permission name="perm.auth.my.authevent" object="com.axelor.auth.db.AuthenticationEvent">
+    <can read="true"/>
+    <domain>self.user.id = ?</domain>
+    <domain-params>__user__.id</domain-params>
+  </permission>
+
   <role name="role.super" title="Super">
     <permission name="perm.auth.all"/>
   </role>
@@ -50,6 +56,7 @@
     <permission name="perm.auth.my.user"/>
     <permission name="perm.auth.my.usertoken"/>
     <permission name="perm.auth.my.mfa"/>
+    <permission name="perm.auth.my.authevent"/>
   </role>
 
 </auth>

@@ -36,9 +36,7 @@ public class AxelorCallbackFilter extends CallbackFilter {
     try {
       super.doFilter(servletRequest, servletResponse, filterChain);
     } finally {
-      if (servletRequest instanceof HttpServletRequest httpRequest) {
-        SessionInfoFilter.applySessionInfo(httpRequest);
-      }
+      SessionInfoFilter.applySessionInfo((HttpServletRequest) servletRequest);
     }
   }
 }

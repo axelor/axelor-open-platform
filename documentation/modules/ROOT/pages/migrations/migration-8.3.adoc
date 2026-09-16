@@ -8,3 +8,40 @@ In this document, we will see the major steps to migrate from 8.2 to 8.3.
 
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.3/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.3.
+
+== Record user authentications
+
+Successful interactive logins are now recorded as `AuthenticationEvent` records: sign-in with the login form (local
+or LDAP), indirect basic authentication and single sign-on providers (OpenID Connect, OAuth, SAML, CAS…). Each event
+stores the user, a human-readable provider name, the IP address, the date, and some details such as the second factor
+used and the user agent. See xref:dev-guide:modules/security.adoc#authentication-events[Authentication Events] for more
+details.
+
+Users other than administrators need a read permission on `com.axelor.auth.db.AuthenticationEvent` to see their own
+history, and they will only ever see their own events.
+
+A new `auth_authentication_event` table is required. See the <<Full migration script>> below.
+
+== Full migration script
+
+Here is the full SQL migration script for all built-in AOP entities :
+
+[source,sql]
+----
+create table auth_authentication_event
+(
+    id         bigint  not null primary key,
+    archived   boolean,
+    version    integer,
+    created_on timestamp(6),
+    details    jsonb,
+    ip_address varchar(255),
+    provider   varchar(255),
+    status     integer not null,
+    user_id    bigint constraint fk_fcd7fnyrr3qavk2xuco4ov3d8 references auth_user
+);
+
+create index auth_event_idx_user on auth_authentication_event (user_id, created_on);
+create index auth_event_idx_created_on on auth_authentication_event (created_on);
+create index auth_authentication_event_user_id_idx on auth_authentication_event (user_id);
+----

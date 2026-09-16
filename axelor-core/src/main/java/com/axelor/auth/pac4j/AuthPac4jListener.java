@@ -8,6 +8,7 @@ import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
+import com.axelor.auth.events.AuthenticationEventRecorder;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.LogoutEvent;
@@ -29,6 +30,7 @@ public class AuthPac4jListener implements AuthenticationListener {
   @Inject private Event<LogoutEvent> logoutEvent;
   @Inject private AuthPac4jProfileService profileService;
   @Inject private AuthSessionService sessionService;
+  @Inject private AuthenticationEventRecorder eventRecorder;
 
   private static final String UNKNOWN_USER = "User not found: %s";
 
@@ -48,17 +50,19 @@ public class AuthPac4jListener implements AuthenticationListener {
    */
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
+    @SuppressWarnings("unchecked")
+    final Optional<CommonProfile> profile = (Optional<CommonProfile>) token.getPrincipal();
+
     if (info instanceof UserAuthenticationInfo authenticationInfo) {
       final User user = authenticationInfo.getUser();
 
       if (user != null) {
+        eventRecorder.onLoginSuccess(user, profile.orElse(null));
         firePostLoginSuccess(token, user);
         return;
       }
     }
 
-    @SuppressWarnings("unchecked")
-    final Optional<CommonProfile> profile = (Optional<CommonProfile>) token.getPrincipal();
     final String username =
         profile
             .map(profileService::getUserIdentifier)

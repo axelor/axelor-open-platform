@@ -13,6 +13,7 @@ import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.AuthenticationEvent;
 import com.axelor.auth.db.MFA;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.UserToken;
@@ -439,6 +440,20 @@ public class Resource<T extends Model> {
         parentId);
   }
 
+  /**
+   * Returns the path to the owning user for models a non-admin user may only see their own records
+   * of, or {@code null} if the model has no such restriction.
+   */
+  private static String getOwnerPath(Class<?> model) {
+    if (MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model)) {
+      return "self.owner.id";
+    }
+    if (AuthenticationEvent.class.isAssignableFrom(model)) {
+      return "self.user.id";
+    }
+    return null;
+  }
+
   private Class<?> classForName(String name) {
     try {
       return Class.forName(name);
@@ -461,11 +476,12 @@ public class Resource<T extends Model> {
     }
 
     User currentUser = AuthUtils.getUser();
-    if ((MFA.class.isAssignableFrom(model) || UserToken.class.isAssignableFrom(model))
-        && currentUser != null
-        && !AuthUtils.isAdmin(currentUser)) {
-      Filter specialModelFilters = new JPQLFilter("self.owner.id = ?", currentUser.getId());
-      filter = filter == null ? specialModelFilters : Filter.and(filter, specialModelFilters);
+    if (currentUser != null && !AuthUtils.isAdmin(currentUser)) {
+      String ownerPath = getOwnerPath(model);
+      if (ownerPath != null) {
+        Filter ownerFilter = new JPQLFilter(ownerPath + " = ?", currentUser.getId());
+        filter = filter == null ? ownerFilter : Filter.and(filter, ownerFilter);
+      }
     }
 
     if (LOG.isTraceEnabled()) {

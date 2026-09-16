@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.apache.shiro.SecurityUtils;
@@ -59,6 +60,10 @@ public class AxelorLoginFilter implements Filter {
     }
 
     // When not authenticated, this triggers login process.
-    securityFilter.doFilter(request, response, chain);
+    try {
+      securityFilter.doFilter(request, response, chain);
+    } finally {
+      SessionInfoFilter.applySessionInfo((HttpServletRequest) request);
+    }
   }
 }

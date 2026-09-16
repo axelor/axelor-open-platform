@@ -18,7 +18,8 @@
 
   <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="action-method-user-save">
     <toolbar>
-      <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices"/>
+      <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices" help="Show active sessions"/>
+      <button name="showAuthenticationEvents" onClick="action-user-show-authentication-events" icon="login" help="Show authentication events" if="__repo__(AuthenticationEvent).isPermitted()"/>
     </toolbar>
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
@@ -85,6 +86,10 @@
       <panel title="Devices">
         <label title="List of devices that have logged into your account. Revoke any sessions that you do not recognize." colSpan="7"/>
         <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices" colSpan="5" title="Devices"/>
+      </panel>
+      <panel title="Connections" if="__repo__(AuthenticationEvent).isPermitted()">
+        <label title="List security log of authentication events involving your account." colSpan="7"/>
+        <button name="showAuthenticationEvents" onClick="action-user-show-authentication-events" icon="login" colSpan="5" title="Connections"/>
       </panel>
     </panel>
   </form>
@@ -269,6 +274,114 @@
 
   <action-method name="action-user-revoke-session">
     <call class="com.axelor.auth.web.UserController" method="terminateSession" />
+  </action-method>
+
+  <action-view name="action-user-show-authentication-events" title="Authentication events" model="com.axelor.auth.db.User">
+    <view type="form" name="user-authentication-events-form" />
+    <view-param name="popup" value="true" />
+    <view-param name="popup-save" value="false" />
+    <view-param name="show-toolbar" value="false" />
+    <context name="_showRecord" expr="eval: id" />
+  </action-view>
+
+  <form title="Authentication events" name="user-authentication-events-form" model="com.axelor.auth.db.User" onLoad="action-user-load-authentication-events">
+    <panel showFrame="false" itemSpan="12">
+      <field name="code" hidden="true" />
+      <field name="_xPageOffset" type="integer" hidden="true" x-dirty="false" />
+      <field name="_xPageSize" type="integer" hidden="true" x-dirty="false" />
+      <field name="_xPageHasNext" type="boolean" hidden="true" x-dirty="false" />
+      <label title="List security log of authentication events involving your account." />
+      <field name="_xAuthenticationEvents" readonly="true" showTitle="false" colSpan="12" x-dirty="false">
+        <viewer>
+          <![CDATA[
+            <>
+              <Box d="flex" flexDirection="column" border rounded>
+                <Box px={3} py={2} borderBottom>
+                  <strong>{_t('History of authentications')}</strong>
+                </Box>
+                {_xAuthenticationEvents && _xAuthenticationEvents.length > 0 ? (
+                  _xAuthenticationEvents.map((event, i) => (
+                    <Box
+                      key={i}
+                      d="flex"
+                      alignItems="flex-start"
+                      g={2}
+                      px={3}
+                      py={2}
+                      borderBottom={i < _xAuthenticationEvents.length - 1}
+                    >
+                      <Icon icon="login" />
+                      <Box d="flex" flexDirection="column" g={1} flex={1} style={{ minWidth: 0 }}>
+                        <Box d="flex" alignItems="center" justifyContent="space-between" g={2}>
+                          <span>{event.message}</span>
+                          {event.status === 'SUCCESS' ? (
+                            <Badge bg="success">{_t('Success')}</Badge>
+                          ) : (
+                            <Badge bg="danger">{_t('Failure')}</Badge>
+                          )}
+                        </Box>
+                        <Box d="flex" alignItems="center" flexWrap="wrap" g={4} style={{ fontSize: '0.85em' }}>
+                          <Box d="flex" alignItems="center" g={1}>
+                            <Icon icon="schedule" />
+                            <span title={event.authDate ? Formatters.datetime(new Date(event.authDate), { props: { seconds: true } }) : undefined}>
+                              {event.authDate ? Formatters['relative-time'](new Date(event.authDate)) : "-"}
+                            </span>
+                          </Box>
+                          <Box d="flex" alignItems="center" g={1}>
+                            <Icon icon="location_on" />
+                            <span>{event.device.remoteIp || "-"}</span>
+                          </Box>
+                          <Box d="flex" alignItems="center" g={1}>
+                            <Icon icon="devices" />
+                            <span>{event.device?.browser && event.device?.os
+                              ? `${event.device.browser} - ${event.device.os}`
+                              : "-"}</span>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))
+                ) : (
+                  <Box d="flex" alignItems="center" justifyContent="center" p={4}>
+                    <Icon icon="login" />
+                    <span style={{ marginLeft: '0.5em' }}>{_t('No authentication events')}</span>
+                  </Box>
+                )}
+              </Box>
+              {(_xPageOffset > 0 || _xPageHasNext) && (
+                <Box d="flex" alignItems="center" justifyContent="center" g={2} mt={3}>
+                  <Button d="flex" alignItems="center"
+                    variant="link"
+                    disabled={!(_xPageOffset > 0)}
+                    onClick={() => $execute("action-user-load-authentication-events", {
+                      _offset: Math.max(0, (_xPageOffset || 0) - (_xPageSize || 20))
+                    })}
+                  >
+                    <Icon icon="chevron_left" />
+                  </Button>
+                  <span>
+                    {(_xPageOffset || 0) + 1} - {(_xPageOffset || 0) + (_xAuthenticationEvents ? _xAuthenticationEvents.length : 0)}
+                  </span>
+                  <Button d="flex" alignItems="center"
+                    variant="link"
+                    disabled={!_xPageHasNext}
+                    onClick={() => $execute("action-user-load-authentication-events", {
+                      _offset: (_xPageOffset || 0) + (_xPageSize || 20)
+                    })}
+                  >
+                    <Icon icon="chevron_right" />
+                  </Button>
+                </Box>
+              )}
+            </>
+          ]]>
+        </viewer>
+      </field>
+    </panel>
+  </form>
+
+  <action-method name="action-user-load-authentication-events">
+    <call class="com.axelor.auth.web.UserController" method="loadAuthenticationEvents" />
   </action-method>
 
 </object-views>

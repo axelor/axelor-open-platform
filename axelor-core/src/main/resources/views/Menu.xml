@@ -47,6 +47,15 @@
     <view type="form" name="permission-form" />
   </action-view>
 
+  <menuitem name="menu-auth-authentication-events" parent="menu-auth" title="Connections"
+    action="action-auth-authentication-events"/>
+
+  <action-view name="action-auth-authentication-events" title="Connections"
+    model="com.axelor.auth.db.AuthenticationEvent">
+    <view type="grid" name="authentication-event-grid" />
+    <view type="form" name="authentication-event-form" />
+  </action-view>
+
   <menuitem name="menu-meta-module" parent="menu-module-management"
     title="All Modules"
     action="meta.modules"/>

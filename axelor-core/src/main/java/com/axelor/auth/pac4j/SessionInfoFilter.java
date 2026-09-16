@@ -35,10 +35,7 @@ public class SessionInfoFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
       throws ServletException, IOException {
-    if (servletRequest instanceof HttpServletRequest httpRequest) {
-      applySessionInfo(httpRequest);
-    }
-
+    applySessionInfo((HttpServletRequest) servletRequest);
     filterChain.doFilter(servletRequest, servletResponse);
   }
 

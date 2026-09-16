@@ -8,23 +8,34 @@ import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.MFAService;
+import com.axelor.auth.UserAuthenticationEvent;
+import com.axelor.auth.db.AuthenticationEvent;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.auth.events.AuthenticationEventService;
 import com.axelor.auth.identity.IdentityVerificationService;
 import com.axelor.auth.pac4j.local.ChangePasswordException;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import java.util.List;
 import java.util.Objects;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserController {
+
+  private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+  private static final int AUTHENTICATION_EVENTS_PAGE_SIZE = 20;
 
   public void onSave(ActionRequest request, ActionResponse response) {
     var mfaService = Beans.get(MFAService.class);
@@ -128,7 +139,7 @@ public class UserController {
     }
 
     User user = JPA.find(User.class, userId);
-    if (canManageSessions(user.getCode())) {
+    if (isSelfOrAdmin(user.getCode())) {
       response.setValue(
           "_xActiveSessions", Beans.get(AuthSessionService.class).getSessionsData(user));
     }
@@ -150,7 +161,7 @@ public class UserController {
     Subject target =
         new Subject.Builder(SecurityUtils.getSecurityManager()).sessionId(sessionId).buildSubject();
 
-    if (isCurrentSession(target) || !canManageSessions((String) target.getPrincipal())) {
+    if (isCurrentSession(target) || !isSelfOrAdmin((String) target.getPrincipal())) {
       response.setError(I18n.get("You are not authorized to revoke this session."));
       return;
     }
@@ -166,16 +177,15 @@ public class UserController {
   }
 
   /**
-   * Checks whether the current user is allowed to manage sessions for a given target user.
+   * Checks whether the current user is the given target user or an admin.
    *
-   * <p>A user can manage sessions if they are an admin or if the target user code matches their
-   * own.
+   * <p>Used to restrict access to a user's security data, such as their sessions and authentication
+   * events, to the user themselves and to admins.
    *
-   * @param targetCode the unique code of the target user whose sessions are being managed.
-   * @return true if the current user is authorized to manage the sessions for the target user;
-   *     false otherwise.
+   * @param targetCode the unique code of the target user
+   * @return true if the current user is an admin or the target user; false otherwise.
    */
-  private boolean canManageSessions(String targetCode) {
+  private boolean isSelfOrAdmin(String targetCode) {
     User currentUser = AuthUtils.getUser();
     if (StringUtils.isBlank(targetCode) || currentUser == null) {
       return false;
@@ -201,5 +211,55 @@ public class UserController {
       return false;
     }
     return currentSession.getId().equals(targetSession.getId());
+  }
+
+  /**
+   * Loads a page of authentication events for the requested user and sets it on the response.
+   *
+   * <p>The page starts at the {@code _offset} context value (defaults to {@code 0}). Only the user
+   * themselves or an admin can load authentication events, and only with the read permission on
+   * {@link AuthenticationEvent}.
+   */
+  public void loadAuthenticationEvents(ActionRequest request, ActionResponse response) {
+    Long userId = (Long) request.getContext().get("id");
+
+    if (userId == null || userId <= 0) {
+      return;
+    }
+
+    User user = JPA.find(User.class, userId);
+    if (!isSelfOrAdmin(user.getCode())
+        || !JpaRepository.of(AuthenticationEvent.class).isPermitted()) {
+      return;
+    }
+
+    final int offset = getOffset(request.getContext().get("_offset"));
+
+    // fetch one more event than the page size to know whether there is a next page
+    final List<UserAuthenticationEvent> events =
+        Beans.get(AuthenticationEventService.class)
+            .loadAuthenticationEvents(user, offset, AUTHENTICATION_EVENTS_PAGE_SIZE);
+    final boolean hasNext = events.size() > AUTHENTICATION_EVENTS_PAGE_SIZE;
+
+    response.setValue(
+        "_xAuthenticationEvents",
+        hasNext ? events.subList(0, AUTHENTICATION_EVENTS_PAGE_SIZE) : events);
+    response.setValue("_xPageOffset", offset);
+    response.setValue("_xPageSize", AUTHENTICATION_EVENTS_PAGE_SIZE);
+    response.setValue("_xPageHasNext", hasNext);
+  }
+
+  private int getOffset(Object value) {
+    if (value instanceof Number number) {
+      return Math.max(0, number.intValue());
+    }
+    if (value instanceof String text && StringUtils.notBlank(text)) {
+      try {
+        return Math.max(0, Integer.parseInt(text.trim()));
+      } catch (NumberFormatException e) {
+        // ignore, use first page
+      }
+    }
+    return 0;
   }
 }

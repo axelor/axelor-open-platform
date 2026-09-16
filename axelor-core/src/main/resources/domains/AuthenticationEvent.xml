@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.3.xsd">
+
+  <module name="auth" package="com.axelor.auth.db" />
+
+  <entity name="AuthenticationEvent" repository="abstract" jsonAttrs="false" logUpdates="false">
+    <![CDATA[
+    Records successful authentication attempts.
+
+    Only interactive logins are recorded. Direct clients (API key, basic auth) are
+    excluded, and external providers only report their successful logins.
+    ]]>
+
+    <many-to-one name="user" ref="com.axelor.auth.db.User" title="User" column="user_id" readonly="true" />
+    <string name="provider" title="Provider" readonly="true" />
+    <enum name="status" ref="AuthenticationStatus" required="true" title="Status" readonly="true" />
+    <string name="ipAddress" title="IP address" readonly="true" />
+    <string name="details" title="Details" readonly="true" json="true"/>
+    <datetime name="createdOn" readonly="true"/>
+
+    <index columns="user,createdOn" name="auth_event_idx_user" />
+    <index columns="createdOn" name="auth_event_idx_created_on" />
+  </entity>
+
+  <enum name="AuthenticationStatus" numeric="true">
+    <item name="SUCCESS" value="0" title="Success" />
+    <item name="FAILURE" value="1" title="Failure" />
+  </enum>
+
+</domain-models>

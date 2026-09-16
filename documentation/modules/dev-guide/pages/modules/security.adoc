@@ -931,6 +931,72 @@ When the user is done, they may call the logout endpoint.
 auth.local.basic-auth = indirect, direct
 -----
 
+[#authentication-events]
+== Authentication Events
+
+Every successful interactive login is recorded as an authentication event. It gives users and administrators a
+history of the sign-ins on each account, to spot unexpected access.
+
+=== Recorded logins
+
+An event is recorded each time a user successfully signs in with an interactive client:
+
+* the login form, with local or LDAP authentication
+* indirect basic authentication
+* single sign-on providers: OpenID Connect, OAuth, SAML, CAS…
+
+When multi-factor authentication is enabled, a single event is recorded once the second factor is verified. It holds
+the provider used for the first factor and the second-factor method.
+
+Requests authenticated by direct clients (API keys, direct basic authentication) aren't recorded. These clients
+authenticate every request, so recording them would create one event per request.
+
+=== Recorded data
+
+[cols="1,3"]
+|===
+| Field | Description
+
+| `user`
+| the authenticated user
+
+| `provider`
+| human-readable name of the provider used to sign in, for example `Standard` for the login form, `LDAP`,
+`Basic authentication`, `Google`, `Keycloak` or `OpenID Connect`. Unknown clients are recorded with their client name.
+
+| `status`
+| the authentication status, always `SUCCESS` for now
+
+| `ipAddress`
+| IP address of the client
+
+| `createdOn`
+| date and time of the authentication
+
+| `client`
+| technical name of the pac4j client used to sign in (for example `AxelorFormClient` or `OidcClient`), intended for
+processing rather than display
+
+| `identifier`
+| the login code of the user
+
+| `mfaMethod`
+| the second-factor method, when multi-factor authentication was used: `TOTP` (authenticator app), `EMAIL` or
+`RECOVERY` (recovery code)
+
+| `userAgent`
+| the `User-Agent` header of the client
+|===
+
+=== Viewing the events
+
+Users can see their own authentication history from the *Connections* button of the preferences form. Administrators
+can see the history of a user from the user form, and the events of all users from
+menu:Administration[User Management > Connections].
+
+Users other than administrators need a read permission on `com.axelor.auth.db.AuthenticationEvent` to see their own
+history, and they will only ever see their own events.
+
 == Emergency Password Reset
 
 In a disaster or recovery scenario — for example, when an administrator has lost their credentials and cannot log in

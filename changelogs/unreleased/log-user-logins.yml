@@ -1,0 +1,8 @@
+---
+title: Log user logins
+type: feature
+description: | 
+  Successful authentication attempts are now recorded as AuthenticationEvent. Users can see the history of their own 
+  attempts from the user and preferences forms. Admins can see the attempts of every user from the new "Connections" 
+  menu. Direct clients such as API key and basic authentication are excluded, and external providers only report their 
+  successful logins.

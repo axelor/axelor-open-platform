@@ -37,6 +37,9 @@ public record UserSession(
      * @return a fully populated {@link Device}
      */
     public static Device of(String remoteIp, UserAgentInfo ua) {
+      if (ua == null) {
+        return ofIpOnly(remoteIp);
+      }
       return new Device(remoteIp, ua.browser(), ua.os(), ua.device());
     }
 

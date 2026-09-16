@@ -27,6 +27,8 @@ import org.pac4j.core.util.Pac4jConstants;
 @Singleton
 public class MfaAuthenticator implements Authenticator {
 
+  public static final String MFA_AUTHENTICATED_METHOD = "mfa_authenticated_method";
+
   public static final String MISSING_MFA_USERNAME = /*$$(*/
       "Authentication session expired. Please log in again." /*)*/;
   public static final String INVALID_MFA_CODE = /*$$(*/
@@ -82,6 +84,9 @@ public class MfaAuthenticator implements Authenticator {
       profile.setId(storedUsername);
       profile.addAttribute(Pac4jConstants.USERNAME, storedUsername);
     }
+
+    // Store the MFA method used
+    profile.addAuthenticationAttribute(MFA_AUTHENTICATED_METHOD, mfaMethod);
 
     final AxelorFormCredentials finalCredentials =
         new AxelorFormCredentials(storedUsername, null, null, mfaCode, mfaMethod);

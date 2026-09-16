@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.3.xsd">
+
+  <grid name="authentication-event-grid" title="Connections" model="com.axelor.auth.db.AuthenticationEvent"
+    orderBy="-createdOn" canNew="false" canEdit="false" canDelete="false">
+    <field name="createdOn" title="Date"/>
+    <field name="user"/>
+    <field name="status"/>
+    <field name="provider"/>
+    <field name="ipAddress"/>
+  </grid>
+
+  <form name="authentication-event-form" title="Connection" model="com.axelor.auth.db.AuthenticationEvent"
+    canNew="false" canEdit="false" canDelete="false">
+    <panel itemSpan="12" showFrame="false">
+      <field name="_xAuthenticationEvent" readonly="true" showTitle="false" colSpan="12">
+        <viewer depends="createdOn,user,status,provider,ipAddress,details">
+          <![CDATA[
+            <>
+              <Box d="flex" flexDirection="column" g={3} p={3} border rounded>
+                <Box d="flex" alignItems="center" justifyContent="space-between">
+                  <Box d="flex" alignItems="center" g={2}>
+                    <Icon icon="person" />
+                    <strong>{user ? (user.name || user.code) : $get('details.identifier')}</strong>
+                  </Box>
+                  {status === 'SUCCESS' ? (
+                    <Badge bg="success">{_t('Success')}</Badge>
+                  ) : (
+                    <Badge bg="danger">{_t('Failure')}</Badge>
+                  )}
+                </Box>
+                <Box d="flex" flexDirection="column" g={2} style={{ fontSize: '0.85em' }}>
+                  <Box d="flex" alignItems="center" g={2}>
+                    <Icon icon="schedule" />
+                    <span title={createdOn ? Formatters.datetime(new Date(createdOn), { props: { seconds: true } }) : undefined}>
+                      {createdOn ? Formatters['relative-time'](new Date(createdOn)) : "-"}
+                    </span>
+                  </Box>
+                  <Box d="flex" alignItems="center" g={2}>
+                    <Icon icon="key" />
+                    <span>{provider || "-"}</span>
+                  </Box>
+                  {$get('details.mfaMethod') && (
+                    <Box d="flex" alignItems="center" g={2}>
+                      <Icon icon="verified_user" />
+                      <span>
+                        {$get('details.mfaMethod') === 'TOTP'
+                          ? _t('2FA: Authenticator app')
+                          : $get('details.mfaMethod') === 'EMAIL'
+                            ? _t('2FA: Email')
+                            : $get('details.mfaMethod') === 'RECOVERY'
+                              ? _t('2FA: Recovery code')
+                              : "-"}
+                      </span>
+                    </Box>
+                  )}
+                  <Box d="flex" alignItems="center" g={2}>
+                    <Icon icon="location_on" />
+                    <span>{ipAddress || "-"}</span>
+                  </Box>
+                  <Box d="flex" alignItems="flex-start" g={2}>
+                    <Icon icon="devices" />
+                    <span>
+                      {$get('details.userAgent') || "-"}
+                    </span>
+                  </Box>
+                </Box>
+              </Box>
+            </>
+          ]]>
+        </viewer>
+      </field>
+    </panel>
+  </form>
+
+</object-views>
