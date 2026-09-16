@@ -8,6 +8,7 @@
   <entity name="UserToken" cacheable="true" repository="abstract">
     <string name="name" title="Name" required="true" index="false"/>
     <datetime name="expiresAt" title="Expires" required="true" />
+    <string name="allowedIps" title="Allowed IPs" max="2048" help="Comma-separated IP addresses or CIDR ranges allowed to use the API key. Leave empty to allow any address." />
     <string name="tokenKey" unique="true" required="true" password="true" readonly="true" />
     <string name="tokenDigest" title="Token" required="true" password="true" readonly="true" />
     <string name="apiKey" title="API key" transient="true" password="true" readonly="true" />

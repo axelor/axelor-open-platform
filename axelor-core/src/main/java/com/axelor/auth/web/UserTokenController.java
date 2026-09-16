@@ -74,13 +74,18 @@ public class UserTokenController {
         response.setError(I18n.get("Expiration date is invalid"));
         return;
       }
+      if (isInvalidAllowedIps(userToken.getAllowedIps())) {
+        response.setError(I18n.get("Allowed IPs must be IP addresses or CIDR ranges"));
+        return;
+      }
       if (isNotAuthorized(owner)) {
         response.setError(I18n.get("You are not authorized to create API key for this user"));
         return;
       }
 
       userToken =
-          userTokenService.createUserToken(userToken.getName(), userToken.getExpiresAt(), owner);
+          userTokenService.createUserToken(
+              userToken.getName(), userToken.getExpiresAt(), userToken.getAllowedIps(), owner);
       response.setCanClose(true);
       response.setView(
           ActionView.define("API key")
@@ -167,6 +172,15 @@ public class UserTokenController {
   private boolean isInvalidExpirationDate(UserToken userToken) {
     return userToken.getExpiresAt() == null
         || userToken.getExpiresAt().isBefore(LocalDateTime.now());
+  }
+
+  private boolean isInvalidAllowedIps(String allowedIps) {
+    try {
+      UserTokenRepository.normalizeAllowedIps(allowedIps);
+      return false;
+    } catch (IllegalArgumentException e) {
+      return true;
+    }
   }
 
   private boolean requiresIdentityCheck(ActionRequest request, ActionResponse response) {

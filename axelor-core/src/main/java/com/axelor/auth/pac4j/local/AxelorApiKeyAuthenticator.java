@@ -11,6 +11,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.UserToken;
 import com.axelor.auth.db.repo.UserTokenRepository;
 import com.axelor.common.StringUtils;
+import com.axelor.common.net.IpAddressMatcher;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import java.time.LocalDateTime;
@@ -23,6 +24,8 @@ import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.Pac4jConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Authenticator implementation for API key-based authentication.
@@ -33,6 +36,7 @@ import org.pac4j.core.util.Pac4jConstants;
  *   <li>Verifies the API key is present and has the correct format
  *   <li>Validates the token against the stored digest
  *   <li>Checks if the token has not expired
+ *   <li>Checks if the client IP address is allowed, when the token is restricted to IP addresses
  *   <li>Confirms the associated user account is active
  * </ul>
  *
@@ -45,6 +49,8 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
   public static final String MISSING_API_KEY = "No API key provided";
   public static final String INVALID_API_KEY = "Invalid or expired API key";
   public static final String USER_DISABLED = "User is disabled.";
+
+  private static final Logger log = LoggerFactory.getLogger(AxelorApiKeyAuthenticator.class);
 
   @Inject UserTokenRepository userTokenRepository;
 
@@ -60,6 +66,11 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
 
     // Validate the credentials and get the matching user token
     UserToken userToken = validateUser(apiKey);
+
+    // Check if allowedIps matches
+    if (!isAllowedAddress(userToken, ctx.webContext().getRemoteAddr())) {
+      throw new AccountNotFoundException(INVALID_API_KEY);
+    }
 
     // Update the token last used date
     setUserTokenLastUsed(userToken);
@@ -128,6 +139,36 @@ public class AxelorApiKeyAuthenticator implements Authenticator {
     }
 
     return userToken;
+  }
+
+  /**
+   * Checks whether the API key can be used from the given address.
+   *
+   * @param userToken the API key
+   * @param remoteAddr the client IP address
+   * @return {@code true} if the API key isn't restricted to IP addresses or the address is allowed
+   */
+  protected boolean isAllowedAddress(UserToken userToken, String remoteAddr) {
+    String allowedIps = userToken.getAllowedIps();
+    if (StringUtils.isBlank(allowedIps)) {
+      return true;
+    }
+
+    try {
+      if (IpAddressMatcher.matchesAny(IpAddressMatcher.parseList(allowedIps), remoteAddr)) {
+        return true;
+      }
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid allowed IPs of API key {}: {}", userToken.getId(), e.getMessage());
+      return false;
+    }
+
+    log.info(
+        "API key {} of user {} used from a disallowed IP address: {}",
+        userToken.getId(),
+        userToken.getOwner().getCode(),
+        remoteAddr);
+    return false;
   }
 
   @Transactional

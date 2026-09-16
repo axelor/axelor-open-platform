@@ -35,6 +35,17 @@ proxy_set_header X-Forwarded-For $remote_addr;
 See xref:dev-guide:application/config.adoc#client-ip-address[Client IP address] for the full requirements, including
 deployments without a reverse proxy or behind a CDN.
 
+== API keys can be restricted by IP address
+
+API keys can now be restricted to a list of IP addresses or CIDR ranges. A restricted API key used from any other
+address is rejected. Existing API keys have no restriction, so they keep working from any address.
+
+The address checked against that list is the client IP address, as resolved in <<client-ip-address>>. Make sure the
+reverse proxy is configured as described there before restricting API keys: otherwise, clients can forge their address
+and bypass the restriction.
+
+A new `allowed_ips` column is added to the `auth_user_token` table, see the migration script below.
+
 == Record user authentications
 
 Successful interactive logins are now recorded as `AuthenticationEvent` records: sign-in with the login form (local
@@ -77,6 +88,8 @@ Here is the full SQL migration script for all built-in AOP entities :
 
 [source,sql]
 ----
+ALTER TABLE auth_user_token ADD allowed_ips varchar(2048);
+
 create table auth_authentication_event
 (
     id         bigint  not null primary key,

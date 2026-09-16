@@ -1,0 +1,13 @@
+---
+title: Allow restricting API keys to IP addresses or CIDR ranges
+type: feature
+description: |
+  API keys can now be restricted to a comma-separated list of IP addresses or CIDR ranges (IPv4 and
+  IPv6), from the API key form. A restricted API key used from any other address is rejected. An API key 
+  without any restriction keeps working from any address.
+
+  A new `allowed_ips` column is added to the `auth_user_token` table:
+
+  ```sql
+  ALTER TABLE auth_user_token ADD allowed_ips varchar(2048);
+  ```

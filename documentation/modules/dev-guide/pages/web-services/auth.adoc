@@ -75,7 +75,9 @@ API keys can be created from the User Preference form. To create a new API key:
 2. Click "Add" to create a new API key
 3. Provide a name
 4. Set an expiration date (default is one month from creation)
-5. Click "Create API key"
+5. Optionally, restrict the IP addresses allowed to use the API key (see
+<<restricting-api-keys-by-ip-address,Restricting API keys by IP address>>)
+6. Click "Create API key"
 
 IMPORTANT: When a new API key is created, it will be displayed only once. Make sure to copy and store it securely as you won't be able to view it again later.
 
@@ -86,8 +88,10 @@ The API Keys tab displays a list of all tokens for the user with the following i
 * Name: A descriptive name for the token
 * Expiration date: When the token will expire
 * Last used: The last time the token was used for authentication
+* Allowed IPs: The IP addresses allowed to use the token, if restricted
 
 The system provides visual indicators for token expiration:
+
 * *Red highlight*: For expired tokens
 * *Yellow highlight*: For tokens expiring within 7 days
 
@@ -96,9 +100,31 @@ The system provides visual indicators for token expiration:
 For each token, you can perform the following operations:
 
 * *Revoke*: Permanently disables the token. Any services using this token will immediately lose access.
-* *Rotate*: Replaces the token with a new one while maintaining the same name and expiration date. This is useful when you suspect a token might have been compromised.
+* *Rotate*: Replaces the token with a new one while maintaining the same name, expiration date and allowed IPs. This is
+useful when you suspect a token might have been compromised.
 
 IMPORTANT: API keys should be treated as sensitive information. Do not share your API keys and store them securely.
+
+[#restricting-api-keys-by-ip-address]
+==== Restricting API keys by IP address
+
+An API key can be restricted to a comma-separated list of IPv4 or IPv6 addresses or CIDR ranges:
+
+----
+192.0.2.10, 198.51.100.0/24, 2001:db8::/32
+----
+
+A request using the API key from any other address is rejected with HTTP status `401 Unauthorized`. Leave the list
+empty to allow any address. Host names are not supported. The list is limited to 2048 characters once normalized, i.e.
+at least 45 entries.
+
+TIP: Restrict API keys to the public addresses your services connect from. An IP restriction limits the impact of a
+leaked API key, it doesn't replace keeping the key secret.
+
+The address checked against that list is the client IP address, read from the header set by the reverse proxy, as
+described in xref:application/config.adoc#client-ip-address[Client IP address]. The application trusts that header as
+it is, so make sure the proxy is configured as described there: otherwise, clients can forge their address and bypass
+the restriction.
 
 === Using API keys for authentication
 

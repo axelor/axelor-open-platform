@@ -71,6 +71,10 @@
                             </span>
                           </Box>
                         </Box>
+                        <Box d="flex" alignItems="center" g={2}>
+                          <Icon icon="lan" />
+                          <span>{_t('Allowed IPs:')} {userToken.allowedIps || "-"}</span>
+                        </Box>
                       </Box>
                     </Box>
                   ))}
@@ -92,6 +96,7 @@
     <panel name="generalInfoPanel">
       <field name="name" readonlyIf="id" />
       <field name="expiresAt" readonlyIf="id" validIf="$moment(expiresAt) &gt; $moment()" />
+      <field name="allowedIps" colSpan="12" widget="text" height="1"/>
       <button name="createTokenBtn" onClick="validate,action-method-create-token" title="Create API key" showIf="!id" />
     </panel>
   </form>

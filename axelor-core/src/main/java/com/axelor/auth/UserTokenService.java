@@ -59,7 +59,19 @@ public class UserTokenService {
     this.userRepository = userRepository;
   }
 
-  public UserToken createUserToken(String name, LocalDateTime expiresAt, User owner) {
+  /**
+   * Creates an API key.
+   *
+   * @param name the name of the API key
+   * @param expiresAt the expiration date
+   * @param allowedIps comma-separated IP addresses or CIDR ranges allowed to use the API key, or
+   *     {@code null} to allow any address
+   * @param owner the user authenticated by the API key
+   * @return the API key, with {@link UserToken#getApiKey()} set
+   * @throws IllegalArgumentException if any allowed IP is not a valid IP address or CIDR range
+   */
+  public UserToken createUserToken(
+      String name, LocalDateTime expiresAt, String allowedIps, User owner) {
     AuthService authService = AuthService.getInstance();
     String token = generateRandomString(TOKEN_LENGTH);
     Long ownerId = owner.getId();
@@ -74,6 +86,7 @@ public class UserTokenService {
         owner = userRepository.find(ownerId);
         ut.setName(name);
         ut.setExpiresAt(expiresAt);
+        ut.setAllowedIps(allowedIps);
         ut.setOwner(owner);
         ut.setTokenDigest(authService.encrypt(token));
         ut.setTokenKey(key);
@@ -150,7 +163,7 @@ public class UserTokenService {
             .filter("self.owner.id = :userId")
             .bind("userId", user.getId())
             .order("id")
-            .select("lastUsedAt", "expiresAt", "name", "createdOn")
+            .select("lastUsedAt", "expiresAt", "name", "createdOn", "allowedIps")
             .fetch(0, 0);
     if (tokensData == null || tokensData.isEmpty()) {
       return data;
@@ -162,6 +175,7 @@ public class UserTokenService {
       result.put("name", tokenData.get("name"));
       result.put("lastUsed", toEpochMillis(tokenData.get("lastUsedAt")));
       result.put("createdOn", toEpochMillis(tokenData.get("createdOn")));
+      result.put("allowedIps", tokenData.get("allowedIps"));
       LocalDateTime expiresAt = parseLocalDateTime(tokenData.get("expiresAt"));
       result.put("expires", toEpochMillis(expiresAt));
       result.put("isActive", expiresAt.isAfter(LocalDateTime.now()));
