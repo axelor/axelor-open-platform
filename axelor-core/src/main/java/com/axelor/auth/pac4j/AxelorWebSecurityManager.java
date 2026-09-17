@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.jcache.AxelorJCacheManager;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -43,8 +44,14 @@ public class AxelorWebSecurityManager extends DefaultWebSecurityManager {
       Set<AuthenticationListener> authenticationListeners,
       ModularRealmAuthenticator authenticator,
       AxelorSessionManager sessionManager,
+      AxelorWebSessionStorageEvaluator sessionStorageEvaluator,
       AxelorRememberMeManager rememberMeManager,
       AxelorJCacheManager cacheManager) {
+
+    if (getSubjectDAO() instanceof DefaultSubjectDAO defaultSubjectDAO) {
+      defaultSubjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
+    }
+
     setCacheManager(cacheManager);
     setRealms(realms);
     authenticator.setRealms(getRealms());
