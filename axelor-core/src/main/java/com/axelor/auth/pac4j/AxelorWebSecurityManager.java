@@ -16,6 +16,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.util.WebUtils;
+import org.pac4j.core.util.Pac4jConstants;
 
 /**
  * Web Security Manager
@@ -61,10 +62,23 @@ public class AxelorWebSecurityManager extends DefaultWebSecurityManager {
     setRememberMeManager(rememberMeManager);
   }
 
+  /**
+   * Renews the existing session, unless session creation is disabled for the current request, and
+   * resets the CSRF token.
+   *
+   * @param subject the subject about to be logged in
+   */
   @Override
   protected void beforeSuccessfulLogin(Subject subject) {
     if (WebUtils.isSessionCreationEnabled(subject)) {
       super.beforeSuccessfulLogin(subject);
+
+      var session = subject.getSession(false);
+      if (session != null) {
+        session.removeAttribute(Pac4jConstants.CSRF_TOKEN);
+        session.removeAttribute(Pac4jConstants.PREVIOUS_CSRF_TOKEN);
+        session.removeAttribute(Pac4jConstants.CSRF_TOKEN_EXPIRATION_DATE);
+      }
     }
   }
 }
