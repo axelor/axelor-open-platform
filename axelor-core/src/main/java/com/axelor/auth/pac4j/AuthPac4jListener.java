@@ -32,6 +32,20 @@ public class AuthPac4jListener implements AuthenticationListener {
 
   private static final String UNKNOWN_USER = "User not found: %s";
 
+  /**
+   * Fires the post-login success event, or rejects the login when the authenticated profile has no
+   * matching active user.
+   *
+   * <p>{@link AuthPac4jRealm} doesn't fail authentication itself when no active user matches the
+   * profile: authentication did succeed as far as the identity provider is concerned, only the
+   * local user is missing. It returns a plain {@link AuthenticationInfo} instead of a {@link
+   * UserAuthenticationInfo}, which is detected here to fire the post-login failure event, terminate
+   * the session and abort the login.
+   *
+   * @param token the token used to authenticate
+   * @param info the authentication info built by the realm
+   * @throws UnknownAccountException if no active user matches the authenticated profile
+   */
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
     if (info instanceof UserAuthenticationInfo authenticationInfo) {
@@ -58,9 +72,28 @@ public class AuthPac4jListener implements AuthenticationListener {
     throw exception;
   }
 
+  /**
+   * Not expected to be reached: login failures are reported elsewhere.
+   *
+   * <p>Credentials are validated by the pac4j clients, before Shiro is involved. A rejection there
+   * never produces a token nor reaches any realm, so no Shiro authentication listener is notified
+   * and the failure event is fired by {@link com.axelor.auth.pac4j.local.CredentialsHandler}
+   * instead.
+   *
+   * <p>Logins rejected by {@link #onSuccess(AuthenticationToken, AuthenticationInfo)} don't come
+   * here either: Shiro calls success listeners outside the block that notifies failure listeners,
+   * so the exception thrown there propagates directly out of the login. Hence that rejection fires
+   * the failure event itself.
+   *
+   * <p>This would only be called if a realm threw an {@link AuthenticationException}, which {@link
+   * AuthPac4jRealm} doesn't do.
+   *
+   * @param token the token used to authenticate
+   * @param ae the exception thrown by the realm
+   */
   @Override
   public void onFailure(AuthenticationToken token, AuthenticationException ae) {
-    // Login failure handled by {@link com.axelor.auth.pac4j.local.CredentialsHandler}
+    // Nothing to do: see javadoc.
   }
 
   @Override
