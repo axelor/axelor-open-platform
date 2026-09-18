@@ -46,7 +46,6 @@ public class AxelorWebSecurityManager extends DefaultWebSecurityManager {
       ModularRealmAuthenticator authenticator,
       AxelorSessionManager sessionManager,
       AxelorWebSessionStorageEvaluator sessionStorageEvaluator,
-      AxelorRememberMeManager rememberMeManager,
       AxelorJCacheManager cacheManager) {
 
     if (getSubjectDAO() instanceof DefaultSubjectDAO defaultSubjectDAO) {
@@ -59,7 +58,7 @@ public class AxelorWebSecurityManager extends DefaultWebSecurityManager {
     authenticator.setAuthenticationListeners(authenticationListeners);
     setAuthenticator(authenticator);
     setSessionManager(sessionManager);
-    setRememberMeManager(rememberMeManager);
+    setRememberMeManager(null);
   }
 
   /**
