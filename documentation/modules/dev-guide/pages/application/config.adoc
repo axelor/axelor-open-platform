@@ -7,6 +7,7 @@
 :url-redis: https://redis.io/
 :url-infinispan: https://infinispan.org/
 :url-ehcache: https://www.ehcache.org/
+:url-tomcat-jndi: https://tomcat.apache.org/tomcat-10.1-doc/jndi-datasource-examples-howto.html
 
 In this chapter we will see various configuration options available to the {page-component-title}
 applications.
@@ -193,6 +194,81 @@ Choose the right option by environment :
 - Production: `none` or `validate` for stability.
 - Development: `update` is the go-to for flexibility.
 - Testing: `create` or `create-drop` gives you fresh data every test.
+
+=== Using a JNDI DataSource
+
+By default, {page-component-title} applications manage their own database connection pool (HikariCP), using the above
+database settings.
+
+Alternatively, the application can use a `DataSource` managed by the servlet container and looked up by its JNDI name.
+
+* Application configuration
+
+First, remove the `db.default.url`, `db.default.user` and `db.default.password` settings from
+`axelor-config.properties`, and set the JNDI name of the `DataSource`:
+
+[source,properties]
+----
+db.default.datasource = java:comp/env/ds/AxelorDS
+----
+
+Alternatively, the JNDI name can be set with the `non-jta-data-source` element  of `META-INF/persistence.xml`:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persistence version="3.0"
+  xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <persistence-unit name="persistenceUnit" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <non-jta-data-source>java:comp/env/ds/AxelorDS</non-jta-data-source>
+    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+  </persistence-unit>
+</persistence>
+----
+
+`db.default.datasource` takes precedence over `non-jta-data-source`.
+
+IMPORTANT: When a `DataSource` is used, `db.default.ddl` is ignored. Use `hibernate.hbm2ddl.auto` instead, for example
+`hibernate.hbm2ddl.auto = update` in `axelor-config.properties`. The `hibernate.hikari.*` settings don't apply either:
+the connection pool is configured in the container.
+
+* Tomcat configuration
+
+Copy the database JDBC jar to `$CATALINA_HOME/lib`.
+
+Then declare the `DataSource` in the context of the application, in
+`$CATALINA_BASE/conf/Catalina/localhost/axelor-demo.xml` (the file name must match the context path of the application,
+here `/axelor-demo`):
+
+[source,xml]
+----
+<Context>
+  <Resource name="ds/AxelorDS" auth="Container"
+      type="javax.sql.DataSource"
+      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+      maxActive="50"
+      maxIdle="10"
+      maxWait="10000"
+      username="username"
+      password="password"
+      driverClassName="org.postgresql.Driver"
+      url="jdbc:postgresql://localhost:5432/mydb"/>
+</Context>
+----
+
+To share a `DataSource` between several applications, declare the `<Resource>` in the `<GlobalNamingResources>`
+element of `conf/server.xml`, and link it in the application context with a `ResourceLink` element:
+
+[source,xml]
+----
+<Context>
+  <ResourceLink global="ds/AxelorDS" name="ds/AxelorDS" type="javax.sql.DataSource"/>
+</Context>
+----
+
+See {url-tomcat-jndi}[Tomcat documentation] for more details.
 
 == Other Settings
 

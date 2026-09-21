@@ -46,6 +46,8 @@ public class DBHelper {
 
   private static Boolean unaccentSupport = null;
 
+  private static volatile String databaseProductName;
+
   private static final int DEFAULT_BATCH_SIZE = 20;
   private static final int DEFAULT_FETCH_SIZE = 20;
 
@@ -256,7 +258,31 @@ public class DBHelper {
   }
 
   private static boolean isEngine(String engine) {
-    return jdbcDriver != null && jdbcDriver.toLowerCase().contains(engine.toLowerCase());
+    final String productName = getDatabaseProductName();
+    final String name = productName != null ? productName : jdbcDriver;
+    return name != null && name.toLowerCase().contains(engine.toLowerCase());
+  }
+
+  /**
+   * Get the database product name, as reported by the connection metadata.
+   *
+   * <p>The value is read once from the connection and cached.
+   *
+   * @return the database product name, or null if it can't be determined
+   */
+  private static String getDatabaseProductName() {
+    if (databaseProductName == null) {
+      synchronized (DBHelper.class) {
+        if (databaseProductName == null) {
+          try (Connection connection = getConnection()) {
+            databaseProductName = connection.getMetaData().getDatabaseProductName();
+          } catch (Exception e) {
+            LOG.warn("Unable to determine database product name: {}", e.getMessage());
+          }
+        }
+      }
+    }
+    return databaseProductName;
   }
 
   public static String getJdbcDriver() {
