@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.base.Joiner;
@@ -36,6 +37,22 @@ public class TestStringUtils {
     assertNull(StringUtils.emptyToNull(""));
     assertEquals(" ", StringUtils.emptyToNull(" "));
     assertEquals("some value", StringUtils.emptyToNull("some value"));
+  }
+
+  @Test
+  public void testTruncate() {
+    assertNull(StringUtils.truncate(null, 5));
+    assertEquals("", StringUtils.truncate("", 5));
+    assertEquals("", StringUtils.truncate("some value", 0));
+    assertEquals("some", StringUtils.truncate("some value", 4));
+    assertEquals("some value", StringUtils.truncate("some value", 10));
+    assertEquals("some value", StringUtils.truncate("some value", 20));
+
+    // surrogate pair is not split
+    assertEquals("ab", StringUtils.truncate("ab😀cd", 3));
+    assertEquals("ab😀", StringUtils.truncate("ab😀cd", 4));
+
+    assertThrows(IllegalArgumentException.class, () -> StringUtils.truncate("some value", -1));
   }
 
   static final String text1 =

@@ -77,6 +77,32 @@ public final class StringUtils {
   }
 
   /**
+   * Truncate the given string value to the given maximum length.
+   *
+   * <p>A surrogate pair is never split: if the cut falls in the middle of one, the whole pair is
+   * removed, so the result may be one character shorter than the maximum length.
+   *
+   * @param value the string value to truncate
+   * @param maxLength the maximum length of the result
+   * @return {@code null} if the value is null, the value itself if not longer than the maximum
+   *     length, the truncated value otherwise
+   * @throws IllegalArgumentException if the maximum length is negative
+   */
+  public static String truncate(String value, int maxLength) {
+    if (maxLength < 0) {
+      throw new IllegalArgumentException("Maximum length must not be negative: " + maxLength);
+    }
+    if (value == null || value.length() <= maxLength) {
+      return value;
+    }
+    int end = maxLength;
+    if (end > 0 && Character.isHighSurrogate(value.charAt(end - 1))) {
+      end--;
+    }
+    return value.substring(0, end);
+  }
+
+  /**
    * Remove diacritics (accents) from a {@link CharSequence}.
    *
    * @param value the string to be stripped
