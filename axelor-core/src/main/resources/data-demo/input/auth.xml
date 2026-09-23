@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <auth>
 
-  <group code="users" name="Users" />
+  <group code="users" name="Users">
+    <role name="role.user"/>
+  </group>
+
   <user code="demo" name="Demo User" group="users" password="demo" />
 
   <permission name="perm.auth.all" object="com.axelor.auth.db.*">

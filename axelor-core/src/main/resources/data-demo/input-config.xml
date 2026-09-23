@@ -38,4 +38,15 @@
 
   </input>
 
+  <input file="auth.xml" root="auth">
+
+    <bind node="group" type="com.axelor.auth.db.Group" update="true" search="self.code = :code">
+      <bind node="@code" to="code" />
+      <bind node="role" to="roles" search="self.name = :name" create="false" update="false">
+        <bind node="@name" to="name"/>
+      </bind>
+    </bind>
+
+  </input>
+
 </xml-inputs>
