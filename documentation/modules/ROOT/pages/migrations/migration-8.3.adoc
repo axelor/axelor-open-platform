@@ -22,6 +22,29 @@ history, and they will only ever see their own events.
 
 A new `auth_authentication_event` table is required. See the <<Full migration script>> below.
 
+Authentication events are kept for 180 days, then deleted by the new `authentication.events.purge` scheduled job,
+which runs every day. The retention period can be changed with the `auth.events.retention`
+setting.
+
+This scheduled job is only created on new databases. On an existing database, create it from
+menu:Administration[Job Management > All Schedules], with:
+
+* *Name*: `authentication.events.purge`
+* *Description*: `Delete older authentication events`
+* *Job*: `com.axelor.auth.events.job.AuthenticationEventPurgeJob`
+* *Cron*: `0 0 5 * * ?` (every day at 5 AM)
+* *Active*: checked
+
+or run the following SQL script :
+
+[source,sql]
+----
+INSERT INTO meta_schedule (id, version, created_on, active, cron, description, job, name)
+VALUES (nextval('auth_authentication_event_seq'), 0, now(), true, '0 0 5 * * ?',
+        'Delete older authentication events','com.axelor.auth.events.job.AuthenticationEventPurgeJob',
+        'authentication.events.purge');
+----
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :
@@ -44,4 +67,9 @@ create table auth_authentication_event
 create index auth_event_idx_user on auth_authentication_event (user_id, created_on);
 create index auth_event_idx_created_on on auth_authentication_event (created_on);
 create index auth_authentication_event_user_id_idx on auth_authentication_event (user_id);
+
+INSERT INTO meta_schedule (id, version, created_on, active, cron, description, job, name)
+VALUES (nextval('auth_authentication_event_seq'), 0, now(), true, '0 0 5 * * ?',
+        'Delete older authentication events','com.axelor.auth.events.job.AuthenticationEventPurgeJob',
+        'authentication.events.purge');
 ----

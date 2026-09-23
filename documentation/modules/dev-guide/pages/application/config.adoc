@@ -290,6 +290,7 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `application.theme` | CSS theme | default theme
 | `application.locale` | default locale | system default
 | `application.base-url` | base url of the application |
+| `auth.events.retention` | number of days authentication events are kept (0 or less to keep them forever) | 180
 | `application.entity.sequence.default_allocation_size` | global default entity allocation size |
 | `application.entity.sequence.<SEQUENCE_NAME>.allocation_size` | per-entity sequence allocation size |
 | `application.polling-interval` | how often client polls in seconds (ie, menu tags fetch), < 1 means disabled | 10

@@ -236,6 +236,8 @@ public interface AvailableAppSettings {
 
   String AUTH_LOCAL_BASIC_AUTH = "auth.local.basic-auth";
 
+  String AUTH_EVENTS_RETENTION = "auth.events.retention";
+
   String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
   String AUTH_LDAP_SERVER_CONNECT_TIMEOUT = "auth.ldap.server.connect-timeout";
   String AUTH_LDAP_SERVER_RESPONSE_TIMEOUT = "auth.ldap.server.response-timeout";

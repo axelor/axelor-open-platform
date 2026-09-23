@@ -997,6 +997,17 @@ menu:Administration[User Management > Connections].
 Users other than administrators need a read permission on `com.axelor.auth.db.AuthenticationEvent` to see their own
 history, and they will only ever see their own events.
 
+=== Retention
+
+Authentication events are kept for 180 days by default. The `authentication.events.purge` scheduled job deletes
+older events. The retention period can be changed with the property `auth.events.retention` :
+
+[source,properties]
+-----
+# number of days authentication events are kept (0 or less to keep them forever)
+auth.events.retention = 180
+-----
+
 == Emergency Password Reset
 
 In a disaster or recovery scenario — for example, when an administrator has lost their credentials and cannot log in
