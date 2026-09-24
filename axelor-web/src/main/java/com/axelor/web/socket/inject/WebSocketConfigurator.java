@@ -121,6 +121,10 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
    * default port of the scheme, so that it can be compared with an <code>Origin</code> header
    * value.
    *
+   * <p>A websocket scheme is reduced to its http counterpart: a proxy may forward the handshake
+   * with <code>X-Forwarded-Proto: wss</code>, which makes the request base url <code>wss://</code>
+   * while the browser sends an <code>https://</code> origin.
+   *
    * @param url the url to reduce
    * @return the origin, or an empty string if the url cannot be parsed
    */
@@ -136,24 +140,28 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
       return "";
     }
 
-    final String scheme = uri.getScheme();
+    final String rawScheme = uri.getScheme();
     final String host = uri.getHost();
 
-    if (scheme == null || host == null) {
+    if (rawScheme == null || host == null) {
       return "";
     }
 
-    final String origin = scheme.toLowerCase(Locale.ROOT) + "://" + host.toLowerCase(Locale.ROOT);
+    final String lowerScheme = rawScheme.toLowerCase(Locale.ROOT);
+    final String scheme =
+        switch (lowerScheme) {
+          case "wss" -> "https";
+          case "ws" -> "http";
+          default -> lowerScheme;
+        };
+    final String origin = scheme + "://" + host.toLowerCase(Locale.ROOT);
     final int port = uri.getPort();
 
     return port == -1 || port == defaultPort(scheme) ? origin : origin + ":" + port;
   }
 
   private static int defaultPort(String scheme) {
-    return switch (scheme.toLowerCase(Locale.ROOT)) {
-      case "https", "wss" -> 443;
-      default -> 80;
-    };
+    return "https".equals(scheme) ? 443 : 80;
   }
 
   @Override
