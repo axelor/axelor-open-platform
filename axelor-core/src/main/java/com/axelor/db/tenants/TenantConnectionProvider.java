@@ -57,10 +57,8 @@ public class TenantConnectionProvider
   protected final DataSource selectDataSource(String tenantIdentifier) {
     if (configProvider.find(tenantIdentifier) == null) {
       dataSourceCache.invalidate(tenantIdentifier);
-      LOGGER.debug("no such tenant found: {}", tenantIdentifier);
       throw new TenantNotFoundException(tenantIdentifier);
     }
-    LOGGER.debug("using tenant: {}", tenantIdentifier);
     return dataSourceCache.get(tenantIdentifier);
   }
 
@@ -116,6 +114,6 @@ public class TenantConnectionProvider
   @Override
   public void injectServices(ServiceRegistryImplementor serviceRegistry) {
     configProvider = TenantSupport.get().getConfigProvider();
-    LOGGER.debug("using tenant config provider: {}", configProvider.getClass().getName());
+    LOGGER.trace("using tenant config provider: {}", configProvider.getClass().getName());
   }
 }
