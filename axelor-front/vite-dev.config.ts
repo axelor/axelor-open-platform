@@ -49,18 +49,14 @@ const proxyWs: ProxyOptions = {
   xfwd: true,
   configure(proxy) {
     // The server checks the `Origin` of the websocket handshake against its own origin, so the
-    // dev server has to announce itself as a reverse proxy, like in production. The `xfwd`
-    // option is not enough on upgrade requests: unlike its http counterpart, it doesn't set
-    // `X-Forwarded-Host` and reports the `ws`/`wss` scheme instead of `http`/`https`.
+    // dev server has to announce itself as a reverse proxy, like in production. On upgrade
+    // requests, the `xfwd` option doesn't set `X-Forwarded-Host`, and it sets
+    // `X-Forwarded-Proto` to the `ws`/`wss` scheme, which is left as is, like Traefik does.
     proxy.on("proxyReqWs", (proxyReq, req) => {
       const { host } = req.headers;
       if (host) {
         proxyReq.setHeader("X-Forwarded-Host", host);
       }
-      proxyReq.setHeader(
-        "X-Forwarded-Proto",
-        "encrypted" in req.socket ? "https" : "http",
-      );
     });
   },
 };

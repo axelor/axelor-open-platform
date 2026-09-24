@@ -80,8 +80,28 @@ public class WebSocketConfiguratorTest {
   }
 
   @Test
+  public void testWebSocketSchemeBaseUrl() {
+    // a proxy may forward the handshake with X-Forwarded-Proto: wss
+    assertTrue(
+        WebSocketConfigurator.isSameOrigin("https://app.example.com", "wss://app.example.com/app"));
+    assertTrue(
+        WebSocketConfigurator.isSameOrigin(
+            "https://app.example.com", "wss://app.example.com:443/app"));
+    assertTrue(
+        WebSocketConfigurator.isSameOrigin("http://localhost:8080", "ws://localhost:8080/app"));
+    assertTrue(
+        WebSocketConfigurator.isSameOrigin(
+            "https://app.example.com:8443", "WSS://APP.example.com:8443/app"));
+    assertFalse(
+        WebSocketConfigurator.isSameOrigin("http://app.example.com", "wss://app.example.com/app"));
+  }
+
+  @Test
   public void testDifferentPortIsRejected() {
     assertFalse(isSameOrigin("https://app.example.com:8443"));
+    assertFalse(
+        WebSocketConfigurator.isSameOrigin(
+            "https://app.example.com", "wss://app.example.com:80/app"));
   }
 
   @Test
@@ -122,6 +142,18 @@ public class WebSocketConfiguratorTest {
     setBaseURL("http://localhost:8080/webapp");
 
     assertTrue(configurator.checkOrigin("http://localhost:8080"));
+    assertFalse(configurator.checkOrigin("https://evil.com"));
+  }
+
+  @Test
+  public void testCheckOriginBehindWssForwardingProxy() throws Exception {
+    final WebSocketConfigurator configurator = new WebSocketConfigurator();
+
+    // ProxyFilter builds the base url from X-Forwarded-Proto: wss, as sent by Traefik
+    setBaseURL("wss://app.example.com/webapp");
+
+    assertTrue(configurator.checkOrigin("https://app.example.com"));
+    assertFalse(configurator.checkOrigin("http://app.example.com"));
     assertFalse(configurator.checkOrigin("https://evil.com"));
   }
 }

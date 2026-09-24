@@ -1,0 +1,9 @@
+---
+title: Fix websocket handshake refused behind a proxy forwarding the wss scheme
+type: fix
+description: |
+  Without `application.base-url`, the origin check of the websocket handshake refused
+  every connection behind a reverse proxy that forwards the upgrade request with
+  `X-Forwarded-Proto: wss` (or `ws`), such as Traefik: the base url was built with the
+  `wss://` scheme while the browser sent an `https://` origin. The `ws` and `wss` schemes are
+  now compared as `http` and `https`.
