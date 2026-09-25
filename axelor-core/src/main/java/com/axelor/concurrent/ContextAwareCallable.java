@@ -51,11 +51,18 @@ public final class ContextAwareCallable<V> implements Callable<V> {
     return new ContextAwareCallable<>(task, ContextState.capture(), withTransaction);
   }
 
+  /**
+   * Executes the enclosed {@link Callable} task within a context-aware environment, applying the
+   * captured context state and managing a transactional scope if specified.
+   *
+   * @return the result of the enclosed task
+   * @throws Exception if an error occurs during task execution
+   */
   @Override
   public V call() throws Exception {
     final ContextState previous = ContextState.capture();
     contextState.apply();
-    try {
+    try (ContextUnitOfWork ignored = ContextUnitOfWork.begin()) {
       return task.call();
     } finally {
       ContextState.restore(previous);

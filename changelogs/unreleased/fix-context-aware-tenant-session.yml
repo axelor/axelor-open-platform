@@ -1,0 +1,13 @@
+---
+title: Fix `ContextAware` tasks running on the wrong tenant
+type: fix
+description: |
+  In multi-tenancy mode, `ContextAware` tasks running on reused threads (such
+  as thread pools) kept the database session opened by the first task on that
+  thread. As the session is bound to the tenant it was opened with, later
+  tasks ran on the first tenant's database, whatever tenant was set.
+
+  Tasks wrapped with `ContextAware` now run with their own database session,
+  opened on the task's tenant and closed once the task is completed. Running a
+  `ContextAware` task inline for another tenant than the current database
+  session now throws an exception, see the multi-tenancy documentation.

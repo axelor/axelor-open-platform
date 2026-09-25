@@ -43,16 +43,15 @@ public final class ContextAwareRunnable implements Runnable {
   }
 
   /**
-   * Executes a task within a specific context state. The method ensures that the provided context
-   * is applied during the task execution and restores the previous context upon completion.
-   * Optionally, the task can be executed within a transactional scope if enabled.
+   * Executes the enclosed {@link Runnable} task within a context-aware environment, applying the
+   * captured context state and managing a transactional scope if specified.
    */
   @Override
   public void run() {
     final ContextState previous = ContextState.capture();
     contextState.apply();
 
-    try {
+    try (ContextUnitOfWork ignored = ContextUnitOfWork.begin()) {
       task.run();
     } finally {
       ContextState.restore(previous);

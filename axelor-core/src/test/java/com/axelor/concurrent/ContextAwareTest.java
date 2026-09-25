@@ -5,7 +5,10 @@
 package com.axelor.concurrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.TestingHelpers;
@@ -16,6 +19,7 @@ import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.test.fixture.Fixture;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -265,5 +269,36 @@ public class ContextAwareTest extends JpaTest {
     } finally {
       TestingHelpers.logout();
     }
+  }
+
+  @Test
+  void testUnitOfWorkOnRecycledThread() throws Exception {
+    try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+      Callable<EntityManager> task = ContextAware.of().build(JPA::em);
+
+      EntityManager first = executor.submit(task).get();
+      EntityManager second = executor.submit(task).get();
+
+      // each task gets its own entity manager, closed once the task is done
+      assertNotSame(first, second);
+      assertTrue(!first.isOpen() && !second.isOpen());
+
+      // no entity manager is left behind on the thread
+      EntityManager leftover = executor.submit(JPA::em).get();
+      assertNotSame(second, leftover);
+      assertTrue(leftover.isOpen());
+    }
+  }
+
+  @Test
+  void testUnitOfWorkInline() throws Exception {
+    EntityManager em = JPA.em();
+
+    // inline task reuses the caller's unit of work and leaves it open
+    assertSame(em, ContextAware.of().build(JPA::em).call());
+    ContextAware.of().build(() -> assertSame(em, JPA.em())).run();
+
+    assertSame(em, JPA.em());
+    assertTrue(em.isOpen());
   }
 }

@@ -164,6 +164,33 @@ Thread task = new Thread(ContextAware.of().build(
 task.start();
 -----
 
+=== Database session
+
+A database session is bound to the tenant that was current when the session was opened. Changing the
+tenant afterwards has no effect on an already opened session.
+
+For this reason, the `ContextAware*` system runs the task inside its own database session, opened
+with the tenant of the task and closed once the task is completed. This is also the case when the
+task runs on a recycled thread (thread pools), so each task works on the database of its own tenant.
+
+If the thread already has an open database session, for example when the task is run directly with
+`.run()` or `.call()` from a web request, the task reuses that session. The task must then target
+the same tenant as the session, otherwise an `IllegalStateException` is thrown:
+
+[source,java]
+.running a task for another tenant
+-----
+// in a web request made on tenant "tenant-a"
+
+// fails: the task would run on the session of "tenant-a"
+ContextAware.of().withTenantId("tenant-b").build(task).run();
+
+// works: the task runs in another thread, with its own session on "tenant-b"
+executor.submit(ContextAware.of().withTenantId("tenant-b").build(task));
+-----
+
+To run a task for another tenant, always run it in another thread.
+
 == Authentication
 
 Clients without session support (e.g. direct basic auth) should provide `X-Tenant-ID` header
