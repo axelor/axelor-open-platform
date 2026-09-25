@@ -27,7 +27,10 @@ public final class AppLogger {
           AvailableAppSettings.LOGGING_PATH,
           settings.getPath(AvailableAppSettings.LOGGING_PATH, null));
     }
-    return new LoggerConfiguration(loggingConfig);
+    final LoggerConfiguration loggerConfig = new LoggerConfiguration(loggingConfig);
+    loggerConfig.multiTenancy(
+        settings.getBoolean(AvailableAppSettings.CONFIG_MULTI_TENANCY, false));
+    return loggerConfig;
   }
 
   public static void install() {

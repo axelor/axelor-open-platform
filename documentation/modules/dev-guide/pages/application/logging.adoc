@@ -20,10 +20,10 @@ Generally, we will configure logging from `axelor-config.properties` files:
 logging.path = {user.home}/.axelor/logs
 
 # Format of file log message
-logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n
+logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- ${LOG_TENANT_PATTERN:-}[%t] %-40.40logger{39} : %m%n
 
 # Format of console log message
-logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
+logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr(${LOG_TENANT_PATTERN:-}){blue}%clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
 
 # Global logging level
 logging.level.root = error
@@ -45,6 +45,12 @@ Global log level can be changed with `logging.level.root` property. Package spec
 can be configured with `logging.level.<package-name> = <level>` settings.
 
 The console logger may log with colors if terminal supports colors.
+
+The `%tenant` pattern outputs the current tenant identifier. A fallback can be given as option,
+used when no tenant is set on the thread: `%tenant{-}` outputs `-` in that case, so every log
+line has the same format. When multi-tenancy is enabled, the `LOG_TENANT_PATTERN` variable is set
+to `[%tenant{-}] `, so `${LOG_TENANT_PATTERN:-}` in the default patterns outputs the tenant before
+the thread name. When disabled, it is empty and the log format is unchanged.
 
 We can by-pass auto configuration from `axelor-config.properties` by including `logback.xml`
 under `src/main/resources`. In that case, you have to configure it on your own. We can also

@@ -63,6 +63,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * <p>The logging pattern can use <code>%clr()</code> to highlight based on log level, or <code>
  * %clr(){color}</code> with <code>faint, red, green, yellow, blue, magenta, cyan</code> as color to
  * style the log message on console output.
+ *
+ * <p>The logging pattern can use <code>%tenant</code> to output the current tenant identifier, or
+ * <code>%tenant{-}</code> to output <code>-</code> when no tenant is set on the thread. When
+ * multi-tenancy is enabled, the <code>${LOG_TENANT_PATTERN}</code> variable is set to <code>
+ * [%tenant{-}] </code>, which is included in the default patterns before the thread name. The raw
+ * tenant identifier is also available with <code>%X{tenant}</code>.
  */
 public class LoggerConfiguration {
 
@@ -76,20 +82,28 @@ public class LoggerConfiguration {
 
   private static final Pattern LOGGING_LEVEL_PATTERN = Pattern.compile("logging\\.level\\.(.*?)");
 
+  /** The MDC key holding the current tenant identifier. */
+  public static final String TENANT_MDC_KEY = "tenant";
+
+  private static final String LOG_TENANT_PATTERN = "LOG_TENANT_PATTERN";
+
   private static final String ANSI_LOG_PATTERN =
       """
       %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) \
-      %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} \
-      %clr(:){faint} %m%n""";
+      %clr(${PID:- }){magenta} %clr(---){faint} %clr(${LOG_TENANT_PATTERN:-}){blue}\
+      %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n""";
 
   private static final String FILE_LOG_PATTERN =
-      "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n";
+      """
+      %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- ${LOG_TENANT_PATTERN:-}[%t] \
+      %-40.40logger{39} : %m%n""";
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
   private LoggerContext context;
   private Properties config;
   private boolean skipDefaultConfig = false;
+  private boolean multiTenancy = false;
 
   public LoggerConfiguration(Properties config) {
     this.context = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -110,6 +124,15 @@ public class LoggerConfiguration {
 
   public void skipDefaultConfig(boolean skipDefaultConfig) {
     this.skipDefaultConfig = skipDefaultConfig;
+  }
+
+  /**
+   * Whether multi-tenancy is enabled. If so, the default patterns include the tenant.
+   *
+   * @param multiTenancy true if multi-tenancy is enabled
+   */
+  public void multiTenancy(boolean multiTenancy) {
+    this.multiTenancy = multiTenancy;
   }
 
   public void install() {
@@ -219,6 +242,11 @@ public class LoggerConfiguration {
 
     // register color converter
     conversionRule("clr", ColorConverter.class);
+    // register tenant converter
+    conversionRule("tenant", TenantConverter.class);
+    if (multiTenancy) {
+      context.putProperty(LOG_TENANT_PATTERN, "[%tenant{-}] ");
+    }
 
     if (configFile == null) {
       return;

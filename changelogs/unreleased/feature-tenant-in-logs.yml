@@ -1,0 +1,19 @@
+---
+title: Add current tenant in logs
+type: feature
+description: |
+  When multi-tenancy is enabled, log lines didn't tell which tenant they belong to, making it hard to troubleshoot an 
+  issue for a given tenant in the shared log file.
+  
+  A new `%tenant` pattern converter outputs the tenant identifier, with an optional fallback used when no tenant 
+  is set on the thread, e.g. `%tenant{-}`. The raw identifier is also available as `%X{tenant}` for custom 
+  `logback.xml` configurations.
+  
+  When multi-tenancy is enabled, the `LOG_TENANT_PATTERN` variable is set to `[%tenant{-}] `. Default console and 
+  file patterns include it as `${LOG_TENANT_PATTERN:-}` right before the thread name. When disabled, it is empty and 
+  the log format is unchanged:
+
+  ```
+  ... INFO 973172 --- [acme] [http-nio-8080-exec-1] com.axelor... : ...
+  ... INFO 973172 --- [-] [main] com.axelor... : ...
+  ```

@@ -79,7 +79,7 @@ public class TenantFilter implements Filter {
     TenantResolver.CURRENT_HOST.set(req.getHeader("Host"));
 
     try {
-      TenantResolver.CURRENT_TENANT.set(currentTenant(req, res));
+      TenantResolver.setTenant(currentTenant(req, res));
       chain.doFilter(request, response);
     } catch (BadTenantException e) {
 
@@ -109,8 +109,7 @@ public class TenantFilter implements Filter {
         }
       }
     } finally {
-      TenantResolver.CURRENT_HOST.remove();
-      TenantResolver.CURRENT_TENANT.remove();
+      TenantResolver.clearCurrentTenant();
     }
   }
 

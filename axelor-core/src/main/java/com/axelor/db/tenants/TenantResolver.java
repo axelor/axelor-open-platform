@@ -5,6 +5,7 @@
 package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
+import com.axelor.common.logging.LoggerConfiguration;
 import com.axelor.inject.Beans;
 import jakarta.annotation.Nullable;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.slf4j.MDC;
 
 /** The tenant identifier resolver. */
 public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
@@ -28,14 +30,29 @@ public class TenantResolver implements CurrentTenantIdentifierResolver<String> {
 
   public static void setCurrentTenant(String tenantId, String tenantHost) {
     if (!enabled) return;
-    CURRENT_TENANT.set(tenantId);
+    setTenant(tenantId);
     CURRENT_HOST.set(tenantHost);
   }
 
   public static void setCurrentTenant(String tenantId) {
     if (!enabled) return;
-    CURRENT_TENANT.set(tenantId);
+    setTenant(tenantId);
     CURRENT_HOST.set(findTenantHost(tenantId));
+  }
+
+  static void setTenant(String tenantId) {
+    CURRENT_TENANT.set(tenantId);
+    if (tenantId == null) {
+      MDC.remove(LoggerConfiguration.TENANT_MDC_KEY);
+    } else {
+      MDC.put(LoggerConfiguration.TENANT_MDC_KEY, tenantId);
+    }
+  }
+
+  static void clearCurrentTenant() {
+    CURRENT_HOST.remove();
+    CURRENT_TENANT.remove();
+    MDC.remove(LoggerConfiguration.TENANT_MDC_KEY);
   }
 
   public static void forEachTenant(Runnable runnable) {

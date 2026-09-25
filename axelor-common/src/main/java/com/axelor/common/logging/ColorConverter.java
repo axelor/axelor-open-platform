@@ -39,7 +39,7 @@ public class ColorConverter extends CompositeConverter<ILoggingEvent> {
 
   @Override
   protected String transform(ILoggingEvent event, String in) {
-    if (System.console() == null) {
+    if (System.console() == null || in.isEmpty()) {
       return in;
     }
 
