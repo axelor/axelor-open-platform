@@ -94,20 +94,23 @@ public class AuditProcessor {
 
   /** Process all pending audit logs. */
   public void process() {
-    List<String> candidateTxIds = fetchCandidateTxIds(BATCH_SIZE);
+    String lastTxId = null;
+    List<String> candidateTxIds;
 
-    if (candidateTxIds.isEmpty()) {
-      return;
-    }
-
-    log.info("Recovering audit logs...");
-
-    for (String txId : candidateTxIds) {
-      if (isShutdownRequest()) {
-        break;
+    while (!(candidateTxIds = fetchCandidateTxIds(lastTxId, BATCH_SIZE)).isEmpty()) {
+      if (lastTxId == null) {
+        log.info("Recovering audit logs...");
       }
-      // Delegate to the specific processor
-      process(txId);
+
+      for (String txId : candidateTxIds) {
+        if (isShutdownRequest()) {
+          return;
+        }
+        // Delegate to the specific processor
+        process(txId);
+      }
+
+      lastTxId = candidateTxIds.getLast();
     }
   }
 
@@ -498,28 +501,37 @@ public class AuditProcessor {
 
   /**
    * Retrieves a list of candidate transaction IDs from the audit log table that have not been
-   * processed.
+   * processed, using keyset pagination on the transaction ID.
    *
+   * <p>Transaction IDs are UUID v7, so ordering them also orders transactions by creation time.
+   *
+   * @param afterTxId the last transaction ID of the previous page; if null, starts from the first
    * @param limit the maximum number of transaction IDs to fetch from the database
-   * @return a list of unprocessed transaction IDs, ordered by the earliest creation time
+   * @return a list of unprocessed transaction IDs greater than {@code afterTxId}, ordered by
+   *     transaction ID
    */
-  private List<String> fetchCandidateTxIds(int limit) {
+  private List<String> fetchCandidateTxIds(String afterTxId, int limit) {
     String sql =
         """
-          SELECT tx_id
+          SELECT DISTINCT tx_id
           FROM audit_log
           WHERE processed = false
-          GROUP BY tx_id
-          ORDER BY MIN(created_on)
+          %s
+          ORDER BY tx_id
           LIMIT ?
-          """;
+          """
+            .formatted(afterTxId == null ? "" : "AND tx_id > ?");
 
     List<String> result = new ArrayList<>();
 
     JPA.JDBCWork work =
         conn -> {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
+            int idx = 1;
+            if (afterTxId != null) {
+              ps.setString(idx++, afterTxId);
+            }
+            ps.setInt(idx, limit);
             try (ResultSet rs = ps.executeQuery()) {
               while (rs.next()) {
                 result.add(rs.getString(1));
