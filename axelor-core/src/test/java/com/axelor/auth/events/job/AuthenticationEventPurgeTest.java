@@ -2,14 +2,13 @@
  * SPDX-FileCopyrightText: Axelor <https://axelor.com>
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-package com.axelor.auth.job;
+package com.axelor.auth.events.job;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.JpaTest;
 import com.axelor.auth.db.AuthenticationEvent;
 import com.axelor.auth.db.AuthenticationStatus;
-import com.axelor.auth.events.job.AuthenticationEventPurgeJob;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import java.time.LocalDateTime;
