@@ -88,7 +88,7 @@
         <button name="showUserSessions" onClick="action-user-show-active-sessions" icon="devices" colSpan="5" title="Devices"/>
       </panel>
       <panel title="Connections" if="__repo__(AuthenticationEvent).isPermitted()">
-        <label title="List security log of authentication events involving your account." colSpan="7"/>
+        <label title="Security log of authentication events involving your account." colSpan="7"/>
         <button name="showAuthenticationEvents" onClick="action-user-show-authentication-events" icon="login" colSpan="5" title="Connections"/>
       </panel>
     </panel>
@@ -290,7 +290,7 @@
       <field name="_xPageOffset" type="integer" hidden="true" x-dirty="false" />
       <field name="_xPageSize" type="integer" hidden="true" x-dirty="false" />
       <field name="_xPageHasNext" type="boolean" hidden="true" x-dirty="false" />
-      <label title="List security log of authentication events involving your account." />
+      <label title="Security log of authentication events involving your account." />
       <field name="_xAuthenticationEvents" readonly="true" showTitle="false" colSpan="12" x-dirty="false">
         <viewer>
           <![CDATA[
