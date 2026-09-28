@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
 import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,21 +167,56 @@ public class AuditProcessor {
       try {
         result = JPA.callInTransaction(() -> processBatch(txId, afterAuditLogId));
       } catch (Exception e) {
-        if (isLockingException(e)) {
+        // Not caused by a specific group (e.g. deleting processed logs or commit)
+        if (!isAuditLogLocked(e)) {
+          log.error("Unexpected error processing txId: {}", txId, e);
+        }
+        break;
+      } finally {
+        // Discard any entity left by the batch, notably when it was rolled back
+        JPA.clear();
+      }
+
+      if (result.failedGroup() == null) {
+        totalProcessed += result.processedGroups().size();
+
+        // Move cursor past this batch
+        lastAuditLogId = result.lastAuditLogId();
+
+        // Everything processed, exit
+        if (result.fetched() < BATCH_SIZE) {
           break;
         }
-        log.error("Unexpected error processing txId: {}", txId, e);
-        break;
-      }
-      totalProcessed += result.succeeded();
-      totalFailed += result.failed();
+      } else {
+        // update the failed group
+        totalFailed++;
+        recordError(result.failedGroup(), result.failure());
 
-      // Move cursor past this batch, so failed groups aren't fetched again in this run
-      lastAuditLogId = result.lastAuditLogId();
+        // Groups processed before the failure were rolled back too, process them again one by
+        // one, so that another failure doesn't roll them back again
+        boolean locked = false;
+        for (AuditWorkGroup group : result.processedGroups()) {
+          try {
+            if (JPA.callInTransaction(() -> processGroup(group))) {
+              totalProcessed++;
+            }
+          } catch (Exception e) {
+            if (isAuditLogLocked(e)) {
+              locked = true;
+              break;
+            }
+            totalFailed++;
+            recordError(group, e);
+          } finally {
+            JPA.clear();
+          }
+        }
+        if (locked) {
+          break;
+        }
 
-      // Everything processed, exit
-      if ((result.succeeded() + result.failed()) < BATCH_SIZE) {
-        break;
+        // Move cursor past the failed group, the next batch starts with the groups after it
+        lastAuditLogId = result.failedGroup().getFirstAuditLogId();
       }
 
       // Check for shutdown without waiting
@@ -224,43 +260,113 @@ public class AuditProcessor {
     return false;
   }
 
+  /**
+   * Determines whether the given throwable or any of its causes is an {@link
+   * AuditLogLockedException}, meaning the pending audit logs are being processed by another worker.
+   */
+  private boolean isAuditLogLocked(Throwable e) {
+    for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+      if (t instanceof AuditLogLockedException) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Executes a JDBC work locking audit logs. A locking failure is thrown as an {@link
+   * AuditLogLockedException}, to tell it apart from locking failures on other tables.
+   */
+  private void doAuditLogLockingWork(Work work) {
+    try {
+      JPA.em().unwrap(Session.class).doWork(work);
+    } catch (RuntimeException e) {
+      if (isLockingException(e)) {
+        throw new AuditLogLockedException(e);
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * Processes the next batch of groups in the current transaction.
+   *
+   * <p>Processing stops at the first failing group, and the transaction is marked for rollback: a
+   * failing group must not leave partial changes, and a database error may have made the
+   * transaction unusable. The failing group and the groups processed before it are returned, so the
+   * caller can record the error and process these groups again once the batch is rolled back.
+   */
   protected BatchResult processBatch(String txId, long afterAuditLogId) {
     // compute audit work group
     List<AuditWorkGroup> batch = fetchNextBatch(txId, afterAuditLogId);
     if (batch.isEmpty()) {
-      return new BatchResult(0, 0, afterAuditLogId);
+      return new BatchResult(0, List.of(), null, null, afterAuditLogId);
     }
     long lastAuditLogId = batch.getLast().getFirstAuditLogId();
 
     // fetch associated audit logs
     fetchLogsForBatch(batch);
 
-    var processedAuditWorkGroups = new ArrayList<AuditWorkGroup>();
-    int failedInBatch = 0;
-
     // process
+    var processedGroups = new ArrayList<AuditWorkGroup>();
     for (AuditWorkGroup auditWorkGroup : batch) {
       try {
         process(auditWorkGroup);
-        processedAuditWorkGroups.add(auditWorkGroup);
+        // Flush now, so that a database error is reported on the group causing it
+        JPA.flush();
+        checkNotRollbackOnly();
       } catch (Exception e) {
-        failedInBatch++;
-        handleError(auditWorkGroup, e);
+        JPA.em().getTransaction().setRollbackOnly();
+        return new BatchResult(batch.size(), processedGroups, auditWorkGroup, e, lastAuditLogId);
       }
+      processedGroups.add(auditWorkGroup);
     }
-
-    // Flush pending changes (e.g., MailMessage inserts, error updates)
-    JPA.flush();
 
     // Bulk delete successfully processed AuditLogs
-    if (!processedAuditWorkGroups.isEmpty()) {
-      deleteProcessedGroups(processedAuditWorkGroups);
+    deleteProcessedGroups(batch);
+
+    checkNotRollbackOnly();
+
+    return new BatchResult(batch.size(), processedGroups, null, null, lastAuditLogId);
+  }
+
+  /**
+   * Processes a single group in the current transaction.
+   *
+   * @return {@code false} if the group has already been processed meanwhile
+   */
+  private boolean processGroup(AuditWorkGroup group) {
+    if (!lockGroup(group)) {
+      return false;
     }
+    // Reload the logs, the ones loaded by a previous transaction are detached
+    group.clearAuditLogs();
+    fetchLogsForBatch(List.of(group));
+    process(group);
+    JPA.flush();
+    deleteProcessedGroups(List.of(group));
+    checkNotRollbackOnly();
+    return true;
+  }
 
-    // Clear to avoid memory issues
-    JPA.clear();
+  /** Records the error of a failed group in a new transaction. */
+  private void recordError(AuditWorkGroup group, Exception e) {
+    try {
+      JPA.runInTransaction(() -> handleError(group, e));
+    } catch (Exception ex) {
+      log.error("Failed to record error for audit logs group {}", group, ex);
+    }
+  }
 
-    return new BatchResult(processedAuditWorkGroups.size(), failedInBatch, lastAuditLogId);
+  /**
+   * Fails if the current transaction has been marked for rollback, for example when an exception
+   * was swallowed after a failed database operation. Otherwise, the transaction would be silently
+   * rolled back while the work is reported as done.
+   */
+  private void checkNotRollbackOnly() {
+    if (JPA.em().getTransaction().getRollbackOnly()) {
+      throw new IllegalStateException("Transaction was marked for rollback only");
+    }
   }
 
   /**
@@ -276,7 +382,7 @@ public class AuditProcessor {
     return (System.currentTimeMillis() - lastActivityTime) < ACTIVITY_WINDOW_MS;
   }
 
-  private void process(AuditWorkGroup group) throws Exception {
+  private void process(AuditWorkGroup group) {
     if (group.getLogs().isEmpty()) {
       return;
     }
@@ -290,7 +396,12 @@ public class AuditProcessor {
     var values = fromJSON(lastLog.getCurrentState());
 
     // Process with consolidated state
-    var entityClass = Class.forName(group.getRelatedModel()).asSubclass(Model.class);
+    Class<? extends Model> entityClass;
+    try {
+      entityClass = Class.forName(group.getRelatedModel()).asSubclass(Model.class);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Unknown model: " + group.getRelatedModel(), e);
+    }
     var entity = JPA.findReferenceById(entityClass, group.getRelatedId());
 
     // If entity is deleted, skip processing
@@ -320,10 +431,8 @@ public class AuditProcessor {
       message = message.substring(0, 1000);
     }
 
-    AuditLog auditLog = group.getFirstAuditLog();
     boolean processed = false;
-    int maxRetry =
-        ((auditLog != null && auditLog.getRetryCount() != null) ? auditLog.getRetryCount() : 0) + 1;
+    int maxRetry = group.getRetryCount() + 1;
     if (maxRetry >= MAX_RETRY) {
       log.error("Max retries exceeded for audit logs group {}", group);
       processed = true;
@@ -379,6 +488,36 @@ public class AuditProcessor {
       log.error("Failed to deserialize JSON", e);
       return Collections.emptyMap();
     }
+  }
+
+  /**
+   * Locks the pending audit logs of the given group.
+   *
+   * @return {@code false} if the group has no pending audit logs anymore
+   */
+  private boolean lockGroup(AuditWorkGroup group) {
+    String sql =
+        """
+            SELECT id FROM audit_log
+            WHERE processed = false AND tx_id = ? AND related_model = ? AND related_id = ? AND event_type = ?
+            %s
+            """
+            .formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
+
+    var found = new boolean[1];
+    doAuditLogLockingWork(
+        conn -> {
+          try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, group.getTxId());
+            ps.setString(2, group.getRelatedModel());
+            ps.setObject(3, group.getRelatedId());
+            ps.setString(4, group.getEventType().name());
+            try (ResultSet rs = ps.executeQuery()) {
+              found[0] = rs.next();
+            }
+          }
+        });
+    return found[0];
   }
 
   /**
@@ -458,13 +597,14 @@ public class AuditProcessor {
     String sqlTemplate =
         """
             WITH locked_rows AS (
-                 SELECT id, tx_id, related_model, related_id, event_type, created_on
+                 SELECT id, tx_id, related_model, related_id, event_type, retry_count, created_on
                  FROM audit_log
                  WHERE processed = false
                    AND tx_id = ?
                  %s
             )
-            SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id
+            SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id,
+                   MAX(COALESCE(retry_count, 0)) as retry_count
             FROM locked_rows
             GROUP BY tx_id, related_model, related_id, event_type
             HAVING MIN(id) > ?
@@ -474,10 +614,9 @@ public class AuditProcessor {
 
     String sql = sqlTemplate.formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
 
-    Session session = JPA.em().unwrap(Session.class);
     List<AuditWorkGroup> result = new ArrayList<>();
 
-    session.doWork(
+    doAuditLogLockingWork(
         conn -> {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
@@ -495,7 +634,8 @@ public class AuditProcessor {
                         rs.getLong("related_id"),
                         AuditEventType.valueOf(rs.getString("event_type")),
                         rs.getLong("min_id"),
-                        rs.getLong("max_id")));
+                        rs.getLong("max_id"),
+                        rs.getInt("retry_count")));
               }
             }
           }
@@ -549,7 +689,29 @@ public class AuditProcessor {
     return result;
   }
 
-  protected record BatchResult(int succeeded, int failed, long lastAuditLogId) {}
+  /**
+   * Result of a batch.
+   *
+   * @param fetched the number of groups fetched
+   * @param processedGroups the groups processed successfully; when the batch failed, the groups
+   *     processed before the failure, rolled back with the batch
+   * @param failedGroup the group which failed, or null if the batch succeeded
+   * @param failure the failure of the failed group
+   * @param lastAuditLogId the cursor after this batch
+   */
+  protected record BatchResult(
+      int fetched,
+      List<AuditWorkGroup> processedGroups,
+      AuditWorkGroup failedGroup,
+      Exception failure,
+      long lastAuditLogId) {}
+
+  /** Thrown when the pending audit logs are locked by another worker. */
+  private static class AuditLogLockedException extends RuntimeException {
+    AuditLogLockedException(Throwable cause) {
+      super(cause);
+    }
+  }
 
   private static class AuditWorkGroup {
 
@@ -559,6 +721,7 @@ public class AuditProcessor {
     Long firstAuditLogId;
     Long lastAuditLogId;
     AuditEventType eventType;
+    int retryCount;
 
     List<AuditLog> logs = new ArrayList<>();
 
@@ -576,13 +739,15 @@ public class AuditProcessor {
         Long relatedId,
         AuditEventType eventType,
         Long firstAuditLogId,
-        Long lastAuditLogId) {
+        Long lastAuditLogId,
+        int retryCount) {
       this.txId = txId;
       this.relatedModel = relatedModel;
       this.relatedId = relatedId;
       this.firstAuditLogId = firstAuditLogId;
       this.lastAuditLogId = lastAuditLogId;
       this.eventType = eventType;
+      this.retryCount = retryCount;
     }
 
     public AuditEventType getEventType() {
@@ -605,12 +770,20 @@ public class AuditProcessor {
       return firstAuditLogId;
     }
 
+    public int getRetryCount() {
+      return retryCount;
+    }
+
     public Long getLastAuditLogId() {
       return lastAuditLogId;
     }
 
     public void addAuditLog(AuditLog log) {
       this.logs.add(log);
+    }
+
+    public void clearAuditLogs() {
+      this.logs.clear();
     }
 
     public List<AuditLog> getLogs() {
