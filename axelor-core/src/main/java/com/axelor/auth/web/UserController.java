@@ -139,7 +139,7 @@ public class UserController {
     }
 
     User user = JPA.find(User.class, userId);
-    if (isSelfOrAdmin(user.getCode())) {
+    if (isSelfOrAdmin(user)) {
       response.setValue(
           "_xActiveSessions", Beans.get(AuthSessionService.class).getSessionsData(user));
     }
@@ -193,6 +193,13 @@ public class UserController {
     return AuthUtils.isAdmin(currentUser) || currentUser.getCode().equals(targetCode);
   }
 
+  private boolean isSelfOrAdmin(User targetUser) {
+    if (targetUser == null) {
+      return false;
+    }
+    return isSelfOrAdmin(targetUser.getCode());
+  }
+
   /**
    * Checks if the target subject is part of the current session.
    *
@@ -228,8 +235,7 @@ public class UserController {
     }
 
     User user = JPA.find(User.class, userId);
-    if (!isSelfOrAdmin(user.getCode())
-        || !JpaRepository.of(AuthenticationEvent.class).isPermitted()) {
+    if (!isSelfOrAdmin(user) || !JpaRepository.of(AuthenticationEvent.class).isPermitted()) {
       return;
     }
 
