@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.axelor.JpaTest;
 import com.axelor.JpaTestModule;
+import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -96,6 +98,11 @@ public class BaseAuditTest extends JpaTest {
         break;
       }
     }
+  }
+
+  @AfterAll
+  public static void clear() {
+    TestingHelpers.resetSettings();
   }
 
   @Transactional

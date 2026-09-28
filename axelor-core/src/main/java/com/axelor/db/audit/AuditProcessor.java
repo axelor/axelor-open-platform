@@ -47,9 +47,9 @@ import org.slf4j.LoggerFactory;
 public class AuditProcessor {
 
   private static final Logger log = LoggerFactory.getLogger(AuditProcessor.class);
-  private static final int BATCH_SIZE =
+  private final int BATCH_SIZE =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BATCH_SIZE, 100);
-  private static final int MAX_RETRY =
+  private final int MAX_RETRY =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_LOGS_MAX_RETRY, 3);
 
   private final MailMessageTrackingService service;
@@ -57,13 +57,13 @@ public class AuditProcessor {
   private BooleanSupplier keepRunningSupplier;
 
   // Throttling constants
-  private static final long BATCH_DELAY_MS =
+  private final long BATCH_DELAY_MS =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BATCH_DELAY, 5);
-  private static final long BUSY_BACKOFF_INTERVAL =
+  private final long BUSY_BACKOFF_INTERVAL =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BUSY_BACKOFF_INTERVAL, 200);
-  private static final long BUSY_BACKOFF_MAX_RETRIES =
+  private final long BUSY_BACKOFF_MAX_RETRIES =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BUSY_BACKOFF_MAX_RETRIES, 3);
-  private static final long ACTIVITY_WINDOW_MS =
+  private final long ACTIVITY_WINDOW_MS =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_ACTIVITY_WINDOW, 200);
 
   // The last time activity was signaled
@@ -140,7 +140,7 @@ public class AuditProcessor {
 
   /** Core processing loop that fetches and processes audit logs in batches. */
   private void processPendingWork(String txId) {
-    int currentOffset = 0;
+    long lastAuditLogId = 0;
     int totalProcessed = 0;
     int totalFailed = 0;
 
@@ -161,10 +161,10 @@ public class AuditProcessor {
       busyWaitCount = 0;
 
       // Process batch
-      int finalCurrentOffset = currentOffset;
+      long afterAuditLogId = lastAuditLogId;
       BatchResult result;
       try {
-        result = JPA.callInTransaction(() -> processBatch(txId, finalCurrentOffset));
+        result = JPA.callInTransaction(() -> processBatch(txId, afterAuditLogId));
       } catch (Exception e) {
         if (isLockingException(e)) {
           break;
@@ -175,8 +175,8 @@ public class AuditProcessor {
       totalProcessed += result.succeeded();
       totalFailed += result.failed();
 
-      // Move offset
-      currentOffset += result.failed();
+      // Move cursor past this batch, so failed groups aren't fetched again in this run
+      lastAuditLogId = result.lastAuditLogId();
 
       // Everything processed, exit
       if ((result.succeeded() + result.failed()) < BATCH_SIZE) {
@@ -224,12 +224,13 @@ public class AuditProcessor {
     return false;
   }
 
-  protected BatchResult processBatch(String txId, int offset) {
+  protected BatchResult processBatch(String txId, long afterAuditLogId) {
     // compute audit work group
-    List<AuditWorkGroup> batch = fetchNextBatch(txId, offset);
+    List<AuditWorkGroup> batch = fetchNextBatch(txId, afterAuditLogId);
     if (batch.isEmpty()) {
-      return new BatchResult(0, 0);
+      return new BatchResult(0, 0, afterAuditLogId);
     }
+    long lastAuditLogId = batch.getLast().getFirstAuditLogId();
 
     // fetch associated audit logs
     fetchLogsForBatch(batch);
@@ -259,7 +260,7 @@ public class AuditProcessor {
     // Clear to avoid memory issues
     JPA.clear();
 
-    return new BatchResult(processedAuditWorkGroups.size(), failedInBatch);
+    return new BatchResult(processedAuditWorkGroups.size(), failedInBatch, lastAuditLogId);
   }
 
   /**
@@ -439,18 +440,20 @@ public class AuditProcessor {
   }
 
   /**
-   * Retrieves the next batch of unprocessed audit logs from the database according to specific
-   * criteria such as transaction ID and offset. The logs are grouped into {@code AuditWorkGroup}
-   * objects for further processing.
+   * Retrieves the next batch of unprocessed audit logs of the given transaction, using keyset
+   * pagination on the first audit log ID of each group. The logs are grouped into {@code
+   * AuditWorkGroup} objects for further processing.
    *
-   * @param txId the ID of the transaction to filter the audit logs; if null, logs for all
-   *     transactions will be fetched
-   * @param offset the offset from which to start fetching the audit logs; used for pagination
+   * @param txId the ID of the transaction whose unprocessed audit logs are fetched; must not be
+   *     null
+   * @param afterAuditLogId only groups whose first audit log ID is greater than this are fetched; 0
+   *     to start from the first group
    * @return a list of {@code AuditWorkGroup} objects representing the grouped unprocessed audit
    *     logs
    */
-  private List<AuditWorkGroup> fetchNextBatch(String txId, int offset) {
-    log.trace("Fetching next batch of audit logs with txId: {}, offset: {}", txId, offset);
+  private List<AuditWorkGroup> fetchNextBatch(String txId, long afterAuditLogId) {
+    log.trace(
+        "Fetching next batch of audit logs with txId: {}, after id: {}", txId, afterAuditLogId);
 
     String sqlTemplate =
         """
@@ -464,8 +467,9 @@ public class AuditProcessor {
             SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id
             FROM locked_rows
             GROUP BY tx_id, related_model, related_id, event_type
-            ORDER BY MIN(created_on)
-            LIMIT ? OFFSET ?
+            HAVING MIN(id) > ?
+            ORDER BY MIN(id)
+            LIMIT ?
             """;
 
     String sql = sqlTemplate.formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
@@ -478,9 +482,9 @@ public class AuditProcessor {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
             ps.setString(idx++, txId);
+            ps.setLong(idx++, afterAuditLogId);
             // Fetch small chunks
-            ps.setInt(idx++, BATCH_SIZE);
-            ps.setInt(idx++, offset);
+            ps.setInt(idx, BATCH_SIZE);
 
             try (ResultSet rs = ps.executeQuery()) {
               while (rs.next()) {
@@ -545,7 +549,7 @@ public class AuditProcessor {
     return result;
   }
 
-  protected record BatchResult(int succeeded, int failed) {}
+  protected record BatchResult(int succeeded, int failed, long lastAuditLogId) {}
 
   private static class AuditWorkGroup {
 
