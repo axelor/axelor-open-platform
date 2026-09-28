@@ -9,6 +9,7 @@ In this document, we will see the major steps to migrate from 8.2 to 8.3.
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.3/CHANGELOG.md[changelog] for a detailed
 list of fixes, changes, and improvements introduced in 8.3.
 
+[#client-ip-address]
 == Client IP address read from a single header
 
 The client IP address, ie what `getRemoteAddr()` returns behind the proxy filter, is now the left-most address of a
@@ -77,7 +78,7 @@ or run the following SQL script :
 [source,sql]
 ----
 INSERT INTO meta_schedule (id, version, created_on, active, cron, description, job, name)
-VALUES (nextval('auth_authentication_event_seq'), 0, now(), true, '0 0 5 * * ?',
+VALUES (nextval('meta_schedule_seq'), 0, now(), true, '0 0 5 * * ?',
         'Delete older authentication events','com.axelor.auth.events.job.AuthenticationEventPurgeJob',
         'authentication.events.purge');
 ----
@@ -107,8 +108,10 @@ create index auth_event_idx_user on auth_authentication_event (user_id, created_
 create index auth_event_idx_created_on on auth_authentication_event (created_on);
 create index auth_authentication_event_user_id_idx on auth_authentication_event (user_id);
 
+create sequence auth_authentication_event_seq;
+
 INSERT INTO meta_schedule (id, version, created_on, active, cron, description, job, name)
-VALUES (nextval('auth_authentication_event_seq'), 0, now(), true, '0 0 5 * * ?',
+VALUES (nextval('meta_schedule_seq'), 0, now(), true, '0 0 5 * * ?',
         'Delete older authentication events','com.axelor.auth.events.job.AuthenticationEventPurgeJob',
         'authentication.events.purge');
 ----

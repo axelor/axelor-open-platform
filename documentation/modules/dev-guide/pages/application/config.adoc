@@ -290,7 +290,6 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `application.theme` | CSS theme | default theme
 | `application.locale` | default locale | system default
 | `application.base-url` | base url of the application |
-| `auth.events.retention` | number of days authentication events are kept (0 or less to keep them forever) | 180
 | `application.entity.sequence.default_allocation_size` | global default entity allocation size |
 | `application.entity.sequence.<SEQUENCE_NAME>.allocation_size` | per-entity sequence allocation size |
 | `application.polling-interval` | how often client polls in seconds (ie, menu tags fetch), < 1 means disabled | 10
@@ -303,6 +302,7 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `application.script.timeout` | Groovy/JavaScript scripts execution timeout (in milliseconds) | 300000
 | `application.permission.disable-action` | whether to not check action permissions | false
 | `application.permission.disable-relational-field` | whether to not check relational fields permissions | false
+| `auth.events.retention` | number of days authentication events are kept (0 or less to keep them forever) | 180
 | `view.single-tab` | whether to use single tab layout | false
 | `view.max-tabs` | define the maximum opened tabs allowed |
 | `view.grid.selection` | set grid widget selection: `checkbox` or `none` | `checkbox`
