@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -163,6 +164,13 @@ public class BaseAuditTest extends JpaTest {
   }
 
   protected void processAuditLogs() {
+    // Recovery ignores the most recent audit logs, left to the asynchronous queue
+    JPA.runInTransaction(
+        () ->
+            JPA.em()
+                .createQuery("UPDATE AuditLog SET createdOn = :createdOn WHERE processed = false")
+                .setParameter("createdOn", LocalDateTime.now().minusHours(1))
+                .executeUpdate());
     JPA.clear();
     new AuditProcessor().process();
     JPA.clear();

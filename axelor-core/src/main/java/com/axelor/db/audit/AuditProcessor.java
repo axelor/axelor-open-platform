@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,6 +67,9 @@ public class AuditProcessor {
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_BUSY_BACKOFF_MAX_RETRIES, 3);
   private final long ACTIVITY_WINDOW_MS =
       AppSettings.get().getInt(AvailableAppSettings.AUDIT_PROCESSOR_ACTIVITY_WINDOW, 200);
+
+  // Recovery leaves the most recent audit logs to the asynchronous queue
+  private static final long RECOVERY_DELAY_SECONDS = 60 * 4;
 
   // The last time activity was signaled
   private static volatile long lastActivityTime = 0;
@@ -649,6 +653,10 @@ public class AuditProcessor {
    *
    * <p>Transaction IDs are UUID v7, so ordering them also orders transactions by creation time.
    *
+   * <p>Only audit logs older than the recovery delay are considered: the most recent ones are being
+   * processed by the asynchronous queue, and processing them here too would only compete for the
+   * same records.
+   *
    * @param afterTxId the last transaction ID of the previous page; if null, starts from the first
    * @param limit the maximum number of transaction IDs to fetch from the database
    * @return a list of unprocessed transaction IDs greater than {@code afterTxId}, ordered by
@@ -660,18 +668,21 @@ public class AuditProcessor {
           SELECT DISTINCT tx_id
           FROM audit_log
           WHERE processed = false
+          AND created_on < ?
           %s
           ORDER BY tx_id
           LIMIT ?
           """
             .formatted(afterTxId == null ? "" : "AND tx_id > ?");
 
+    LocalDateTime createdBefore = LocalDateTime.now().minusSeconds(RECOVERY_DELAY_SECONDS);
     List<String> result = new ArrayList<>();
 
     JPA.JDBCWork work =
         conn -> {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
+            ps.setObject(idx++, createdBefore);
             if (afterTxId != null) {
               ps.setString(idx++, afterTxId);
             }
