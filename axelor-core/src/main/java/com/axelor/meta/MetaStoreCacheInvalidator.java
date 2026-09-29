@@ -11,77 +11,68 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.event.spi.EventSource;
-import org.hibernate.event.spi.PostCommitDeleteEventListener;
-import org.hibernate.event.spi.PostCommitInsertEventListener;
-import org.hibernate.event.spi.PostCommitUpdateEventListener;
 import org.hibernate.event.spi.PostDeleteEvent;
+import org.hibernate.event.spi.PostDeleteEventListener;
 import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
  * Invalidates {@link MetaStore} JSON-field caches once per transaction that changes a
  * cache-affecting entity.
  *
- * <p>The post-commit events fire once per changed row; to avoid invalidating the (possibly
- * distributed) cache for every row, the first cache-affecting entity of a transaction registers a
- * single {@link AfterTransactionCompletionProcess} and the remaining rows are deduplicated via
- * {@link #scheduled}.
+ * <p>When a transaction flushes its first cache-affecting entity, a single {@link
+ * AfterTransactionCompletionProcess} is registered and the remaining rows are deduplicated via
+ * {@link #PENDING}. This avoids invalidating the (possibly distributed) cache for every row. This
+ * follows Hibernate's own {@link org.hibernate.cache.internal.CollectionCacheInvalidator}, which
+ * registers its after-completion process from flush-time post events.
+ *
+ * <p>Changes to JSON fields and JSON models are only reflected by {@link MetaStore} once the
+ * transaction completes. A transaction that changes them and reads them back before committing may
+ * get the previously cached state.
  *
  * <p>The cache is invalidated on both commit and rollback: the cache loaders run on the caller's
- * session, so a read performed during a failed transaction may have cached uncommitted state.
+ * session, so a cache miss during a transaction with flushed changes may have cached uncommitted
+ * state.
  */
 public class MetaStoreCacheInvalidator
-    implements PostCommitInsertEventListener,
-        PostCommitUpdateEventListener,
-        PostCommitDeleteEventListener {
+    implements PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
 
   /** Transactions that already have a pending invalidation scheduled. */
-  private final Set<Transaction> scheduled = ConcurrentHashMap.newKeySet();
-
-  @Override
-  public boolean requiresPostCommitHandling(EntityPersister persister) {
-    return affectsJsonFieldsCache(persister.getMappedClass());
-  }
+  private static final Set<Transaction> PENDING = ConcurrentHashMap.newKeySet();
 
   @Override
   public void onPostInsert(PostInsertEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
-  }
-
-  @Override
-  public void onPostInsertCommitFailed(PostInsertEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
+    scheduleInvalidation(event.getSession(), event.getEntity());
   }
 
   @Override
   public void onPostUpdate(PostUpdateEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
-  }
-
-  @Override
-  public void onPostUpdateCommitFailed(PostUpdateEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
+    scheduleInvalidation(event.getSession(), event.getEntity());
   }
 
   @Override
   public void onPostDelete(PostDeleteEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
+    scheduleInvalidation(event.getSession(), event.getEntity());
   }
 
   @Override
-  public void onPostDeleteCommitFailed(PostDeleteEvent event) {
-    scheduleInvalidation(event.getSession(), event.getPersister());
+  public boolean requiresPostCommitHandling(EntityPersister persister) {
+    // not used, only for POST_COMMIT_* group
+    return true;
   }
 
-  private void scheduleInvalidation(EventSource session, EntityPersister persister) {
-    if (!affectsJsonFieldsCache(persister.getMappedClass())) {
+  private void scheduleInvalidation(EventSource session, Object entity) {
+    if (!(entity instanceof MetaJsonField || entity instanceof MetaJsonModel)) {
       return;
     }
 
-    var transaction = session.accessTransaction();
+    final Transaction transaction = session.accessTransaction();
+
     // Register the after-completion hook only once per transaction.
-    if (!scheduled.add(transaction)) {
+    if (!PENDING.add(transaction)) {
       return;
     }
 
@@ -90,13 +81,8 @@ public class MetaStoreCacheInvalidator
         .registerProcess(
             (AfterTransactionCompletionProcess)
                 (success, s) -> {
-                  scheduled.remove(transaction);
+                  PENDING.remove(transaction);
                   MetaStore.invalidateJsonFields();
                 });
-  }
-
-  private static boolean affectsJsonFieldsCache(Class<?> klass) {
-    return MetaJsonField.class.isAssignableFrom(klass)
-        || MetaJsonModel.class.isAssignableFrom(klass);
   }
 }

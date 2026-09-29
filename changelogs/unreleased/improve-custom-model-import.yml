@@ -8,3 +8,6 @@ description: |
   `JsonProperty.getTitle()` now returns untranslated title, to realign consistency with `Property.getTitle()`.
 
   `Context` no longer applies user permission/visibility filtering when checking whether a JSON field exists, to realign consistency with how regular (non-JSON) fields are resolved.
+
+  JSON field and JSON model changes are reflected by `MetaStore` only once the transaction completes.
+  Reading them back within the same transaction may return the previously cached state.

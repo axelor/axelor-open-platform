@@ -33,15 +33,13 @@ public class AuditIntegrator implements Integrator {
     registry.setListeners(EventType.FLUSH_ENTITY, new AuditUpdateListener());
 
     final JsonReferenceListener jsonListener = new JsonReferenceListener();
-    registry.appendListeners(EventType.PRE_INSERT, jsonListener);
     registry.appendListeners(EventType.PRE_UPDATE, jsonListener);
-    registry.appendListeners(EventType.PRE_DELETE, jsonListener);
     registry.appendListeners(EventType.POST_COMMIT_UPDATE, jsonListener);
 
     final MetaStoreCacheInvalidator metaStoreCacheInvalidator = new MetaStoreCacheInvalidator();
-    registry.appendListeners(EventType.POST_COMMIT_INSERT, metaStoreCacheInvalidator);
-    registry.appendListeners(EventType.POST_COMMIT_UPDATE, metaStoreCacheInvalidator);
-    registry.appendListeners(EventType.POST_COMMIT_DELETE, metaStoreCacheInvalidator);
+    registry.appendListeners(EventType.POST_INSERT, metaStoreCacheInvalidator);
+    registry.appendListeners(EventType.POST_UPDATE, metaStoreCacheInvalidator);
+    registry.appendListeners(EventType.POST_DELETE, metaStoreCacheInvalidator);
 
     Beans.get(HibernateListenerService.class).registerListeners(registry);
   }
