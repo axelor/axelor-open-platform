@@ -59,6 +59,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -447,12 +448,7 @@ public final class MetaStore {
         .fetch()
         .stream()
         .map(JsonReferenceFieldDTO::from)
-        .collect(
-            Collectors.toMap(
-                JsonReferenceFieldDTO::name,
-                Function.identity(),
-                (existing, replacement) -> existing,
-                LinkedHashMap::new));
+        .collect(toUnmodifiableJsonFieldsMap());
   }
 
   private static Map<String, JsonReferenceFieldDTO> loadJsonFieldsByJsonModel(ModelFieldKey key) {
@@ -469,12 +465,24 @@ public final class MetaStore {
 
     return found.getFields().stream()
         .map(JsonReferenceFieldDTO::from)
-        .collect(
-            Collectors.toMap(
-                JsonReferenceFieldDTO::name,
-                Function.identity(),
-                (existing, replacement) -> existing,
-                LinkedHashMap::new));
+        .collect(toUnmodifiableJsonFieldsMap());
+  }
+
+  /**
+   * Collects json fields into an unmodifiable map keyed by field name, preserving order.
+   *
+   * <p>The map is stored as is in the json fields cache and shared between callers, so it must not
+   * be modified.
+   */
+  private static Collector<JsonReferenceFieldDTO, ?, Map<String, JsonReferenceFieldDTO>>
+      toUnmodifiableJsonFieldsMap() {
+    return Collectors.collectingAndThen(
+        Collectors.toMap(
+            JsonReferenceFieldDTO::name,
+            Function.identity(),
+            (existing, replacement) -> existing,
+            LinkedHashMap::new),
+        Collections::unmodifiableMap);
   }
 
   private static List<JsonReferenceFieldDTO> loadTargetJsonFields(String targetModel) {
