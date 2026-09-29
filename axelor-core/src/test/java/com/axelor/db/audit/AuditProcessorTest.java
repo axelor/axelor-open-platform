@@ -17,6 +17,7 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.db.audit.state.AuditState;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailMessageTrackingService;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -258,6 +260,39 @@ class AuditProcessorTest extends BaseAuditTest {
     failingIds.forEach(this::assertFailedOnce);
     assertEquals(2, countPendingAuditLogs(), "only the failing groups should remain pending");
     assertGroupsProcessedOnce(ids, failingIds);
+  }
+
+  // --- Concurrency ---
+
+  /** A transaction locked by another worker is skipped, and processed once the lock is released. */
+  @Test
+  void shouldSkipTransactionLockedByAnotherWorker() throws Exception {
+    Assumptions.assumeTrue(DBHelper.isPostgreSQL(), "advisory locks are only used on PostgreSQL");
+
+    var ids = asAdmin(this::createTrackedInOneTransaction);
+    var txId = Query.of(AuditLog.class).fetchOne().getTxId();
+
+    // Another worker holds the lock of the transaction
+    try (var conn = DBHelper.getConnection();
+        var ps = conn.prepareStatement("SELECT pg_advisory_lock(?, hashtext(?))")) {
+      ps.setInt(1, AuditProcessor.ADVISORY_LOCK_CLASS_ID);
+      ps.setString(2, txId);
+      ps.execute();
+
+      processAuditLogs();
+
+      assertEquals(GROUP_COUNT, countPendingAuditLogs(), "locked transaction was processed");
+      for (Long id : ids) {
+        assertEquals(0, countMessages(id));
+        assertEquals(0, auditLogOf(id).getRetryCount());
+      }
+    }
+
+    // Lock released with the connection
+    processAuditLogs();
+
+    assertEquals(0, countPendingAuditLogs());
+    assertGroupsProcessedOnce(ids, List.of());
   }
 
   // --- Groups with several audit logs ---

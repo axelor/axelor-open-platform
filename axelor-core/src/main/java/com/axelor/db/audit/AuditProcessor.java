@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
-import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +68,10 @@ public class AuditProcessor {
 
   // Recovery leaves the most recent audit logs to the asynchronous queue
   private static final long RECOVERY_DELAY_SECONDS = 60 * 4;
+
+  // First key of the advisory locks taken on transaction IDs. The two-key form doesn't overlap with
+  // single-key advisory locks, like the leader election one.
+  static final int ADVISORY_LOCK_CLASS_ID = 0x41554454; // "AUDT"
 
   // The last time activity was signaled
   private static volatile long lastActivityTime = 0;
@@ -172,9 +174,7 @@ public class AuditProcessor {
         result = JPA.callInTransaction(() -> processBatch(txId, afterAuditLogId));
       } catch (Exception e) {
         // Not caused by a specific group (e.g. deleting processed logs or commit)
-        if (!isAuditLogLocked(e)) {
-          log.error("Unexpected error processing txId: {}", txId, e);
-        }
+        log.error("Unexpected error processing txId: {}", txId, e);
         break;
       } finally {
         // Discard any entity left by the batch, notably when it was rolled back
@@ -198,25 +198,17 @@ public class AuditProcessor {
 
         // Groups processed before the failure were rolled back too, process them again one by
         // one, so that another failure doesn't roll them back again
-        boolean locked = false;
         for (AuditWorkGroup group : result.processedGroups()) {
           try {
             if (JPA.callInTransaction(() -> processGroup(group))) {
               totalProcessed++;
             }
           } catch (Exception e) {
-            if (isAuditLogLocked(e)) {
-              locked = true;
-              break;
-            }
             totalFailed++;
             recordError(group, e);
           } finally {
             JPA.clear();
           }
-        }
-        if (locked) {
-          break;
         }
 
         // Move cursor past the failed group, the next batch starts with the groups after it
@@ -243,53 +235,35 @@ public class AuditProcessor {
   }
 
   /**
-   * Determines whether the given throwable or any of its causes represent a locking-related
-   * exception. Specifically, it checks for instances of {@code
-   * jakarta.persistence.PessimisticLockException}, {@code org.hibernate.PessimisticLockException},
-   * or {@code org.hibernate.exception.LockAcquisitionException} or {@code
-   * org.postgresql.util.PSQLException} with 55P03 SQL state.
+   * Takes an advisory lock on the given transaction ID, held until the end of the current database
+   * transaction, so that only one worker at a time processes the audit logs of a transaction.
    *
-   * @param e the throwable to examine; may be null
-   * @return {@code true} if the throwable or any of its causes is a locking-related exception,
-   *     {@code false} otherwise
+   * <p>Only on PostgreSQL; on other databases, no lock is taken.
+   *
+   * @return {@code false} if the lock is held by another worker
    */
-  private boolean isLockingException(Throwable e) {
-    if (e == null) return false;
-    if (e instanceof PSQLException psqlException && "55P03".equals(psqlException.getSQLState()))
+  private boolean lockTransaction(String txId) {
+    if (!DBHelper.isPostgreSQL()) {
       return true;
-    if (e instanceof jakarta.persistence.PessimisticLockException
-        || e instanceof org.hibernate.PessimisticLockException
-        || e instanceof org.hibernate.exception.LockAcquisitionException) return true;
-    if (e.getCause() != null && e.getCause() != e) return isLockingException(e.getCause());
-    return false;
-  }
-
-  /**
-   * Determines whether the given throwable or any of its causes is an {@link
-   * AuditLogLockedException}, meaning the pending audit logs are being processed by another worker.
-   */
-  private boolean isAuditLogLocked(Throwable e) {
-    for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
-      if (t instanceof AuditLogLockedException) {
-        return true;
-      }
     }
-    return false;
-  }
-
-  /**
-   * Executes a JDBC work locking audit logs. A locking failure is thrown as an {@link
-   * AuditLogLockedException}, to tell it apart from locking failures on other tables.
-   */
-  private void doAuditLogLockingWork(Work work) {
-    try {
-      JPA.em().unwrap(Session.class).doWork(work);
-    } catch (RuntimeException e) {
-      if (isLockingException(e)) {
-        throw new AuditLogLockedException(e);
-      }
-      throw e;
+    var locked = new boolean[1];
+    JPA.em()
+        .unwrap(Session.class)
+        .doWork(
+            conn -> {
+              try (PreparedStatement ps =
+                  conn.prepareStatement("SELECT pg_try_advisory_xact_lock(?, hashtext(?))")) {
+                ps.setInt(1, ADVISORY_LOCK_CLASS_ID);
+                ps.setString(2, txId);
+                try (ResultSet rs = ps.executeQuery()) {
+                  locked[0] = rs.next() && rs.getBoolean(1);
+                }
+              }
+            });
+    if (!locked[0]) {
+      log.debug("Audit logs of transaction {} are processed by another worker", txId);
     }
+    return locked[0];
   }
 
   /**
@@ -299,8 +273,14 @@ public class AuditProcessor {
    * failing group must not leave partial changes, and a database error may have made the
    * transaction unusable. The failing group and the groups processed before it are returned, so the
    * caller can record the error and process these groups again once the batch is rolled back.
+   *
+   * <p>If another worker is processing the same transaction, nothing is fetched.
    */
   protected BatchResult processBatch(String txId, long afterAuditLogId) {
+    if (!lockTransaction(txId)) {
+      return new BatchResult(0, List.of(), null, null, afterAuditLogId);
+    }
+
     // compute audit work group
     List<AuditWorkGroup> batch = fetchNextBatch(txId, afterAuditLogId);
     if (batch.isEmpty()) {
@@ -337,10 +317,11 @@ public class AuditProcessor {
   /**
    * Processes a single group in the current transaction.
    *
-   * @return {@code false} if the group has already been processed meanwhile
+   * @return {@code false} if the group has already been processed meanwhile, or if another worker
+   *     is processing its transaction
    */
   private boolean processGroup(AuditWorkGroup group) {
-    if (!lockGroup(group)) {
+    if (!lockTransaction(group.getTxId()) || !hasPendingLogs(group)) {
       return false;
     }
     // Reload the logs, the ones loaded by a previous transaction are detached
@@ -353,10 +334,18 @@ public class AuditProcessor {
     return true;
   }
 
-  /** Records the error of a failed group in a new transaction. */
+  /**
+   * Records the error of a failed group in a new transaction. Skipped if another worker is
+   * processing its transaction, which will retry the group.
+   */
   private void recordError(AuditWorkGroup group, Exception e) {
     try {
-      JPA.runInTransaction(() -> handleError(group, e));
+      JPA.runInTransaction(
+          () -> {
+            if (lockTransaction(group.getTxId())) {
+              handleError(group, e);
+            }
+          });
     } catch (Exception ex) {
       log.error("Failed to record error for audit logs group {}", group, ex);
     }
@@ -495,32 +484,32 @@ public class AuditProcessor {
   }
 
   /**
-   * Locks the pending audit logs of the given group.
+   * Checks whether the given group still has pending audit logs.
    *
    * @return {@code false} if the group has no pending audit logs anymore
    */
-  private boolean lockGroup(AuditWorkGroup group) {
+  private boolean hasPendingLogs(AuditWorkGroup group) {
     String sql =
         """
             SELECT id FROM audit_log
             WHERE processed = false AND tx_id = ? AND related_model = ? AND related_id = ? AND event_type = ?
-            %s
-            """
-            .formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
+            """;
 
     var found = new boolean[1];
-    doAuditLogLockingWork(
-        conn -> {
-          try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, group.getTxId());
-            ps.setString(2, group.getRelatedModel());
-            ps.setObject(3, group.getRelatedId());
-            ps.setString(4, group.getEventType().name());
-            try (ResultSet rs = ps.executeQuery()) {
-              found[0] = rs.next();
-            }
-          }
-        });
+    JPA.em()
+        .unwrap(Session.class)
+        .doWork(
+            conn -> {
+              try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, group.getTxId());
+                ps.setString(2, group.getRelatedModel());
+                ps.setObject(3, group.getRelatedId());
+                ps.setString(4, group.getEventType().name());
+                try (ResultSet rs = ps.executeQuery()) {
+                  found[0] = rs.next();
+                }
+              }
+            });
     return found[0];
   }
 
@@ -598,29 +587,23 @@ public class AuditProcessor {
     log.trace(
         "Fetching next batch of audit logs with txId: {}, after id: {}", txId, afterAuditLogId);
 
-    String sqlTemplate =
+    String sql =
         """
-            WITH locked_rows AS (
-                 SELECT id, tx_id, related_model, related_id, event_type, retry_count, created_on
-                 FROM audit_log
-                 WHERE processed = false
-                   AND tx_id = ?
-                 %s
-            )
             SELECT tx_id, related_model, related_id, event_type, MIN(id) as min_id, MAX(id) as max_id,
                    MAX(COALESCE(retry_count, 0)) as retry_count
-            FROM locked_rows
+            FROM audit_log
+            WHERE processed = false
+              AND tx_id = ?
             GROUP BY tx_id, related_model, related_id, event_type
             HAVING MIN(id) > ?
             ORDER BY MIN(id)
             LIMIT ?
             """;
 
-    String sql = sqlTemplate.formatted(DBHelper.isPostgreSQL() ? "FOR UPDATE NOWAIT" : "");
-
+    Session session = JPA.em().unwrap(Session.class);
     List<AuditWorkGroup> result = new ArrayList<>();
 
-    doAuditLogLockingWork(
+    session.doWork(
         conn -> {
           try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
@@ -716,13 +699,6 @@ public class AuditProcessor {
       AuditWorkGroup failedGroup,
       Exception failure,
       long lastAuditLogId) {}
-
-  /** Thrown when the pending audit logs are locked by another worker. */
-  private static class AuditLogLockedException extends RuntimeException {
-    AuditLogLockedException(Throwable cause) {
-      super(cause);
-    }
-  }
 
   private static class AuditWorkGroup {
 
