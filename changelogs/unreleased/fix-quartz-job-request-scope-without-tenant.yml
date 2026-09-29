@@ -1,0 +1,6 @@
+---
+title: Fix request scope not opened for scheduled jobs outside multi-tenancy
+type: fix
+description: |
+  Jobs run without a tenant didn't get a request scope, so any `@RequestScoped`
+  service they used failed with `OutOfScopeException`.

@@ -54,7 +54,7 @@ public class GuiceJobRunShell extends JobRunShell {
         .map(JobDetail::getKey)
         .map(Key::getGroup) // group is tenant id
         .filter(group -> StringUtils.notBlank(group) && !DEFAULT_GROUP.equals(group))
-        .ifPresentOrElse(this::run, super::run);
+        .ifPresentOrElse(this::run, this::superRun);
   }
 
   private void superRun() {
