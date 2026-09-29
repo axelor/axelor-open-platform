@@ -5,8 +5,10 @@
 package com.axelor.web.socket.channels;
 
 import com.axelor.cache.AxelorCache;
+import com.axelor.cache.AxelorTopic;
+import com.axelor.cache.AxelorTopic.MessageListener;
 import com.axelor.cache.CacheBuilder;
-import com.axelor.cache.redisson.RedissonProvider;
+import com.axelor.cache.DistributedFactory;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.tenants.TenantResolver;
@@ -21,8 +23,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.redisson.RedissonShutdownException;
-import org.redisson.api.RTopic;
-import org.redisson.api.listener.MessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class RedisMailChannel extends MailChannel {
   private final AxelorCache<String, Map<String, Integer>> globalSessions =
       CacheBuilder.newBuilder("mail-sessions").expireAfterAccess(Duration.ofHours(6)).build();
 
-  private final RTopic topic;
+  private final AxelorTopic topic;
   private final int listenerId;
 
   private static final Logger log = LoggerFactory.getLogger(RedisMailChannel.class);
@@ -49,8 +49,8 @@ public class RedisMailChannel extends MailChannel {
   public RedisMailChannel(
       MailMessageRepository mailMessageRepo, ObjectMapper objectMapper, JpaSecurity jpaSecurity) {
     super(mailMessageRepo, objectMapper, jpaSecurity);
-    var redisson = RedissonProvider.get();
-    topic = redisson.getTopic(TOPIC_NAME);
+    // Publishes with the current tenant and applies it before invoking listeners.
+    topic = DistributedFactory.getTopic(TOPIC_NAME);
 
     // Listen for messages from other instances.
     listenerId = topic.addListener(MailData.class, new MailMessageListener());
@@ -148,10 +148,10 @@ public class RedisMailChannel extends MailChannel {
   protected class MailMessageListener implements MessageListener<MailData> {
 
     @Override
-    public void onMessage(CharSequence channel, MailData data) {
+    public void onMessage(MailData data) {
       log.trace("Received message: {}", data);
 
-      // Forward message to local sessions.
+      // Forward to local sessions for the publisher's tenant.
       RedisMailChannel.super.broadcast(data);
     }
   }

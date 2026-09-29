@@ -1,0 +1,9 @@
+---
+title: Fix live mail messages sent to the wrong tenant with Redis
+type: fix
+description: |
+  In multi-tenant setups with Redisson, live mail messages from other
+  instances lacked tenant context and reached only default-tenant users.
+
+  Messages now include the publisher's tenant. Because the payload structure
+  changed, mixed-version instances will not share live mail during rolling upgrades.
