@@ -1,0 +1,10 @@
+---
+title: Fix report images loaded from the wrong tenant
+type: fix
+description: |
+  In multi-tenancy mode, `ImageTool` loaded `MetaFile` records from the
+  default tenant's database for all reports. Tasks ran on `ReportExecutor`
+  without tenant context and reused a default-tenant database session.
+
+  Tasks submitted to `ReportExecutor` now run with the caller's tenant and
+  close their database session on completion.

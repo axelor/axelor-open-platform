@@ -4,15 +4,13 @@
  */
 package com.axelor.report.tool;
 
-import com.axelor.db.JPA;
-import java.util.concurrent.BlockingQueue;
+import com.axelor.concurrent.ContextAware;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +29,12 @@ public final class ReportExecutor {
 
   private ReportExecutor() {
     sExecutor =
-        new ReportThreadPoolExecutor(
+        new ThreadPoolExecutor(
             defaultCorePoolSize,
             defaultMaximumPoolSize,
             defaultKeepAliveTime,
             defaultTimeUnit,
             new LinkedBlockingQueue<>());
-    ;
   }
 
   private static synchronized ReportExecutor getInstance() {
@@ -51,8 +48,17 @@ public final class ReportExecutor {
     return sExecutor;
   }
 
+  /**
+   * Submits a task to the report executor.
+   *
+   * <p>The task runs with the caller's context (tenant, user, base URL and language) and its own
+   * database session, closed once the task is completed.
+   *
+   * @param task the task to run
+   * @return the future result of the task
+   */
   public static <T> Future<T> submit(Callable<T> task) {
-    return getInstance().getExecutor().submit(task);
+    return getInstance().getExecutor().submit(ContextAware.of().withTransaction(false).build(task));
   }
 
   public static void shutdown() {
@@ -72,24 +78,5 @@ public final class ReportExecutor {
     }
 
     LOG.info("Report executor stopped.");
-  }
-
-  static class ReportThreadPoolExecutor extends ThreadPoolExecutor {
-
-    public ReportThreadPoolExecutor(
-        int corePoolSize,
-        int maximumPoolSize,
-        long keepAliveTime,
-        @NotNull TimeUnit unit,
-        @NotNull BlockingQueue<Runnable> workQueue) {
-      super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-    }
-
-    /** Clear JPA cache after execution to avoid any inconsistency */
-    @Override
-    protected void afterExecute(Runnable r, Throwable t) {
-      JPA.clear();
-      super.afterExecute(r, t);
-    }
   }
 }
