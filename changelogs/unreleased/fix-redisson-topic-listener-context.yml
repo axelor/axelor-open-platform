@@ -1,0 +1,10 @@
+---
+title: Fix Redisson topic listeners retaining database sessions across tenants
+type: fix
+description: |
+  Redisson topic listeners run on reused threads. Database sessions opened by
+  a listener leaked across tasks on the same thread, keeping the first
+  message's tenant.
+
+  Listeners now run as `ContextAware` tasks with the publisher's tenant and
+  a dedicated database session that closes when done.

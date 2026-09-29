@@ -5,13 +5,18 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorTopic;
+import com.axelor.concurrent.ContextAware;
 import com.axelor.db.tenants.TenantResolver;
 import org.redisson.api.RTopic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Adapter for {@link org.redisson.api.RTopic} to conform to the {@link AxelorTopic}. */
 public class RedissonTopicAdapter implements AxelorTopic {
 
   private final RTopic topic;
+
+  private static final Logger log = LoggerFactory.getLogger(RedissonTopicAdapter.class);
 
   record MessageWrapper<M>(String tenantId, M message) {}
 
@@ -24,6 +29,12 @@ public class RedissonTopicAdapter implements AxelorTopic {
     return topic.publish(new MessageWrapper<>(TenantResolver.currentTenantIdentifier(), message));
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Listeners run on shared Redisson worker threads. Each listener runs in a {@link
+   * ContextAware} task with the publisher's tenant and a dedicated database session.
+   */
   @SuppressWarnings("unchecked")
   @Override
   public <M> int addListener(Class<M> type, MessageListener<? extends M> listener) {
@@ -34,12 +45,12 @@ public class RedissonTopicAdapter implements AxelorTopic {
             return;
           }
 
-          String previousTenantId = TenantResolver.currentTenantIdentifier();
-          TenantResolver.setCurrentTenant(wrapper.tenantId());
           try {
-            ((MessageListener<M>) listener).onMessage((M) wrapper.message());
-          } finally {
-            TenantResolver.setCurrentTenant(previousTenantId);
+            ContextAware.of(wrapper.tenantId(), null, null, null, false)
+                .build(() -> ((MessageListener<M>) listener).onMessage((M) wrapper.message()))
+                .run();
+          } catch (RuntimeException e) {
+            log.error("Topic listener failed", e);
           }
         });
   }
