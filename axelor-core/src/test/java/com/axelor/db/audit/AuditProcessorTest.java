@@ -275,7 +275,7 @@ class AuditProcessorTest extends BaseAuditTest {
     // Another worker holds the lock of the transaction
     try (var conn = DBHelper.getConnection();
         var ps = conn.prepareStatement("SELECT pg_advisory_lock(?, hashtext(?))")) {
-      ps.setInt(1, AuditProcessor.ADVISORY_LOCK_CLASS_ID);
+      ps.setInt(1, AuditBatchProcessor.ADVISORY_LOCK_CLASS_ID);
       ps.setString(2, txId);
       ps.execute();
 
