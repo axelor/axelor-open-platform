@@ -61,7 +61,6 @@ public class FieldsEncryptionTest extends BaseEncryptionTest {
             savedEntityId = entity.getId();
           });
     }
-    savedEntityId = Query.of(SecureEntity.class).fetchOne().getId();
   }
 
   @SuppressWarnings("rawtypes")
