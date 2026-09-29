@@ -22,7 +22,7 @@ versions.ldaptive = "2.5.1"
 
 versions.junit = "6.0.3"
 
-versions.slf4j = "2.0.19"
+versions.slf4j = "2.0.20"
 
 versions.tomcat = "10.1.59"
 
