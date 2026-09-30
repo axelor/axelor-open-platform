@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded:
   
   - HikariCP from 7.0.2 to 7.1.0
+  - Logback from 1.5.38 to 1.6.4
