@@ -122,7 +122,7 @@ libs.hibernate = [
 ]
 
 // Caching libs
-libs.ehcache = "org.ehcache:ehcache:3.11.1"
+libs.ehcache = "org.ehcache:ehcache:3.12.0"
 libs.redisson = [
   "org.redisson:redisson:${versions.redisson}",
   dependencies.create("org.redisson:redisson-hibernate-6:${versions.redisson}") {
@@ -134,15 +134,15 @@ libs.redisson = [
   // overrides jackson version used
   "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
-libs.hazelcast = "com.hazelcast:hazelcast:5.6.0"
+libs.hazelcast = "com.hazelcast:hazelcast:5.7.0"
 libs.caffeine = [
   "com.github.ben-manes.caffeine:caffeine:${versions.caffeine}",
   "com.github.ben-manes.caffeine:jcache:${versions.caffeine}"
 ]
 libs.infinispan = [
-  "org.infinispan:infinispan-hibernate-cache-v66:16.1.4",
-  "org.infinispan:infinispan-core:16.1.4",
-  "org.infinispan:infinispan-jcache:16.1.4"
+  "org.infinispan:infinispan-hibernate-cache-v66:16.2.3",
+  "org.infinispan:infinispan-core:16.2.3",
+  "org.infinispan:infinispan-jcache:16.2.3"
 ]
 
 // apache tika
