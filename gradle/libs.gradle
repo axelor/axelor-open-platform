@@ -20,7 +20,7 @@ versions.jakartaee_pac4j = "8.0.3"
 versions.pac4j = "6.5.9"
 versions.ldaptive = "2.5.1"
 
-versions.junit = "6.0.3"
+versions.junit = "6.1.3"
 
 versions.slf4j = "2.0.20"
 
