@@ -1,0 +1,7 @@
+---
+title: Upgrade backend dependencies
+type: change
+description: |
+  Here is the list of backend dependencies upgraded:
+  
+  - HikariCP from 7.0.2 to 7.1.0
