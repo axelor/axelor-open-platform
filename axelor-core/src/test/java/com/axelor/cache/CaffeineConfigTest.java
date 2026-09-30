@@ -24,6 +24,10 @@ class CaffeineConfigTest {
 
   private CaffeineConfiguration<?, ?> region(String name) {
     Config config = ConfigFactory.load();
+    // "default" is a reserved section, not a cache: it is only reachable through defaults()
+    if ("default".equals(name)) {
+      return TypesafeConfigurator.defaults(config);
+    }
     return TypesafeConfigurator.from(config, name)
         .orElseThrow(() -> new AssertionError("Region not found in application.conf: " + name));
   }

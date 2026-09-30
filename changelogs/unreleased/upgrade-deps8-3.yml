@@ -6,3 +6,4 @@ description: |
   
   - HikariCP from 7.0.2 to 7.1.0
   - Logback from 1.5.38 to 1.6.4
+  - Caffeine from 3.2.4 to 3.3.0

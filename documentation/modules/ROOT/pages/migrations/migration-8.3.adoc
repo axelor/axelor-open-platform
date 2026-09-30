@@ -83,6 +83,32 @@ VALUES (nextval('meta_schedule_seq'), 0, now(), true, '0 0 5 * * ?',
         'authentication.events.purge');
 ----
 
+== Quote cache region names in Caffeine `application.conf`
+
+Caffeine 3.3.0 matches cache region names under `caffeine.jcache` as exact keys. Region names containing dots (such as
+entity or collection names) must be quoted in `application.conf`. Without quotes, dots are parsed as nested paths,
+so the region is not matched and silently falls back to `default` settings.
+
+Update custom `application.conf` files:
+
+[source,conf]
+----
+caffeine.jcache {
+  # Before
+  com.example.db.MyEntity {
+    policy.maximum.size = 500
+  }
+
+  # After
+  "com.example.db.MyEntity" {
+    policy.maximum.size = 500
+  }
+}
+----
+
+See xref:dev-guide:application/config.adoc#persistence-cache-configuration[Persistence Cache Configuration] for the
+default regions.
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :

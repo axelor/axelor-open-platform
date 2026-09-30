@@ -6,7 +6,7 @@ versions.guice = "7.0.0"
 versions.guava = "33.5.0-jre"
 versions.hibernate = "6.6.58.Final"
 versions.hibernate_validator = "8.0.5.Final"
-versions.caffeine = "3.2.4"
+versions.caffeine = "3.3.0"
 versions.redisson = "4.7.0"
 
 versions.groovy = "4.0.33"
