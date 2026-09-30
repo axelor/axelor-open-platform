@@ -8,3 +8,4 @@ description: |
   - Logback from 1.5.38 to 1.6.4
   - Caffeine from 3.2.4 to 3.3.0
   - Guava from 33.5.0 to 33.7.2
+  - CommonsIO from 2.21.0 to 2.22.0
