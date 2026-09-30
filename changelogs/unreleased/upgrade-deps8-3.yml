@@ -10,3 +10,4 @@ description: |
   - Guava from 33.5.0 to 33.7.2
   - CommonsIO from 2.21.0 to 2.22.0
   - Apache Tika from 3.2.3 to 3.3.2
+  - Snakeyaml from 2.6 to 2.7
