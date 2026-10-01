@@ -312,6 +312,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const columnNamesRef = useRef<string[]>([]);
+    /* eslint-disable react-hooks/refs -- columnNamesRef is a memoization cache
+     * that keeps the same array identity while the column names are equal, so
+     * columnNames (and the memo below using it) only change with the names. */
     const columnNames = useMemo(() => {
       const list = (columns ?? []).map((c) => c.name).filter(Boolean);
       if (isEqual(list, columnNamesRef.current)) {
@@ -381,6 +384,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       // intentionally exclude `fields`, `record`, etc. to avoid unnecessary recomputation.
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editColumnName, columnNames, view.items]);
+    /* eslint-enable react-hooks/refs */
 
     const expandState = useMemo(
       () =>

@@ -194,6 +194,9 @@ export function ToolbarActions({
   const actionContext = _actionContext ?? action.context;
 
   const innerRef = useRef<HTMLDivElement>(null);
+  /* eslint-disable react-hooks/refs -- the DOM is measured during render on
+   * purpose: parentWidth comes from a resize observer and is the trigger to
+   * re-measure the rendered toolbar children. */
   const responsive = useMemo(() => {
     // Compute total width of children, excluding responsive dropdown menu.
     let width = innerRef.current?.offsetWidth ?? 0;
@@ -206,6 +209,7 @@ export function ToolbarActions({
       Math.ceil(width ?? 0)
     );
   }, [parentRef, innerRef, parentWidth]);
+  /* eslint-enable react-hooks/refs */
 
   const getItems = useCallback(
     (getText: (item: ToolbarItem) => string = getTextFull) => {

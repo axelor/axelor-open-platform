@@ -406,7 +406,7 @@ const FormContainer = memo(function FormContainer({
     onSave: onSaveAction,
   } = schema;
 
-  const defaultRecord = useRef({ [defaultSymbol]: true }).current;
+  const defaultRecord = useMemo(() => ({ [defaultSymbol]: true }), []);
   const {
     id: tabId,
     popup,

@@ -51,7 +51,6 @@ export function OneToManyEdit({
   const [popup, setPopup] = useState(false);
   const [state, setState] = useGridState();
   const [value, setValue] = useAtom(
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     useMemo(
       () =>
         atom(
@@ -147,7 +146,6 @@ export function OneToManyEdit({
   });
 
   const onSearch = useCallback(
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
       const unsaved = (value || []).filter((x) => !ids.includes(x.id));

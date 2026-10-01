@@ -39,7 +39,8 @@ export function useGridState(
         }),
         ...gridState,
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // deps are forwarded by the caller, so they can't be an array literal here
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo
     deps,
   );
   const [state, setState] = useAtom(gridAtom);

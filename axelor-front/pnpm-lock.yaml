@@ -162,8 +162,8 @@ importers:
         specifier: ^10.11.0
         version: 10.11.0
       eslint-plugin-react-hooks:
-        specifier: ^7.0.1
-        version: 7.0.1(eslint@10.11.0)
+        specifier: ^7.1.1
+        version: 7.1.1(eslint@10.11.0)
       eslint-plugin-react-refresh:
         specifier: ^0.5.7
         version: 0.5.7(eslint@10.11.0)
@@ -1921,11 +1921,11 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
-  eslint-plugin-react-hooks@7.0.1:
-    resolution: {integrity: sha512-O0d0m04evaNzEPoSW+59Mezf8Qt0InfgGIBJnpC0h3NH/WjUAR7BIKUfysC6todmtiZ/A0oUVS8Gce0WhBrHsA==}
+  eslint-plugin-react-hooks@7.1.1:
+    resolution: {integrity: sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==}
     engines: {node: '>=18'}
     peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
 
   eslint-plugin-react-refresh@0.5.7:
     resolution: {integrity: sha512-XhJSzLljuYD4UjNuFGJu2v7aD3sqNVK12w5/DCUfrNfHWegZo2+TsavNx8MuxMwEquuFAzNbNfXKU0WoZ+YUIg==}
@@ -5425,10 +5425,10 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-plugin-react-hooks@7.0.1(eslint@10.11.0):
+  eslint-plugin-react-hooks@7.1.1(eslint@10.11.0):
     dependencies:
       '@babel/core': 7.29.7
-      '@babel/parser': 7.29.0
+      '@babel/parser': 7.29.7
       eslint: 10.11.0
       hermes-parser: 0.25.1
       zod: 4.3.6

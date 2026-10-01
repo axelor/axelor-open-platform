@@ -167,6 +167,9 @@ export function Phone({
     [onChange],
   );
 
+  /* eslint-disable react-hooks/refs -- lastEmittedRef/lastPhoneRef only track
+   * our own last emission to detect the onChange echo; they must not trigger a
+   * re-render, so they are read during render on purpose. */
   const {
     inputValue,
     phone,
@@ -187,6 +190,7 @@ export function Phone({
     onChange: handlePhoneChange,
     disableDialCodePrefill: true,
   });
+  /* eslint-enable react-hooks/refs */
   const applyPhoneInputValue = useCallback(
     (value: string, data: string = value, selectionStart = value.length) => {
       handlePhoneValueChange({
@@ -254,6 +258,9 @@ export function Phone({
   // Position for portaled dropdown
   const dropdownPos = useMemo(() => {
     if (!showDropdown) return {};
+    // The button is measured only when the dropdown opens, while the button
+    // is already mounted; showDropdown is the intended trigger.
+    // eslint-disable-next-line react-hooks/refs
     const { bottom, left } = buttonRef.current?.getBoundingClientRect() ?? {};
     return { top: bottom, left };
   }, [showDropdown]);
