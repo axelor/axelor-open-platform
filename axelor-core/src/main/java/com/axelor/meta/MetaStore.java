@@ -82,12 +82,6 @@ public final class MetaStore {
 
   private static final Map<String, JsonReferenceFieldDTO> NULL_JSON_FIELD = new NullMap<>();
 
-  /** Reference (relational) custom fields keyed by their owning model or custom model. */
-  private static final AxelorCache<String, List<JsonReferenceFieldDTO>> REFERENCE_JSON_FIELDS =
-      CacheBuilder.newBuilder("referenceJsonFieldCache")
-          .expireAfterWrite(Duration.ofHours(1))
-          .build(MetaStore::loadReferenceJsonFields);
-
   /** Reverse index: custom fields keyed by the model they reference (their target). */
   private static final AxelorCache<String, List<JsonReferenceFieldDTO>> TARGET_JSON_FIELDS =
       CacheBuilder.newBuilder("targetJsonFieldCache")
@@ -405,16 +399,61 @@ public final class MetaStore {
   @Nullable
   private static Map<String, JsonReferenceFieldDTO> getJsonFieldsOrNull(
       ModelFieldKey key, Function<ModelFieldKey, Map<String, JsonReferenceFieldDTO>> loader) {
-    var jsonFields = JSON_FIELDS.get(key, loader);
+    return nullIfAbsent(JSON_FIELDS.get(key, loader));
+  }
+
+  /** Converts the cached null map placeholder to null. */
+  @Nullable
+  private static Map<String, JsonReferenceFieldDTO> nullIfAbsent(
+      Map<String, JsonReferenceFieldDTO> jsonFields) {
     return jsonFields instanceof NullMap ? null : jsonFields;
   }
 
   /**
    * Returns the relational (reference) custom fields owned by the given model. The key is a
    * fully-qualified class name for real models, or a custom model name for {@link MetaJsonModel}s.
+   *
+   * <p>Computed from the json fields cache: for real models, the reference fields of all its json
+   * properties are combined, as the json fields cache is keyed per model and json property.
    */
   public static List<JsonReferenceFieldDTO> getReferenceJsonFields(String modelKey) {
-    return REFERENCE_JSON_FIELDS.get(modelKey);
+    if (modelKey.contains(".")) {
+      final Class<?> modelClass;
+      try {
+        modelClass = Class.forName(modelKey);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Class not found: " + modelKey, e);
+      }
+      final List<ModelFieldKey> keys =
+          Stream.of(Mapper.of(modelClass).getProperties())
+              .filter(Property::isJson)
+              .map(property -> ModelFieldKey.of(modelKey, property.getName()))
+              .toList();
+
+      // Fetch all json properties' fields at once (a single round trip with a distributed cache).
+      // getAll only returns cached entries: missing ones are loaded individually.
+      final Map<ModelFieldKey, Map<String, JsonReferenceFieldDTO>> cached =
+          JSON_FIELDS.getAll(new HashSet<>(keys));
+
+      return keys.stream()
+          .map(
+              key -> {
+                final var fields = cached.get(key);
+                return fields != null
+                    ? nullIfAbsent(fields)
+                    : getJsonFieldsOrNull(key, MetaStore::loadJsonFieldsByModelField);
+              })
+          .filter(Objects::nonNull)
+          .flatMap(fields -> fields.values().stream())
+          .filter(JsonReferenceFieldDTO::isReference)
+          .toList();
+    }
+
+    var jsonFields = getJsonFields(modelKey);
+
+    return jsonFields != null
+        ? jsonFields.values().stream().filter(JsonReferenceFieldDTO::isReference).toList()
+        : Collections.emptyList();
   }
 
   /**
@@ -498,31 +537,6 @@ public final class MetaStore {
         .stream()
         .map(JsonReferenceFieldDTO::from)
         .toList();
-  }
-
-  private static List<JsonReferenceFieldDTO> loadReferenceJsonFields(String modelKey) {
-    if (modelKey.contains(".")) {
-      final Class<?> modelClass;
-      try {
-        modelClass = Class.forName(modelKey);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Class not found: " + modelKey, e);
-      }
-      return Stream.of(Mapper.of(modelClass).getProperties())
-          .filter(Property::isJson)
-          .map(Property::getName)
-          .map(fieldName -> getJsonFields(modelKey, fieldName))
-          .filter(Objects::nonNull)
-          .flatMap(map -> map.values().stream())
-          .filter(JsonReferenceFieldDTO::isReference)
-          .toList();
-    }
-
-    var jsonFields = getJsonFields(modelKey);
-
-    return jsonFields != null
-        ? jsonFields.values().stream().filter(JsonReferenceFieldDTO::isReference).toList()
-        : Collections.emptyList();
   }
 
   /** Builds the field metadata and overlays user locale/access contexts. */
@@ -870,7 +884,6 @@ public final class MetaStore {
 
   public static void invalidateJsonFields() {
     JSON_FIELDS.invalidateAll();
-    REFERENCE_JSON_FIELDS.invalidateAll();
     TARGET_JSON_FIELDS.invalidateAll();
   }
 }
