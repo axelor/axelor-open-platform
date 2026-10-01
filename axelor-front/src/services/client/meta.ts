@@ -369,8 +369,7 @@ export type ActionResult = {
     cancelBtnTitle?: string;
   };
   notify?:
-    | { title: string; message: string }
-    | { title: string; message: string }[];
+    { title: string; message: string } | { title: string; message: string }[];
   errors?: Record<string, string>;
   values?: DataRecord;
   attrs?: Record<string, Record<string, any>>;

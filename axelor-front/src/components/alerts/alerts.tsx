@@ -11,12 +11,7 @@ import { SanitizedContent } from "@/utils/sanitize";
 import styles from "./alerts.module.css";
 
 export type AlertType =
-  | "primary"
-  | "secondary"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+  "primary" | "secondary" | "info" | "success" | "warning" | "danger";
 
 export type AlertProps = {
   id: string;
