@@ -14,9 +14,14 @@ const unslashedBase = base === "/" ? base : base.slice(0, -1);
 const { plugins = [], ...conf } = viteConfig as ViteUserConfig;
 
 // add jotai babel plugins
+// `focusAtom` is our own helper (@/utils/atoms), not imported from jotai
+const jotaiOptions = { customAtomNames: ["focusAtom"] };
 plugins.push(
   babel({
-    plugins: [jotaiDebugLabel, jotaiReactRefresh],
+    plugins: [
+      [jotaiDebugLabel, jotaiOptions],
+      [jotaiReactRefresh, jotaiOptions],
+    ],
   }),
 );
 

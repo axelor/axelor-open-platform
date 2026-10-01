@@ -177,8 +177,8 @@ importers:
         specifier: ^17.13.0
         version: 17.13.0
       jotai-babel:
-        specifier: ^0.1.0
-        version: 0.1.0(@babel/core@7.29.7)(@babel/template@7.29.7)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.3.0)(react@19.3.0))
+        specifier: ^0.3.0
+        version: 0.3.0(@babel/core@7.29.7)(@babel/template@7.29.7)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.3.0)(react@19.3.0))
       jsdom:
         specifier: ^29.0.1
         version: 29.0.1
@@ -2397,8 +2397,8 @@ packages:
     resolution: {integrity: sha512-QKNsM0o3Xe6ISQU869e+DhG+4CK/48aHYdJZGlFQVTjnbvgpcKyxpzk29fGiO7i/J8VENZ+d2iGnSsvmuHywlA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  jotai-babel@0.1.0:
-    resolution: {integrity: sha512-nNrxxP3c9IQpK4NaZdJBir0rdRcqebJgSc+IHJZNUtL2t7fVuwUG2cUxy9ObZJ6woih13NnSGTmbPuIR0v2Vqg==}
+  jotai-babel@0.3.0:
+    resolution: {integrity: sha512-YL8MJ4ZKsKoXNCgrJvayVyBrwg0tJ56SVJg7i2s9SpTCa/SJ/KNc0gJBEWZDJuXC7xEcAKFbFNOc2cKQM9Ak5w==}
     peerDependencies:
       '@babel/core': '>=7.0.0'
       '@babel/template': '>=7.0.0'
@@ -6009,7 +6009,7 @@ snapshots:
       graceful-fs: 4.2.11
       picomatch: 4.0.4
 
-  jotai-babel@0.1.0(@babel/core@7.29.7)(@babel/template@7.29.7)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.3.0)(react@19.3.0)):
+  jotai-babel@0.3.0(@babel/core@7.29.7)(@babel/template@7.29.7)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.3.0)(react@19.3.0)):
     dependencies:
       '@babel/core': 7.29.7
       '@babel/template': 7.29.7
