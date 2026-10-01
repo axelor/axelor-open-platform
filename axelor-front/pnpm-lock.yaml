@@ -71,8 +71,8 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       immer:
-        specifier: ^11.1.4
-        version: 11.1.4
+        specifier: ^11.1.21
+        version: 11.1.21
       jotai:
         specifier: ^2.19.0
         version: 2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4)
@@ -81,7 +81,7 @@ importers:
         version: 1.0.1(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4))
       jotai-immer:
         specifier: ^0.4.3
-        version: 0.4.3(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4))
+        version: 0.4.3(immer@11.1.21)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4))
       libphonenumber-js:
         specifier: ^1.12.40
         version: 1.12.40
@@ -2163,8 +2163,8 @@ packages:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
 
-  immer@11.1.4:
-    resolution: {integrity: sha512-XREFCPo6ksxVzP4E0ekD5aMdf8WMwmdNaz6vuvxgI40UaEiu6q3p8X52aU6GdyvLY3XXX/8R7JOTXStz/nBbRw==}
+  immer@11.1.21:
+    resolution: {integrity: sha512-bZSadeCPGdaY5/qRLgr6mDSH1ra21rD3rqpiWk7+QTr4ayYPTE9qZYdLh/NdPhMe0wSrTvHD/Lk8q5EwhUs0aw==}
 
   immutable@3.8.3:
     resolution: {integrity: sha512-AUY/VyX0E5XlibOmWt10uabJzam1zlYjwiEgQSDc5+UIkFNaF9WM0JxXKaNMGf+F/ffUF+7kRKXM9A7C0xXqMg==}
@@ -3422,7 +3422,7 @@ snapshots:
       csstype: 3.2.3
       dayjs: 1.11.23
       focus-trap: 8.0.1
-      immer: 11.1.4
+      immer: 11.1.21
       jsbarcode: 3.12.3
       qrcode: 1.5.4
       react: 19.2.4
@@ -5647,7 +5647,7 @@ snapshots:
 
   ignore@7.0.5: {}
 
-  immer@11.1.4: {}
+  immer@11.1.21: {}
 
   immutable@3.8.3: {}
 
@@ -5772,9 +5772,9 @@ snapshots:
     dependencies:
       jotai: 2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4)
 
-  jotai-immer@0.4.3(immer@11.1.4)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4)):
+  jotai-immer@0.4.3(immer@11.1.21)(jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4)):
     dependencies:
-      immer: 11.1.4
+      immer: 11.1.21
       jotai: 2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4)
 
   jotai@2.19.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.14)(react@19.2.4):

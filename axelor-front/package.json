@@ -39,7 +39,7 @@
     "dayjs": "^1.11.23",
     "dompurify": "^3.4.12",
     "echarts": "^6.0.0",
-    "immer": "^11.1.4",
+    "immer": "^11.1.21",
     "jotai": "^2.19.0",
     "jotai-family": "^1.0.1",
     "jotai-immer": "^0.4.3",
