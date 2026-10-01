@@ -107,8 +107,8 @@ importers:
         specifier: ^6.1.6
         version: 6.1.6(@types/react@19.2.14)(react@19.2.4)
       react-grid-layout:
-        specifier: 2.2.3
-        version: 2.2.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 2.2.4
+        version: 2.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-international-phone:
         specifier: ^4.8.0
         version: 4.8.0(react@19.2.4)
@@ -2738,8 +2738,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-grid-layout@2.2.3:
-    resolution: {integrity: sha512-OAEJHBxmfuxQfVtZwRzmsokijGlBgzYIJ7MUlLk/VSa43SaGzu15w5D0P2RDrfX5EvP9POMbL6bFrai/huDzbQ==}
+  react-grid-layout@2.2.4:
+    resolution: {integrity: sha512-Eb57FsgOMYOfsUGrMI1ku/FFR+dPNPrE8qo+3hwZubpqVSy4GO9v52DeX50Tl3JDYAlCypP4rmw7Vrqk/zOIvA==}
     peerDependencies:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
@@ -6171,7 +6171,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  react-grid-layout@2.2.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-grid-layout@2.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       clsx: 2.1.1
       fast-equals: 4.0.3
