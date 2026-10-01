@@ -38,8 +38,10 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.IllegalFileException;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Context;
@@ -721,6 +723,9 @@ public class RestService extends ResourceService {
       return false;
     }
 
+    final User user = AuthUtils.getUser();
+    final MetaPermissions perms = Beans.get(MetaPermissions.class);
+
     for (final Entry<String, JsonReferenceFieldDTO> entry : jsonFields.entrySet()) {
       final JsonReferenceFieldDTO value = entry.getValue();
 
@@ -731,6 +736,12 @@ public class RestService extends ResourceService {
       final String target = value.targetModel();
 
       if (target != null && MetaFile.class.isAssignableFrom(Class.forName(target))) {
+        final MetaPermissionRule rule =
+            perms.findRule(user, parentModel, value.modelField() + "." + value.name());
+        if (rule != null && !Boolean.TRUE.equals(rule.getCanRead())) {
+          continue;
+        }
+
         final String type = value.type();
 
         if (type != null
