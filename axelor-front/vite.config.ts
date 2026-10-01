@@ -29,7 +29,7 @@ export default defineConfig({
     {
       name: "monaco-hash",
       writeBundle() {
-        const sourceDir = path.resolve(__dirname, monacoNodePath);
+        const sourceDir = path.resolve(import.meta.dirname, monacoNodePath);
         const targetDir = `dist/${monacoPath}`;
         fs.mkdirSync(path.dirname(targetDir));
         fs.symlinkSync(sourceDir, targetDir, "dir");
@@ -53,11 +53,11 @@ export default defineConfig({
     alias: [
       {
         find: "react",
-        replacement: path.resolve(__dirname, "./node_modules/react"),
+        replacement: path.resolve(import.meta.dirname, "./node_modules/react"),
       },
       {
         find: "react-dom",
-        replacement: path.resolve(__dirname, "./node_modules/react-dom"),
+        replacement: path.resolve(import.meta.dirname, "./node_modules/react-dom"),
       },
       {
         find: /^~(.*)/,
@@ -65,7 +65,7 @@ export default defineConfig({
       },
       {
         find: /^@\/(.*)/,
-        replacement: path.join(__dirname, "src", "$1"),
+        replacement: path.join(import.meta.dirname, "src", "$1"),
       },
     ],
     dedupe: ["react", "react-dom"],
@@ -85,7 +85,7 @@ export default defineConfig({
      *  └──────────────┴──────────────────┴───────────────────┘
      */
     target: ["es2022"],
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         manualChunks: (id) => {
           if (id.includes("@babel+standalone")) {

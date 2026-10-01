@@ -1,9 +1,9 @@
-import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
 import jotaiDebugLabel from "jotai-babel/plugin-debug-label";
 import jotaiReactRefresh from "jotai-babel/plugin-react-refresh";
 import { ProxyOptions, loadEnv, mergeConfig } from "vite";
 import { ViteUserConfig, defineConfig } from "vitest/config";
-import viteConfig from "./vite.config";
+import viteConfig from "./vite.config.ts";
 
 const env = loadEnv("dev", process.cwd(), "");
 let base = env.VITE_PROXY_CONTEXT ?? "/";
@@ -11,14 +11,14 @@ let base = env.VITE_PROXY_CONTEXT ?? "/";
 base = base.endsWith("/") ? base : `${base}/`;
 const unslashedBase = base === "/" ? base : base.slice(0, -1);
 
-const { plugins, ...conf } = viteConfig as ViteUserConfig;
+const { plugins = [], ...conf } = viteConfig as ViteUserConfig;
 
-// replace react plugin
-plugins[0] = react({
-  babel: {
+// add jotai babel plugins
+plugins.push(
+  babel({
     plugins: [jotaiDebugLabel, jotaiReactRefresh],
-  },
-});
+  }),
+);
 
 const proxyAll: ProxyOptions = {
   target: env.VITE_PROXY_TARGET,
@@ -26,7 +26,7 @@ const proxyAll: ProxyOptions = {
   xfwd: true,
   bypass(req, res, options) {
     // Compare pathname without any query params
-    const pathname = req.url.split("?")[0];
+    const pathname = (req.url ?? "").split("?")[0];
     if (
       pathname === base ||
       pathname === base + "index.html" ||

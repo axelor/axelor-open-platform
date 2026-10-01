@@ -59,7 +59,9 @@
     "swagger-ui-react": "^5.32.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@eslint/js": "^10.0.1",
+    "@rolldown/plugin-babel": "^0.2.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@types/jest": "^30.0.0",
@@ -69,7 +71,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/react-transition-group": "^4.4.12",
     "@types/swagger-ui-react": "^5.18.0",
-    "@vitejs/plugin-react": "^5.1.4",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^10.11.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
@@ -83,8 +85,8 @@
     "svgo": "^4.1.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.0",
-    "vite": "^7.3.5",
-    "vite-plugin-svgr": "^4.5.0",
+    "vite": "^8.3.2",
+    "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.1"
   },
   "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800",
