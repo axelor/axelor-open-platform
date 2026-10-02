@@ -1,4 +1,5 @@
 import { forwardRef, lazy, useEffect, useState } from "react";
+import { type Day } from "date-fns";
 import { type DatePickerProps } from "react-datepicker";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -49,13 +50,21 @@ const LOCALE_LOADERS: Record<string, () => Promise<any>> = {
   "zh-TW": () => import("date-fns/locale/zh-TW"),
 };
 
-const load = async (locale: string) => {
+// date-fns 4.3 changed the `pt` locale week start from Monday to Sunday,
+// keep Monday as before
+const CALENDAR_START_DAY: Record<string, Day> = {
+  pt: 1,
+};
+
+const resolveLocale = (locale: string) => {
   const short = locale.split(/[-_]/)[0];
-  const loader =
-    LOCALE_LOADERS[locale] ??
-    LOCALE_LOADERS[short] ??
-    LOCALE_LOADERS[DEFAULT_LOCALE];
-  return await loader();
+  if (LOCALE_LOADERS[locale]) return locale;
+  if (LOCALE_LOADERS[short]) return short;
+  return DEFAULT_LOCALE;
+};
+
+const load = async (locale: string) => {
+  return await LOCALE_LOADERS[resolveLocale(locale)]();
 };
 
 export const Picker = forwardRef<
@@ -94,6 +103,7 @@ export const Picker = forwardRef<
   if (loaded) {
     return (
       <ReactDatePicker
+        calendarStartDay={CALENDAR_START_DAY[resolveLocale(locale)]}
         {...props}
         ref={ref}
         locale={locale}

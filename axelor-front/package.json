@@ -35,7 +35,7 @@
     "bootstrap-sass": "2.3.2",
     "bunshi": "^2.2.0",
     "color": "^5.0.3",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "dayjs": "^1.11.23",
     "dompurify": "^3.4.16",
     "echarts": "^6.1.0",
