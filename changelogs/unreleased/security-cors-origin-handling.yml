@@ -1,0 +1,15 @@
+---
+title: Fix CORS origin matching and disable credentials by default
+type: security
+description: |
+  With `cors.allow-origin = *`, a literal `Access-Control-Allow-Origin: *` is now sent and credentials are never 
+  allowed with `*`.
+
+  `cors.allow-credentials` now defaults to `false`. Set it to `true`, with explicit origins, if a browser client served 
+  from another origin relies on cookies.
+
+  `cors.allow-origin` is now a comma-separated list of exact origins (`scheme://host[:port]`) instead of a regular 
+  expression. Invalid values, such as regular expressions, are ignored with a warning: list each allowed origin 
+  explicitly. The `null` origin cannot be listed explicitly: it is only accepted with `*`, without credentials.
+
+  This changes the CORS behavior: if `cors.allow-origin` is configured, check the 8.2 migration guide.

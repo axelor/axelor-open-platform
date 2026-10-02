@@ -239,6 +239,45 @@ three scalars instead.
 NOTE: Callers that only use `Selector.fetch(int, int)` are unaffected — the output map shape is unchanged, with the
 reference key still carrying the same `{id, $version, <nameField>}` compact map as before.
 
+== CORS filter hardened
+
+NOTE: This change is shipped in the 8.2.4 patch release.
+
+If CORS is not enabled (`cors.allow-origin` not set, which is the default), no action is required.
+
+=== Credentials are never allowed with `*`
+
+When `cors.allow-origin` is `*`, the filter now sends a literal `Access-Control-Allow-Origin: *` and
+never sends `Access-Control-Allow-Credentials`, even if `cors.allow-credentials` is `true`. A warning
+is logged at startup when both are configured.
+
+=== `cors.allow-credentials` now defaults to `false`
+
+Previously, credentials were allowed by default. If your browser clients served from another origin
+rely on cookies, set `cors.allow-credentials = true` explicitly, together with an explicit list of
+origins.
+
+=== `cors.allow-origin` is a list of exact origins
+
+`cors.allow-origin` was previously evaluated as a regular expression. It is now a comma-separated list
+of exact origins (`scheme://host[:port]`), or `*`:
+
+* values are lowercased, and trailing slashes and default ports (`:443` for `https`, `:80` for `http`)
+are removed;
+* invalid entries, such as regular expressions or wildcard hosts (`https://*.example.com`), are ignored
+with a warning;
+* if no valid origin remains, all cross-origin requests are rejected with `403`;
+* the `null` origin cannot be listed explicitly. It is only accepted with `*`, without credentials.
+
+If you used a regular expression, replace it with the list of origins it was meant to match.
+
+[IMPORTANT]
+====
+If you use OpenID Connect or SAML with `response-mode = form_post` (or the SAML POST binding) and an
+explicit `cors.allow-origin` list, also list the origin of your identity provider. Otherwise, its form
+post to the callback URL is rejected with `403`.
+====
+
 == Full migration script
 
 Here is the full SQL migration script for all built-in AOP entities :

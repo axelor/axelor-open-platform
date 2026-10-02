@@ -85,17 +85,22 @@ It can be controlled with following settings:
 # ~~~~~
 # CORS settings to allow cross origin requests
 
-# regular expression to test allowed origin or * to allow all (not recommended)
-#cors.allow-origin = *
-#cors.allow-credentials = true
+# comma-separated list of exact origins (scheme://host[:port]) or * to allow all
+#cors.allow-origin = https://example.com
+#cors.allow-credentials = false
 #cors.allow-methods = GET,PUT,POST,DELETE,HEAD,OPTIONS
-#cors.allow-headers = Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
-#cors.expose-headers =
+#cors.allow-headers = Origin,Accept,Authorization,X-Requested-With,X-CSRF-Token,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
+#cors.expose-headers = X-CSRF-Token
 #cors.max-age = 1728000
 ----
 
-Generally, you should only set `cors.allow-origin` to a list of domains to allow.
-Other options should be left as it is.
+Configure `cors.allow-origin` with a comma-separated list of exact origins (`scheme://host[:port]`).
+Configured values are lowercased, and trailing slashes and default ports (`:443` for `https`,
+`:80` for `http`) are removed, as browsers never send them in the `Origin` header.
+Invalid entries, such as regular expressions or wildcard hosts, are ignored with a warning.
+If no valid origin remains, all cross-origin requests are rejected.
+When set to `*`, the filter ignores `cors.allow-credentials` and never allows credentials.
+The `null` origin cannot be listed explicitly: it is only accepted with `*`, without credentials.
 
 To avoid preflight cors requests, do not add `X-Requested-With` header and
 provide `Accept: application/json` header for `GET` and `POST` requests and

@@ -350,13 +350,12 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `data.import.demo-data` | whether to import demo data for the application | true
 | `data.store.provider` | FQN of a `Store` implementation |
 | `template.search-dir` | template storage path for groovy template | \{user.home}/.axelor/templates
-| `cors.allow-origin` | comma-separated list of origins to allow | '*'
-| `cors.allow-credentials` | whether credentials are supported | true
+| `cors.allow-origin` | comma-separated list of exact origins to allow (`scheme://host[:port]`) or `*` |
+| `cors.allow-credentials` | whether credentials are supported (ignored with `*`) | false
 | `cors.allow-methods` | comma-separated list of methods to allow | GET,PUT,POST,DELETE,HEAD,OPTIONS
 | `cors.allow-headers` | comma-separated list of headers to allow in a request | Origin,Accept,Authorization,X-Requested-With,X-CSRF-Token,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
-| `cors.expose-headers` | comma-separated list of headers to include in a response |
+| `cors.expose-headers` | comma-separated list of headers to include in a response | X-CSRF-Token
 | `cors.max-age` | how long the response from a pre-flight request can be cached by clients (in seconds) | 1728000
-| `cors.expose-headers` | comma-separated list of headers to include in a response |
 | `quartz.enable` | whether to enable quartz scheduler | false
 | `quartz.thread-count` | total number of threads in quartz thread pool | 3
 | `quartz.job-store.class` | JobStore class (e.g., `org.quartz.impl.jdbcjobstore.JobStoreTX` for JDBC persistence) | `org.quartz.simpl.RAMJobStore`
