@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useAtom } from "jotai/index";
+import { useAtom } from "jotai";
 
 import { FieldProps } from "../../builder";
 import { Selection } from "../selection";

@@ -40,7 +40,7 @@
     "dompurify": "^3.4.16",
     "echarts": "^6.1.0",
     "immer": "^11.1.21",
-    "jotai": "^2.19.0",
+    "jotai": "^3.0.1",
     "jotai-family": "^1.1.0",
     "jotai-immer": "^0.4.3",
     "libphonenumber-js": "^1.13.14",
