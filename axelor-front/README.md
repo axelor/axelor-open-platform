@@ -5,7 +5,7 @@ The next generation web frontend of Axelor.
 ## Pre-requisites
 
 - node >= v24.21
-- pnpm >= 10
+- pnpm >= 11
 
 ```bash
 #Nodejs
@@ -16,7 +16,8 @@ $ source "$HOME/.nvm/nvm.sh"
 # Install and use node version found in .nvmrc of the project
 $ nvm install && nvm use
 
-# pnpm
+# pnpm (run it again after switching Node version with nvm,
+# the pnpm shim is installed per Node version)
 $ corepack enable pnpm
 ```
 
@@ -80,6 +81,29 @@ Make sure to clone `axelor-ui` project next to the `axelor-open-platform` source
 ```
 Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui`
 to use the linked version of the library.
+
+`pnpm link` adds a `link:` override for `@axelor/ui` in `pnpm-workspace.yaml`, don't commit it.
+Unit tests (`pnpm test`) don't work while the library is linked. To go back to the published
+version, revert the override in `pnpm-workspace.yaml` and run `pnpm install`.
+
+### ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING when running pnpm
+
+```
+TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.
+```
+
+An outdated corepack shim (from an older Node.js install) is running pnpm. Enable corepack
+from the Node.js version used by the project and clear the shell command cache:
+
+```bash
+$ nvm use
+$ corepack enable pnpm
+$ hash -r
+$ pnpm --version
+```
+
+If it still fails, check `which pnpm`: another `pnpm` found earlier in the `PATH` has
+to be removed or updated with `npm i -g corepack@latest`.
 
 ### ENOSPC: System limit for number of file watchers reached
 

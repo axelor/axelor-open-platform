@@ -1,0 +1,19 @@
+patchedDependencies:
+  bootstrap-sass@2.3.2: patches/bootstrap-sass@2.3.2.patch
+
+peerDependencyRules:
+  ignoreMissing:
+    - "@babel/*"
+    - "@eslint/*"
+
+overrides:
+  axios: 1.18.1
+
+allowBuilds:
+  esbuild: true
+  "@tree-sitter-grammars/tree-sitter-yaml": false
+  "@scarf/scarf": false
+  core-js: false
+  core-js-pure: false
+  tree-sitter: false
+  tree-sitter-json: false

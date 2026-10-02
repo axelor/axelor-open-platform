@@ -90,30 +90,5 @@
     "vite-plugin-svgr": "^5.2.0",
     "vitest": "^5.0.3"
   },
-  "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800",
-  "pnpm": {
-    "patchedDependencies": {
-      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch"
-    },
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@babel/*",
-        "@eslint/*"
-      ]
-    },
-    "ignoredBuiltDependencies": [
-      "@tree-sitter-grammars/tree-sitter-yaml",
-      "@scarf/scarf",
-      "core-js",
-      "core-js-pure",
-      "tree-sitter",
-      "tree-sitter-json"
-    ],
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ],
-    "overrides": {
-      "axios": "1.18.1"
-    }
-  }
+  "packageManager": "pnpm@11.28.5+sha512.484563d30b4c2ad27cb48aa94ff2b302dbcebc8ff6bf28816c2589886e146ce7f76f354f3bc1a438e6f5e9768c302aa0a6f7add8232903cd4cf81426cbc14d9e"
 }
