@@ -5,9 +5,9 @@
 package com.axelor.db.audit;
 
 import com.axelor.db.Model;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
@@ -18,7 +18,8 @@ import org.hibernate.event.spi.PreUpdateEvent;
 
 public class AuditTrail {
 
-  private final Map<Transaction, AuditTracker> trackers = new ConcurrentHashMap<>();
+  private final Map<Transaction, AuditTracker> trackers =
+      Caffeine.newBuilder().weakKeys().<Transaction, AuditTracker>build().asMap();
 
   private AuditTracker get(EventSource sourceSession) {
     return trackers.computeIfAbsent(

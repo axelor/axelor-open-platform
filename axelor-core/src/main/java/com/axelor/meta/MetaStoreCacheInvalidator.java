@@ -6,8 +6,9 @@ package com.axelor.meta;
 
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.event.spi.EventSource;
@@ -41,7 +42,9 @@ public class MetaStoreCacheInvalidator
     implements PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
 
   /** Transactions that already have a pending invalidation scheduled. */
-  private static final Set<Transaction> PENDING = ConcurrentHashMap.newKeySet();
+  private static final Set<Transaction> PENDING =
+      Collections.newSetFromMap(
+          Caffeine.newBuilder().weakKeys().<Transaction, Boolean>build().asMap());
 
   @Override
   public void onPostInsert(PostInsertEvent event) {
