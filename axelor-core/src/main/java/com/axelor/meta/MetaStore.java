@@ -45,6 +45,7 @@ import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.time.Duration;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,15 +79,22 @@ public final class MetaStore {
           .expireAfterAccess(Duration.ofDays(1))
           .build();
 
-  private static class NullMap<K, V> extends HashMap<K, V> {}
-
-  private static final Map<String, JsonReferenceFieldDTO> NULL_JSON_FIELD = new NullMap<>();
-
   /** Reverse index: custom fields keyed by the model they reference (their target). */
   private static final AxelorCache<String, List<JsonReferenceFieldDTO>> TARGET_JSON_FIELDS =
-      CacheBuilder.newBuilder("targetJsonFieldCache")
-          .expireAfterWrite(Duration.ofHours(1))
+      CacheBuilder.newBuilder("targetJsonFields")
+          .maximumSize(1000)
+          .expireAfterAccess(Duration.ofDays(1))
           .build(MetaStore::loadTargetJsonFields);
+
+  private static class NullMap<K, V> extends AbstractMap<K, V> implements Serializable {
+
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+      return Collections.emptySet();
+    }
+  }
+
+  private static final Map<String, JsonReferenceFieldDTO> NULL_JSON_FIELD = new NullMap<>();
 
   /** Key used to store and retrieve JSON fields from the json fields cache. */
   private record ModelFieldKey(String modelName, String modelField) implements Serializable {
