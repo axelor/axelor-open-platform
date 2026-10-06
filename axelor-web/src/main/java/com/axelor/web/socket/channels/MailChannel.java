@@ -132,12 +132,14 @@ public class MailChannel extends Channel {
 
   public void processMailMessage(MailMessageEvent event) {
     switch (event.type()) {
-      case CREATED ->
-          executor.submit(
-              ContextAware.of()
-                  .withUser(null)
-                  .withTransaction(false)
-                  .build(() -> processCreated(event.message())));
+      case CREATED -> {
+        Long id = event.message() != null ? event.message().getId() : null;
+        executor.submit(
+            ContextAware.of()
+                .withUser(null)
+                .withTransaction(false)
+                .build(() -> processCreated(id != null ? mailMessageRepo.find(id) : null)));
+      }
       case DELETED ->
           executor.submit(
               ContextAware.of()
