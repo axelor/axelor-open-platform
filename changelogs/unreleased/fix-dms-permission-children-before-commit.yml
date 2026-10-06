@@ -1,0 +1,10 @@
+---
+title: Fix DMS child permissions applied before the parent permission is committed
+type: fix
+description: |
+  When sharing a folder, a background thread propagated permissions to child
+  files before the folder permission committed. A newly created permission was
+  not yet visible to the worker.
+
+  Child permissions are now applied after commit, so the worker sees the
+  saved permission.
