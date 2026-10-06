@@ -33,8 +33,13 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.shiro.authz.UnauthorizedException;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
+
+  private static final Logger log = LoggerFactory.getLogger(DMSPermissionRepository.class);
 
   @Inject private PermissionRepository perms;
 
@@ -301,18 +306,48 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
       return;
     }
 
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
-    try {
-      submitChildPermissionTasks(entity, executor, existingPermissionIds, createPermissionFileIds);
-    } finally {
-      // Do not wait for completion.
-      executor.shutdown();
-    }
+    final String value = entity.getValue();
+    final Long groupId = Optional.ofNullable(entity.getGroup()).map(Group::getId).orElse(null);
+    final Long userId = Optional.ofNullable(entity.getUser()).map(User::getId).orElse(null);
+    final Long permissionId =
+        Optional.ofNullable(entity.getPermission()).map(Permission::getId).orElse(null);
+    final Long fileId = entity.getFile().getId();
+
+    // Run only once committed, so the worker sees the saved permissions.
+    JPA.em()
+        .unwrap(SessionImplementor.class)
+        .getActionQueue()
+        .registerProcess(
+            (success, session) -> {
+              if (!success) {
+                return;
+              }
+              final ExecutorService executor = Executors.newSingleThreadExecutor();
+              try {
+                submitChildPermissionTasks(
+                    executor,
+                    value,
+                    groupId,
+                    userId,
+                    permissionId,
+                    existingPermissionIds,
+                    createPermissionFileIds);
+              } catch (RuntimeException e) {
+                // Must not throw from the after-commit callback.
+                log.error("Unable to apply permission to children of file {}", fileId, e);
+              } finally {
+                // Do not wait for completion.
+                executor.shutdown();
+              }
+            });
   }
 
   private void submitChildPermissionTasks(
-      DMSPermission entity,
       ExecutorService executor,
+      String value,
+      Long groupId,
+      Long userId,
+      Long permissionId,
       List<Long> existingPermissionIds,
       List<Long> createPermissionFileIds) {
     Lists.partition(existingPermissionIds, BATCH_SIZE)
@@ -327,7 +362,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                                       """
                                       UPDATE DMSPermission self SET self.value = :value \
                                   WHERE self.id IN :ids""")
-                                  .setParameter("value", entity.getValue())
+                                  .setParameter("value", value)
                                   .setParameter("ids", ids)
                                   .executeUpdate();
                               JPA.flush();
@@ -342,20 +377,15 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                         .build(
                             () -> {
                               final Group group =
-                                  Optional.ofNullable(entity.getGroup())
-                                      .map(Group::getId)
-                                      .map(id -> JpaRepository.of(Group.class).find(id))
-                                      .orElse(null);
+                                  groupId == null
+                                      ? null
+                                      : JpaRepository.of(Group.class).find(groupId);
                               final User user =
-                                  Optional.ofNullable(entity.getUser())
-                                      .map(User::getId)
-                                      .map(id -> JpaRepository.of(User.class).find(id))
-                                      .orElse(null);
+                                  userId == null ? null : JpaRepository.of(User.class).find(userId);
                               final Permission permission =
-                                  Optional.ofNullable(entity.getPermission())
-                                      .map(Permission::getId)
-                                      .map(id -> JpaRepository.of(Permission.class).find(id))
-                                      .orElse(null);
+                                  permissionId == null
+                                      ? null
+                                      : JpaRepository.of(Permission.class).find(permissionId);
                               JpaRepository.of(DMSFile.class)
                                   .all()
                                   .filter("self.id IN :ids")
@@ -364,7 +394,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                                   .forEach(
                                       file -> {
                                         final DMSPermission dmsPermission = new DMSPermission();
-                                        dmsPermission.setValue(entity.getValue());
+                                        dmsPermission.setValue(value);
                                         dmsPermission.setFile(file);
                                         dmsPermission.setGroup(group);
                                         dmsPermission.setUser(user);
