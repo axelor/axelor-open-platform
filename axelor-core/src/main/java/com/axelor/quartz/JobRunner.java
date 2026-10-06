@@ -30,10 +30,10 @@ import com.google.common.primitives.Longs;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -357,7 +357,7 @@ public class JobRunner {
 
   private List<MetaSchedule> findSchedules(String group) {
     final ExecutorService executor = Executors.newSingleThreadExecutor();
-    final AtomicReference<List<MetaSchedule>> result = new AtomicReference<>();
+    final AtomicReference<List<MetaSchedule>> result = new AtomicReference<>(List.of());
     try {
       executor
           .submit(
@@ -380,7 +380,7 @@ public class JobRunner {
   }
 
   private Map<String, List<MetaSchedule>> findGroups() {
-    final Map<String, List<MetaSchedule>> groups = new HashMap<>();
+    final Map<String, List<MetaSchedule>> groups = new ConcurrentHashMap<>();
     final List<TenantConfig> all = Beans.get(TenantConfigProvider.class).findAll();
     final ForkJoinPool pool = new ForkJoinPool(DBHelper.getMaxWorkers());
     try {
