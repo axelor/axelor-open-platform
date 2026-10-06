@@ -1,0 +1,9 @@
+---
+title: Fix WebSocket handlers ending a unit of work they did not start
+type: fix
+description: |
+  withAuth ignored the failure to begin a unit of work when one was
+  already active, then ended it anyway, closing the caller's unit of
+  work.
+
+  Only end the unit of work if withAuth started it.

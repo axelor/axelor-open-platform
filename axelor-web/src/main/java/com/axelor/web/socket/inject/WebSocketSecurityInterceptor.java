@@ -42,8 +42,10 @@ public class WebSocketSecurityInterceptor implements MethodInterceptor {
     TenantResolver.setCurrentTenant(tenantId, tenantHost);
 
     final UnitOfWork unitOfWork = Beans.get(UnitOfWork.class);
+    boolean owner = false;
     try {
       unitOfWork.begin();
+      owner = true;
     } catch (IllegalStateException e) {
       // Ignore
     }
@@ -53,7 +55,9 @@ public class WebSocketSecurityInterceptor implements MethodInterceptor {
       return task.apply((Subject) subject);
     } finally {
       ThreadContext.remove();
-      unitOfWork.end();
+      if (owner) {
+        unitOfWork.end();
+      }
     }
   }
 
