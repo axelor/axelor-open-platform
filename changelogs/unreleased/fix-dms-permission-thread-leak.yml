@@ -1,0 +1,10 @@
+---
+title: Fix thread leak when updating DMS permissions
+type: fix
+description: |
+  Each `DMSPermissionRepository` instance created its own worker thread to
+  apply permissions to child files, and never released it. Idle threads
+  accumulated over time.
+
+  The worker thread is now created only when child permissions need updating,
+  and exits once done.
