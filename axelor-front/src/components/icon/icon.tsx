@@ -137,6 +137,27 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   offline_bolt: "charger",
   // 2026-03-12
   bus_map_pin_2: "bus_map_pin",
+  // 2026-03-27
+  youtube_activity_2: "smart_display",
+  youtube_video: "smart_display",
+  // 2026-04-03
+  fitbit_raquetball: "sports_tennis",
+  // 2026-06-09
+  unknown_7: "text_up",
+  // 2026-06-11
+  bitbucket: "folder_code",
+  car_spark: "directions_car",
+  credit_card_spark: "credit_card",
+  flight_spark: "flight",
+  gitlab: "folder_code",
+  local_shipping_spark: "local_shipping",
+  mail_spark: "mail",
+  passport_spark: "passport",
+  screen_spark_pause: "pause_presentation",
+  workspace_studio: "workspaces",
+  // 2026-08-14
+  file_map: "file_map_stack",
+  // until 2026-09-22 : nothing
 };
 
 export type IconProps = {

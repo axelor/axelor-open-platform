@@ -17,3 +17,6 @@ allowBuilds:
   core-js-pure: false
   tree-sitter: false
   tree-sitter-json: false
+
+minimumReleaseAgeExclude:
+  - '@axelor/ui'
