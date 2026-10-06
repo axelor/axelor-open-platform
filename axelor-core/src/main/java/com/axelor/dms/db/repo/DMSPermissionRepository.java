@@ -40,8 +40,6 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
   private DMSFileRepository dmsFiles;
 
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
   private static final int BATCH_SIZE = 1000;
 
   public DMSPermissionRepository() {
@@ -299,6 +297,24 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                   }
                 }));
 
+    if (existingPermissionIds.isEmpty() && createPermissionFileIds.isEmpty()) {
+      return;
+    }
+
+    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      submitChildPermissionTasks(entity, executor, existingPermissionIds, createPermissionFileIds);
+    } finally {
+      // Do not wait for completion.
+      executor.shutdown();
+    }
+  }
+
+  private void submitChildPermissionTasks(
+      DMSPermission entity,
+      ExecutorService executor,
+      List<Long> existingPermissionIds,
+      List<Long> createPermissionFileIds) {
     Lists.partition(existingPermissionIds, BATCH_SIZE)
         .forEach(
             ids ->
