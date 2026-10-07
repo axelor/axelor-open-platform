@@ -4,7 +4,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
-import svgr from "vite-plugin-svgr";
 
 import monacoPkg from "monaco-editor/package.json" with { type: "json" };
 
@@ -21,11 +20,6 @@ export default defineConfig({
   base: "./",
   plugins: [
     react(),
-    svgr({
-      svgrOptions: {
-        icon: true,
-      },
-    }),
     {
       name: "monaco-hash",
       writeBundle() {

@@ -1,5 +1,3 @@
-/// <reference types="vite-plugin-svgr/client" />
-
 // CSS modules
 type CSSModuleClasses = { readonly [key: string]: string };
 
