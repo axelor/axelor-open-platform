@@ -1,3 +1,336 @@
+## 8.2.4 (2026-10-07)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded:
+  
+  - Shiro from 2.1.0 to 2.2.1
+  - pac4j from 6.5.3 to 6.5.9
+  - buji-pac4j from 9.1.1 to 9.1.2
+  - Tomcat from 10.1.57 to 10.1.60
+  - Jackson from 2.21.5 to 2.21.7
+  - Groovy from 4.0.32 to 4.0.33
+  - Slf4j from 2.0.18 to 2.0.20
+  - Ldaptive from 2.5.0 to 2.5.1
+  - Jansi from 4.1.0 to 4.1.3
+  - Swagger from 2.2.50 to 2.2.55
+  - ByteBuddy from 1.18.10 to 1.18.14
+  - Resteasy from 6.2.16 to 6.2.19
+  - Graal from 25.0.3 to 25.0.4.1.1
+  - Hibernate from 6.6.53 to 6.6.58
+  - Hibernate Validator from 8.0.3 to 8.0.5
+  - Jsoup from 1.22.2 to 1.23.2
+  - Redisson from 4.3.1 to 4.7.0
+  
+  </details>
+
+#### Fix
+
+* Fix forceTitle view param and canEdit dashlet attribute in popup editor for all views
+
+  <details>
+  
+  The forceTitle action param was only applied when opening records from a
+  grid dashlet popup. It is now applied for all views (grid, cards, kanban,
+  calendar, gantt) opening the popup editor.
+  
+  A panel-dashlet declared with both `canEdit="true"` and `readonly="true"`
+  now lets users edit its records, as the canEdit attribute is meant to
+  override the readonly state.
+  
+  </details>
+
+* Fix scheduled jobs missing for some tenants at startup
+
+  <details>
+  
+  In multi-tenancy mode, the schedules of all tenants were loaded in parallel
+  into a non-thread-safe map. Some tenants' schedules could be lost, and their
+  jobs were not scheduled.
+  
+  </details>
+
+* Fix audit log processing blocked by a failing record
+
+  <details>
+  
+  When a record failed with a database error during audit log processing,
+  the whole batch was rolled back, including its retry count. The same
+  record then failed again on every run and blocked the other pending
+  audit logs of its transaction.
+  
+  A failing record no longer rolls back the others, and its retry count is
+  saved so it is discarded after the maximum number of retries.
+  
+  </details>
+
+* Fix merging of values returned by chained actions
+
+  <details>
+  
+  When several actions were chained together, the values each of them returned
+  were aggregated before being applied to the record, and that merge could
+  corrupt relational values.
+  
+  New (unsaved) collection rows returned by different actions were all matched
+  on their (missing) id and collapsed into a single row, losing data. Such rows
+  are now matched by their client id (cid) instead, so distinct new lines stay
+  separate.
+  
+  A many-to-one or one-to-one field pointed at a different record by a later
+  action was deep-merged with the previous value, leaking stale fields from the
+  old record onto the new one. The new value now fully replaces the previous one
+  as soon as the record id changes; values are only merged when they refer to
+  the same record.
+  
+  </details>
+
+* Allow built-in helpers in Groovy action scripts
+
+  <details>
+  
+  Groovy `<action-script>` actions threw a `ScriptPolicyException` when
+  using built-in scope variables (`$request`, `$response`, and
+  transactional `$em`).
+  
+  `ActionRequest` and `ActionResponse` are now in the default `ScriptPolicy`
+  allow list, and `$em` is wrapped in an allowed `EntityManager` delegate.
+  JavaScript action scripts were not affected.
+  
+  </details>
+
+* Fix live mail messages sent to the wrong tenant with Redis
+
+  <details>
+  
+  In multi-tenant setups with Redisson, live mail messages from other
+  instances lacked tenant context and reached only default-tenant users.
+  
+  Messages now include the publisher's tenant. Because the payload structure
+  changed, mixed-version instances will not share live mail during rolling upgrades.
+  
+  </details>
+
+* Fix panel-dashlet not reloading when its refresh attribute is set
+* Fix date widget portal focus handling in advanced search
+
+  <details>
+  
+  Selecting a month or year from the date picker's dropdown on a date field
+  in Advanced Search could freeze or crash the application.
+  
+  </details>
+
+* Fix report images loaded from the wrong tenant
+
+  <details>
+  
+  In multi-tenancy mode, `ImageTool` loaded `MetaFile` records from the
+  default tenant's database for all reports. Tasks ran on `ReportExecutor`
+  without tenant context and reused a default-tenant database session.
+  
+  Tasks submitted to `ReportExecutor` now run with the caller's tenant and
+  close their database session on completion.
+  
+  </details>
+
+* Fix `ContextAware` tasks running on the wrong tenant
+
+  <details>
+  
+  In multi-tenancy mode, `ContextAware` tasks running on reused threads (such
+  as thread pools) kept the database session opened by the first task on that
+  thread. As the session is bound to the tenant it was opened with, later
+  tasks ran on the first tenant's database, whatever tenant was set.
+  
+  Tasks wrapped with `ContextAware` now run with their own database session,
+  opened on the task's tenant and closed once the task is completed. Running a
+  `ContextAware` task inline for another tenant than the current database
+  session now throws an exception, see the multi-tenancy documentation.
+  
+  </details>
+
+* Pin EclipseLink MOXy as JAXB provider
+
+  <details>
+  
+  Call `JAXBContextFactory.createContext` directly instead of
+  `JAXBContext.newInstance` so classpath provider lookup does not pick
+  another implementation (such as Glassfish `jaxb-runtime`).
+  
+  Drop `jaxb.properties` files that Jakarta XML Binding 4.0 no longer
+  reads.
+  
+  </details>
+
+* Fix Gantt tasks collapsing to zero duration when dragged in zoomed-out views
+
+  <details>
+  
+  Dragging a task bar in the Gantt view could inadvertently set its end date equal 
+  to its start date. This occurred when a task was shorter than a single column of 
+  the current zoom level (e.g., a 4-day task in the Month view, or a 3-week task in 
+  the Year view). Because both edges of the bar snapped to the nearest column 
+  independently, they could land on the exact same date.
+  
+  The end date is now strictly derived from the snapped start date plus the task's 
+  original duration. Moving a task now reliably preserves its length across all zoom levels.
+  
+  </details>
+
+* Fix cross-thread database access during live mail notifications
+
+  <details>
+  
+  New mail messages were sent to the WebSocket mail channel as entities
+  attached to the request's database session. Building the message details
+  on the channel's worker thread lazy-loaded data through that session from
+  another thread, which could fail or return incomplete details.
+  
+  The message is now reloaded on the worker thread.
+  
+  </details>
+
+* Fix database engine detection when using a JNDI data source
+* Fix Redisson topic listeners retaining database sessions across tenants
+
+  <details>
+  
+  Redisson topic listeners run on reused threads. Database sessions opened by
+  a listener leaked across tasks on the same thread, keeping the first
+  message's tenant.
+  
+  Listeners now run as `ContextAware` tasks with the publisher's tenant and
+  a dedicated database session that closes when done.
+  
+  </details>
+
+* Fix thread leak when updating DMS permissions
+
+  <details>
+  
+  Each `DMSPermissionRepository` instance created its own worker thread to
+  apply permissions to child files, and never released it. Idle threads
+  accumulated over time.
+  
+  The worker thread is now created only when child permissions need updating,
+  and exits once done.
+  
+  </details>
+
+* Fix detached entity error during audit log processing
+
+  <details>
+  
+  Audit processing rebuilt a ContextHandler proxy for tracked reference
+  fields and computed their name, which re-pointed the managed entity
+  through a bidirectional one-to-one wiring setter and failed to cascade
+  on flush. Read the reference label directly from the stored audit map
+  instead, and wire the inverse side of a one-to-one on edit so the
+  name is computed correctly at save time.
+  
+  </details>
+
+* Fix slow recovery of pending audit logs
+
+  <details>
+  
+  The leader recovery only processed a limited number of pending
+  transactions on each run, every few minutes, so a large backlog of
+  pending audit logs took a long time to be recovered.
+  
+  All pending transactions are now recovered in a single run.
+  
+  </details>
+
+* Fix time zone of API key dates
+* Fix WebSocket handlers ending a unit of work they did not start
+
+  <details>
+  
+  withAuth ignored the failure to begin a unit of work when one was
+  already active, then ended it anyway, closing the caller's unit of
+  work.
+  
+  Only end the unit of work if withAuth started it.
+  
+  </details>
+
+* Fix lock errors on audit logs processing
+
+  <details>
+  
+  When several workers processed the audit logs of the same transaction,
+  for example the leader recovery and the asynchronous queue, PostgreSQL
+  reported "could not obtain lock on row in relation audit_log" errors.
+  
+  Audit logs are no longer locked by rows: an advisory lock on the
+  transaction ID ensures only one worker processes its audit logs at a
+  time, and the other workers skip it without error.
+  
+  </details>
+
+* Fix DMS child permissions applied before the parent permission is committed
+
+  <details>
+  
+  When sharing a folder, a background thread propagated permissions to child
+  files before the folder permission committed. A newly created permission was
+  not yet visible to the worker.
+  
+  Child permissions are now applied after commit, so the worker sees the
+  saved permission.
+  
+  </details>
+
+* Fix request scope not opened for scheduled jobs outside multi-tenancy
+
+  <details>
+  
+  Jobs run without a tenant didn't get a request scope, so any `@RequestScoped`
+  service they used failed with `OutOfScopeException`.
+  
+  </details>
+
+* Fix grid row saving before validIf validation completes
+
+  <details>
+  
+  In an editable grid, pressing Enter to save a row could commit a field with
+  a `validIf` condition before its validity was re-evaluated. This allowed an
+  invalid value to be saved, or delayed showing the invalid state until a
+  later action.
+  
+  </details>
+
+#### Security
+
+* Added sensitive JDK classes to the script policy deny list
+* Consistently exclude password fields from record data
+* Check the origin of the websocket handshake
+* Fix CORS origin matching and disable credentials by default
+
+  <details>
+  
+  With `cors.allow-origin = *`, a literal `Access-Control-Allow-Origin: *` is now sent and credentials are never 
+  allowed with `*`.
+  
+  `cors.allow-credentials` now defaults to `false`. Set it to `true`, with explicit origins, if a browser client served 
+  from another origin relies on cookies.
+  
+  `cors.allow-origin` is now a comma-separated list of exact origins (`scheme://host[:port]`) instead of a regular 
+  expression. Invalid values, such as regular expressions, are ignored with a warning: list each allowed origin 
+  explicitly. The `null` origin cannot be listed explicitly: it is only accepted with `*`, without credentials.
+  
+  This changes the CORS behavior: if `cors.allow-origin` is configured, check the 8.2 migration guide.
+  
+  </details>
+
+
 ## 8.2.3 (2026-08-06)
 
 #### Feature

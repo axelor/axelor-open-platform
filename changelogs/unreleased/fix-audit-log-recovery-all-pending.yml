@@ -1,9 +1,0 @@
----
-title: Fix slow recovery of pending audit logs
-type: fix
-description: |
-  The leader recovery only processed a limited number of pending
-  transactions on each run, every few minutes, so a large backlog of
-  pending audit logs took a long time to be recovered.
-
-  All pending transactions are now recovered in a single run.

@@ -1,7 +1,0 @@
----
-title: Fix scheduled jobs missing for some tenants at startup
-type: fix
-description: |
-  In multi-tenancy mode, the schedules of all tenants were loaded in parallel
-  into a non-thread-safe map. Some tenants' schedules could be lost, and their
-  jobs were not scheduled.

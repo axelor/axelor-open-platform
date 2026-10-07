@@ -1,3 +1,0 @@
----
-title: Fix database engine detection when using a JNDI data source
-type: fix
