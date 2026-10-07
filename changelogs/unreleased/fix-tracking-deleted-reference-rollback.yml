@@ -1,0 +1,8 @@
+---
+title: Fix change tracking rolling back the transaction when a tracked record or reference is deleted
+type: fix
+description: |
+  Change tracking no longer fails the transaction when a tracked many-to-one/one-to-one
+  target is deleted in the same transaction: the history message uses the target id
+  instead of its name. Records deleted in the transaction no longer get a "Record updated"
+  message, and any other tracking error is logged instead of rolling back the transaction.

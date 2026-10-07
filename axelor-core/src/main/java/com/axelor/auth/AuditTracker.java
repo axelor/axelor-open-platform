@@ -97,9 +97,13 @@ final class AuditTracker {
     private Map<String, Object> values;
     private Map<String, Object> oldValues;
 
+    private static String key(Model entity) {
+      return EntityHelper.getEntityClass(entity).getName() + ":" + entity.getId();
+    }
+
     public static void create(
         Model entity, Map<String, Object> values, Map<String, Object> oldValues) {
-      String key = entity.getClass().getName() + ":" + entity.getId();
+      String key = key(entity);
       EntityState state = STORE.get().get(key);
       if (state == null) {
         state = new EntityState();
@@ -110,6 +114,10 @@ final class AuditTracker {
       } else {
         state.values.putAll(values);
       }
+    }
+
+    public static void remove(Model entity) {
+      STORE.get().remove(key(entity));
     }
   }
 
@@ -176,8 +184,19 @@ final class AuditTracker {
       case MANY_TO_ONE:
       case ONE_TO_ONE:
         try {
-          return Mapper.of(property.getTarget()).get(value, property.getTargetName()).toString();
+          Object targetValue = Mapper.of(property.getTarget()).get(value, property.getTargetName());
+          if (targetValue != null) {
+            return targetValue.toString();
+          }
         } catch (Exception e) {
+          log.warn("Unable to get {} of {}", property.getTargetName(), property.getTarget(), e);
+        }
+
+        // Target may not exist anymore (e.g. deleted in the same transaction),
+        // so don't load it and use its id instead.
+        if (value instanceof HibernateProxy) {
+          return String.valueOf(
+              ((HibernateProxy) value).getHibernateLazyInitializer().getIdentifier());
         }
         break;
       case ONE_TO_MANY:
@@ -241,6 +260,8 @@ final class AuditTracker {
   }
 
   public void delete(Model entity) {
+    // no tracking of an entity that doesn't exist anymore
+    EntityState.remove(entity);
     DELETED.get().add(entity);
   }
 
@@ -520,7 +541,16 @@ final class AuditTracker {
     int count = 0;
     for (EntityState state : store.values()) {
       User user = CURRENT_USER.get();
-      process(state, user);
+      try {
+        process(state, user);
+      } catch (Exception e) {
+        // tracking failure should not fail the transaction
+        log.error(
+            "Error while tracking changes of {}#{}",
+            EntityHelper.getEntityClass(state.entity).getName(),
+            state.entity.getId(),
+            e);
+      }
 
       if (++count % DBHelper.getJdbcBatchSize() == 0) {
         JPA.flush();
