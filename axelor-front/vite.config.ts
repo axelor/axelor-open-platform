@@ -87,6 +87,9 @@ export default defineConfig({
           }
         },
       },
+      checks: {
+        bundlerTimings: false,
+      },
     },
   },
 });
