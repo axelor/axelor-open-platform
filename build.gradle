@@ -8,14 +8,18 @@ buildscript {
   apply from: "gradle/repos.gradle"
   dependencies {
     classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
+    classpath 'org.cyclonedx.bom:org.cyclonedx.bom.gradle.plugin:3.5.0'
   }
 }
 
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: com.axelor.gradle.support.ChangelogSupport
+apply plugin: 'org.cyclonedx.bom'
 
 apply from: "version.gradle"
+
+group = "com.axelor"
 
 def gitGitRevision(p) {
   def gitEntry = new File("$p.projectDir/.git")
@@ -52,6 +56,31 @@ def gitGitRevision(p) {
   }
 
   return null
+}
+
+cyclonedxBom {
+  projectType = org.cyclonedx.model.Component.Type.APPLICATION
+  schemaVersion = org.cyclonedx.Version.VERSION_16
+  xmlOutput.convention((RegularFile) null)
+  jsonOutput = layout.buildDirectory.file("reports/cyclonedx/application-bom.json")
+  includeLicenseText = false
+}
+
+// root project has no dependencies of its own
+cyclonedxDirectBom {
+  enabled = false
+}
+
+// front-end dependencies are npm packages, not visible to the Gradle dependency graph
+project(':axelor-front') {
+  tasks.named('cyclonedxDirectBom') {
+    enabled = false
+  }
+}
+
+// drop disabled direct BOM tasks from the aggregate, otherwise their dependency graph is still resolved
+tasks.named('cyclonedxBom') {
+  setDependsOn(dependsOn.findAll { !(it instanceof TaskProvider) || it.get().enabled })
 }
 
 configure(subprojects - project(':axelor-front')) {
