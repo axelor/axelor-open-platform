@@ -272,19 +272,33 @@ libs.buji_pac4j = [
     exclude group: 'org.apache.shiro', module: 'shiro-web'
     exclude group: 'org.pac4j', module: 'pac4j-javaee'
     exclude group: 'org.projectlombok', module: 'lombok'
+    // use the jackson version defined in libs.jackson_libs
+    exclude group: "com.fasterxml.jackson.core"
+    exclude group: "com.fasterxml.jackson.datatype"
   },
-  "org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}",
+  dependencies.create("org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}") {
+    // use the jackson version defined in libs.jackson_libs
+    exclude group: "com.fasterxml.jackson.core"
+    exclude group: "com.fasterxml.jackson.datatype"
+  },
   dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
     exclude group: 'org.mockito', module: 'mockito-core'
+    // use the jackson version defined in libs.jackson_libs
+    exclude group: "com.fasterxml.jackson.core"
+    exclude group: "com.fasterxml.jackson.datatype"
   }
 ]
 
 libs.pac4j = libs.buji_pac4j + [
   dependencies.create("org.pac4j:pac4j-http:${versions.pac4j}") {
-    exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+    // use the jackson version defined in libs.jackson_libs
+    exclude group: "com.fasterxml.jackson.core"
+    exclude group: "com.fasterxml.jackson.datatype"
   },
   dependencies.create("org.pac4j:pac4j-ldap:${versions.pac4j}") {
-    exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+    // use the jackson version defined in libs.jackson_libs
+    exclude group: "com.fasterxml.jackson.core"
+    exclude group: "com.fasterxml.jackson.datatype"
   },
   "org.ldaptive:ldaptive:${versions.ldaptive}",
   // ldaptive is built against Netty 4.1
