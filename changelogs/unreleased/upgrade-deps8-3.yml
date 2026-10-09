@@ -5,7 +5,7 @@ description: |
   Here is the list of backend dependencies upgraded:
   
   - HikariCP from 7.0.2 to 7.1.0
-  - Logback from 1.5.38 to 1.6.4
+  - Logback from 1.5.38 to 1.6.5
   - Caffeine from 3.2.4 to 3.3.0
   - Guava from 33.5.0 to 33.7.2
   - CommonsIO from 2.21.0 to 2.22.0
