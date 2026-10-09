@@ -33,6 +33,8 @@ versions.flyway = "11.20.3"
 
 versions.swagger = "2.2.55"
 
+versions.bouncycastle = "1.86"
+
 // unit testing
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit}"
 libs.junit_launcher = "org.junit.platform:junit-platform-launcher:${versions.junit}" // for IDE
@@ -137,6 +139,7 @@ libs.redisson = [
   },
   // overrides jackson version used
   "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}",
+  "io.projectreactor:reactor-core:3.8.7",
   libs.netty_bom
 ]
 libs.hazelcast = "com.hazelcast:hazelcast:5.7.0"
@@ -367,7 +370,11 @@ libs.birt_runtime = [
   birt_module("org.eclipse.birt.report.engine"),
   birt_module("org.eclipse.birt.report.item.crosstab.core"),
   birt_module("org.eclipse.birt.report.model.adapter.oda"),
-  birt_module("uk.co.spudsoft.birt.emitters.excel")
+  birt_module("uk.co.spudsoft.birt.emitters.excel"),
+  // overrides bouncycastle version used
+  "org.bouncycastle:bcprov-jdk18on:${versions.bouncycastle}",
+  "org.bouncycastle:bcpkix-jdk18on:${versions.bouncycastle}",
+  "org.bouncycastle:bcutil-jdk18on:${versions.bouncycastle}"
 ]
 
 // Quartz Scheduler
@@ -401,11 +408,15 @@ libs.jasypt = "org.jasypt:jasypt:1.9.3"
 
 libs.picocli = "info.picocli:picocli:4.7.7"
 
-libs.minio = dependencies.create("io.minio:minio:8.6.0") {
-  exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
-  exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
-  exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
-}
+libs.minio = [
+  dependencies.create("io.minio:minio:8.6.0") {
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+  },
+  // For newer version of snappy-java
+  "org.xerial.snappy:snappy-java:1.1.10.11"
+]
 
 libs.totp = dependencies.create('dev.samstevens.totp:totp:1.7.1') {
   exclude group: 'com.beust', module: 'jcommander'
