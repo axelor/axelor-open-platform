@@ -324,6 +324,8 @@ def birt_module = { name ->
   dependencies.create("org.eclipse.birt:${name}:4.25.0") {
     exclude module: "jetty-servlet-api"
     exclude module: "xml-apis"
+    // use servlet 6.0 (Jakarta EE 10) from libs.jakarta_servlet, not 6.1 (Jakarta EE 11)
+    exclude group: "jakarta.servlet", module: "jakarta.servlet-api"
   }
 }
 
