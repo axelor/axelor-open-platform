@@ -7,7 +7,7 @@ versions.guava = "33.7.2-jre"
 versions.hibernate = "6.6.58.Final"
 versions.hibernate_validator = "8.0.5.Final"
 versions.caffeine = "3.3.0"
-versions.redisson = "4.7.0"
+versions.redisson = "4.8.0"
 
 versions.groovy = "4.0.33"
 versions.graal_js = "25.0.4.1.1"
