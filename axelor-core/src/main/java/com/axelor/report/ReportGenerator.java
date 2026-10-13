@@ -8,6 +8,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
 import com.axelor.file.temp.TempFiles;
 import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +35,8 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.RenderOption;
 import org.eclipse.birt.report.engine.emitter.pdf.PDFPageDevice;
 import org.eclipse.birt.report.model.api.IResourceLocator;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 /** The report generator service. */
 public class ReportGenerator {
@@ -98,17 +103,55 @@ public class ReportGenerator {
           .put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, getClass().getClassLoader());
       task.getAppContext().put(IConnectionFactory.CLOSE_PASS_IN_CONNECTION, Boolean.FALSE);
 
-      JPA.jdbcWork(
-          connection -> {
-            task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
-            try {
-              task.run();
-            } catch (EngineException e) {
-              throw new RuntimeException(e);
-            } finally {
-              task.close();
-            }
-          });
+      if (JPA.em().getTransaction().isActive()) {
+        // The session holds its connection until the transaction ends, and BIRT sees the
+        // transaction's uncommitted changes.
+        JPA.jdbcWork(connection -> run(task, connection));
+      } else {
+        // Outside a transaction, the session releases its connection after each operation, so an
+        // entity query made while rendering (scripts, ImageTool...) would close it under BIRT.
+        runOnDedicatedConnection(task);
+      }
+    }
+  }
+
+  private static void runOnDedicatedConnection(IRunAndRenderTask task) {
+    final JdbcConnectionAccess access =
+        JPA.em().unwrap(SharedSessionContractImplementor.class).getJdbcConnectionAccess();
+    final Connection connection;
+    try {
+      connection = access.obtainConnection();
+    } catch (SQLException e) {
+      throw new PersistenceException(e);
+    }
+    Throwable failure = null;
+    try {
+      run(task, connection);
+    } catch (Throwable e) {
+      failure = e;
+      throw e;
+    } finally {
+      try {
+        access.releaseConnection(connection);
+      } catch (SQLException e) {
+        if (failure != null) {
+          failure.addSuppressed(e);
+        } else {
+          throw new PersistenceException(e);
+        }
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void run(IRunAndRenderTask task, Connection connection) {
+    task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
+    try {
+      task.run();
+    } catch (EngineException e) {
+      throw new RuntimeException(e);
+    } finally {
+      task.close();
     }
   }
 

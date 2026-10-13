@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="AxelorDS" id="2"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Contacts" id="3">
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ContactFullName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">AxelorDS</property>
+            <xml-property name="queryText"><![CDATA[select c.full_name as "ContactFullName" from contact_contact c]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ContactCount" id="4">
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ContactCount</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">AxelorDS</property>
+            <xml-property name="queryText"><![CDATA[select count(*) as "ContactCount" from contact_contact c]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="5"/>
+    </page-setup>
+    <body>
+        <table id="10">
+            <property name="dataSet">Contacts</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">ContactFullName</property>
+                    <expression name="expression" type="javascript">dataSetRow["ContactFullName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="11"/>
+            <detail>
+                <row id="12">
+                    <cell id="13">
+                        <data id="14">
+                            <property name="resultSetColumn">ContactFullName</property>
+                            <method name="onCreate"><![CDATA[com.axelor.db.JPA.em().createQuery("select count(self) from Contact self").getSingleResult();]]></method>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+        <table id="20">
+            <property name="dataSet">ContactCount</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">ContactCountText</property>
+                    <expression name="expression" type="javascript">"Contact count: " + dataSetRow["ContactCount"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="21"/>
+            <detail>
+                <row id="22">
+                    <cell id="23">
+                        <data id="24">
+                            <property name="resultSetColumn">ContactCountText</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+</report>

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.axelor.JpaTest;
+import com.axelor.db.JPA;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
@@ -16,7 +17,6 @@ import jakarta.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 public class ReportTest extends JpaTest {
 
   private static final String DESIGN = "contacts.rptdesign";
+
+  private static final String SESSION_DESIGN = "contacts-session.rptdesign";
 
   @Inject private IReportEngine engine;
 
@@ -47,30 +49,40 @@ public class ReportTest extends JpaTest {
 
   @Test
   public void testRender() {
-
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    Map<String, Object> params = new HashMap<>();
-
-    try {
-      try {
-        generator.generate(output, DESIGN, "html", params);
-      } finally {
-        output.close();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
-    byte[] bytes = output.toByteArray();
-
-    assertNotNull(bytes);
-    assertTrue(bytes.length > 0);
-
-    String html = new String(bytes);
+    String html = render(DESIGN);
 
     for (Contact contact : contacts.all().fetch()) {
       assertTrue(html.contains(contact.getFullName()));
     }
+  }
+
+  @Test
+  public void testRenderWithEntityQueries() {
+    // entity queries run while rendering must not close the connection used by BIRT
+    String html = render(SESSION_DESIGN);
+    assertTrue(html.contains("Contact count: " + contacts.all().count()), html);
+  }
+
+  @Test
+  public void testRenderInTransaction() {
+    // within a transaction, the report sees its uncommitted changes
+    JPA.runInTransaction(
+        () -> {
+          Contact contact = JPA.save(new Contact("Uncommitted", "Contact"));
+          JPA.flush();
+          String html = render(DESIGN);
+          JPA.em().getTransaction().setRollbackOnly();
+          assertTrue(html.contains(contact.getFullName()), html);
+        });
+  }
+
+  private String render(String design) {
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    try {
+      generator.generate(output, design, "html", new HashMap<>());
+    } catch (Exception e) {
+      fail(e);
+    }
+    return output.toString();
   }
 }
