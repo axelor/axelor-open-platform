@@ -1,3 +1,34 @@
+## 8.2.5 (2026-10-15)
+
+#### Fix
+
+* Fix report data sets failing with "Connection is closed"
+
+  <details>
+  
+  Reports run outside a transaction lent the request's database connection to BIRT. Any entity query made while 
+  rendering, such as `ImageTool` loading a company logo, released that connection to the pool. The data sets queried 
+  afterwards failed with `Connection is closed`, and the report was generated empty or incomplete.
+  
+  Outside a transaction, reports now run on a dedicated database connection. Within a transaction, they still use the 
+  transaction's connection and see its uncommitted changes.
+  
+  </details>
+
+* Fix values lost when chaining actions on a saved record
+
+  <details>
+  
+  On a saved record, when several actions were chained together (for example
+  in an action-group or an onChange), the values set by some of them were lost
+  if one of the actions returned the whole record and another set only a few
+  fields. The form kept its stale values and was not marked as modified. All
+  values returned by the chained actions are now applied, the later action
+  winning for a given field.
+  
+  </details>
+
+
 ## 8.2.4 (2026-10-07)
 
 #### Change
