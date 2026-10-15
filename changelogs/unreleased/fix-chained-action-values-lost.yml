@@ -1,0 +1,10 @@
+---
+title: Fix values lost when chaining actions on a saved record
+type: fix
+description: |
+  On a saved record, when several actions were chained together (for example
+  in an action-group or an onChange), the values set by some of them were lost
+  if one of the actions returned the whole record and another set only a few
+  fields. The form kept its stale values and was not marked as modified. All
+  values returned by the chained actions are now applied, the later action
+  winning for a given field.

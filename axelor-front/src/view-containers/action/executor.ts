@@ -38,6 +38,8 @@ const executeAction: typeof actionRequest = async (options) => {
  * `incoming` (the later action wins) and follows record identity:
  *
  * - Scalars: `incoming` overrides `accumulated`.
+ * - Root values: always merged field-by-field, as they all describe the
+ *   current record even when only some actions return its `id`.
  * - Relational objects (m2o/o2o): merged field-by-field only when both sides
  *   refer to the same record; as soon as the `id` changes (treating `null` and
  *   `undefined` as the same "no id"), `incoming` fully replaces the previous
@@ -51,11 +53,11 @@ const executeAction: typeof actionRequest = async (options) => {
  * @param incoming the values from the current action
  * @returns the merged values
  */
-function mergeValues(
+export function mergeValues(
   accumulated: Partial<DataRecord>,
   incoming: Partial<DataRecord>,
 ) {
-  function merge(acc: any, inc: any): any {
+  function merge(acc: any, inc: any, root = false): any {
     if (Array.isArray(inc)) {
       return inc.map((v: DataRecord) =>
         merge(
@@ -67,7 +69,7 @@ function mergeValues(
       );
     }
     if (inc && acc && typeof inc === "object") {
-      if ((acc.id ?? null) !== (inc.id ?? null)) {
+      if (!root && (acc.id ?? null) !== (inc.id ?? null)) {
         return inc;
       }
       return {
@@ -79,7 +81,7 @@ function mergeValues(
     }
     return inc;
   }
-  return merge(accumulated, incoming);
+  return merge(accumulated, incoming, true);
 }
 
 const processActionResult = (result: ActionResult[]): ActionResult[] => {
