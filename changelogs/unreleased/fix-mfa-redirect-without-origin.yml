@@ -1,0 +1,8 @@
+---
+title: Fix error after multi-factor authentication when login was opened directly
+type: fix
+description: |
+  When the login page was opened directly instead of through a redirect from
+  another page, completing multi-factor authentication ended on an
+  "Unexpected Application Error" (`Cannot read properties of undefined (reading 'pathname')`).
+  The user is now redirected to the home page.

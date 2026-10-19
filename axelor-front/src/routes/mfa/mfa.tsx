@@ -40,7 +40,7 @@ export function MFA() {
 
   if (session?.data?.user) {
     let { from } = location.state || { from: { pathname: "/" } };
-    if (from === "/login") from = "/";
+    if (!from || from === "/login") from = "/";
     return <Navigate to={from} />;
   }
 

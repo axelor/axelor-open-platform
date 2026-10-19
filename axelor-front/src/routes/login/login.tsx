@@ -115,7 +115,7 @@ export function Login() {
   if (data?.user) {
     removeErrorParam();
     let { from } = location.state || { from: { pathname: "/" } };
-    if (from === "/login") from = "/";
+    if (!from || from === "/login") from = "/";
     return <Navigate to={from} />;
   }
 
