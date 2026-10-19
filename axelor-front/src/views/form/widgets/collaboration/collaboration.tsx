@@ -14,6 +14,7 @@ import { Block, Box, Menu, MenuItem, useClassNames } from "@axelor/ui";
 import { useSession } from "@/hooks/use-session";
 import { useNavTabsSize } from "@/layout/nav-tabs";
 import { i18n } from "@/services/client/i18n";
+import { session } from "@/services/client/session";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { FormAtom } from "../../builder";
 import Avatar from "../mail-messages/avatar/avatar";
@@ -232,7 +233,8 @@ function SingleUser({
   withUserName?: boolean;
 }) {
   const classNames = useClassNames();
-  const userName = useUserName(user);
+  const userName = user.name;
+  const avatarUser = useAvatarUser(user);
   const className = useMemo(() => getClassName(state), [getClassName, state]);
   const [currentDate, setCurrentDate] = useState(getCurrentDate);
   const title = useMemo(
@@ -258,7 +260,7 @@ function SingleUser({
             className={classNames(styles.avatarContainer, styles[className])}
           >
             <Avatar
-              user={user}
+              user={avatarUser}
               title={title}
               className={classNames(styles.avatar)}
             />
@@ -275,7 +277,11 @@ function SingleUser({
       onMouseEnter={handleMouseEnter}
       className={classNames(styles.avatarContainer, styles[className])}
     >
-      <Avatar user={user} title={title} className={classNames(styles.avatar)} />
+      <Avatar
+        user={avatarUser}
+        title={title}
+        className={classNames(styles.avatar)}
+      />
     </Box>
   );
 }
@@ -308,7 +314,7 @@ function GroupedUsers({
 
   const firstUser = useMemo(() => users[0] || {}, [users]);
   const firstState = states[firstUser.code];
-  const firstUserName = useUserName(firstUser);
+  const firstUserName = firstUser.name;
 
   const className = useMemo(
     () => getClassName(firstState),
@@ -375,30 +381,23 @@ function useSessionUser() {
     if (!user) {
       return user;
     }
-    const { id, login, name, nameField, image } = user;
+    const { id, login, name, image } = user;
     return {
       id,
       code: login,
-      [nameField ?? "name"]: name,
+      name,
       $avatar: image,
     } as User;
   }, [session]);
 }
 
-function useUserName(user: User) {
-  const session = useSession();
-  const nameField = useMemo(
-    () => session.data?.user?.nameField ?? "name",
-    [session]
-  );
+// Avatar resolves the name from the User namecolumn, whereas collaboration
+// users always carry it in `name`.
+function useAvatarUser(user: User) {
+  const nameField = session.info?.user?.nameField ?? "name";
 
   return useMemo(
-    () =>
-      (
-        user as User & {
-          [nameField: string]: string;
-        }
-      )[nameField],
+    () => ({ ...user, [nameField]: user.name }),
     [user, nameField]
   );
 }

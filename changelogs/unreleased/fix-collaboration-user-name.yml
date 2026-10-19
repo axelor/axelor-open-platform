@@ -1,0 +1,8 @@
+---
+title: Fix collaboration user names when User namecolumn is redefined
+type: fix
+description: |
+  When the namecolumn of the User entity was redefined (for example to
+  `fullName`), the collaboration avatars shown when several users open the
+  same record had no initials, and their tooltip showed "undefined" instead
+  of the user's name. They now show the user's initials and name again.
