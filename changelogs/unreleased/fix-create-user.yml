@@ -1,0 +1,7 @@
+---
+title: Fix saving a new user
+type: fix
+description: |
+  Creating a user failed on save, because the MFA configuration of the user
+  was looked up before the user was persisted. New users are now saved
+  without error.

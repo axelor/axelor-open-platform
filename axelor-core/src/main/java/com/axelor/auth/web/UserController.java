@@ -27,8 +27,12 @@ import org.apache.shiro.subject.Subject;
 public class UserController {
 
   public void onSave(ActionRequest request, ActionResponse response) {
-    var mfaService = Beans.get(MFAService.class);
     var user = request.getContext().asType(User.class);
+    if (user == null || user.getId() == null) {
+      return;
+    }
+
+    var mfaService = Beans.get(MFAService.class);
     var mfa = mfaService.getRelatedMfa(user, false);
 
     if (mfa != null
