@@ -130,7 +130,12 @@ public class FileService extends AbstractService {
       return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
 
-    final java.nio.file.Path file = TempFiles.findTempFile(link);
+    final java.nio.file.Path file;
+    try {
+      file = TempFiles.findTempFile(link);
+    } catch (IllegalArgumentException e) {
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+    }
     if (file == null || !file.toFile().isFile()) {
       throw new IllegalArgumentException(new FileNotFoundException(name));
     }

@@ -6,6 +6,7 @@ package com.axelor.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.file.temp.TempFiles;
@@ -64,5 +65,16 @@ public class TempFileTest {
     tempFile = TempFiles.createTempFile("my", ".csv");
     tempFile = TempFiles.findTempFile(tempFile.getFileName().toString());
     assertTrue(Files.exists(tempFile));
+  }
+
+  @Test
+  void findTempFileValidate() {
+    String absolute = Path.of("example.txt").toAbsolutePath().toString();
+
+    assertThrows(IllegalArgumentException.class, () -> TempFiles.findTempFile(absolute));
+    assertThrows(IllegalArgumentException.class, () -> TempFiles.findTempFile(""));
+    assertThrows(IllegalArgumentException.class, () -> TempFiles.findTempFile("."));
+    assertThrows(IllegalArgumentException.class, () -> TempFiles.findTempFile("../x.txt"));
+    assertThrows(IllegalArgumentException.class, () -> TempFiles.findTempFile("a/../../x.txt"));
   }
 }

@@ -6,6 +6,7 @@ package com.axelor.file.temp;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.common.FileUtils;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -76,11 +77,15 @@ public class TempFiles {
   /**
    * Find a temporary file by the given name created previously.
    *
+   * <p>The name can include multiple segments if the resolved path stays inside the temporary
+   * directory.
+   *
    * @param name name of the temp file
    * @return file path
+   * @throws IllegalArgumentException if the resolved path is outside the temporary directory
    */
   public static Path findTempFile(String name) {
-    return getTempPath().resolve(name);
+    return FileUtils.resolveAsChild(getTempPath(), name);
   }
 
   /**
