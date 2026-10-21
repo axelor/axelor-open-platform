@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -134,6 +135,117 @@ public class TestFileUtils {
     assertFalse(FileUtils.isChildPath(parent, parent));
     assertFalse(FileUtils.isChildPath(parent, Path.of("/test")));
     assertFalse(FileUtils.isChildPath(parent, Path.of("../../some")));
+
+    Path cwd = Path.of(".");
+    assertTrue(FileUtils.isChildPath(cwd, Path.of("some")));
+    assertFalse(FileUtils.isChildPath(cwd, Path.of("../some")));
+  }
+
+  @Test
+  void testResolveAsChild() {
+    Path parent = Path.of("/tmp/test");
+    Path child = parent.resolve("some");
+
+    assertEquals(child, FileUtils.resolveAsChild(parent, "some"));
+    assertEquals(child, FileUtils.resolveAsChild(parent, "some/"));
+    assertEquals(child, FileUtils.resolveAsChild(parent, "./some"));
+    assertEquals(child, FileUtils.resolveAsChild(parent, "./some/"));
+    assertEquals(child, FileUtils.resolveAsChild(parent, "some/../some"));
+
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsChild(parent, ""));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsChild(parent, "."));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsChild(parent, "/some"));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsChild(parent, "../some"));
+
+    Path cwd = Path.of(".");
+    assertEquals(Path.of("some"), FileUtils.resolveAsChild(cwd, "some"));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsChild(cwd, "../some"));
+  }
+
+  @Test
+  void testResolveSiblingAsChild() {
+    Path parent = Path.of("/tmp/test");
+    Path file = parent.resolve("some");
+    Path sibling = parent.resolve("sibling");
+
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, "sibling"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, "sibling/"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, "./sibling"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, "./sibling/"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, "some/../sibling"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsChild(file, Path.of("sibling")));
+    assertEquals(
+        parent.resolve("dir/sub"), FileUtils.resolveSiblingAsChild(file, Path.of("dir", "sub")));
+
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsChild(file, ""));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsChild(file, "."));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsChild(file, "/sibling"));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsChild(file, "../sibling"));
+    Path root = Path.of("/");
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsChild(root, "sibling"));
+
+    Path relative = Path.of("some");
+    assertEquals(
+        Path.of("sibling").toAbsolutePath(), FileUtils.resolveSiblingAsChild(relative, "sibling"));
+  }
+
+  @Test
+  void testResolveAsSingleChild() {
+    Path parent = Path.of("/tmp/test");
+    Path child = parent.resolve("some");
+
+    assertEquals(child, FileUtils.resolveAsSingleChild(parent, "some"));
+    assertEquals(child, FileUtils.resolveAsSingleChild(parent, "some/"));
+
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, ""));
+    assertThrows(IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, "."));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, "./some"));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, "some/sub"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveAsSingleChild(parent, "some/../some"));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, "/some"));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(parent, "../some"));
+    Path root = Path.of("/");
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveAsSingleChild(root, "/some"));
+  }
+
+  @Test
+  void testResolveSiblingAsSingleChild() {
+    Path parent = Path.of("/tmp/test");
+    Path file = parent.resolve("some");
+    Path sibling = parent.resolve("sibling");
+
+    assertEquals(sibling, FileUtils.resolveSiblingAsSingleChild(file, "sibling"));
+    assertEquals(sibling, FileUtils.resolveSiblingAsSingleChild(file, "sibling/"));
+
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsSingleChild(file, ""));
+    assertThrows(
+        IllegalArgumentException.class, () -> FileUtils.resolveSiblingAsSingleChild(file, "."));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveSiblingAsSingleChild(file, "./sibling"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveSiblingAsSingleChild(file, "dir/sub"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveSiblingAsSingleChild(file, "some/../sibling"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveSiblingAsSingleChild(file, "/sibling"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> FileUtils.resolveSiblingAsSingleChild(file, "../sibling"));
   }
 
   @Test

@@ -405,12 +405,149 @@ public final class FileUtils {
    *
    * @param parent the parent path
    * @param candidate the candidate path
-   * @return tru if the candidate path is located inside the parent path, otherwise false
+   * @return true if the candidate path is located inside the parent path, otherwise false
    */
   public static boolean isChildPath(Path parent, Path candidate) {
-    final Path normalizedParent = parent.normalize();
-    final Path normalizedCandidate = normalizedParent.resolve(candidate).normalize();
-    return normalizedCandidate.startsWith(normalizedParent)
-        && !normalizedCandidate.equals(normalizedParent);
+    return resolveChild(parent, candidate) != null;
+  }
+
+  private static Path resolveChild(Path parent, Path child) {
+    final Path normalizedParent = parent.toAbsolutePath().normalize();
+    final Path normalizedChild = normalizedParent.resolve(child).normalize();
+    if (normalizedChild.startsWith(normalizedParent) && !normalizedChild.equals(normalizedParent)) {
+      return parent.isAbsolute() ? normalizedChild : parent.resolve(child).normalize();
+    }
+    return null;
+  }
+
+  /**
+   * Safely resolve the given child path against the given parent path, ensuring that the resolved
+   * path is located inside the parent path.
+   *
+   * @param parent the parent path
+   * @param child the child path to resolve against the parent path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent path
+   */
+  public static Path resolveAsChild(Path parent, Path child) {
+    final Path resolved = resolveChild(parent, child);
+
+    if (resolved == null) {
+      throw new IllegalArgumentException("Invalid path: " + child + " is not a child of " + parent);
+    }
+
+    return resolved;
+  }
+
+  /**
+   * Safely resolve the given child path against the given parent path, ensuring that the resolved
+   * path is located inside the parent path.
+   *
+   * @param parent the parent path
+   * @param child the child path to resolve against the parent path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent path
+   */
+  public static Path resolveAsChild(Path parent, String child) {
+    return resolveAsChild(parent, Path.of(child));
+  }
+
+  private static Path requireSingleSegment(Path path) {
+    if (path.getNameCount() != 1 || path.isAbsolute() || path.toString().isEmpty()) {
+      throw new IllegalArgumentException("Invalid path: " + path + " is not a single segment");
+    }
+    return path;
+  }
+
+  /**
+   * Safely resolve the given child path against the given parent path, ensuring that the resolved
+   * path is located inside the parent path and that the child path is a single segment.
+   *
+   * @param parent the parent path
+   * @param child the child path to resolve against the parent path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent path or
+   *     if the child path is not a single segment
+   */
+  public static Path resolveAsSingleChild(Path parent, Path child) {
+    return resolveAsChild(parent, requireSingleSegment(child));
+  }
+
+  /**
+   * Safely resolve the given child path against the given parent path, ensuring that the resolved
+   * path is located inside the parent path and that the child path is a single segment.
+   *
+   * @param parent the parent path
+   * @param child the child path to resolve against the parent path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent path or
+   *     if the child path is not a single segment
+   */
+  public static Path resolveAsSingleChild(Path parent, String child) {
+    return resolveAsSingleChild(parent, Path.of(child));
+  }
+
+  /**
+   * Safely resolve the given sibling path against the parent of the given path, ensuring that the
+   * resolved path is located inside that parent.
+   *
+   * @param path the path whose parent the sibling is resolved against
+   * @param sibling the sibling path to resolve against the parent of the given path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent of the
+   *     given path or if the given path has no parent
+   */
+  public static Path resolveSiblingAsChild(Path path, Path sibling) {
+    Path parentPath = path.toAbsolutePath().normalize().getParent();
+
+    if (parentPath == null) {
+      throw new IllegalArgumentException("Path has no parent: " + path);
+    }
+
+    return resolveAsChild(parentPath, sibling);
+  }
+
+  /**
+   * Safely resolve the given sibling path against the parent of the given path, ensuring that the
+   * resolved path is located inside that parent.
+   *
+   * @param path the path whose parent the sibling is resolved against
+   * @param sibling the sibling path to resolve against the parent of the given path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent of the
+   *     given path or if the given path has no parent
+   */
+  public static Path resolveSiblingAsChild(Path path, String sibling) {
+    return resolveSiblingAsChild(path, Path.of(sibling));
+  }
+
+  /**
+   * Safely resolve the given sibling path against the parent of the given path, ensuring that the
+   * resolved path is located inside that parent and that the sibling path is a single segment.
+   *
+   * @param path the path whose parent the sibling is resolved against
+   * @param sibling the sibling path to resolve against the parent of the given path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent of the
+   *     given path or if the given path has no parent or if the sibling path is not a single
+   *     segment
+   */
+  public static Path resolveSiblingAsSingleChild(Path path, Path sibling) {
+    return resolveSiblingAsChild(path, requireSingleSegment(sibling));
+  }
+
+  /**
+   * Safely resolve the given sibling path against the parent of the given path, ensuring that the
+   * resolved path is located inside that parent and that the sibling path is a single segment.
+   *
+   * @param path the path whose parent the sibling is resolved against
+   * @param sibling the sibling path to resolve against the parent of the given path
+   * @return the resolved path
+   * @throws IllegalArgumentException if the resolved path is not located inside the parent of the
+   *     given path or if the given path has no parent or if the sibling path is not a single
+   *     segment
+   */
+  public static Path resolveSiblingAsSingleChild(Path path, String sibling) {
+    return resolveSiblingAsSingleChild(path, Path.of(sibling));
   }
 }
