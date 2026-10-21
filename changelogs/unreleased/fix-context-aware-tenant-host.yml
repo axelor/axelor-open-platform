@@ -1,0 +1,8 @@
+---
+title: Fix the tenant host changed for the rest of the request after a synchronous context-aware run
+type: fix
+description: |
+  Running a `ContextAware` task on the calling request thread now restores the tenant host
+  taken from the request. It was replaced by the first host configured for the tenant, or
+  cleared when the tenant has no configured hosts, which affected tenant base URLs built
+  later in the same request.

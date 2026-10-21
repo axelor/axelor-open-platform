@@ -85,12 +85,14 @@ final class ContextState {
   static final class Scope implements AutoCloseable {
 
     private final String tenantId;
+    private final String tenantHost;
     private final User user;
     private final String baseUrl;
     private final Locale language;
 
     private Scope() {
       this.tenantId = TenantResolver.currentTenantIdentifier();
+      this.tenantHost = TenantResolver.currentTenantHost();
       this.user = AuthUtils.getCurrentUser();
       this.baseUrl = AppFilter.getBaseURL();
       this.language = AppFilter.getLanguage();
@@ -98,7 +100,9 @@ final class ContextState {
 
     @Override
     public void close() {
-      TenantResolver.setCurrentTenant(tenantId);
+      // Restore the saved host: on a request thread it comes from the Host header and may differ
+      // from the host setCurrentTenant(tenantId) would look up in the tenant config.
+      TenantResolver.setCurrentTenant(tenantId, tenantHost);
       if (user == null) {
         AuthUtils.removeCurrentUser();
       } else {
