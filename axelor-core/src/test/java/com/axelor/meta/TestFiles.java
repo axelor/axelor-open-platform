@@ -21,6 +21,7 @@ package com.axelor.meta;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.axelor.dms.db.DMSFile;
 import com.axelor.meta.db.MetaFile;
@@ -124,5 +125,47 @@ public class TestFiles extends MetaTest {
     files.delete(dms1);
     files.delete(dms2);
     files.delete(dms3);
+  }
+
+  @Test
+  public void testInvalidTempFileName() {
+    assertThrows(IllegalArgumentException.class, () -> MetaFiles.findTempFile(""));
+    assertThrows(IllegalArgumentException.class, () -> MetaFiles.findTempFile("."));
+    assertThrows(IllegalArgumentException.class, () -> MetaFiles.findTempFile(".."));
+    assertThrows(IllegalArgumentException.class, () -> MetaFiles.findTempFile("../test"));
+    assertThrows(IllegalArgumentException.class, () -> MetaFiles.findTempFile("/home/test"));
+    assertThrows(IllegalArgumentException.class, () -> files.clean("../test"));
+  }
+
+  @Test
+  public void testNextFileName() throws IOException {
+    Path existing = MetaFiles.getPath("traversal/test.txt");
+    Path uploadPath = existing.getParent().getParent();
+
+    // resolves to the existing file from the upload directory,
+    // its next name must stay next to the existing file
+    String fileName =
+        "../".repeat(uploadPath.getNameCount())
+            + uploadPath.getRoot().relativize(uploadPath)
+            + "/traversal/test.txt";
+    assertEquals(existing, MetaFiles.getPath(fileName));
+
+    Files.createDirectories(existing.getParent());
+    Files.write(existing, "Hello...".getBytes());
+
+    Path tmp = Files.createTempFile("test", null);
+    MetaFile metaFile = new MetaFile();
+    try {
+      metaFile.setFileName(fileName);
+      files.upload(tmp.toFile(), metaFile);
+      assertEquals("traversal/test-1.txt", metaFile.getFilePath());
+    } finally {
+      if (metaFile.getId() != null) {
+        files.delete(metaFile);
+      }
+      Files.deleteIfExists(tmp);
+      Files.deleteIfExists(existing);
+      Files.deleteIfExists(existing.getParent());
+    }
   }
 }

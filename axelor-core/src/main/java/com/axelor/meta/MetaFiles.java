@@ -121,13 +121,17 @@ public class MetaFiles {
     return UPLOAD_PATH.resolve(tenantId);
   }
 
-  private static Path getUploadPath(String fileName) {
-    final Path uploadPath = getUploadPath().normalize();
-    final Path targetPath = uploadPath.resolve(fileName).normalize();
-    if (targetPath.startsWith(uploadPath) && !targetPath.equals(uploadPath)) {
+  private static Path resolveAsChild(Path parent, String fileName) {
+    final Path parentPath = parent.normalize();
+    final Path targetPath = parentPath.resolve(fileName).normalize();
+    if (targetPath.startsWith(parentPath) && !targetPath.equals(parentPath)) {
       return targetPath;
     }
     throw new IllegalArgumentException("Invalid file name: " + fileName);
+  }
+
+  private static Path getUploadPath(String fileName) {
+    return resolveAsChild(getUploadPath(), fileName);
   }
 
   private static Path getTempPath() {
@@ -135,7 +139,7 @@ public class MetaFiles {
   }
 
   private static Path getTempPath(String fileName) {
-    return getTempPath().resolve(fileName);
+    return resolveAsChild(getTempPath(), fileName);
   }
 
   /**
@@ -337,20 +341,20 @@ public class MetaFiles {
 
   private Path getNextPath(String fileName) {
     synchronized (lock) {
-      int dotIndex = fileName.lastIndexOf('.');
+      Path target = getUploadPath(getTargetName(fileName));
+      Path targetDir = target.getParent();
+      // derive next names from the resolved simple name, so they stay in the target directory
+      String targetName = target.getFileName().toString();
+      int dotIndex = targetName.lastIndexOf('.');
       int counter = 1;
-      String fileNameBase = fileName;
+      String fileNameBase = targetName;
       String fileNameExt = "";
       if (dotIndex > -1) {
-        fileNameExt = fileName.substring(dotIndex);
-        fileNameBase = fileName.substring(0, dotIndex);
+        fileNameExt = targetName.substring(dotIndex);
+        fileNameBase = targetName.substring(0, dotIndex);
       }
-      String targetName = getTargetName(fileName);
-      Path target = getUploadPath(targetName);
-      Path targetDir = target.getParent();
       while (Files.exists(target)) {
-        targetName = fileNameBase + "-" + counter++ + fileNameExt;
-        target = targetDir.resolve(targetName);
+        target = targetDir.resolve(fileNameBase + "-" + counter++ + fileNameExt);
       }
       return target;
     }
