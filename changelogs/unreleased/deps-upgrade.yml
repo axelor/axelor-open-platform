@@ -7,3 +7,4 @@ description: |
   - Upgrade PostgreSQL JDBC driver from 42.7.11 to 42.7.14
   - Upgrade Hibernate Validator from 6.2.5 to 6.2.6
   - Upgrade Jackson from 2.18.7 to 2.18.12
+  - Upgrade SLF4J from 2.0.17 to 2.0.20
