@@ -127,8 +127,7 @@ public class AuthPac4jModule extends ShiroWebModule {
       Collection<Realm> realms,
       Set<AuthenticationListener> authenticationListeners,
       ModularRealmAuthenticator authenticator,
-      AxelorSessionManager sessionManager,
-      AxelorRememberMeManager rememberMeManager) {
+      AxelorSessionManager sessionManager) {
     final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
     securityManager.setRealms(realms);
@@ -136,7 +135,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     authenticator.setAuthenticationListeners(authenticationListeners);
     securityManager.setAuthenticator(authenticator);
     securityManager.setSessionManager(sessionManager);
-    securityManager.setRememberMeManager(rememberMeManager);
+    securityManager.setRememberMeManager(null);
 
     return securityManager;
   }
