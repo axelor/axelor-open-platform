@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded :
   
   - Upgrade PostgreSQL JDBC driver from 42.7.11 to 42.7.14
+  - Upgrade Hibernate Validator from 6.2.5 to 6.2.6
