@@ -210,6 +210,7 @@ libs.apache_shiro = [
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
   "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+  "org.pac4j:pac4j-javaee:${versions.pac4j}",
   dependencies.create("org.pac4j:pac4j-http:${versions.pac4j}") {
       exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
   },
@@ -222,6 +223,7 @@ libs.pac4j = [
 libs.buji_pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
   "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+  "org.pac4j:pac4j-javaee:${versions.pac4j}",
 ]
 
 // UnboundID LDAP SDK (for testing only)
