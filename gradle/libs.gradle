@@ -26,7 +26,7 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.7.1"
 
-versions.swagger = "2.2.49"
+versions.swagger = "2.2.55"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"

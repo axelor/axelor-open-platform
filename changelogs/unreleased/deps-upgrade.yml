@@ -10,3 +10,4 @@ description: |
   - Upgrade SLF4J from 2.0.17 to 2.0.20
   - Upgrade Tomcat from 9.0.118 to 9.0.123
   - Upgrade Undertow from 2.2.39 to 2.2.41
+  - Upgrade Swagger from 2.2.49 to 2.2.55
