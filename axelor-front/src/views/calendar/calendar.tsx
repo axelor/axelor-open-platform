@@ -1,3 +1,4 @@
+import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import deepGet from "lodash/get";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +24,7 @@ import { moment } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
 import { CalendarView, Field, FormView } from "@/services/client/meta.types";
 import format from "@/utils/format";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewContext,
@@ -699,6 +701,18 @@ export function Calendar(props: ViewProps<CalendarView>) {
       return acc;
     }, [] as SchedulerEvent<DataRecord>[]);
   }, [events, filters, handleHilites]);
+
+  const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
+
+  useEffect(() => {
+    if (dashlet) {
+      setDashletHandlers({
+        dataStore,
+        view: meta.view,
+        onRefresh,
+      });
+    }
+  }, [dashlet, dataStore, meta.view, onRefresh, setDashletHandlers]);
 
   // register shortcuts
   useShortcuts({ viewType: "calendar", onRefresh: onRefresh });
