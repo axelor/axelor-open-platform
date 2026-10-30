@@ -199,6 +199,10 @@ function GridInner(props: ViewProps<GridView>) {
     selectedRows: viewSelectedRows,
   });
 
+  const getGridState = useAtomCallback(
+    useCallback((get) => get(gridStateAtom), [gridStateAtom]),
+  );
+
   const selector = action?.name?.startsWith("$selector");
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
   const [records, setRecords] = useState(dataStore.records);
@@ -215,14 +219,6 @@ function GridInner(props: ViewProps<GridView>) {
       },
       [popupOptions, searchAtom],
     ),
-  );
-
-  useEffect(
-    () =>
-      dataStore.subscribe((ds) => {
-        setRecords(processSearchResult(ds));
-      }),
-    [dataStore, processSearchResult],
   );
 
   const onColumnCustomize = useCustomizePopup({
@@ -243,6 +239,41 @@ function GridInner(props: ViewProps<GridView>) {
     action.params?.["popup"] || action.params?.["dashlet.in.popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
+
+  const { treeLimit, treeField, treeFieldTitle } = view;
+  const widget = toKebabCase(view.widget ?? "");
+  const isExpandable = widget === "expandable";
+  const isTreeGrid = treeField && widget === "tree-grid";
+  const hasGridExpandableView = isExpandable || isTreeGrid;
+
+  useEffect(() => {
+    // as data store records same, so no updates
+    // for tree-grid, force reset records to provide reload to expandable form
+    if (hasGridExpandableView) {
+      return dataStore.subscribe(
+        (ds) => {
+          const expandedIds = new Set(
+            getGridState()
+              .rows.filter((row) => row.expand)
+              .map((row) => row.record.id),
+          );
+          const records = processSearchResult(ds);
+          setRecords(
+            expandedIds.size > 0
+              ? records.map((record) =>
+                  expandedIds.has(record.id) ? { ...record } : record,
+                )
+              : records,
+          );
+        },
+        { force: true },
+      );
+    }
+
+    return dataStore.subscribe((ds) => {
+      setRecords(processSearchResult(ds));
+    });
+  }, [dataStore, hasGridExpandableView, getGridState, processSearchResult]);
 
   const { editable: _editable, onDelete: onDeleteAction, inlineHelp } = view;
   const canShowHelp = !sessionData?.user?.noHelp && inlineHelp;
@@ -1143,11 +1174,6 @@ function GridInner(props: ViewProps<GridView>) {
 
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
   const canMassUpdate = perms?.massUpdate != false && hasButton("edit") && massUpdateFields.length > 0;
-
-  const { treeLimit, treeField, treeFieldTitle } = view;
-  const widget = toKebabCase(view.widget ?? "");
-  const isExpandable = widget === "expandable";
-  const isTreeGrid = treeField && widget === "tree-grid";
 
   const { data: expandableSummaryMeta } = useAsync(async () => {
     const { summaryView, model } = view;

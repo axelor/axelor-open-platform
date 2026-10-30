@@ -68,6 +68,8 @@ export function ExpandIcon({
   );
 }
 
+const timeSymbol = Symbol("$$time");
+
 export function ExpandableFormView({
   gridView,
   meta,
@@ -193,11 +195,11 @@ export function ExpandableFormView({
         get,
         set,
         rec: DataRecord,
-        opts: { fromAction?: boolean } = {},
+        opts: { fromAction?: boolean; fromReload?: boolean } = {},
       ) => {
         let hasFetched = false;
 
-        const { fromAction } = opts;
+        const { fromAction, fromReload } = opts;
 
         const _record: DataRecord = await (async () => {
           const fields = Object.keys(meta.fields ?? {});
@@ -220,6 +222,7 @@ export function ExpandableFormView({
 
         const record: DataRecord = (fetchedRef.current = {
           id: rec.id,
+          [timeSymbol]: Date.now(),
           ..._record,
           ...(rec._dirty
             ? {
@@ -250,7 +253,7 @@ export function ExpandableFormView({
             await actionExecutor.execute(action);
           }
 
-          if (!isNew && fromAction) {
+          if (!isNew && (fromAction || fromReload)) {
             const event = new CustomEvent("form:refresh", {
               detail: { tabId, formId: record.id },
             });
@@ -410,7 +413,7 @@ export function ExpandableFormView({
   );
 
   const doRefresh = useCallback(() => {
-    if (record) doOnLoad(record);
+    if (record) doOnLoad(record, { fromReload: true });
   }, [record, doOnLoad]);
 
   const doActionReload = useCallback(async () => {
