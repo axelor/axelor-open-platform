@@ -124,7 +124,10 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const onSearch = useAfterActions(doSearch);
 
-  const onRefresh = useCallback(() => doSearch({}), [doSearch]);
+  const onRefresh = useCallback(
+    (options?: Partial<SearchOptions>) => doSearch(options),
+    [doSearch],
+  );
 
   const formAtom = useCreateFormAtomByMeta(meta);
 

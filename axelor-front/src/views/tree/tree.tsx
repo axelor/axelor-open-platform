@@ -340,12 +340,15 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const onSearch = useAfterActions(doSearch);
 
-  const onRefresh = useCallback(async () => {
-    childrenCacheRef.current.clear();
-    loadingMoreRef.current.clear();
-    doReset();
-    await onSearch({});
-  }, [doReset, onSearch]);
+  const onRefresh = useCallback(
+    async (options?: Partial<SearchOptions>) => {
+      childrenCacheRef.current.clear();
+      loadingMoreRef.current.clear();
+      doReset();
+      await onSearch(options);
+    },
+    [doReset, onSearch],
+  );
 
   const getActionContext = useCallback(() => getContext(true), [getContext]);
 
@@ -735,7 +738,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
                 iconProps: {
                   icon: "refresh",
                 },
-                onClick: onRefresh,
+                onClick: () => onRefresh(),
               },
             ],
           }}
