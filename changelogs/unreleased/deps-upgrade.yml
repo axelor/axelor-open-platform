@@ -9,3 +9,4 @@ description: |
   - Upgrade Undertow from 2.3.26 to 2.3.27
   - Upgrade Tomcat from 10.1.60 to 10.1.61
   - Upgrade Gradle from 8.14.5 to 8.14.6
+  - Upgrade Hibernate from 6.6.58 to 6.6.59
