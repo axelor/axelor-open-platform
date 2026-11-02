@@ -1,3 +1,186 @@
+## 7.4.14 (2026-11-02)
+
+#### Feature
+
+* Select field content on focus for input widgets
+
+  <details>
+  
+  Numeric (integer, long, decimal), duration, date/datetime/time,
+  selection, and many-to-one fields now automatically select their entire
+  content when the field receives focus — whether via Tab or a mouse click.
+  A second click on an already-focused field places the cursor normally
+  without forcing reselection.
+  
+  String fields are excluded, since users editing text most often just want
+  to fix a typo rather than replace the whole value.
+  
+  </details>
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade PostgreSQL JDBC driver from 42.7.11 to 42.7.14
+  - Upgrade Hibernate Validator from 6.2.5 to 6.2.6
+  - Upgrade Jackson from 2.18.7 to 2.18.12
+  - Upgrade SLF4J from 2.0.17 to 2.0.20
+  - Upgrade Tomcat from 9.0.118 to 9.0.123
+  - Upgrade Undertow from 2.2.39 to 2.2.41
+  - Upgrade Swagger from 2.2.49 to 2.2.55
+  
+  </details>
+
+#### Fix
+
+* Fix reload expanded node on tree grid refresh
+* Fix merging of values returned by chained actions
+
+  <details>
+  
+  When several actions were chained together, the values each of them returned
+  were aggregated before being applied to the record, and that merge could
+  corrupt relational values.
+  
+  New (unsaved) collection rows returned by different actions were all matched
+  on their (missing) id and collapsed into a single row, losing data. Such rows
+  are now matched by their client id (cid) instead, so distinct new lines stay
+  separate.
+  
+  A many-to-one or one-to-one field pointed at a different record by a later
+  action was deep-merged with the previous value, leaking stale fields from the
+  old record onto the new one. The new value now fully replaces the previous one
+  as soon as the record id changes; values are only merged when they refer to
+  the same record.
+  
+  </details>
+
+* Compact M2M field items in action context and save requests
+
+  <details>
+  
+  When a many-to-many field held full record objects (e.g. filled by an action
+  with records fetched from a repository), all their fields were re-sent on
+  every subsequent save or action call. The server then attempted to update
+  the linked records themselves, which could fail with unexpected permission
+  errors.
+  
+  Saved many-to-many items are now sent as plain references (id, version and
+  the display name), whether the field belongs to the model or is only defined
+  in the view. New (unsaved) items are still sent in full so they can be
+  created. One-to-many fields are not affected.
+  
+  The same compaction is applied when an editable grid row is committed or a
+  record is saved from a popup editor, so many-to-many values filled by
+  actions there no longer carry updates into later saves of the parent record.
+  
+  </details>
+
+* Fix check draggable attribute in tree view node
+* Fetch missing relation fields via selector and editor popups
+
+  <details>
+  
+  When selecting a record from a selector popup or saving via an editor popup
+  in M2O, M2M (tags), or M2M/O2M collection grid widgets, fields required for
+  display (e.g. target-name, colorField, computed grid columns) that were not
+  present in the popup's grid or form view could be missing, causing values to
+  disappear until the page was refreshed.
+  
+  Records returned from these popups now always include the fields the widget
+  needs for display, so values no longer disappear after selecting or saving
+  a record.
+  
+  </details>
+
+* Fix websocket handshake refused behind a proxy forwarding the wss scheme
+
+  <details>
+  
+  Without `application.base-url`, the origin check of the websocket handshake refused
+  every connection behind a reverse proxy that forwards the upgrade request with
+  `X-Forwarded-Proto: wss` (or `ws`), such as Traefik: the base url was built with the
+  `wss://` scheme while the browser sent an `https://` origin. The `ws` and `wss` schemes are
+  now compared as `http` and `https`.
+  
+  </details>
+
+* Fix thread leak when updating DMS permissions
+
+  <details>
+  
+  Each `DMSPermissionRepository` instance created its own worker thread to
+  apply permissions to child files, and never released it. Idle threads
+  accumulated over time.
+  
+  The worker thread is now created only when child permissions need updating,
+  and exits once done.
+  
+  </details>
+
+* Fix DMS child permissions applied before the parent permission is committed
+
+  <details>
+  
+  When sharing a folder, a background thread propagated permissions to child
+  files before the folder permission committed. A newly created permission was
+  not yet visible to the worker.
+  
+  Child permissions are now applied after commit, so the worker sees the
+  saved permission.
+  
+  </details>
+
+* Fix change tracking rolling back the transaction when a tracked record or reference is deleted
+
+  <details>
+  
+  Change tracking no longer fails the transaction when a tracked many-to-one/one-to-one
+  target is deleted in the same transaction: the history message uses the target id
+  instead of its name. Records deleted in the transaction no longer get a "Record updated"
+  message, and any other tracking error is logged instead of rolling back the transaction.
+  
+  </details>
+
+* Fix grid row saving before validIf validation completes
+
+  <details>
+  
+  In an editable grid, pressing Enter to save a row could commit a field with
+  a `validIf` condition before its validity was re-evaluated. This allowed an
+  invalid value to be saved, or delayed showing the invalid state until a
+  later action.
+  
+  </details>
+
+#### Security
+
+* Validate temporary file names
+* Consistently exclude password fields from record data
+* Check the origin of the websocket handshake
+* Fix CORS origin matching and disable credentials by default
+
+  <details>
+  
+  With `cors.allow-origin = *`, a literal `Access-Control-Allow-Origin: *` is now sent and credentials are never 
+  allowed with `*`.
+  
+  `cors.allow-credentials` now defaults to `false`. Set it to `true`, with explicit origins, if a browser client served 
+  from another origin relies on cookies.
+  
+  `cors.allow-origin` is now a comma-separated list of exact origins (`scheme://host[:port]`) instead of a regular 
+  expression. Invalid values, such as regular expressions, are ignored with a warning: list each allowed origin 
+  explicitly. The `null` origin cannot be listed explicitly: it is only accepted with `*`, without credentials.
+  
+  This changes the CORS behavior: if `cors.allow-origin` is configured, check the 7.4 migration guide.
+  
+  </details>
+
+
 ## 7.4.13 (2026-08-06)
 
 #### Fix
