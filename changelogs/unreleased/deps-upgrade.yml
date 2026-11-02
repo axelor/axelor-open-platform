@@ -1,0 +1,7 @@
+---
+title: Upgrade backend dependencies
+type: change
+description: |
+  Here is the list of backend dependencies upgraded:
+  
+  - Upgrade PostgreSQL driver from 42.7.13 to 42.7.14

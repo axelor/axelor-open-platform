@@ -110,7 +110,7 @@ libs.jakarta_annotation = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.7.13"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.7.14"
 
 // Hibernate
 libs.hibernate = [
