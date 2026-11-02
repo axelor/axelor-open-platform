@@ -1,3 +1,98 @@
+## 8.2.6 (2026-11-02)
+
+#### Change
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded:
+  
+  - Upgrade PostgreSQL driver from 42.7.13 to 42.7.14
+  - Upgrade Jackson from 2.21.7 to 2.21.8
+  - Upgrade Undertow from 2.3.26 to 2.3.27
+  - Upgrade Tomcat from 10.1.60 to 10.1.61
+  - Upgrade Gradle from 8.14.5 to 8.14.6
+  - Upgrade Hibernate from 6.6.58 to 6.6.59
+  - Upgrade Hibernate Validator from 8.0.5 to 8.0.6
+  - Upgrade Graal JS from 25.0.4.1.1 to 25.0.5.0.3
+  
+  </details>
+
+#### Fix
+
+* Fix the tenant host changed for the rest of the request after a synchronous context-aware run
+
+  <details>
+  
+  Running a `ContextAware` task on the calling request thread now restores the tenant host
+  taken from the request. It was replaced by the first host configured for the tenant, or
+  cleared when the tenant has no configured hosts, which affected tenant base URLs built
+  later in the same request.
+  
+  </details>
+
+* Fix collaboration user names when User namecolumn is redefined
+
+  <details>
+  
+  When the namecolumn of the User entity was redefined (for example to
+  `fullName`), the collaboration avatars shown when several users open the
+  same record had no initials, and their tooltip showed "undefined" instead
+  of the user's name. They now show the user's initials and name again.
+  
+  </details>
+
+* Fix pagination in cards and tree dashlets
+* Fix saving a new user
+
+  <details>
+  
+  Creating a user failed on save, because the MFA configuration of the user
+  was looked up before the user was persisted. New users are now saved
+  without error.
+  
+  </details>
+
+* Fix error after multi-factor authentication when login was opened directly
+
+  <details>
+  
+  When the login page was opened directly instead of through a redirect from
+  another page, completing multi-factor authentication ended on an
+  "Unexpected Application Error" (`Cannot read properties of undefined (reading 'pathname')`).
+  The user is now redirected to the home page.
+  
+  </details>
+
+* Fix websocket handshake refused behind a proxy forwarding the wss scheme
+
+  <details>
+  
+  Without `application.base-url`, the origin check of the websocket handshake refused
+  every connection behind a reverse proxy that forwards the upgrade request with
+  `X-Forwarded-Proto: wss` (or `ws`), such as Traefik: the base url was built with the
+  `wss://` scheme while the browser sent an `https://` origin. The `ws` and `wss` schemes are
+  now compared as `http` and `https`.
+  
+  </details>
+
+* Fix the user leaking to the next request after a synchronous context-aware run
+
+  <details>
+  
+  Running a `ContextAware` task on the calling request thread no longer leaves the session
+  user in the current-user thread-local. The next request served by the same pooled thread
+  could otherwise run as the previous caller.
+  
+  </details>
+
+* Fix refresh in calendar dashlets
+
+#### Security
+
+* Validate temporary file names
+
 ## 8.2.5 (2026-10-15)
 
 #### Fix
