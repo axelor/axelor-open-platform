@@ -11,3 +11,4 @@ description: |
   - Upgrade Gradle from 8.14.5 to 8.14.6
   - Upgrade Hibernate from 6.6.58 to 6.6.59
   - Upgrade Hibernate Validator from 8.0.5 to 8.0.6
+  - Upgrade Graal JS from 25.0.4.1.1 to 25.0.5.0.3
