@@ -5,3 +5,4 @@ description: |
   Here is the list of backend dependencies upgraded:
   
   - Upgrade PostgreSQL driver from 42.7.13 to 42.7.14
+  - Upgrade Jackson from 2.21.7 to 2.21.8
