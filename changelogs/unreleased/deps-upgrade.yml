@@ -6,3 +6,4 @@ description: |
   
   - Upgrade PostgreSQL driver from 42.7.13 to 42.7.14
   - Upgrade Jackson from 2.21.7 to 2.21.8
+  - Upgrade Undertow from 2.3.26 to 2.3.27
