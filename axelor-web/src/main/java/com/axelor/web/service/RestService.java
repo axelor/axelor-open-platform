@@ -24,6 +24,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.mapper.PropertyType;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.file.store.FileStoreFactory;
 import com.axelor.file.store.Store;
@@ -540,7 +541,7 @@ public class RestService extends ResourceService {
     }
 
     final Property prop = mapper.getProperty(field);
-    if (prop == null) {
+    if (prop == null || !isDownloadable(prop)) {
       return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
@@ -629,6 +630,14 @@ public class RestService extends ResourceService {
       throws IOException {
 
     return download(id, field, isImage, parentId, parentModel, fileName, false);
+  }
+
+  /** Only binary fields and references to {@link MetaFile} can be downloaded. */
+  private static boolean isDownloadable(Property prop) {
+    return prop.getType() == PropertyType.BINARY
+        || prop.isReference()
+            && prop.getTarget() != null
+            && MetaFile.class.isAssignableFrom(prop.getTarget());
   }
 
   private boolean canDownload(
