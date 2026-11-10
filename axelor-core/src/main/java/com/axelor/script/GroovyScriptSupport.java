@@ -79,6 +79,9 @@ public class GroovyScriptSupport {
     // sandbox (evaluate...) and marks the code as sandboxed (see SandboxGroovyMethods).
     config.setScriptBaseClass(SandboxScript.class.getName());
 
+    // Closures extend SandboxClosure, which denies delegates and owners not allowed by the policy.
+    config.setBytecodePostprocessor(new SandboxClosureProcessor());
+
     config.addCompilationCustomizers(importCustomizer);
     config.addCompilationCustomizers(astCustomizer);
     config.addCompilationCustomizers(astPropCustomizer);

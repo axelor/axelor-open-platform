@@ -683,6 +683,86 @@ class TestScriptPolicy {
     assertEquals(null, helper.eval("def l = null; l*.size()"));
   }
 
+  // Inside a closure, calls and properties without a receiver are resolved on its delegate (or
+  // owner), which the receiver checks never see. A sandboxed closure must therefore never get a
+  // delegate or owner the policy denies, however it is set.
+  @Test
+  void testGroovyClosureDelegateMustBeAllowed() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    final String closure = "def c = { -> getenv('HOME') }; ";
+
+    assertBlockedByPolicy(helper, closure + "c.delegate = System; c()");
+    assertBlockedByPolicy(helper, closure + "c.setDelegate(System); c()");
+    assertBlockedByPolicy(helper, closure + "c['delegate'] = System; c()");
+    assertBlockedByPolicy(helper, closure + "c.setProperty('delegate', System); c()");
+    assertBlockedByPolicy(helper, closure + "c.invokeMethod('setDelegate', System); c()");
+    assertBlockedByPolicy(helper, closure + "c.\"${'setDel' + 'egate'}\"(System); c()");
+    assertBlockedByPolicy(helper, closure + "c.rehydrate(System, null, null)()");
+    assertBlockedByPolicy(helper, closure + "c.rehydrate(null, System, null)()");
+
+    // Property access resolved on the delegate.
+    assertBlockedByPolicy(
+        helper, "def c = { -> env }; c.resolveStrategy = 1; c.delegate = System; c()");
+
+    // Nested closure, resolved through its owner's delegate.
+    assertBlockedByPolicy(
+        helper, "def c = { -> { -> getenv('HOME') }() }; c.delegate = System; c()");
+  }
+
+  // Common closure usage must keep working with sandboxed closures.
+  @Test
+  void testGroovyClosuresStillWork() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Script closures are sandboxed.
+    assertTrue(helper.eval("{ -> 1 }") instanceof SandboxClosure);
+
+    // Delegate set by GDK methods to an allowed receiver.
+    assertEquals("ABC", helper.eval("'abc'.with { toUpperCase() }"));
+    assertEquals("abc", helper.eval("'abc'.tap { toUpperCase() }"));
+    assertEquals("X", helper.eval("[name: 'x'].with { name.toUpperCase() }"));
+    assertEquals(3, helper.eval("[1, 2, 3].with { size() }"));
+
+    // Delegate set explicitly to an allowed object.
+    assertEquals(3, helper.eval("def c = { -> size() }; c.delegate = [1, 2, 3]; c()"));
+    // resolveStrategy 1 is Closure.DELEGATE_FIRST (the Closure class itself is not allowed).
+    assertEquals(
+        "X",
+        helper.eval(
+            "def c = { -> name.toUpperCase() }; c.resolveStrategy = 1;"
+                + " c.delegate = [name: 'x']; c()"));
+    assertEquals(1, helper.eval("def c = { -> 1 }; c.rehydrate([1], null, null)()"));
+
+    // Iteration and collection methods.
+    assertEquals(10, helper.eval("[1, 2, 3].collect { it * 2 }.findAll { it > 2 }.sum()"));
+    assertEquals("a1,b2", helper.eval("[a: 1, b: 2].collect { k, v -> k + v }.join(',')"));
+    assertEquals(List.of(1, 2, 3), helper.eval("[3, 1, 2].sort { a, b -> a <=> b }"));
+    assertEquals(6, helper.eval("[1, 2, 3].inject(0) { acc, v -> acc + v }"));
+    assertEquals(
+        Map.of(true, List.of(2), false, List.of(1, 3)),
+        helper.eval("[1, 2, 3].groupBy { it % 2 == 0 }"));
+    assertEquals(List.of(0, 1, 2), helper.eval("def l = []; 3.times { l << it }; l"));
+    assertEquals(
+        List.of("0:a", "1:b"),
+        helper.eval("def l = []; ['a', 'b'].eachWithIndex { v, i -> l << i + ':' + v }; l"));
+
+    // Nested closures, captured variables, default parameters, recursion.
+    assertEquals(
+        List.of(11, 12),
+        helper.eval("def outer = { x -> [1, 2].collect { y -> x + y } }; outer(10)"));
+    assertEquals(3, helper.eval("def n = 1; def inc = { -> n += 2 }; inc(); n"));
+    assertEquals(5, helper.eval("def f = { x = 5 -> x }; f()"));
+    assertEquals(
+        120, helper.eval("def fact; fact = { n -> n <= 1 ? 1 : n * fact(n - 1) }; fact(5)"));
+
+    // Closure owner and delegate are readable.
+    assertEquals(true, helper.eval("def c = { -> delegate == owner }; c()"));
+
+    // Closure returned to Java and called later.
+    Closure<?> closure = (Closure<?>) helper.eval("{ a, b -> a + b }");
+    assertEquals(3, closure.call(1, 2));
+  }
+
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
   // on allow-listed receivers, so the receiver check does not apply to them.
   @Test

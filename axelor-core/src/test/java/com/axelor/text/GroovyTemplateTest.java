@@ -130,6 +130,35 @@ public class GroovyTemplateTest extends TemplateScriptTest {
   }
 
   @Test
+  void testClosuresInTemplates() {
+    var templates = new GroovyTemplates();
+    var orderedValues = new java.util.LinkedHashMap<String, Object>();
+    orderedValues.put("a", 1);
+    orderedValues.put("b", 2);
+
+    for (var prefix : List.of("", SPECIAL_PREFIX)) {
+      assertEquals(
+          prefix + "2,4,6",
+          templates
+              .fromText(prefix + "<% out << items.collect { it * 2 }.join(',') %>")
+              .make(Map.of("items", List.of(1, 2, 3)))
+              .render());
+      assertEquals(
+          prefix + "a=1;b=2;",
+          templates
+              .fromText(prefix + "<% values.each { k, v -> %>${k}=${v};<% } %>")
+              .make(Map.of("values", orderedValues))
+              .render());
+      assertEquals(
+          prefix + "X",
+          templates
+              .fromText(prefix + "<% out << [name: 'x'].with { name.toUpperCase() } %>")
+              .make(Map.of())
+              .render());
+    }
+  }
+
+  @Test
   void testSandboxEscapesAreDenied() {
     var templates = new GroovyTemplates();
     var missingCmd = "axelor-nonexistent-binary-xyz";
@@ -141,8 +170,8 @@ public class GroovyTemplateTest extends TemplateScriptTest {
               "'" + missingCmd + "'.invokeMethod('execute', null)",
               "use(System) { 'PATH'.getenv() }",
               "evaluate('1 + 1')",
-              "[('__$$policy'): [check: { o -> o }, checkMethod: { o, n -> o }]]"
-                  + ".with { Runtime.getRuntime() }")) {
+              "[('__$$policy'): [check: { o -> o }]].with { Runtime.getRuntime() }",
+              "def c = { -> getenv('PATH') }; c.delegate = System; c()")) {
         var renderer = templates.fromText(prefix + "<% " + code + " %>").make(Map.of());
         assertThrows(IllegalArgumentException.class, renderer::render, "Should not allow: " + code);
       }
