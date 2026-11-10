@@ -82,6 +82,12 @@ public class GroovyScriptSupport {
     // Closures extend SandboxClosure, which denies delegates and owners not allowed by the policy.
     config.setBytecodePostprocessor(new SandboxClosureProcessor());
 
+    // No compile-time code from the script: no global AST transformation (e.g. @Grab), and no
+    // annotation, rejected first so that no annotation-triggered transformation ever runs.
+    config.setDisabledGlobalASTTransformations(
+        GroovyAnnotationCheck.globalTransforms(JpaScanner.getClassLoader()));
+    config.addCompilationCustomizers(new GroovyAnnotationCheck());
+
     config.addCompilationCustomizers(importCustomizer);
     config.addCompilationCustomizers(astCustomizer);
     config.addCompilationCustomizers(astPropCustomizer);

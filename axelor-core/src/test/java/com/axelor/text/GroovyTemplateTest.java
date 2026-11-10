@@ -159,6 +159,33 @@ public class GroovyTemplateTest extends TemplateScriptTest {
   }
 
   @Test
+  void testAnnotationsAreRejected() {
+    var templates = new GroovyTemplates();
+
+    for (var prefix : List.of("", SPECIAL_PREFIX)) {
+      var text =
+          prefix
+              + "<% @groovy.transform.ASTTest(value = { throw new RuntimeException("
+              + "'COMPILE-TIME') }) def x = 1 %>";
+      // the template is compiled when it is made
+      Throwable ex =
+          assertThrows(
+              RuntimeException.class, () -> templates.fromText(text).make(Map.of()).render());
+      // The template engines report compilation errors as a message (including the template
+      // source), so check the message rather than the exception types.
+      String messages = "";
+      for (Throwable c = ex; c != null; c = c.getCause()) {
+        assertFalse(
+            "COMPILE-TIME".equals(c.getMessage()), "The @ASTTest closure must not run: " + ex);
+        messages += c.getMessage();
+      }
+      assertTrue(
+          messages.contains("Annotation '@groovy.transform.ASTTest' not allowed"),
+          () -> "Expected the annotation to be rejected, got: " + ex);
+    }
+  }
+
+  @Test
   void testSandboxEscapesAreDenied() {
     var templates = new GroovyTemplates();
     var missingCmd = "axelor-nonexistent-binary-xyz";

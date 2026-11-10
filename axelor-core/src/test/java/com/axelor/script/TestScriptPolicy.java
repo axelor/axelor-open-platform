@@ -763,6 +763,59 @@ class TestScriptPolicy {
     assertEquals(3, closure.call(1, 2));
   }
 
+  // Annotations can trigger AST transformations that run code while the script is compiled, before
+  // any runtime check exists, so scripts cannot use any annotation.
+  @Test
+  void testGroovyAnnotationsAreRejected() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // @ASTTest runs its closure at compile time: it must be rejected before it runs.
+    final String astTest =
+        "@groovy.transform.ASTTest(value = { throw new RuntimeException('COMPILE-TIME') })"
+            + " def x = 1; x";
+    Throwable ex = assertThrows(RuntimeException.class, () -> helper.eval(astTest));
+    assertTrue(hasPolicyException(ex), () -> "Expected a ScriptPolicyException, got: " + ex);
+    for (Throwable c = ex; c != null; c = c.getCause()) {
+      assertFalse("COMPILE-TIME".equals(c.getMessage()), "The @ASTTest closure must not run");
+    }
+
+    // Other transformations: dependency download, script base class replacement, alias.
+    assertBlockedByPolicy(helper, "@Grab('org.example:none:1.0') import java.util.List; 1");
+    assertBlockedByPolicy(helper, "@groovy.transform.BaseScript groovy.lang.Script base; 1");
+    assertBlockedByPolicy(
+        helper,
+        "@groovy.transform.AnnotationCollector([groovy.transform.ASTTest]) @interface Alias {}; 1");
+
+    // Every position an annotation can be in.
+    assertBlockedByPolicy(helper, "@Deprecated def x = 1; x");
+    assertBlockedByPolicy(helper, "@groovy.transform.Field def x = 1; x");
+    assertBlockedByPolicy(helper, "@Deprecated import java.util.List; 1");
+    assertBlockedByPolicy(helper, "@Deprecated def f() { 1 }; f()");
+    assertBlockedByPolicy(helper, "def f(@Deprecated x) { x }; f(1)");
+    assertBlockedByPolicy(helper, "{ @Deprecated x -> x }(1)");
+    assertBlockedByPolicy(helper, "for (@Deprecated int i = 0; i < 1; i++) {}; 1");
+    assertBlockedByPolicy(helper, "@groovy.transform.ToString class X {}; 1");
+    assertBlockedByPolicy(helper, "class X { @Deprecated def m() {} }; 1");
+    assertBlockedByPolicy(helper, "class X { @Deprecated String p }; 1");
+    assertBlockedByPolicy(helper, "class X { @Deprecated private String f }; 1");
+    assertBlockedByPolicy(helper, "class X { X(@Deprecated String p) {} }; 1");
+
+    // The parser drops annotations on a for-in loop variable and on a catch parameter: they never
+    // reach the compiler, so they cannot trigger a transformation.
+    final String compileTime =
+        "@groovy.transform.ASTTest(value = { throw new RuntimeException('COMPILE-TIME') })";
+    assertEquals("compiled", helper.eval("for (" + compileTime + " x in [1]) {}; 'compiled'"));
+    assertEquals(
+        "compiled",
+        helper.eval("try { 1 } catch (" + compileTime + " Exception e) { 2 }; 'compiled'"));
+
+    // An @ character that is not an annotation is fine.
+    assertEquals("user@example.com", helper.eval("'user@example.com'"));
+    assertEquals("a@1", helper.eval("def n = 1; \"a@${n}\".toString()"));
+    assertEquals(3, helper.eval("def f(x) { x + 1 }; f(2)"));
+    assertEquals(2, helper.eval("try { 1 / 0 } catch (ArithmeticException e) { 2 }"));
+  }
+
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
   // on allow-listed receivers, so the receiver check does not apply to them.
   @Test
