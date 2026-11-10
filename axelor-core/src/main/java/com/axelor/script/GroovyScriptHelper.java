@@ -5,7 +5,6 @@
 package com.axelor.script;
 
 import com.axelor.rpc.Context;
-import com.axelor.script.GroovyScriptSupport.PolicyChecker;
 import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -31,14 +30,12 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
   @Override
   public Object eval(String expr, Bindings bindings) throws Exception {
     Script script = GroovyScriptSupport.createScript(expr);
-    PolicyChecker checker = timeout > 0 ? new PolicyChecker(timeout) : new PolicyChecker();
 
     script.setBinding(
         new Binding(bindings) {
 
           @Override
           public Object getVariable(String name) {
-            if (PolicyChecker.NAME.equals(name)) return checker;
             try {
               return super.getVariable(name);
             } catch (MissingPropertyException e) {
@@ -52,6 +49,9 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
             }
           }
         });
-    return script.run();
+    try (GroovySandbox.Scope scope =
+        timeout > 0 ? GroovySandbox.enter(timeout) : GroovySandbox.enter()) {
+      return script.run();
+    }
   }
 }

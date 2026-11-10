@@ -12,8 +12,8 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.script.GroovySandbox;
 import com.axelor.script.GroovyScriptSupport;
-import com.axelor.script.GroovyScriptSupport.PolicyChecker;
 import com.axelor.script.ScriptBindings;
 import com.google.common.io.CharStreams;
 import groovy.text.TemplateEngine;
@@ -119,7 +119,6 @@ public class GroovyTemplates implements Templates {
       final TemplateEngine engine = isWordTemplate(text) ? STREAMING_ENGINE : GSTRING_ENGINE;
 
       bindings.put("__fmt__", new FormatHelper());
-      bindings.put(PolicyChecker.NAME, new PolicyChecker());
 
       try {
         final groovy.text.Template template = engine.createTemplate(text);
@@ -127,7 +126,9 @@ public class GroovyTemplates implements Templates {
 
           @Override
           public void render(Writer out) throws IOException {
-            template.make(bindings).writeTo(out);
+            try (GroovySandbox.Scope scope = GroovySandbox.enter()) {
+              template.make(bindings).writeTo(out);
+            }
           }
         };
       } catch (Exception e) {

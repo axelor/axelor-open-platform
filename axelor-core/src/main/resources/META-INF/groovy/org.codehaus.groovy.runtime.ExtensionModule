@@ -1,0 +1,3 @@
+moduleName=axelor-script-sandbox
+moduleVersion=1.0
+extensionClasses=com.axelor.script.SandboxGroovyMethods

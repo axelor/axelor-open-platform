@@ -128,4 +128,24 @@ public class GroovyTemplateTest extends TemplateScriptTest {
           "Should not allow unrestricted Beans.get");
     }
   }
+
+  @Test
+  void testSandboxEscapesAreDenied() {
+    var templates = new GroovyTemplates();
+    var missingCmd = "axelor-nonexistent-binary-xyz";
+
+    for (var prefix : List.of("", SPECIAL_PREFIX)) {
+      for (var code :
+          List.of(
+              "'" + missingCmd + "'.with { execute() }",
+              "'" + missingCmd + "'.invokeMethod('execute', null)",
+              "use(System) { 'PATH'.getenv() }",
+              "evaluate('1 + 1')",
+              "[('__$$policy'): [check: { o -> o }, checkMethod: { o, n -> o }]]"
+                  + ".with { Runtime.getRuntime() }")) {
+        var renderer = templates.fromText(prefix + "<% " + code + " %>").make(Map.of());
+        assertThrows(IllegalArgumentException.class, renderer::render, "Should not allow: " + code);
+      }
+    }
+  }
 }

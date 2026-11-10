@@ -18,11 +18,12 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.StreamingTemplateEngine;
-import java.lang.reflect.Executable;
 import java.util.concurrent.TimeUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import org.codehaus.groovy.control.messages.ExceptionMessage;
 
 public class GroovyScriptSupport {
 
@@ -55,50 +56,6 @@ public class GroovyScriptSupport {
     }
   }
 
-  public static class PolicyChecker {
-
-    public static final String NAME = "__$$policy";
-
-    public static final String CALL_CHECK = "check";
-    public static final String CALL_TIMEOUT = "timeout";
-
-    private long start;
-
-    private long timeout;
-
-    public PolicyChecker() {
-      this(SCRIPT_POLICY.getTimeout());
-    }
-
-    public PolicyChecker(long timeout) {
-      this.timeout = timeout;
-      this.start = System.currentTimeMillis();
-    }
-
-    public void timeout() {
-      if (System.currentTimeMillis() - start > timeout) {
-        throw new ScriptTimeoutException();
-      }
-    }
-
-    public <T> T check(T obj) {
-      if (obj == null) return null;
-
-      Class<?> klass = obj.getClass();
-
-      if (obj instanceof Class<?>) klass = (Class<?>) obj;
-      if (obj instanceof Executable) klass = ((Executable) obj).getDeclaringClass();
-
-      if (obj instanceof Script) {
-        return obj;
-      }
-
-      SCRIPT_POLICY.check(klass);
-
-      return obj;
-    }
-  }
-
   static {
     config.getOptimizationOptions().put("indy", Boolean.TRUE);
     config.getOptimizationOptions().put("int", Boolean.FALSE);
@@ -118,9 +75,14 @@ public class GroovyScriptSupport {
     final ASTTransformationCustomizer astPropCustomizer =
         new ASTTransformationCustomizer(GroovyCheckProp.class);
 
+    // Scripts and templates extend SandboxScript, which denies the Script methods escaping the
+    // sandbox (evaluate...) and marks the code as sandboxed (see SandboxGroovyMethods).
+    config.setScriptBaseClass(SandboxScript.class.getName());
+
     config.addCompilationCustomizers(importCustomizer);
     config.addCompilationCustomizers(astCustomizer);
     config.addCompilationCustomizers(astPropCustomizer);
+    config.addCompilationCustomizers(new GroovyImportCheck());
 
     try {
       cacheSize =
@@ -153,10 +115,26 @@ public class GroovyScriptSupport {
                 code -> {
                   try {
                     return GCL.parseClass(code);
+                  } catch (MultipleCompilationErrorsException e) {
+                    throw policyError(e);
                   } finally {
                     GCL.clearCache();
                   }
                 });
+  }
+
+  /**
+   * Unwraps a policy violation detected at compile time (see {@link GroovyImportCheck}), so it is
+   * reported as a {@link ScriptPolicyException} rather than a generic compilation error.
+   */
+  private static RuntimeException policyError(MultipleCompilationErrorsException e) {
+    for (Object error : e.getErrorCollector().getErrors()) {
+      if (error instanceof ExceptionMessage message
+          && message.getCause() instanceof ScriptPolicyException policyException) {
+        return policyException;
+      }
+    }
+    return e;
   }
 
   public static Script createScript(String script) {

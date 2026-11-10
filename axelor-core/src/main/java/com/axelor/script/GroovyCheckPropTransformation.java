@@ -4,16 +4,12 @@
  */
 package com.axelor.script;
 
-import com.axelor.script.GroovyScriptSupport.PolicyChecker;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassNode;
-import org.codehaus.groovy.ast.expr.ArgumentListExpression;
-import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
-import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.transform.AbstractASTTransformation;
@@ -34,8 +30,8 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
  * would become:
  *
  * <pre>
- * def value = __$$policy.check(foo).bar
- * def value2 = __$$policy.check(com.axelor.example.Foo).BAR
+ * def value = GroovySandbox.check(foo).bar
+ * def value2 = GroovySandbox.check(com.axelor.example.Foo).BAR
  * </pre>
  */
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
@@ -64,20 +60,18 @@ public class GroovyCheckPropTransformation extends AbstractASTTransformation {
       return unit;
     }
 
-    private MethodCallExpression checkX(Expression expr) {
-      return new MethodCallExpression(
-          new VariableExpression(PolicyChecker.NAME),
-          new ConstantExpression(PolicyChecker.CALL_CHECK),
-          new ArgumentListExpression(expr));
-    }
-
     @Override
     public Expression transform(Expression expr) {
       if (expr instanceof PropertyExpression prop) {
         Expression obj = prop.getObjectExpression();
-        if (!(obj instanceof MethodCallExpression)) {
+        // a call result is already checked by GroovyCheckTransformation
+        if (!(obj instanceof MethodCallExpression)
+            && !GroovyCheckTransformation.isSandboxCall(obj)) {
           PropertyExpression res =
-              new PropertyExpression(checkX(obj), prop.getProperty(), prop.isSafe());
+              new PropertyExpression(
+                  GroovyCheckTransformation.receiverCheckX(obj, prop.isSpreadSafe()),
+                  prop.getProperty(),
+                  prop.isSafe());
           res.setSpreadSafe(prop.isSpreadSafe());
           return res;
         }

@@ -6,6 +6,7 @@ package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,9 +34,11 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.Transactional;
+import groovy.lang.Closure;
 import java.util.List;
 import java.util.Map;
 import javax.script.SimpleBindings;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -572,6 +575,240 @@ class TestScriptPolicy {
     assertEquals(
         "Found %s %s".formatted(contact.getFirstName(), contact.getLastName()),
         emNotify.get("message"));
+  }
+
+  @Test
+  void testGroovyGdkProcessExecutionIsDenied() {
+    // A command that does not exist: nothing runs even if the policy fails to block the call.
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Positive controls: denied via the receiver check.
+
+    // Receiver is Runtime (denied class).
+    assertBlockedByPolicy(helper, "Runtime.getRuntime().exec('" + missingCmd + "'); 1");
+
+    // Constructor of a denied class.
+    assertBlockedByPolicy(helper, "new ProcessBuilder('" + missingCmd + "').start(); 1");
+
+    // The reported bypass: a GDK extension method dispatched on an allow-listed receiver.
+
+    // Receiver is java.util.ArrayList (package java.util is allow-listed),
+    // dispatched to ProcessGroovyMethods.execute(List).
+    assertBlockedByPolicy(helper, "['" + missingCmd + "'].execute(); 1");
+
+    // Receiver is java.lang.String (package java.lang is allow-listed),
+    // dispatched to ProcessGroovyMethods.execute(String).
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.execute(); 1");
+
+    // Array receiver variant, dispatched to ProcessGroovyMethods.execute(String[]).
+    assertBlockedByPolicy(helper, "(['" + missingCmd + "'] as String[]).execute(); 1");
+
+    // Overload with env/dir arguments (null, so no denied type is constructed as a side effect),
+    // dispatched to ProcessGroovyMethods.execute(List, String[], File).
+    assertBlockedByPolicy(
+        helper, "['" + missingCmd + "'].execute((String[]) null, (File) null); 1");
+
+    // Spread (recv*.execute()) dispatches execute() on each element, so a receiver whose element
+    // type (not the collection type) provides the GDK method must be caught too.
+    assertBlockedByPolicy(helper, "(['" + missingCmd + "'] as Set)*.execute(); 1");
+    assertBlockedByPolicy(helper, "[k: '" + missingCmd + "'].values()*.execute(); 1");
+    assertBlockedByPolicy(helper, "(['" + missingCmd + "'] as String[])*.execute(); 1");
+
+    // Other dispatch routes reaching the same GDK method, which the call-site checks cannot see:
+    // they are caught by the SandboxGroovyMethods override of execute() itself.
+
+    // Dynamic method name.
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.\"${'exec' + 'ute'}\"(); 1");
+    // invokeMethod with the method name as argument.
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.invokeMethod('execute', null); 1");
+    // Implicit call resolved on a closure delegate.
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.with { execute() }; 1");
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.tap { execute() }; 1");
+    assertBlockedByPolicy(helper, "['" + missingCmd + "'].with { execute() }; 1");
+    assertBlockedByPolicy(
+        helper, "def c = { -> execute() }; c.delegate = '" + missingCmd + "'; c(); 1");
+    // Spread over a receiver that is neither a Collection nor an array.
+    assertBlockedByPolicy(helper, "['" + missingCmd + "'].iterator()*.execute(); 1");
+  }
+
+  // The sandbox must not depend on a name the script can rebind: a local variable or a closure
+  // delegate named like the old policy checker variable must not replace the checks.
+  @Test
+  void testGroovyPolicyChecksCannotBeShadowed() {
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+    final String fake =
+        "[check: { o -> o }, checkMethod: { o, n -> o }, checkSpread: { o, n -> o },"
+            + " timeout: { -> null }]";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(
+        helper,
+        "def __$$policy = " + fake + "; Runtime.getRuntime().exec('" + missingCmd + "'); 1");
+    assertBlockedByPolicy(
+        helper,
+        "[('__$$policy'): "
+            + fake
+            + "].with { Runtime.getRuntime().exec('"
+            + missingCmd
+            + "') }; 1");
+
+    // A map delegate no longer hides the checks from the closure (it used to fail with a NPE).
+    assertEquals("X", helper.eval("[name: 'x'].with { name.toUpperCase() }"));
+  }
+
+  // A spread (recv*.name) dispatches on each element of the receiver, not on the receiver itself,
+  // so a denied class hidden in an allowed collection, iterator, etc. must be caught.
+  @Test
+  void testGroovySpreadElementsAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Spread method calls.
+    assertBlockedByPolicy(helper, "[System]*.getenv('HOME')");
+    assertBlockedByPolicy(helper, "([System] as Set)*.getenv('HOME')");
+    assertBlockedByPolicy(helper, "[System].iterator()*.getenv('HOME')");
+
+    // Spread property access.
+    assertBlockedByPolicy(helper, "[System]*.env");
+    assertBlockedByPolicy(helper, "[System].iterator()*.env");
+    assertBlockedByPolicy(helper, "def l = [System]; l*.env");
+
+    // Allowed spreads still work.
+    assertEquals(List.of("1", "2"), helper.eval("[1, 2]*.toString()"));
+    assertEquals(List.of("A", "B"), helper.eval("['a', 'b'].iterator()*.toUpperCase()"));
+    assertEquals(List.of(1, 2), helper.eval("['a', 'bb']*.length()"));
+    assertEquals(List.of("a"), helper.eval("[a: 1].entrySet()*.key"));
+    assertEquals(null, helper.eval("def l = null; l*.size()"));
+  }
+
+  // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
+  // on allow-listed receivers, so the receiver check does not apply to them.
+  @Test
+  void testGroovyCategoriesAndMixinsAreDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "use(System) { 'PATH'.getenv() }");
+    assertBlockedByPolicy(helper, "def m = 'use'; \"$m\"(System) { 'PATH'.getenv() }");
+    assertBlockedByPolicy(helper, "use([System]) { 'PATH'.getenv() }");
+    assertBlockedByPolicy(helper, "String.mixin(GroovyShell); 'x'.evaluate('1 + 1')");
+  }
+
+  // A statically imported method is called without a receiver, so its class is checked when the
+  // script is compiled.
+  @Test
+  void testGroovyStaticImportsAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "import static java.lang.System.getenv; getenv('PATH')");
+    assertBlockedByPolicy(helper, "import static java.lang.System.getenv as env; env('PATH')");
+    assertBlockedByPolicy(helper, "import static java.lang.System.*; getenv('PATH')");
+
+    // Allowed classes can still be statically imported.
+    assertEquals(2, helper.eval("import static java.lang.Math.max; max(1, 2)"));
+  }
+
+  // A closure created by a script stays sandboxed when called later, outside the evaluation.
+  @Test
+  void testGroovyClosureEscapingTheScriptIsSandboxed() {
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    Closure<?> closure =
+        (Closure<?>) helper.eval("{ -> '" + missingCmd + "'.\"${'exec' + 'ute'}\"() }");
+
+    Throwable ex = assertThrows(RuntimeException.class, closure::call);
+    assertTrue(hasPolicyException(ex), () -> "Expected a ScriptPolicyException, got: " + ex);
+  }
+
+  // The GDK overrides only deny sandboxed callers: trusted code keeps the GDK behavior.
+  @Test
+  void testGroovyGdkOverridesDoNotAffectTrustedCode() {
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+
+    // Reaches ProcessGroovyMethods.execute(String), which fails as the command does not exist.
+    Throwable ex =
+        assertThrows(
+            Exception.class, () -> InvokerHelper.invokeMethod(missingCmd, "execute", null));
+    assertFalse(hasPolicyException(ex), () -> "Expected no ScriptPolicyException, got: " + ex);
+    assertTrue(
+        String.valueOf(ex.getMessage()).contains("Cannot run program"),
+        () -> "Expected the process to be started, got: " + ex);
+  }
+
+  // GDK IO/resource reads must stay denied. Today the receiver check already blocks them (URL/File
+  // are not allow-listed); this guards that surface against a future change reopening file/URL
+  // exfiltration. Targets are nonexistent paths, so an unblocked read only throws FileNotFound.
+  @Test
+  void testGroovyGdkResourceAccessIsDenied() {
+    final String missingPath = "/axelor-nonexistent-path-xyz";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // URL reads (receiver is java.net.URL): ResourceGroovyMethods/IOGroovyMethods.
+    assertBlockedByPolicy(helper, "'file:" + missingPath + "'.toURL().text");
+    assertBlockedByPolicy(helper, "'file:" + missingPath + "'.toURL().getText()");
+    assertBlockedByPolicy(helper, "'file:" + missingPath + "'.toURL().bytes");
+    assertBlockedByPolicy(helper, "'file:" + missingPath + "'.toURL().openStream(); 1");
+    assertBlockedByPolicy(helper, "new URL('file:" + missingPath + "').text");
+
+    // File read via coercion (receiver is java.io.File): ResourceGroovyMethods.getText(File).
+    assertBlockedByPolicy(helper, "('" + missingPath + "' as File).text");
+  }
+
+  // A nested evaluation escapes the sandbox entirely: Script.evaluate(String) / Eval / new
+  // GroovyShell() compile the nested code without the policy's AST customizers, so inside it even
+  // Runtime/ProcessBuilder run unchecked.
+  //
+  // Eval.me and new GroovyShell() are denied by the receiver check (their class is not
+  // allow-listed).
+  // Script.evaluate(...) is not caught that way because the receiver is the trusted running script,
+  // so SandboxScript, the base class of compiled scripts, overrides it to throw.
+  @Test
+  void testGroovyNestedEvaluationIsSandboxed() {
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Already denied by the receiver check (guards).
+    assertBlockedByPolicy(helper, "Eval.me('1+1')");
+    assertBlockedByPolicy(helper, "new GroovyShell(); 1");
+
+    // Sandbox escape via Script.evaluate: the nested code would run unchecked and reach the process
+    // layer; the evaluate() call itself is denied.
+    assertBlockedByPolicy(
+        helper, "evaluate(\"new ProcessBuilder('" + missingCmd + "').start(); 1\")");
+    assertBlockedByPolicy(
+        helper, "evaluate(\"Runtime.getRuntime().exec('" + missingCmd + "'); 1\")");
+    assertBlockedByPolicy(helper, "evaluate(\"['" + missingCmd + "'].execute(); 1\")");
+
+    // Other dispatch routes to evaluate().
+    final String nested = "\"new ProcessBuilder('" + missingCmd + "').start(); 1\"";
+    assertBlockedByPolicy(helper, "this.evaluate(" + nested + ")");
+    assertBlockedByPolicy(helper, "invokeMethod('evaluate', " + nested + ")");
+    assertBlockedByPolicy(helper, "this.\"${'eval' + 'uate'}\"(" + nested + ")");
+    assertBlockedByPolicy(helper, "[1].with { evaluate(" + nested + ") }");
+  }
+
+  private void assertBlockedByPolicy(ScriptHelper helper, String code) {
+    Throwable ex = assertThrows(RuntimeException.class, () -> helper.eval(code));
+    assertTrue(
+        hasPolicyException(ex),
+        () ->
+            "Expected the policy to deny ["
+                + code
+                + "] with a ScriptPolicyException, but it was not blocked. Got: "
+                + ex);
+  }
+
+  private static boolean hasPolicyException(Throwable t) {
+    for (Throwable c = t; c != null; c = c.getCause()) {
+      if (c instanceof ScriptPolicyException) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Transactional

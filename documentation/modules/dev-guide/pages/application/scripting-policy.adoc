@@ -150,6 +150,19 @@ These rules are added after any custom configuration.
 - `java.util.ResourceBundle`
 - `java.util.Timer`
 
+In addition, the following are denied whatever the receiver, including allowed classes
+such as `String` or `List`:
+
+- Starting operating system processes, including through Groovy shortcuts such as
+  `"cmd".execute()` or `["cmd", "arg"].execute()`
+- Nested script evaluation, such as Groovy's `evaluate(...)`, which would run code
+  outside the policy
+- Groovy categories and mixins (`use(...)`, `mixin(...)`), which would expose methods of
+  any class on allowed objects
+
+Static imports (`import static ...`) are checked against the same rules as other class
+accesses: importing from a class that is not allowed fails when the script is compiled.
+
 == `\\__bean__` Helper
 
 The `\\__bean__(Class<T>)` is a script safe alternative to `com.axelor.inject.Beans.get(Class<T>)`.
