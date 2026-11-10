@@ -10,13 +10,13 @@ import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
-import org.codehaus.groovy.ast.expr.ClassExpression;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.StaticMethodCallExpression;
+import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.BlockStatement;
 import org.codehaus.groovy.ast.stmt.DoWhileStatement;
 import org.codehaus.groovy.ast.stmt.ExpressionStatement;
@@ -105,8 +105,6 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
 
     private final SourceUnit unit;
 
-    private boolean inClass;
-
     public CheckTransformer(SourceUnit unit) {
       this.unit = unit;
     }
@@ -119,10 +117,7 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
     @Override
     public Expression transform(Expression expr) {
 
-      // only process script class content
-      inClass = inClass || expr instanceof ClassExpression;
-
-      if (inClass && expr instanceof PropertyExpression) {
+      if (expr instanceof PropertyExpression) {
         PropertyExpression prop = (PropertyExpression) super.transform(expr);
         Expression obj = prop.getObjectExpression();
         if (obj instanceof MethodCallExpression) {
@@ -135,12 +130,24 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
         return prop;
       }
 
-      if (inClass && expr instanceof ConstructorCallExpression) {
+      if (expr instanceof ConstructorCallExpression call) {
+        // super(...) / this(...): must stay the first statement of a constructor, and only call a
+        // constructor of the class itself or of its superclass (allowed, see GroovyClassCheck)
+        if (call.isSpecialCall()) {
+          return super.transform(expr);
+        }
         return receiverCheckX(super.transform(expr), false);
       }
 
-      if (inClass && expr instanceof MethodCallExpression) {
+      if (expr instanceof MethodCallExpression) {
         MethodCallExpression method = (MethodCallExpression) super.transform(expr);
+
+        // super.method(...): calls the superclass method (allowed, see GroovyClassCheck); wrapping
+        // the receiver would call the overriding method instead
+        if (method.getObjectExpression() instanceof VariableExpression variable
+            && variable.isSuperExpression()) {
+          return method;
+        }
 
         MethodCallExpression res =
             new MethodCallExpression(
@@ -152,7 +159,7 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
         return res;
       }
 
-      if (inClass && expr instanceof ClosureExpression ce) {
+      if (expr instanceof ClosureExpression ce) {
         if (ce.getCode() != null) {
           ce.getCode().visit(this);
         }

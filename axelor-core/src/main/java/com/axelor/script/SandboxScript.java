@@ -18,7 +18,7 @@ import java.io.File;
  *
  * <p>This class also marks sandboxed code, see {@link GroovySandbox#denyFromSandbox(String)}.
  */
-public abstract class SandboxScript extends Script {
+public abstract class SandboxScript extends Script implements SandboxCode {
 
   protected SandboxScript() {
     super();

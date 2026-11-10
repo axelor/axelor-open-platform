@@ -23,7 +23,7 @@ import groovy.lang.Closure;
  * <p>The compiled closures are made to extend this class by {@link SandboxClosureProcessor}, as the
  * Groovy compiler always generates closures extending {@link Closure}.
  */
-public abstract class SandboxClosure<V> extends Closure<V> {
+public abstract class SandboxClosure<V> extends Closure<V> implements SandboxCode {
 
   private static final long serialVersionUID = 1L;
 

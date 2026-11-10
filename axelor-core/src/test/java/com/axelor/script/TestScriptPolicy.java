@@ -626,6 +626,7 @@ class TestScriptPolicy {
     // Implicit call resolved on a closure delegate.
     assertBlockedByPolicy(helper, "'" + missingCmd + "'.with { execute() }; 1");
     assertBlockedByPolicy(helper, "'" + missingCmd + "'.tap { execute() }; 1");
+    assertBlockedByPolicy(helper, "'" + missingCmd + "'.identity { execute() }; 1");
     assertBlockedByPolicy(helper, "['" + missingCmd + "'].with { execute() }; 1");
     assertBlockedByPolicy(
         helper, "def c = { -> execute() }; c.delegate = '" + missingCmd + "'; c(); 1");
@@ -787,18 +788,19 @@ class TestScriptPolicy {
         "@groovy.transform.AnnotationCollector([groovy.transform.ASTTest]) @interface Alias {}; 1");
 
     // Every position an annotation can be in.
-    assertBlockedByPolicy(helper, "@Deprecated def x = 1; x");
+    assertBlockedByPolicy(helper, "@SuppressWarnings('x') def x = 1; x");
     assertBlockedByPolicy(helper, "@groovy.transform.Field def x = 1; x");
-    assertBlockedByPolicy(helper, "@Deprecated import java.util.List; 1");
-    assertBlockedByPolicy(helper, "@Deprecated def f() { 1 }; f()");
-    assertBlockedByPolicy(helper, "def f(@Deprecated x) { x }; f(1)");
-    assertBlockedByPolicy(helper, "{ @Deprecated x -> x }(1)");
-    assertBlockedByPolicy(helper, "for (@Deprecated int i = 0; i < 1; i++) {}; 1");
+    assertBlockedByPolicy(helper, "class X { @groovy.transform.Generated def m() {} }; 1");
+    assertBlockedByPolicy(helper, "@SuppressWarnings('x') import java.util.List; 1");
+    assertBlockedByPolicy(helper, "@SuppressWarnings('x') def f() { 1 }; f()");
+    assertBlockedByPolicy(helper, "def f(@SuppressWarnings('x') x) { x }; f(1)");
+    assertBlockedByPolicy(helper, "{ @SuppressWarnings('x') x -> x }(1)");
+    assertBlockedByPolicy(helper, "for (@SuppressWarnings('x') int i = 0; i < 1; i++) {}; 1");
     assertBlockedByPolicy(helper, "@groovy.transform.ToString class X {}; 1");
-    assertBlockedByPolicy(helper, "class X { @Deprecated def m() {} }; 1");
-    assertBlockedByPolicy(helper, "class X { @Deprecated String p }; 1");
-    assertBlockedByPolicy(helper, "class X { @Deprecated private String f }; 1");
-    assertBlockedByPolicy(helper, "class X { X(@Deprecated String p) {} }; 1");
+    assertBlockedByPolicy(helper, "class X { @SuppressWarnings('x') def m() {} }; 1");
+    assertBlockedByPolicy(helper, "class X { @SuppressWarnings('x') String p }; 1");
+    assertBlockedByPolicy(helper, "class X { @SuppressWarnings('x') private String f }; 1");
+    assertBlockedByPolicy(helper, "class X { X(@SuppressWarnings('x') String p) {} }; 1");
 
     // The parser drops annotations on a for-in loop variable and on a catch parameter: they never
     // reach the compiler, so they cannot trigger a transformation.
@@ -809,11 +811,188 @@ class TestScriptPolicy {
         "compiled",
         helper.eval("try { 1 } catch (" + compileTime + " Exception e) { 2 }; 'compiled'"));
 
+    // @Override and @Deprecated are allowed, with constant values.
+    assertEquals(
+        "b",
+        helper.eval(
+            "class A { String toString() { 'a' } };"
+                + " class B extends A { @Override String toString() { 'b' } }; new B().toString()"));
+    assertEquals(
+        "b",
+        helper.eval(
+            "import java.util.*; class B { @java.lang.Override String toString() { 'b' } };"
+                + " new B().toString()"));
+    assertEquals(1, helper.eval("@Deprecated def f() { 1 }; f()"));
+    assertEquals(
+        1, helper.eval("@Deprecated(since = '1.0', forRemoval = true) def f() { 1 }; f()"));
+    assertEquals(1, helper.eval("@Deprecated def x = 1; x"));
+    assertEquals(1, helper.eval("class C { @Deprecated int v = 1 }; new C().v"));
+    assertEquals(1, helper.eval("@java.lang.Deprecated class C { int v = 1 }; new C().v"));
+
+    // ...but only when they cannot refer to another type: an import alias, a star import, a
+    // class of that name declared in the script, or non-constant values.
+    final String astTestValue = "(value = { throw new RuntimeException('COMPILE-TIME') })";
+    Throwable aliased =
+        assertThrows(
+            Throwable.class,
+            () ->
+                helper.eval(
+                    "import groovy.transform.ASTTest as Override; @Override"
+                        + astTestValue
+                        + " def x = 1; x"));
+    assertTrue(hasPolicyException(aliased), () -> "Expected a ScriptPolicyException: " + aliased);
+    for (Throwable c = aliased; c != null; c = c.getCause()) {
+      assertFalse("COMPILE-TIME".equals(c.getMessage()), "The @ASTTest closure must not run");
+    }
+    assertBlockedByPolicy(
+        helper, "import groovy.transform.*; class B { @Override String toString() { 'b' } }; 1");
+    assertBlockedByPolicy(helper, "import static java.lang.Math.*; @Deprecated def x = 1; x");
+    assertBlockedByPolicy(helper, "@interface Deprecated {}; @Deprecated def x = 1; x");
+    assertBlockedByPolicy(helper, "@Deprecated(since = { 'x' }) def f() { 1 }; f()");
+
     // An @ character that is not an annotation is fine.
     assertEquals("user@example.com", helper.eval("'user@example.com'"));
     assertEquals("a@1", helper.eval("def n = 1; \"a@${n}\".toString()"));
     assertEquals(3, helper.eval("def f(x) { x + 1 }; f(2)"));
     assertEquals(2, helper.eval("try { 1 / 0 } catch (ArithmeticException e) { 2 }"));
+  }
+
+  // Classes declared in a script are checked like the script itself, wherever their code is.
+  @Test
+  void testGroovyScriptClassesAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    final String denied = "System.getenv('HOME')";
+
+    assertBlockedByPolicy(helper, "class X { def go() { " + denied + " } }; new X().go()");
+    assertBlockedByPolicy(helper, "class X { static go() { " + denied + " } }; X.go()");
+    assertBlockedByPolicy(helper, "class X { def v = " + denied + " }; new X().v");
+    assertBlockedByPolicy(helper, "class X { static v = " + denied + " }; X.v");
+    assertBlockedByPolicy(helper, "class X { static { " + denied + " } }; new X(); 1");
+    assertBlockedByPolicy(helper, "class X { { " + denied + " } }; new X(); 1");
+    assertBlockedByPolicy(helper, "class X { X() { " + denied + " } }; new X(); 1");
+    assertBlockedByPolicy(
+        helper, "class X { def go() { [1].collect { " + denied + " } } }; new X().go()");
+    assertBlockedByPolicy(
+        helper, "class X { class Y { def go() { " + denied + " } } }; new X.Y(new X()).go()");
+    assertBlockedByPolicy(helper, "enum E { A; def go() { " + denied + " } }; E.A.go()");
+    assertBlockedByPolicy(
+        helper, "def r = new Runnable() { void run() { " + denied + " } }; r.run(); 1");
+
+    // The GDK overrides apply to script classes too.
+    assertBlockedByPolicy(
+        helper, "class X { def go() { 'axelor-nonexistent-binary-xyz'.execute() } }; new X().go()");
+  }
+
+  // What a script class inherits is not compiled from the script, so its supertypes must be
+  // allowed.
+  @Test
+  void testGroovyScriptClassSupertypesAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(
+        helper, "class X extends java.io.File { X() { super('/etc/hostname') } }; new X().text");
+    assertBlockedByPolicy(helper, "class X extends Thread {}; 1");
+    assertBlockedByPolicy(helper, "class X implements java.io.Closeable { void close() {} }; 1");
+    assertBlockedByPolicy(helper, "new java.io.File('/etc/hostname') {}.text");
+
+    // finalize() would run on the JVM finalizer thread, outside of any evaluation.
+    assertBlockedByPolicy(helper, "class X { void finalize() {} }; 1");
+
+    // A class extending groovy.lang.Script (not SandboxScript) would get the original
+    // evaluate(), running code without the policy. It is a script-declared class like any other,
+    // so it must be checked too, although Groovy's ClassNode.isScript() is true for it.
+    final String nested = "\"System.getenv('HOME')\"";
+    assertBlockedByPolicy(
+        helper,
+        "class Foo extends Script { def run() { null } }; new Foo().evaluate(" + nested + ")");
+    assertBlockedByPolicy(helper, "abstract class Foo extends Script {}; 1");
+    assertBlockedByPolicy(
+        helper, "class O { static class Foo extends Script { def run() { null } } }; 1");
+    assertBlockedByPolicy(helper, "new Script() { def run() { evaluate(" + nested + ") } }.run()");
+  }
+
+  // A script class instance called later by Java code, outside the evaluation, stays sandboxed.
+  @Test
+  void testGroovyScriptClassEscapingTheScriptIsSandboxed() {
+    final String missingCmd = "axelor-nonexistent-binary-xyz";
+
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    Object obj =
+        helper.eval(
+            "class X { String toString() { '"
+                + missingCmd
+                + "'.\"${'exec' + 'ute'}\"(); 'x' } }; new X()");
+
+    Throwable ex = assertThrows(RuntimeException.class, obj::toString);
+    assertTrue(hasPolicyException(ex), () -> "Expected a ScriptPolicyException, got: " + ex);
+  }
+
+  // Common class usage must keep working.
+  @Test
+  void testGroovyScriptClassesStillWork() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Fields, properties, constructors, methods, static members.
+    assertEquals(
+        "Hello, Ada",
+        helper.eval(
+            "class Greeter { String name; Greeter(String name) { this.name = name };"
+                + " def greet() { \"Hello, ${name}\".toString() } }; new Greeter('Ada').greet()"));
+    assertEquals(3, helper.eval("class P { int x = 1; int y = 2 }; def p = new P(); p.x + p.y"));
+    assertEquals(5, helper.eval("class M { static int add(int a, int b) { a + b } }; M.add(2, 3)"));
+    assertEquals(
+        2, helper.eval("class C { static int n = 0; C() { n++ } }; new C(); new C(); C.n"));
+    assertEquals(
+        "a",
+        helper.eval(
+            "class D { String v; D() { this('a') }; D(String v) { this.v = v } };" + " new D().v"));
+
+    // Inheritance between script classes, super calls, overriding.
+    assertEquals(
+        "BA",
+        helper.eval(
+            "class A { def f() { 'A' } }; class B extends A { def f() { 'B' + super.f() } };"
+                + " new B().f()"));
+    assertEquals(
+        "x:1",
+        helper.eval(
+            "class A { String n; A(String n) { this.n = n } };"
+                + " class B extends A { int v; B(String n, int v) { super(n); this.v = v } };"
+                + " def b = new B('x', 1); b.n + ':' + b.v"));
+    assertEquals("hi", helper.eval("class A { String toString() { 'hi' } }; new A().toString()"));
+
+    // Allowed supertypes, interfaces, enums, anonymous and nested classes.
+    assertEquals(
+        List.of(3, 2, 1),
+        helper.eval(
+            "class Desc implements Comparator<Integer> {"
+                + " int compare(Integer a, Integer b) { b <=> a } };"
+                + " [1, 3, 2].toSorted(new Desc())"));
+    assertEquals(
+        "B",
+        helper.eval(
+            "interface Named { String name() }; class N implements Named {"
+                + " String name() { 'B' } }; new N().name()"));
+    assertEquals(
+        List.of("A", "B"), helper.eval("enum E { A, B }; E.values().collect { it.name() }"));
+    assertEquals("B", helper.eval("enum E { A, B }; E.valueOf('B').name()"));
+    assertEquals(
+        1,
+        helper.eval(
+            "def c = new Comparator<Integer>() { int compare(Integer a, Integer b) {"
+                + " a <=> b } }; c.compare(2, 1)"));
+    assertEquals(
+        "in", helper.eval("class O { static class I { def v() { 'in' } } }; new O.I().v()"));
+    assertEquals(
+        "k",
+        helper.eval(
+            "class Box extends HashMap<String, String> {}; def b = new Box();"
+                + " b.put('k', 'v'); b.keySet().first()"));
+
+    // Closures and collections inside class methods.
+    assertEquals(
+        List.of(2, 4),
+        helper.eval("class S { def twice(l) { l.collect { it * 2 } } }; new S().twice([1, 2])"));
   }
 
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
@@ -922,10 +1101,19 @@ class TestScriptPolicy {
     assertBlockedByPolicy(helper, "invokeMethod('evaluate', " + nested + ")");
     assertBlockedByPolicy(helper, "this.\"${'eval' + 'uate'}\"(" + nested + ")");
     assertBlockedByPolicy(helper, "[1].with { evaluate(" + nested + ") }");
+
+    // The other Script methods compiling and running code: evaluate(File) and run(File, String[]).
+    // The File is null (a cast is not checked), so the call reaches the SandboxScript override
+    // itself rather than being denied by the receiver check on File.
+    assertBlockedByPolicy(helper, "evaluate((File) null)");
+    assertBlockedByPolicy(helper, "run((File) null, [] as String[])");
+    assertBlockedByPolicy(helper, "invokeMethod('run', [(File) null, [] as String[]] as Object[])");
+    assertBlockedByPolicy(helper, "this.\"${'r' + 'un'}\"((File) null, [] as String[])");
   }
 
   private void assertBlockedByPolicy(ScriptHelper helper, String code) {
-    Throwable ex = assertThrows(RuntimeException.class, () -> helper.eval(code));
+    // any throwable: a denial in a static initializer is reported as an ExceptionInInitializerError
+    Throwable ex = assertThrows(Throwable.class, () -> helper.eval(code));
     assertTrue(
         hasPolicyException(ex),
         () ->

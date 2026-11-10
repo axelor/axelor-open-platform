@@ -92,6 +92,7 @@ public class GroovyScriptSupport {
     config.addCompilationCustomizers(astCustomizer);
     config.addCompilationCustomizers(astPropCustomizer);
     config.addCompilationCustomizers(new GroovyImportCheck());
+    config.addCompilationCustomizers(new GroovyClassCheck());
 
     try {
       cacheSize =

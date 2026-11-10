@@ -82,9 +82,14 @@ public final class GroovySandbox {
     }
   }
 
-  /** Validates an object used as a call receiver or property owner against the policy. */
+  /**
+   * Validates an object used as a call receiver or property owner against the policy.
+   *
+   * <p>Classes compiled by the sandbox ({@link SandboxCode}: scripts, their closures and the
+   * classes they declare) are allowed: their code is checked, and their supertypes are allowed.
+   */
   public static <T> T check(T obj) {
-    if (obj == null || obj instanceof SandboxScript) {
+    if (obj == null) {
       return obj;
     }
 
@@ -92,7 +97,9 @@ public final class GroovySandbox {
     if (obj instanceof Class<?> type) klass = type;
     if (obj instanceof Executable executable) klass = executable.getDeclaringClass();
 
-    policy().check(klass);
+    if (!SandboxCode.class.isAssignableFrom(klass)) {
+      policy().check(klass);
+    }
 
     return obj;
   }
@@ -121,9 +128,9 @@ public final class GroovySandbox {
   }
 
   /**
-   * Denies an operation when it is called from sandboxed code, i.e. when a script or template
-   * compiled by {@link GroovyScriptSupport} (or a closure defined in one) is on the call stack.
-   * Trusted code calling the same operation is not affected.
+   * Denies an operation when it is called from sandboxed code, i.e. when code compiled by {@link
+   * GroovyScriptSupport} ({@link SandboxCode}: a script or template, a closure or a class defined
+   * in one) is on the call stack. Trusted code calling the same operation is not affected.
    */
   static void denyFromSandbox(String operation) {
     if (isSandboxed()) {
@@ -137,13 +144,7 @@ public final class GroovySandbox {
   }
 
   private static boolean isSandboxClass(Class<?> klass) {
-    // closures are compiled as inner classes of the script class
-    for (Class<?> type = klass; type != null; type = type.getEnclosingClass()) {
-      if (SandboxScript.class.isAssignableFrom(type)) {
-        return true;
-      }
-    }
-    return false;
+    return SandboxCode.class.isAssignableFrom(klass);
   }
 
   private static ScriptPolicy policy() {
