@@ -170,6 +170,7 @@ Groovy scripts and templates follow additional rules:
 
 - Annotations are not allowed, except `@Override` and `@Deprecated`. In a script with
   star imports (`import x.y.*`), write them fully qualified: `@java.lang.Override`.
+- Package declarations are not allowed.
 - Classes declared in a script can only extend and implement allowed types, and cannot
   define `finalize()`.
 - Reflection is limited to the public members of allowed classes.

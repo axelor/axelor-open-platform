@@ -912,6 +912,51 @@ class TestScriptPolicy {
     assertBlockedByPolicy(helper, "new Script() { def run() { evaluate(" + nested + ") } }.run()");
   }
 
+  // A package would let a script declare a class under the name of an existing class, which the
+  // script would then resolve to instead of the real one: the sandbox base class, helpers or
+  // checks. Scripts cannot declare a package, so their classes are in the default package.
+  @Test
+  void testGroovyPackageDeclarationsAreRejected() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    // Replacing the SandboxScript base class: evaluate() would run code without the policy.
+    assertBlockedByPolicy(
+        helper,
+        "package com.axelor.script; abstract class SandboxScript extends Script {};"
+            + " evaluate(\"System.getenv('HOME')\")");
+    // Replacing the checks.
+    assertBlockedByPolicy(
+        helper,
+        "package com.axelor.script; class GroovySandbox { static check(o) { o };"
+            + " static checkSpread(o) { o }; static timeout() {}; static constructed(t, o) { o } };"
+            + " System.getenv('HOME')");
+    // Replacing the __bean__ / __repo__ helpers.
+    assertBlockedByPolicy(
+        helper,
+        "package com.axelor.script; class GroovyScriptSupport { static class Helpers {"
+            + " static getBean(Class c) { 'fake' }; static getRepo(Class c) { null } } };"
+            + " __bean__(String)");
+
+    // Any package.
+    assertBlockedByPolicy(helper, "package com.example; 1");
+    assertBlockedByPolicy(helper, "package foo; class A { def v() { 2 } }; new A().v()");
+
+    // Without package, script classes keep working.
+    assertEquals(2, helper.eval("class A { def v() { 2 } }; new A().v()"));
+
+    // The package the template engines generate is allowed exactly (it contains no existing
+    // class), and the code in it is still sandboxed.
+    assertEquals(1, helper.eval("package groovy.tmp.templates; 1"));
+    assertBlockedByPolicy(helper, "package groovy.tmp.templates; System.getenv('HOME')");
+    assertBlockedByPolicy(
+        helper,
+        "package groovy.tmp.templates; class GroovySandbox { static check(o) { o } };"
+            + " System.getenv('HOME')");
+    assertBlockedByPolicy(helper, "package groovy.tmp.templates.sub; 1");
+    assertBlockedByPolicy(helper, "package groovy.tmp; 1");
+    assertBlockedByPolicy(helper, "package groovy.tmp.templatesx; 1");
+  }
+
   // A script class instance called later by Java code, outside the evaluation, stays sandboxed.
   @Test
   void testGroovyScriptClassEscapingTheScriptIsSandboxed() {

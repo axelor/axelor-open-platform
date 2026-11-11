@@ -23,6 +23,7 @@ import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.ast.PackageNode;
 import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
 import org.codehaus.groovy.ast.expr.ConstantExpression;
@@ -36,7 +37,15 @@ import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.transform.BaseScriptASTTransformation;
 
 /**
- * Rejects annotations in scripts and templates, except {@code @Override} and {@code @Deprecated}.
+ * Rejects package declarations, and annotations except {@code @Override} and {@code @Deprecated},
+ * in scripts and templates.
+ *
+ * <p>A package would let a script declare a class under the name of an existing class (e.g. {@code
+ * com.axelor.script.SandboxScript}), which the script's own code would then resolve to instead of
+ * the real one, replacing the sandbox base class or helpers. Without package, the classes of a
+ * script are in the default package, where no existing class is. The only exception is the package
+ * the template engines declare in the source they generate ({@code groovy.tmp.templates}), which
+ * contains no existing class either.
  *
  * <p>Some annotations trigger AST transformations that run code while the script is compiled,
  * before any runtime check exists: {@code @ASTTest} runs arbitrary code, {@code @Grab} downloads
@@ -46,8 +55,8 @@ import org.codehaus.groovy.transform.BaseScriptASTTransformation;
  *
  * <p>Names are not resolved yet in this phase, so {@code @Override} and {@code @Deprecated} are
  * only allowed when they cannot mean anything else: written fully qualified, or by simple name in a
- * script that cannot redefine that name (no import of that name, no star import, no package, no
- * class of that name). Their values must be constants.
+ * script that cannot redefine that name (no import of that name, no star import, no class of that
+ * name). Their values must be constants.
  *
  * <p>This runs in the {@link CompilePhase#CONVERSION} phase, before the annotation-triggered
  * transformations are collected and applied (from {@link CompilePhase#SEMANTIC_ANALYSIS}).
@@ -57,6 +66,13 @@ class GroovyAnnotationCheck extends CompilationCustomizer {
   private static final ClassNode GENERATED = ClassHelper.make(Generated.class);
 
   private static final Set<String> JAVA_ANNOTATIONS = Set.of("Override", "Deprecated");
+
+  /**
+   * The package the Groovy template engines declare in the source they generate (the parser keeps
+   * the trailing dot). It is allowed exactly, not its sub-packages: no existing class is in it, so
+   * a script class declared there cannot take the name of one.
+   */
+  private static final String TEMPLATE_PACKAGE = "groovy.tmp.templates.";
 
   private static final String JAVA_LANG = "java.lang.";
 
@@ -100,8 +116,13 @@ class GroovyAnnotationCheck extends CompilationCustomizer {
   public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) {
     ModuleNode module = source.getAST();
     if (module != null) {
-      if (module.getPackage() != null) {
-        reject(module.getPackage(), module);
+      PackageNode pkg = module.getPackage();
+      if (pkg != null) {
+        if (!TEMPLATE_PACKAGE.equals(pkg.getName())) {
+          throw new ScriptPolicyException(
+              String.format("Package declaration not allowed (line %d).", pkg.getLineNumber()));
+        }
+        reject(pkg, module);
       }
       Stream.of(
               module.getImports(),
@@ -156,8 +177,7 @@ class GroovyAnnotationCheck extends CompilationCustomizer {
 
   /** Whether a simple type name may resolve to something else than the {@code java.lang} type. */
   private static boolean canRedefine(ModuleNode module, String simpleName) {
-    return module.getPackage() != null
-        || !module.getStarImports().isEmpty()
+    return !module.getStarImports().isEmpty()
         || !module.getStaticStarImports().isEmpty()
         || module.getImport(simpleName) != null
         || module.getStaticImports().containsKey(simpleName)
