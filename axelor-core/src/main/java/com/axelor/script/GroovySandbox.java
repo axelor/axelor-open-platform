@@ -102,6 +102,10 @@ public final class GroovySandbox {
       checkReflected(executable);
       klass = executable.getDeclaringClass();
     }
+    // an array of script objects (e.g. the values of a script enum) is checked as its elements
+    while (klass.isArray()) {
+      klass = klass.getComponentType();
+    }
 
     if (!SandboxCode.class.isAssignableFrom(klass)) {
       policy().check(klass);

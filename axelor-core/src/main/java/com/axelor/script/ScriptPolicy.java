@@ -138,17 +138,28 @@ class ScriptPolicy {
     throw new ScriptPolicyException(String.format("Class '%s' not allowed.", type.getName()));
   }
 
-  private boolean match(String pattern, String pkg) {
-    // wild-card package?
+  /**
+   * Whether the package matches the pattern: {@code a.b} matches only the package {@code a.b},
+   * {@code a.b.*} matches {@code a.b} and its immediate sub-packages ({@code a.b.c}, not {@code
+   * a.b.c.d}).
+   */
+  static boolean match(String pattern, String pkg) {
     if (pattern.endsWith(".*")) {
-      return pkg.replace(pattern.substring(0, pattern.length() - 1), "").split("\\.").length == 1
-          || pkg.equals(pattern.substring(0, pattern.length() - 2));
+      String base = pattern.substring(0, pattern.length() - 2);
+      if (pkg.equals(base)) {
+        return true;
+      }
+      String prefix = base + ".";
+      return pkg.startsWith(prefix) && pkg.indexOf('.', prefix.length()) < 0;
     }
-    // exact match
     return pattern.equals(pkg);
   }
 
   public boolean allowed(Class<?> klass) {
+    // an array gives access to its elements only, so it is checked as its element type
+    while (klass.isArray()) {
+      klass = klass.getComponentType();
+    }
     String pkg = klass.getPackageName();
     Class<?> cls = getTopClass(klass);
 
