@@ -37,9 +37,10 @@ class GroovyImportCheck extends CompilationCustomizer {
             module.getStaticImports().values().stream(),
             module.getStaticStarImports().values().stream())
         .map(ImportNode::getType)
-        .map(ClassNode::getTypeClass)
-        // helpers imported by GroovyScriptSupport itself
-        .filter(type -> type != Helpers.class)
+        .map(GroovyTypes::resolve)
+        // nothing to check (e.g. a class declared in the script), or the helpers imported by
+        // GroovyScriptSupport itself
+        .filter(type -> type != null && type != Helpers.class)
         .forEach(type -> ScriptPolicy.getInstance().check(type));
   }
 }

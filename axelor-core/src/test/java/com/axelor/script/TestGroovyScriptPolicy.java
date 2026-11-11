@@ -852,6 +852,14 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
 
     // Allowed classes can still be statically imported.
     assertEquals(2, helper.eval("import static java.lang.Math.max; max(1, 2)"));
+
+    // So can classes declared in the script (not compiled yet when imports are checked; their code
+    // is checked like the rest of the script).
+    assertEquals(1, helper.eval("import static Foo.bar; class Foo { static bar() { 1 } }; bar()"));
+    assertEquals(2, helper.eval("import static Foo.*; class Foo { static bar() { 2 } }; bar()"));
+    assertBlockedByPolicy(
+        helper,
+        "import static Foo.bar; class Foo { static bar() { System.getenv('HOME') } }; bar()");
   }
 
   // A closure created by a script stays sandboxed when called later, outside the evaluation.

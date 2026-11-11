@@ -61,12 +61,11 @@ class GroovyClassCheck extends CompilationCustomizer {
   }
 
   private static void checkSupertype(ClassNode type) {
-    // declared in the same script: checked on its own
-    if (type == null || type.isPrimaryClassNode()) {
-      return;
-    }
-    Class<?> klass = type.getTypeClass();
-    if (klass == Object.class || klass == GroovyObject.class || klass == SandboxCode.class) {
+    Class<?> klass = GroovyTypes.resolve(type);
+    if (klass == null
+        || klass == Object.class
+        || klass == GroovyObject.class
+        || klass == SandboxCode.class) {
       return;
     }
     ScriptPolicy.getInstance().check(klass);
