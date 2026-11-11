@@ -840,6 +840,19 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, "String.mixin(GroovyShell); 'x'.evaluate('1 + 1')");
   }
 
+  // A shutdown hook runs when the JVM shuts down, outside of any evaluation (no timeout), and could
+  // delay or block the shutdown of the whole application.
+  @Test
+  void testShutdownHooksAreDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "addShutdownHook { 1 }; 1");
+    assertBlockedByPolicy(helper, "'x'.addShutdownHook { 1 }; 1");
+    assertBlockedByPolicy(helper, "\"${'addShutdown' + 'Hook'}\"({ 1 }); 1");
+    assertBlockedByPolicy(helper, "'x'.invokeMethod('addShutdownHook', { 1 }); 1");
+    assertBlockedByPolicy(helper, "'x'.with { addShutdownHook { 1 } }; 1");
+  }
+
   // A statically imported method is called without a receiver, so its class is checked when the
   // script is compiled.
   @Test

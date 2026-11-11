@@ -37,6 +37,8 @@ import org.codehaus.groovy.runtime.StringGroovyMethods;
  *       application (e.g. removing the guard of {@link SandboxGuardedMethods})
  *   <li>{@code asType} ({@code as}): converting a list or map calls a constructor of the target
  *       class, so the target class must be allowed
+ *   <li>{@code addShutdownHook}: registers code run when the JVM shuts down, outside of any
+ *       evaluation (no timeout), for the whole application
  * </ul>
  *
  * <p>They are denied only when called from sandboxed code; otherwise they delegate to the GDK.
@@ -186,6 +188,13 @@ public final class SandboxGroovyMethods {
   public static <T> T asType(String self, Class<T> type) {
     GroovySandbox.checkConversion(type);
     return StringGroovyMethods.asType(self, type);
+  }
+
+  // DefaultGroovyMethods.addShutdownHook
+
+  public static void addShutdownHook(Object self, Closure<?> closure) {
+    GroovySandbox.denyFromSandbox("addShutdownHook");
+    DefaultGroovyMethods.addShutdownHook(self, closure);
   }
 
   // DefaultGroovyMethods.mixin
