@@ -93,6 +93,10 @@ public class GroovyScriptSupport {
     config.addCompilationCustomizers(astPropCustomizer);
     config.addCompilationCustomizers(new GroovyImportCheck());
     config.addCompilationCustomizers(new GroovyClassCheck());
+    config.addCompilationCustomizers(new GroovyTypeCheck());
+
+    // Methods of allowed classes changing state shared by the whole application.
+    SandboxGuardedMethods.install();
 
     try {
       cacheSize =

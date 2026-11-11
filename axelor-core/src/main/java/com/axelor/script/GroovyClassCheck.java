@@ -70,5 +70,12 @@ class GroovyClassCheck extends CompilationCustomizer {
       return;
     }
     ScriptPolicy.getInstance().check(klass);
+    // a subclass would inherit their guarded static methods, outside of their guarding metaclass
+    for (Class<?> guarded : SandboxGuardedMethods.classes()) {
+      if (guarded.isAssignableFrom(klass)) {
+        throw new ScriptPolicyException(
+            String.format("Class '%s' cannot be extended in scripts.", klass.getName()));
+      }
+    }
   }
 }

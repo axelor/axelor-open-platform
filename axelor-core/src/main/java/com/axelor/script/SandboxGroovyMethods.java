@@ -5,12 +5,17 @@
 package com.axelor.script;
 
 import groovy.lang.Closure;
+import groovy.lang.GString;
+import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.ProcessGroovyMethods;
+import org.codehaus.groovy.runtime.StringGroovyMethods;
 
 /**
  * Groovy extension methods overriding the GDK methods that escape the script sandbox.
@@ -28,6 +33,10 @@ import org.codehaus.groovy.runtime.ProcessGroovyMethods;
  *       System.getenv}) as methods of allow-listed receivers
  *   <li>{@code mixin}: mixes any class (e.g. {@code GroovyShell}) into an allow-listed class, for
  *       the whole application
+ *   <li>{@code setMetaClass}, {@code metaClass}: replace the metaclass of a class, for the whole
+ *       application (e.g. removing the guard of {@link SandboxGuardedMethods})
+ *   <li>{@code asType} ({@code as}): converting a list or map calls a constructor of the target
+ *       class, so the target class must be allowed
  * </ul>
  *
  * <p>They are denied only when called from sandboxed code; otherwise they delegate to the GDK.
@@ -98,6 +107,85 @@ public final class SandboxGroovyMethods {
   public static Object use(Object self, Object[] array) {
     GroovySandbox.denyFromSandbox("use");
     return DefaultGroovyMethods.use(self, array);
+  }
+
+  // DefaultGroovyMethods.setMetaClass, metaClass
+
+  public static void setMetaClass(Class<?> self, MetaClass metaClass) {
+    GroovySandbox.denyFromSandbox("setMetaClass");
+    DefaultGroovyMethods.setMetaClass(self, metaClass);
+  }
+
+  public static void setMetaClass(Object self, MetaClass metaClass) {
+    GroovySandbox.denyFromSandbox("setMetaClass");
+    DefaultGroovyMethods.setMetaClass(self, metaClass);
+  }
+
+  public static void setMetaClass(GroovyObject self, MetaClass metaClass) {
+    GroovySandbox.denyFromSandbox("setMetaClass");
+    DefaultGroovyMethods.setMetaClass(self, metaClass);
+  }
+
+  public static MetaClass metaClass(Class<?> self, Closure<?> closure) {
+    GroovySandbox.denyFromSandbox("metaClass");
+    return DefaultGroovyMethods.metaClass(self, closure);
+  }
+
+  public static MetaClass metaClass(Object self, Closure<?> closure) {
+    GroovySandbox.denyFromSandbox("metaClass");
+    return DefaultGroovyMethods.metaClass(self, closure);
+  }
+
+  // DefaultGroovyMethods.asType, StringGroovyMethods.asType
+
+  public static <T> T asType(Iterable<?> self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Collection<?> self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Object[] self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Closure<?> self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Map<?, ?> self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Number self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(Object self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return DefaultGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(CharSequence self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return StringGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(GString self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return StringGroovyMethods.asType(self, type);
+  }
+
+  public static <T> T asType(String self, Class<T> type) {
+    GroovySandbox.checkConversion(type);
+    return StringGroovyMethods.asType(self, type);
   }
 
   // DefaultGroovyMethods.mixin

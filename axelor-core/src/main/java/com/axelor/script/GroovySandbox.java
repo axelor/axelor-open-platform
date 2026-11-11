@@ -5,6 +5,8 @@
 package com.axelor.script;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +32,7 @@ public final class GroovySandbox {
   static final String CALL_CHECK = "check";
   static final String CALL_CHECK_SPREAD = "checkSpread";
   static final String CALL_TIMEOUT = "timeout";
+  static final String CALL_CONSTRUCTED = "constructed";
 
   private static final ThreadLocal<Evaluation> CURRENT = new ThreadLocal<>();
 
@@ -95,13 +98,72 @@ public final class GroovySandbox {
 
     Class<?> klass = obj.getClass();
     if (obj instanceof Class<?> type) klass = type;
-    if (obj instanceof Executable executable) klass = executable.getDeclaringClass();
+    if (obj instanceof Executable executable) {
+      checkReflected(executable);
+      klass = executable.getDeclaringClass();
+    }
 
     if (!SandboxCode.class.isAssignableFrom(klass)) {
       policy().check(klass);
     }
 
     return obj;
+  }
+
+  /**
+   * Returns the constructed object. Generated as {@code constructed(check(Type), new Type(...))}:
+   * the first argument checks the class before the second one runs the constructor, so a denied
+   * class is never constructed (its constructor could have side effects, e.g. create a file).
+   */
+  public static <T> T constructed(Object checkedType, T obj) {
+    return obj;
+  }
+
+  /**
+   * Denies a conversion ({@code as}, {@code asType}) from sandboxed code to a class the policy does
+   * not allow: Groovy converts a list or map by calling a constructor of the target class.
+   */
+  static void checkConversion(Class<?> type) {
+    if (type == null || !isConstructible(type) || policy().allowed(type)) {
+      return;
+    }
+    if (isSandboxed()) {
+      throw new ScriptPolicyException(
+          String.format("Conversion to '%s' not allowed.", type.getName()));
+    }
+  }
+
+  /**
+   * Whether a conversion to the type may construct it: an interface or an abstract class cannot be
+   * constructed (a map or closure is converted to a proxy). Sandbox classes are checked by the
+   * policy themselves.
+   */
+  static boolean isConstructible(Class<?> type) {
+    Class<?> klass = type;
+    while (klass.isArray()) {
+      klass = klass.getComponentType();
+    }
+    return !klass.isPrimitive()
+        && !klass.isInterface()
+        && !Modifier.isAbstract(klass.getModifiers())
+        && !SandboxCode.class.isAssignableFrom(klass);
+  }
+
+  /**
+   * A reflected method or constructor is checked as its declaring class. Only public members of
+   * public classes can be used, so that reflection cannot reach what a direct call cannot (private
+   * members, {@code setAccessible}), and guarded methods are rejected (see {@link
+   * SandboxGuardedMethods}).
+   */
+  private static void checkReflected(Executable executable) {
+    if (!Modifier.isPublic(executable.getModifiers())
+        || !Modifier.isPublic(executable.getDeclaringClass().getModifiers())
+        || (executable instanceof Method method && SandboxGuardedMethods.isGuarded(method))) {
+      throw new ScriptPolicyException(
+          String.format(
+              "Reflective access to '%s.%s' not allowed.",
+              executable.getDeclaringClass().getName(), executable.getName()));
+    }
   }
 
   /**

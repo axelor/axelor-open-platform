@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -83,7 +84,9 @@ class ScriptPolicy {
     ThreadGroup.class,
     Properties.class,
     ResourceBundle.class,
-    Timer.class
+    Timer.class,
+    // writes files: new Formatter('/path/to/file')
+    Formatter.class
   };
 
   private final List<String> allowPackages;

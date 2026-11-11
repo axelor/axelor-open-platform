@@ -36,7 +36,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.persist.Transactional;
 import groovy.lang.Closure;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.script.SimpleBindings;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.junit.jupiter.api.Test;
@@ -607,8 +609,7 @@ class TestScriptPolicy {
 
     // Overload with env/dir arguments (null, so no denied type is constructed as a side effect),
     // dispatched to ProcessGroovyMethods.execute(List, String[], File).
-    assertBlockedByPolicy(
-        helper, "['" + missingCmd + "'].execute((String[]) null, (File) null); 1");
+    assertBlockedByPolicy(helper, "['" + missingCmd + "'].execute((String[]) null, null); 1");
 
     // Spread (recv*.execute()) dispatches execute() on each element, so a receiver whose element
     // type (not the collection type) provides the GDK method must be caught too.
@@ -995,6 +996,143 @@ class TestScriptPolicy {
         helper.eval("class S { def twice(l) { l.collect { it * 2 } } }; new S().twice([1, 2])"));
   }
 
+  // Methods of allowed classes changing (or reading) state shared by the whole application are
+  // guarded, whatever route reaches them; trusted code can still call them.
+  @Test
+  void testGroovyGuardedMethodsAreDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    Locale locale = Locale.getDefault();
+    Locale format = Locale.getDefault(Locale.Category.FORMAT);
+    TimeZone zone = TimeZone.getDefault();
+    try {
+      final String set = "Locale.FRANCE";
+      for (String code :
+          List.of(
+              "Locale.setDefault(" + set + ")",
+              "Locale.setDefault(Locale.Category.FORMAT, " + set + ")",
+              "Locale.\"set${'Default'}\"(" + set + ")",
+              "Locale.invokeMethod('setDefault', " + set + ")",
+              "Locale.default = " + set,
+              "Locale.GERMANY.setDefault(" + set + ")",
+              "Locale.GERMANY.with { setDefault(" + set + ") }",
+              "def c = { -> setDefault("
+                  + set
+                  + ") }; c.delegate = Locale; c.resolveStrategy = 1; c()",
+              "[" + set + "].each(Locale.&setDefault)",
+              "Locale.getMethod('setDefault', Locale).invoke(null, " + set + ")",
+              "Locale.metaClass = null; Locale.setDefault(" + set + ")",
+              "Locale.setMetaClass(null); Locale.setDefault(" + set + ")",
+              "Locale.metaClass { }",
+              "TimeZone.setDefault(TimeZone.getTimeZone('Pacific/Kiritimati'))",
+              "SimpleTimeZone.setDefault(TimeZone.getTimeZone('Pacific/Kiritimati'))",
+              "class T extends SimpleTimeZone { T() { super(0, 'T') } }; T.setDefault(new T())",
+              "java.time.zone.ZoneRulesProvider.refresh()",
+              "ServiceLoader.load(Runnable).iterator().hasNext()",
+              "Integer.getInteger('java.specification.version')",
+              "Long.getLong('java.specification.version')",
+              "Boolean.getBoolean('java.awt.headless')",
+              "com.axelor.common.Inflections.getInstance().plural('(.*)', 'zz')",
+              "com.axelor.common.Inflections.getInstance().with { irregular('a', 'b') }")) {
+        assertBlockedByPolicy(helper, code + "; 1");
+        assertEquals(locale, Locale.getDefault(), () -> "Locale changed by: " + code);
+        assertEquals(
+            format, Locale.getDefault(Locale.Category.FORMAT), () -> "Changed by: " + code);
+        assertEquals(zone, TimeZone.getDefault(), () -> "Time zone changed by: " + code);
+      }
+
+      // Their other methods still work.
+      assertEquals("fr_FR", helper.eval("Locale.FRANCE.toString()"));
+      assertEquals(locale, helper.eval("Locale.getDefault()"));
+      assertEquals(14L, helper.eval("Integer.valueOf('12') + Long.parseLong('1') + 1"));
+      assertEquals(
+          com.axelor.common.Inflections.getInstance().pluralize("contact"),
+          helper.eval("com.axelor.common.Inflections.getInstance().pluralize('contact')"));
+
+      // Trusted code is not affected.
+      InvokerHelper.invokeStaticMethod(Locale.class, "setDefault", new Object[] {Locale.ITALY});
+      assertEquals(Locale.ITALY, Locale.getDefault());
+    } finally {
+      Locale.setDefault(locale);
+      Locale.setDefault(Locale.Category.FORMAT, format);
+      TimeZone.setDefault(zone);
+    }
+  }
+
+  // Reflection cannot reach what a direct call cannot.
+  @Test
+  void testGroovyReflectionIsLimitedToPublicMembers() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "'abc'.getClass().getDeclaredMethod('isLatin1').invoke('abc')");
+    assertBlockedByPolicy(
+        helper, "def m = 'abc'.getClass().getDeclaredMethod('isLatin1'); m.setAccessible(true)");
+    assertBlockedByPolicy(helper, "'abc'.getClass().getDeclaredField('value').get('abc')");
+    assertBlockedByPolicy(
+        helper, "Locale.getMethod('setDefault', Locale).invoke(null, Locale.FRANCE)");
+
+    assertEquals(3, helper.eval("'abc'.getClass().getMethod('length').invoke('abc')"));
+  }
+
+  // A denied class is never constructed, its constructor could have side effects: here, create a
+  // file. Groovy also constructs objects when converting a list or map to a type.
+  @Test
+  void testGroovyDeniedClassesAreNotConstructed() throws Exception {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    java.nio.file.Path dir =
+        java.nio.file.Files.createDirectories(
+            java.nio.file.Path.of("build", "tmp", "script-policy"));
+    java.nio.file.Path file =
+        dir.resolve("constructed-" + java.util.UUID.randomUUID() + ".txt").toAbsolutePath();
+    String path = "'" + file.toString().replace("\\", "/") + "'";
+    try {
+      for (String code :
+          List.of(
+              "new Formatter(" + path + ")",
+              "new java.io.FileOutputStream(" + path + ")",
+              "Formatter f = [" + path + "]",
+              "java.io.FileOutputStream f = [" + path + "]",
+              "[" + path + "] as java.io.FileOutputStream",
+              "[" + path + "].asType(java.io.FileOutputStream)",
+              "def t = java.io.FileOutputStream; [" + path + "].asType(t)",
+              "class X { java.io.FileOutputStream f = [" + path + "] }; new X()",
+              "java.io.FileOutputStream g() { [" + path + "] }; g()",
+              "def g(java.io.FileOutputStream o) { o }; g(null)",
+              // array initializers convert each element to the element type
+              "new java.io.FileOutputStream[] { [" + path + "] }",
+              "new java.io.FileOutputStream[][] { new java.io.FileOutputStream[] { ["
+                  + path
+                  + "] } }",
+              "def a = new Formatter[] { [" + path + "] }")) {
+        assertBlockedByPolicy(helper, code + "; 1");
+        assertFalse(java.nio.file.Files.exists(file), () -> "File created by: " + code);
+      }
+
+      // Allowed types, interfaces and abstract classes can still be written and converted to.
+      assertEquals(
+          5,
+          helper.eval(
+              "List l = [1, 2]; Set s = [1] as Set; BigDecimal d = 1.5; String[] a = ['x'];"
+                  + " int i = 2; l.size() + s.size() + i"));
+      assertEquals(
+          1,
+          helper.eval(
+              "Closure c = { 1 }; Runnable r = { }; Comparator<Integer> k = { a, b -> a <=> b };"
+                  + " c()"));
+      assertEquals(
+          2026, helper.eval("java.time.LocalDate d = java.time.LocalDate.of(2026, 1, 2); d.year"));
+      assertEquals(3, helper.eval("class P { int x; P(int x) { this.x = x } }; P p = [3]; p.x"));
+      assertEquals(12, helper.eval("'12' as Integer"));
+      assertEquals(2, helper.eval("new ArrayList([1, 2]).size()"));
+      assertEquals(
+          List.of("a", "b"), Arrays.asList((Object[]) helper.eval("new String[] { 'a', 'b' }")));
+      // an array without elements to convert (it is checked as its element type when used)
+      assertEquals(
+          1, helper.eval("def a = new java.io.File[2]; def b = new java.io.File[] { }; 1"));
+    } finally {
+      java.nio.file.Files.deleteIfExists(file);
+    }
+  }
+
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
   // on allow-listed receivers, so the receiver check does not apply to them.
   @Test
@@ -1102,13 +1240,12 @@ class TestScriptPolicy {
     assertBlockedByPolicy(helper, "this.\"${'eval' + 'uate'}\"(" + nested + ")");
     assertBlockedByPolicy(helper, "[1].with { evaluate(" + nested + ") }");
 
-    // The other Script methods compiling and running code: evaluate(File) and run(File, String[]).
-    // The File is null (a cast is not checked), so the call reaches the SandboxScript override
-    // itself rather than being denied by the receiver check on File.
-    assertBlockedByPolicy(helper, "evaluate((File) null)");
-    assertBlockedByPolicy(helper, "run((File) null, [] as String[])");
-    assertBlockedByPolicy(helper, "invokeMethod('run', [(File) null, [] as String[]] as Object[])");
-    assertBlockedByPolicy(helper, "this.\"${'r' + 'un'}\"((File) null, [] as String[])");
+    // The other Script method compiling and running code: run(File, String[]). The File is null,
+    // so the call reaches the SandboxScript override itself. (A script cannot get a File, nor even
+    // cast to it, so evaluate(File) cannot be reached.)
+    assertBlockedByPolicy(helper, "run(null, [] as String[])");
+    assertBlockedByPolicy(helper, "invokeMethod('run', [null, [] as String[]] as Object[])");
+    assertBlockedByPolicy(helper, "this.\"${'r' + 'un'}\"(null, [] as String[])");
   }
 
   private void assertBlockedByPolicy(ScriptHelper helper, String code) {

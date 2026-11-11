@@ -149,6 +149,7 @@ These rules are added after any custom configuration.
 - `java.util.Properties`
 - `java.util.ResourceBundle`
 - `java.util.Timer`
+- `java.util.Formatter`
 
 In addition, the following are denied whatever the receiver, including allowed classes
 such as `String` or `List`:
@@ -162,6 +163,26 @@ such as `String` or `List`:
 
 Static imports (`import static ...`) are checked against the same rules as other class
 accesses: importing from a class that is not allowed fails when the script is compiled.
+
+=== Groovy scripts
+
+Groovy scripts and templates follow additional rules:
+
+- Annotations are not allowed, except `@Override` and `@Deprecated`. In a script with
+  star imports (`import x.y.*`), write them fully qualified: `@java.lang.Override`.
+- Classes declared in a script can only extend and implement allowed types, and cannot
+  define `finalize()`.
+- Reflection is limited to the public members of allowed classes.
+- The following methods of allowed classes are denied, as they read or change state
+  shared by the whole application:
+  ** `java.util.Locale.setDefault`
+  ** `java.util.TimeZone.setDefault`
+  ** `java.time.zone.ZoneRulesProvider.registerProvider` and `refresh`
+  ** `java.util.ServiceLoader.load` and `loadInstalled`
+  ** `java.lang.Integer.getInteger`, `java.lang.Long.getLong` and
+     `java.lang.Boolean.getBoolean`, which read system properties
+  ** `com.axelor.common.Inflections` methods changing the inflection rules (`ignore`,
+     `irregular`, `singular`, `plural`)
 
 == `\\__bean__` Helper
 

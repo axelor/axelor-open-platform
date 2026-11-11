@@ -10,6 +10,7 @@ import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
+import org.codehaus.groovy.ast.expr.ClassExpression;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression;
 import org.codehaus.groovy.ast.expr.Expression;
@@ -136,7 +137,11 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
         if (call.isSpecialCall()) {
           return super.transform(expr);
         }
-        return receiverCheckX(super.transform(expr), false);
+        // constructed(check(Type), new Type(...)): the class is checked before the constructor runs
+        return sandboxCallX(
+            GroovySandbox.CALL_CONSTRUCTED,
+            new ArgumentListExpression(
+                receiverCheckX(new ClassExpression(call.getType()), false), super.transform(expr)));
       }
 
       if (expr instanceof MethodCallExpression) {
