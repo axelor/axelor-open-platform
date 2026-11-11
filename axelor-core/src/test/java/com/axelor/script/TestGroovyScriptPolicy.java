@@ -10,8 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.JpaTestModule;
-import com.axelor.common.ObjectUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionExecutor;
@@ -20,20 +18,7 @@ import com.axelor.meta.schema.actions.validate.validator.Notify;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
-import com.axelor.script.policy.MyOtherService;
-import com.axelor.script.policy.MyOtherServiceImpl;
-import com.axelor.script.policy.MyOtherServiceImpl2;
-import com.axelor.script.policy.MyService;
-import com.axelor.script.policy.MyServiceImpl;
-import com.axelor.script.policy.MyServiceImpl2;
-import com.axelor.script.policy.MyYetAnotherService;
-import com.axelor.script.policy.MyYetAnotherServiceImpl;
-import com.axelor.test.GuiceExtension;
-import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
-import com.axelor.test.db.repo.ContactRepository;
-import com.google.inject.AbstractModule;
-import com.google.inject.persist.Transactional;
 import groovy.lang.Closure;
 import java.util.List;
 import java.util.Locale;
@@ -42,35 +27,15 @@ import java.util.TimeZone;
 import javax.script.SimpleBindings;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(GuiceExtension.class)
-@GuiceModules({
-  JpaTestModule.class,
-  TestScriptPolicy.MyModule.class,
-  TestScriptPolicy.MyModule2.class
-})
-class TestScriptPolicy {
-
-  public static class MyModule extends AbstractModule {
-    @Override
-    protected void configure() {
-      bind(MyService.class).to(MyServiceImpl.class);
-      bind(MyOtherService.class).to(MyOtherServiceImpl.class);
-      bind(MyYetAnotherService.class).to(MyYetAnotherServiceImpl.class);
-    }
-  }
-
-  public static class MyModule2 extends AbstractModule {
-    @Override
-    protected void configure() {
-      bind(MyServiceImpl.class).to(MyServiceImpl2.class);
-      bind(MyOtherServiceImpl.class).to(MyOtherServiceImpl2.class);
-    }
-  }
+/**
+ * Scripting policy and sandbox of the Groovy engine (scripts and templates compiled by {@link
+ * GroovyScriptSupport}).
+ */
+class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
 
   @Test
-  void testGroovy() {
+  void testPolicy() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // Allowed by annotation
@@ -199,258 +164,8 @@ class TestScriptPolicy {
     assertThrows(IllegalArgumentException.class, () -> helper.eval("com.axelor.db.JPA.em()"));
   }
 
-  // Script policy evaluation differs from Groovy and EL:
-  // - For inner classes, access is considered according to the top-level class
-  // - Denied property access returns empty object instead of throwing exception
   @Test
-  void testJavaScript() {
-    try (JavaScriptScriptHelper helper = new JavaScriptScriptHelper(new SimpleBindings())) {
-      // Allowed by annotation
-      assertEquals(
-          "AllowedByAnnotation",
-          helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myMethod()"));
-      assertEquals(
-          "InnerAllowedByAnnotation",
-          helper.eval(
-              "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerAllowed).myMethod()"));
-      assertEquals(
-          "InnerDefault",
-          helper.eval(
-              "__bean__(com.axelor.script.policy.AllowedByAnnotation.InnerDefault).myMethod()"));
-
-      // Allowed by configuration
-      assertEquals(
-          "AllowedByConfiguration",
-          helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticMethod()"));
-      assertEquals(
-          "InnerAllowedByConfiguration",
-          helper.eval(
-              "com.axelor.script.policy.AllowedByConfiguration.InnerAllowed.myStaticMethod()"));
-
-      // denied by configuration
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticMethod()"));
-      assertThrows(
-          IllegalArgumentException.class,
-          () ->
-              helper.eval(
-                  "com.axelor.script.policy.DeniedByConfiguration.InnerAllowed.myStaticMethod()"));
-      assertThrows(
-          IllegalArgumentException.class,
-          () ->
-              helper.eval(
-                  "com.axelor.script.policy.DeniedByConfiguration.InnerDenied.myStaticMethod()"));
-
-      // Denied by default
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> helper.eval("com.axelor.script.policy.DeniedByDefault.myStaticMethod()"));
-      assertThrows(
-          IllegalArgumentException.class,
-          () ->
-              helper.eval("com.axelor.script.policy.DeniedByDefault.InnerDenied.myStaticMethod()"));
-
-      assertEquals(
-          "SubAllowedByAnnotation",
-          helper.eval("__bean__(com.axelor.script.policy.SubAllowedByAnnotation).myMethod()"));
-
-      assertEquals(
-          "SubAllowedByConfiguration",
-          helper.eval("com.axelor.script.policy.SubAllowedByConfiguration.myStaticMethod()"));
-
-      // Service method calls
-      assertEquals(
-          "Hello, World!", helper.eval("__bean__(com.axelor.script.policy.MyService).myMethod()"));
-      assertEquals(
-          "myYetAnotherMethod",
-          helper.eval("__bean__(com.axelor.script.policy.MyService).myYetAnotherMethod()"));
-      assertEquals(
-          2, helper.eval("__bean__(com.axelor.script.policy.MyOtherService).myOtherMethod()"));
-      assertThrows(
-          IllegalArgumentException.class,
-          () ->
-              helper.eval(
-                  "__bean__(com.axelor.script.policy.MyYetAnotherService).myYetAnotherMethod()"));
-
-      // Property access
-      assertEquals(
-          "AllowedByAnnotation",
-          helper.eval("__bean__(com.axelor.script.policy.AllowedByAnnotation).myValue"));
-      assertEquals(
-          "AllowedByConfiguration",
-          helper.eval("com.axelor.script.policy.AllowedByConfiguration.myStaticValue"));
-      assertTrue(
-          ObjectUtils.isEmpty(
-              helper.eval("com.axelor.script.policy.DeniedByConfiguration.myStaticValue")));
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> helper.eval("__bean__(com.axelor.script.policy.DeniedByConfiguration).myValue"));
-
-      // Constant access
-      assertEquals("myConstant", helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT"));
-      assertEquals(
-          List.of("hello", "world"),
-          helper.eval("com.axelor.script.policy.MyService.MY_CONSTANT_LIST"));
-      assertEquals(
-          "myOtherConstant", helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT"));
-      assertEquals(
-          List.of("hello", "world"),
-          helper.eval("com.axelor.script.policy.MyOtherService.MY_CONSTANT_LIST"));
-      assertTrue(
-          ObjectUtils.isEmpty(
-              helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT")));
-      assertTrue(
-          ObjectUtils.isEmpty(
-              helper.eval("com.axelor.script.policy.MyYetAnotherService.MY_CONSTANT_LIST")));
-
-      // Service returning instance of denied class
-      assertDoesNotThrow(
-          () ->
-              helper.eval(
-                  """
-                  const myService = __bean__(com.axelor.script.policy.MyService);
-                  const a = myService.myYetAnotherMethod();
-
-                  if (a !== "myYetAnotherMethod") {
-                    throw new Error("Should be allowed");
-                  }
-
-                  const myYetAnotherService = myService.getMyYetAnotherService();
-
-                  try {
-                    const b = myYetAnotherService.MY_CONSTANT;
-                    if (b?.length > 0) {
-                      throw new Exception("Should be denied");
-                    }
-                  } catch (e) {
-                    // Denied as expected
-                  }
-                  """));
-
-      // Entity manager
-      assertThrows(IllegalArgumentException.class, () -> helper.eval("com.axelor.db.JPA.em()"));
-    }
-  }
-
-  @Test
-  void testEL() {
-    ScriptHelper helper = new ELScriptHelper(new SimpleBindings());
-
-    // Allowed by annotation
-    assertEquals(
-        "AllowedByAnnotation",
-        helper.eval("__bean__(T('com.axelor.script.policy.AllowedByAnnotation')).myMethod()"));
-    assertEquals(
-        "InnerAllowedByAnnotation",
-        helper.eval(
-            "__bean__(T('com.axelor.script.policy.AllowedByAnnotation$InnerAllowed')).myMethod()"));
-    assertEquals(
-        "InnerDefault",
-        helper.eval(
-            "__bean__(T('com.axelor.script.policy.AllowedByAnnotation$InnerDefault')).myMethod()"));
-
-    // Allowed by configuration
-    assertEquals(
-        "AllowedByConfiguration",
-        helper.eval("T('com.axelor.script.policy.AllowedByConfiguration').myStaticMethod()"));
-    assertEquals(
-        "InnerAllowedByConfiguration",
-        helper.eval(
-            "T('com.axelor.script.policy.AllowedByConfiguration$InnerAllowed').myStaticMethod()"));
-
-    // Denied by configuration
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("T('com.axelor.script.policy$DeniedByConfiguration').myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "T('com.axelor.script.policy.DeniedByConfiguration$InnerAllowed').myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "T('com.axelor.script.policy.DeniedByConfiguration$InnerDenied').myStaticMethod()"));
-
-    // Denied by default
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("T('com.axelor.script.policy.DeniedByDefault').myStaticMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "T('com.axelor.script.policy.DeniedByDefault$InnerDenied').myStaticMethod()"));
-
-    assertEquals(
-        "SubAllowedByAnnotation",
-        helper.eval("__bean__(T('com.axelor.script.policy.SubAllowedByAnnotation')).myMethod()"));
-
-    assertEquals(
-        "SubAllowedByConfiguration",
-        helper.eval("T('com.axelor.script.policy.SubAllowedByConfiguration').myStaticMethod()"));
-
-    // Service
-    assertEquals(
-        "Hello, World!",
-        helper.eval("__bean__(T('com.axelor.script.policy.MyService')).myMethod()"));
-    assertEquals(
-        "myYetAnotherMethod",
-        helper.eval("__bean__(T('com.axelor.script.policy.MyService')).myYetAnotherMethod()"));
-    assertEquals(
-        2, helper.eval("__bean__(T('com.axelor.script.policy.MyOtherService')).myOtherMethod()"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(T('com.axelor.script.policy.MyYetAnotherService')).myYetAnotherMethod()"));
-
-    // Property access
-    assertEquals(
-        "AllowedByAnnotation",
-        helper.eval("__bean__(T('com.axelor.script.policy.AllowedByAnnotation')).myValue"));
-    assertEquals(
-        "AllowedByConfiguration",
-        helper.eval("T('com.axelor.script.policy.AllowedByConfiguration').myStaticValue"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("T('com.axelor.script.policy.DeniedByConfiguration').myStaticValue"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("__bean__(T('com.axelor.script.policy.DeniedByConfiguration')).myValue"));
-
-    // Constant access
-    assertEquals("myConstant", helper.eval("T('com.axelor.script.policy.MyService').MY_CONSTANT"));
-    assertEquals(
-        List.of("hello", "world"),
-        helper.eval("T('com.axelor.script.policy.MyService').MY_CONSTANT_LIST"));
-    assertEquals(
-        "myOtherConstant", helper.eval("T('com.axelor.script.policy.MyOtherService').MY_CONSTANT"));
-    assertEquals(
-        List.of("hello", "world"),
-        helper.eval("T('com.axelor.script.policy.MyOtherService').MY_CONSTANT_LIST"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("T('com.axelor.script.policy.MyYetAnotherService').MY_CONSTANT"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> helper.eval("T('com.axelor.script.policy.MyYetAnotherService').MY_CONSTANT_LIST"));
-
-    // Service returning instance of denied class
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            helper.eval(
-                "__bean__(T('com.axelor.script.policy.MyService')).getMyYetAnotherService().MY_CONSTANT"));
-
-    // Entity manager
-    assertThrows(IllegalArgumentException.class, () -> helper.eval("T('com.axelor.db.JPA').em()"));
-  }
-
-  @Test
-  void testGroovyActionScript() {
+  void testActionScript() {
     var contact = ensureContact("John", "Doe", "john.doe@axelor.com");
 
     var action = new ActionScript();
@@ -515,72 +230,7 @@ class TestScriptPolicy {
   }
 
   @Test
-  void testJavaScriptActionScript() {
-    var contact = ensureContact("John", "Doe", "john.doe@axelor.com");
-
-    var action = new ActionScript();
-    var script = new ActionScript.ActScript();
-    script.setLanguage("js");
-    action.setScript(script);
-
-    var request = new ActionRequest();
-    request.setModel(Contact.class.getName());
-    request.setData(Map.of("context", Mapper.toMap(contact)));
-    var handler = Beans.get(ActionExecutor.class).newActionHandler(request);
-
-    // Test $request and $response
-    script.setCode(
-        """
-        const firstName = $request.context.firstName;
-        $response.setNotify(`Hello, ${firstName}!`);
-        """);
-    var response = (ActionResponse) action.execute(handler);
-    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
-
-    @SuppressWarnings("unchecked")
-    var data = ((List<Map<String, Object>>) response.getData()).get(0);
-    @SuppressWarnings("unchecked")
-    var notify = (Map<String, Object>) data.get(Notify.KEY);
-    assertEquals("Hello, %s!".formatted(contact.getFirstName()), notify.get("message"));
-
-    script.setTransactional(true);
-
-    // Test $json
-    script.setCode(
-        """
-        let record = $json.create("custom_model", {"name": "Custom JSON JS"});
-        record = $json.save(record);
-        $response.setNotify(`Saved ${record.name}`);
-        """);
-    response = (ActionResponse) action.execute(handler);
-    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
-
-    @SuppressWarnings("unchecked")
-    var jsonData = ((List<Map<String, Object>>) response.getData()).get(0);
-    @SuppressWarnings("unchecked")
-    var jsonNotify = (Map<String, Object>) jsonData.get(Notify.KEY);
-    assertEquals("Saved Custom JSON JS", jsonNotify.get("message"));
-
-    // Test $em
-    script.setCode(
-        """
-        const found = $em.find(Contact, $request.context.id);
-        $response.setNotify(`Found ${found.firstName} ${found.lastName}`);
-        """);
-    response = (ActionResponse) action.execute(handler);
-    assertEquals(Response.STATUS_SUCCESS, response.getStatus());
-
-    @SuppressWarnings("unchecked")
-    var emData = ((List<Map<String, Object>>) response.getData()).get(0);
-    @SuppressWarnings("unchecked")
-    var emNotify = (Map<String, Object>) emData.get(Notify.KEY);
-    assertEquals(
-        "Found %s %s".formatted(contact.getFirstName(), contact.getLastName()),
-        emNotify.get("message"));
-  }
-
-  @Test
-  void testGroovyGdkProcessExecutionIsDenied() {
+  void testGdkProcessExecutionIsDenied() {
     // A command that does not exist: nothing runs even if the policy fails to block the call.
     final String missingCmd = "axelor-nonexistent-binary-xyz";
 
@@ -638,7 +288,7 @@ class TestScriptPolicy {
   // The sandbox must not depend on a name the script can rebind: a local variable or a closure
   // delegate named like the old policy checker variable must not replace the checks.
   @Test
-  void testGroovyPolicyChecksCannotBeShadowed() {
+  void testPolicyChecksCannotBeShadowed() {
     final String missingCmd = "axelor-nonexistent-binary-xyz";
     final String fake =
         "[check: { o -> o }, checkMethod: { o, n -> o }, checkSpread: { o, n -> o },"
@@ -664,7 +314,7 @@ class TestScriptPolicy {
   // A spread (recv*.name) dispatches on each element of the receiver, not on the receiver itself,
   // so a denied class hidden in an allowed collection, iterator, etc. must be caught.
   @Test
-  void testGroovySpreadElementsAreChecked() {
+  void testSpreadElementsAreChecked() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // Spread method calls.
@@ -689,7 +339,7 @@ class TestScriptPolicy {
   // owner), which the receiver checks never see. A sandboxed closure must therefore never get a
   // delegate or owner the policy denies, however it is set.
   @Test
-  void testGroovyClosureDelegateMustBeAllowed() {
+  void testClosureDelegateMustBeAllowed() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
     final String closure = "def c = { -> getenv('HOME') }; ";
 
@@ -713,7 +363,7 @@ class TestScriptPolicy {
 
   // Common closure usage must keep working with sandboxed closures.
   @Test
-  void testGroovyClosuresStillWork() {
+  void testClosuresStillWork() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // Script closures are sandboxed.
@@ -768,7 +418,7 @@ class TestScriptPolicy {
   // Annotations can trigger AST transformations that run code while the script is compiled, before
   // any runtime check exists, so scripts cannot use any annotation.
   @Test
-  void testGroovyAnnotationsAreRejected() {
+  void testAnnotationsAreRejected() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // @ASTTest runs its closure at compile time: it must be rejected before it runs.
@@ -860,7 +510,7 @@ class TestScriptPolicy {
 
   // Classes declared in a script are checked like the script itself, wherever their code is.
   @Test
-  void testGroovyScriptClassesAreChecked() {
+  void testScriptClassesAreChecked() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
     final String denied = "System.getenv('HOME')";
 
@@ -887,7 +537,7 @@ class TestScriptPolicy {
   // What a script class inherits is not compiled from the script, so its supertypes must be
   // allowed.
   @Test
-  void testGroovyScriptClassSupertypesAreChecked() {
+  void testScriptClassSupertypesAreChecked() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     assertBlockedByPolicy(
@@ -916,7 +566,7 @@ class TestScriptPolicy {
   // script would then resolve to instead of the real one: the sandbox base class, helpers or
   // checks. Scripts cannot declare a package, so their classes are in the default package.
   @Test
-  void testGroovyPackageDeclarationsAreRejected() {
+  void testPackageDeclarationsAreRejected() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // Replacing the SandboxScript base class: evaluate() would run code without the policy.
@@ -959,7 +609,7 @@ class TestScriptPolicy {
 
   // A script class instance called later by Java code, outside the evaluation, stays sandboxed.
   @Test
-  void testGroovyScriptClassEscapingTheScriptIsSandboxed() {
+  void testScriptClassEscapingTheScriptIsSandboxed() {
     final String missingCmd = "axelor-nonexistent-binary-xyz";
 
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
@@ -975,7 +625,7 @@ class TestScriptPolicy {
 
   // Common class usage must keep working.
   @Test
-  void testGroovyScriptClassesStillWork() {
+  void testScriptClassesStillWork() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     // Fields, properties, constructors, methods, static members.
@@ -1044,7 +694,7 @@ class TestScriptPolicy {
   // Methods of allowed classes changing (or reading) state shared by the whole application are
   // guarded, whatever route reaches them; trusted code can still call them.
   @Test
-  void testGroovyGuardedMethodsAreDenied() {
+  void testGuardedMethodsAreDenied() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
     Locale locale = Locale.getDefault();
     Locale format = Locale.getDefault(Locale.Category.FORMAT);
@@ -1105,7 +755,7 @@ class TestScriptPolicy {
 
   // Reflection cannot reach what a direct call cannot.
   @Test
-  void testGroovyReflectionIsLimitedToPublicMembers() {
+  void testReflectionIsLimitedToPublicMembers() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     assertBlockedByPolicy(helper, "'abc'.getClass().getDeclaredMethod('isLatin1').invoke('abc')");
@@ -1121,7 +771,7 @@ class TestScriptPolicy {
   // A denied class is never constructed, its constructor could have side effects: here, create a
   // file. Groovy also constructs objects when converting a list or map to a type.
   @Test
-  void testGroovyDeniedClassesAreNotConstructed() throws Exception {
+  void testDeniedClassesAreNotConstructed() throws Exception {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
     java.nio.file.Path dir =
         java.nio.file.Files.createDirectories(
@@ -1181,7 +831,7 @@ class TestScriptPolicy {
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
   // on allow-listed receivers, so the receiver check does not apply to them.
   @Test
-  void testGroovyCategoriesAndMixinsAreDenied() {
+  void testCategoriesAndMixinsAreDenied() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     assertBlockedByPolicy(helper, "use(System) { 'PATH'.getenv() }");
@@ -1193,7 +843,7 @@ class TestScriptPolicy {
   // A statically imported method is called without a receiver, so its class is checked when the
   // script is compiled.
   @Test
-  void testGroovyStaticImportsAreChecked() {
+  void testStaticImportsAreChecked() {
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
 
     assertBlockedByPolicy(helper, "import static java.lang.System.getenv; getenv('PATH')");
@@ -1206,7 +856,7 @@ class TestScriptPolicy {
 
   // A closure created by a script stays sandboxed when called later, outside the evaluation.
   @Test
-  void testGroovyClosureEscapingTheScriptIsSandboxed() {
+  void testClosureEscapingTheScriptIsSandboxed() {
     final String missingCmd = "axelor-nonexistent-binary-xyz";
 
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
@@ -1219,7 +869,7 @@ class TestScriptPolicy {
 
   // The GDK overrides only deny sandboxed callers: trusted code keeps the GDK behavior.
   @Test
-  void testGroovyGdkOverridesDoNotAffectTrustedCode() {
+  void testGdkOverridesDoNotAffectTrustedCode() {
     final String missingCmd = "axelor-nonexistent-binary-xyz";
 
     // Reaches ProcessGroovyMethods.execute(String), which fails as the command does not exist.
@@ -1236,7 +886,7 @@ class TestScriptPolicy {
   // are not allow-listed); this guards that surface against a future change reopening file/URL
   // exfiltration. Targets are nonexistent paths, so an unblocked read only throws FileNotFound.
   @Test
-  void testGroovyGdkResourceAccessIsDenied() {
+  void testGdkResourceAccessIsDenied() {
     final String missingPath = "/axelor-nonexistent-path-xyz";
 
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
@@ -1261,7 +911,7 @@ class TestScriptPolicy {
   // Script.evaluate(...) is not caught that way because the receiver is the trusted running script,
   // so SandboxScript, the base class of compiled scripts, overrides it to throw.
   @Test
-  void testGroovyNestedEvaluationIsSandboxed() {
+  void testNestedEvaluationIsSandboxed() {
     final String missingCmd = "axelor-nonexistent-binary-xyz";
 
     ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
@@ -1291,40 +941,5 @@ class TestScriptPolicy {
     assertBlockedByPolicy(helper, "run(null, [] as String[])");
     assertBlockedByPolicy(helper, "invokeMethod('run', [null, [] as String[]] as Object[])");
     assertBlockedByPolicy(helper, "this.\"${'r' + 'un'}\"(null, [] as String[])");
-  }
-
-  private void assertBlockedByPolicy(ScriptHelper helper, String code) {
-    // any throwable: a denial in a static initializer is reported as an ExceptionInInitializerError
-    Throwable ex = assertThrows(Throwable.class, () -> helper.eval(code));
-    assertTrue(
-        hasPolicyException(ex),
-        () ->
-            "Expected the policy to deny ["
-                + code
-                + "] with a ScriptPolicyException, but it was not blocked. Got: "
-                + ex);
-  }
-
-  private static boolean hasPolicyException(Throwable t) {
-    for (Throwable c = t; c != null; c = c.getCause()) {
-      if (c instanceof ScriptPolicyException) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Transactional
-  Contact ensureContact(String firstName, String lastName, String email) {
-    var repo = Beans.get(ContactRepository.class);
-    var contact = repo.findByEmail(email);
-
-    if (contact == null) {
-      contact = new Contact(firstName, lastName);
-      contact.setEmail(email);
-      contact = repo.save(contact);
-    }
-
-    return contact;
   }
 }
