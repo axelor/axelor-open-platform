@@ -97,6 +97,15 @@ class ScriptPolicy {
 
   private final long timeout;
 
+  // Bound to the class, so it does not keep it from being unloaded.
+  private final ClassValue<Boolean> allowedCache =
+      new ClassValue<>() {
+        @Override
+        protected Boolean computeValue(Class<?> type) {
+          return computeAllowed(type);
+        }
+      };
+
   private ScriptPolicy() {
     List<String> initialAllowPackages = new ArrayList<>();
     List<Class<?>> initialAllowClasses = new ArrayList<>();
@@ -155,7 +164,17 @@ class ScriptPolicy {
     return pattern.equals(pkg);
   }
 
+  /**
+   * Whether the class is allowed. The answer is computed once per class and cached: the rules
+   * cannot change once the policy is created, and this is called for every receiver, constructor,
+   * conversion, etc. of every script.
+   */
   public boolean allowed(Class<?> klass) {
+    return allowedCache.get(klass);
+  }
+
+  /** Computes whether the class is allowed, see {@link #allowed(Class)}. */
+  boolean computeAllowed(Class<?> klass) {
     // an array gives access to its elements only, so it is checked as its element type
     while (klass.isArray()) {
       klass = klass.getComponentType();
