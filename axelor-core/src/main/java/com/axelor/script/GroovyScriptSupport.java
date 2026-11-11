@@ -18,7 +18,17 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.StreamingTemplateEngine;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
@@ -39,6 +49,9 @@ public class GroovyScriptSupport {
   private static final LoadingCache<String, Class<?>> SCRIPT_CACHE;
 
   private static final ScriptPolicy SCRIPT_POLICY;
+
+  private static final String GLOBAL_TRANSFORMS =
+      "META-INF/services/org.codehaus.groovy.transform.ASTTransformation";
 
   public static class Helpers {
 
@@ -84,8 +97,7 @@ public class GroovyScriptSupport {
 
     // No compile-time code from the script: no global AST transformation (e.g. @Grab), and no
     // annotation, rejected first so that no annotation-triggered transformation ever runs.
-    config.setDisabledGlobalASTTransformations(
-        GroovyAnnotationCheck.globalTransforms(JpaScanner.getClassLoader()));
+    config.setDisabledGlobalASTTransformations(globalTransforms(JpaScanner.getClassLoader()));
     config.addCompilationCustomizers(new GroovyAnnotationCheck());
 
     config.addCompilationCustomizers(importCustomizer);
@@ -135,6 +147,36 @@ public class GroovyScriptSupport {
                     GCL.clearCache();
                   }
                 });
+  }
+
+  /**
+   * Lists the global AST transformations available to the given class loader, to disable them all.
+   *
+   * <p>Global transformations apply to every compiled source and react to what it contains (e.g.
+   * {@code GrabAnnotationTransformation} for {@code @Grab}). They run in the {@link
+   * CompilePhase#CONVERSION} phase before any compilation customizer, so {@link
+   * GroovyAnnotationCheck} cannot reject their trigger in time: they are disabled instead. Scripts
+   * do not need any.
+   *
+   * <p>They are found the same way as the Groovy compiler does, from the service files.
+   */
+  private static Set<String> globalTransforms(ClassLoader loader) {
+    Set<String> names = new LinkedHashSet<>();
+    try {
+      for (URL url : Collections.list(loader.getResources(GLOBAL_TRANSFORMS))) {
+        try (BufferedReader reader =
+            new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+          reader
+              .lines()
+              .map(String::trim)
+              .filter(line -> !line.isEmpty() && !line.startsWith("#"))
+              .forEach(names::add);
+        }
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException("Unable to list the global AST transformations", e);
+    }
+    return names;
   }
 
   /**
