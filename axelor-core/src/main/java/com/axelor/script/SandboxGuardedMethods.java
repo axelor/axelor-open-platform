@@ -22,14 +22,21 @@ import org.codehaus.groovy.reflection.CachedClass;
 
 /**
  * Methods of allowed classes that scripts cannot call, as they read or change state shared by the
- * whole application (JVM defaults, system properties, shared rules).
+ * whole application (JVM defaults, system properties, shared rules), or give access to the
+ * classpath resources (configuration files with credentials) and class loaders.
  *
  * <p>The policy allows or denies whole classes, and these classes must stay allowed for their other
  * methods. Checking the method name at the call site would miss the other routes Groovy offers
  * (computed names, {@code invokeMethod}, closure delegates, method pointers, property syntax...),
  * which all go through the metaclass of the target class. So a guarding metaclass is installed on
- * the guarded classes: it rejects these methods when sandboxed code is on the call stack, and lets
- * trusted code call them. Reflective calls are rejected by {@link GroovySandbox#check(Object)}.
+ * the guarded classes: it rejects these methods, and the properties read or written through them,
+ * when sandboxed code is on the call stack, and lets trusted code call them. Reflective calls are
+ * rejected by {@link GroovySandbox#check(Object)}.
+ *
+ * <p>A {@code Class} object is checked as the class it represents, so the methods of {@code
+ * java.lang.Class} are reachable from any allowed class (e.g. {@code
+ * Contact.getResourceAsStream(...)}). Calls on a class literal go through the metaclass of {@code
+ * java.lang.Class} too, so guarding it covers them.
  */
 final class SandboxGuardedMethods {
 
@@ -48,7 +55,16 @@ final class SandboxGuardedMethods {
           Long.class, Set.of("getLong"),
           Boolean.class, Set.of("getBoolean"),
           // shared inflection rules
-          Inflections.class, Set.of("ignore", "irregular", "singular", "plural"));
+          Inflections.class, Set.of("ignore", "irregular", "singular", "plural"),
+          // classpath resources and class loaders
+          Class.class,
+              Set.of(
+                  "getResourceAsStream",
+                  "getResource",
+                  "getClassLoader",
+                  "getProtectionDomain",
+                  "getModule"),
+          Module.class, Set.of("getResourceAsStream", "getClassLoader"));
 
   /** Public JDK subclasses inheriting a guarded static method. */
   private static final Map<Class<?>, Class<?>> SUBCLASSES =
@@ -111,8 +127,17 @@ final class SandboxGuardedMethods {
       if ("metaClass".equals(property)) {
         deny("metaClass");
       }
+      checkAccessor("set", property);
+    }
+
+    private void checkGetter(String property) {
+      checkAccessor("get", property);
+      checkAccessor("is", property);
+    }
+
+    private void checkAccessor(String prefix, String property) {
       if (property != null && !property.isEmpty()) {
-        checkMethod("set" + Character.toUpperCase(property.charAt(0)) + property.substring(1));
+        checkMethod(prefix + Character.toUpperCase(property.charAt(0)) + property.substring(1));
       }
     }
 
@@ -172,6 +197,24 @@ final class SandboxGuardedMethods {
     public Object invokeStaticMethod(Object object, String methodName, Object[] arguments) {
       checkMethod(methodName);
       return super.invokeStaticMethod(object, methodName, arguments);
+    }
+
+    @Override
+    public Object getProperty(Object object, String property) {
+      checkGetter(property);
+      return super.getProperty(object, property);
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object getProperty(
+        Class sender,
+        Object receiver,
+        String property,
+        boolean isCallToSuper,
+        boolean fromInsideClass) {
+      checkGetter(property);
+      return super.getProperty(sender, receiver, property, isCallToSuper, fromInsideClass);
     }
 
     @Override

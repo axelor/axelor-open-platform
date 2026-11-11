@@ -753,6 +753,71 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     }
   }
 
+  // A Class object is checked as the class it represents, so the methods of java.lang.Class are
+  // reachable from any allowed class (here a model): they must not give access to the classpath
+  // resources (configuration files with credentials) or to the class loaders.
+  @Test
+  void testClasspathResourcesAreDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    final String contact = "com.axelor.test.db.Contact";
+    final String res = "'/axelor-config.properties'";
+
+    for (String code :
+        List.of(
+            contact + ".getResourceAsStream(" + res + ")",
+            contact + ".class.getResourceAsStream(" + res + ")",
+            "new " + contact + "().getClass().getResourceAsStream(" + res + ")",
+            "new " + contact + "().class.getResourceAsStream(" + res + ")",
+            "def c = " + contact + "; c.getResourceAsStream(" + res + ")",
+            contact + ".with { getResourceAsStream(" + res + ") }",
+            "def c = { -> getResourceAsStream("
+                + res
+                + ") }; c.delegate = "
+                + contact
+                + "; c.resolveStrategy = 1; c()",
+            contact + ".\"${'getResource' + 'AsStream'}\"(" + res + ")",
+            contact + ".invokeMethod('getResourceAsStream', " + res + ")",
+            "def m = " + contact + ".&getResourceAsStream; m(" + res + ")",
+            "String.getResourceAsStream(" + res + ")",
+            contact + ".getResource(" + res + ")",
+            contact + ".getClassLoader()",
+            contact + ".classLoader",
+            contact + "['classLoader']",
+            contact + ".\"${'class' + 'Loader'}\"",
+            contact + ".metaClass.getProperty(" + contact + ", 'classLoader')",
+            contact + ".metaClass.invokeMethod(" + contact + ", 'getClassLoader', null)",
+            contact + ".with { classLoader }",
+            contact + ".@classLoader",
+            contact + ".protectionDomain",
+            contact + ".getProtectionDomain()",
+            contact + ".module",
+            contact + ".getModule().getResourceAsStream(" + res + ")",
+            "Class.getMethod('getResourceAsStream', String).invoke(" + contact + ", " + res + ")",
+            "Class.getMethod('getClassLoader').invoke(" + contact + ")",
+            contact + ".getClass().getMethod('getClassLoader').invoke(" + contact + ")",
+            "new Scanner("
+                + contact
+                + ".getResourceAsStream("
+                + res
+                + ")).useDelimiter('\\\\A').next()")) {
+      assertBlockedByPolicy(helper, code + "; 1");
+    }
+    assertEquals(null, helper.eval(contact + ".properties.classLoader"));
+
+    // The other methods of java.lang.Class still work.
+    assertEquals("Contact", helper.eval(contact + ".simpleName"));
+    assertEquals("Contact", helper.eval(contact + ".getSimpleName()"));
+    assertEquals(contact, helper.eval(contact + ".name"));
+    assertEquals(contact, helper.eval("new " + contact + "().getClass().getName()"));
+    assertEquals("String", helper.eval("'abc'.class.simpleName"));
+    assertEquals(true, helper.eval(contact + ".isInstance(new " + contact + "())"));
+
+    // Trusted code is not affected.
+    assertTrue(
+        InvokerHelper.invokeMethod(Contact.class, "getClassLoader", null) instanceof ClassLoader);
+    assertTrue(InvokerHelper.getProperty(Contact.class, "classLoader") instanceof ClassLoader);
+  }
+
   // Reflection cannot reach what a direct call cannot.
   @Test
   void testReflectionIsLimitedToPublicMembers() {

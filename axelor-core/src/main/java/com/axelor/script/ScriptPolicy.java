@@ -18,6 +18,7 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.Timer;
 
 class ScriptPolicy {
@@ -86,7 +87,9 @@ class ScriptPolicy {
     ResourceBundle.class,
     Timer.class,
     // writes files: new Formatter('/path/to/file')
-    Formatter.class
+    Formatter.class,
+    // reads any stream, file or channel given to it (the stream itself is not allowed)
+    Scanner.class
   };
 
   private final List<String> allowPackages;
