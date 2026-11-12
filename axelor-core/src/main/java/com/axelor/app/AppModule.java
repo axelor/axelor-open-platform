@@ -17,6 +17,7 @@ import com.axelor.meta.service.ViewProcessor;
 import com.axelor.meta.theme.MetaThemeService;
 import com.axelor.meta.theme.MetaThemeServiceImpl;
 import com.axelor.report.ReportEngineProvider;
+import com.axelor.script.GroovySandbox;
 import com.axelor.script.ScriptPolicyConfigurator;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
@@ -61,6 +62,9 @@ public class AppModule extends AbstractModule {
 
     bind(AppSettingsObserver.class);
     bind(ViewWatcherObserver.class);
+
+    // stops the Groovy script timeout clock (observes shutdown)
+    bind(GroovySandbox.class);
 
     bind(MetaThemeService.class).to(MetaThemeServiceImpl.class);
 

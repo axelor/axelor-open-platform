@@ -232,13 +232,13 @@ def mode = __bean__(com.axelor.app.script.ScriptAppSettings).getApplicationMode(
 
 == Execution Timeouts
 
-Prevent infinite loops with script execution timeouts.
+Prevent runaway scripts (infinite loops, unbounded recursion...) with script execution timeouts.
 
 Application-wide script timeout configuration:
 
 [source,properties]
 ----
-# Groovy/JavaScript scripts execution timeout (in milliseconds)
+# Groovy/JavaScript scripts execution timeout (in milliseconds), 0 to disable it
 # Defaults to 300000 ms (5 minutes)
 application.script.timeout = 300000
 ----
@@ -252,8 +252,17 @@ ScriptHelper helper = new GroovyScriptHelper(context).withTimeout(500);
 Object result = helper.eval("while (true) { /* infinite loop */ }");
 ----
 
+A script evaluated while another script of the same language runs on the same thread (for example, by a service
+called from a script) cannot extend the enclosing timeout: the earliest deadline applies.
+
 The way timeout check is performed depends on the script type:
 
-- Groovy: checked in loop statements only.
-- JavaScript: checked before every statement.
+- Groovy: the script is stopped once the timeout is reached, at its next check (each call, loop iteration, method
+  or closure). A script blocked inside a Java call, such as a long database query, cannot be interrupted while it
+  waits; it is stopped as soon as the call returns, and the evaluation fails with a timeout even if the script would
+  have finished.
+- JavaScript: the script is interrupted once the timeout is reached, at its next safepoint (such as a loop
+  iteration or a function call). A script blocked inside a Java call, such as a long database query, cannot be
+  interrupted while it waits; it is stopped as soon as the call returns, and the evaluation fails with a timeout
+  even if the script would have finished.
 - Expression Language: not checked, as loops are not supported.

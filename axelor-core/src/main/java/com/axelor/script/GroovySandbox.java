@@ -4,12 +4,17 @@
  */
 package com.axelor.script;
 
+import com.axelor.event.Observes;
+import com.axelor.events.ShutdownEvent;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
@@ -39,10 +44,21 @@ public final class GroovySandbox {
   private static final StackWalker STACK_WALKER =
       StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-  private GroovySandbox() {}
+  /** Only instantiated by Guice, to observe the application shutdown. */
+  GroovySandbox() {}
 
-  /** An evaluation in progress on the current thread. */
-  private record Evaluation(long start, long timeout) {}
+  /** Stops the coarse clock thread (see {@link Clock}), when the application stops. */
+  void onAppShutdown(@Observes ShutdownEvent event) {
+    if (clockStarted) {
+      Clock.stop();
+    }
+  }
+
+  /** An evaluation in progress on the current thread, until its deadline ({@code nanoTime}). */
+  private record Evaluation(long deadline) {}
+
+  /** Caps a timeout so that the deadline does not overflow. */
+  private static final long MAX_TIMEOUT_NANOS = Long.MAX_VALUE / 4;
 
   /** Ends the evaluation started by {@link #enter()} when closed. */
   @FunctionalInterface
@@ -60,13 +76,22 @@ public final class GroovySandbox {
   }
 
   /**
-   * Starts an evaluation on the current thread, with the given timeout (in milliseconds), until the
-   * returned scope is closed. Evaluations can be nested (a script calling a service that evaluates
-   * another script): closing the scope restores the enclosing one.
+   * Starts an evaluation on the current thread, with the given timeout (in milliseconds; 0 or less
+   * for none), until the returned scope is closed. Evaluations can be nested (a script calling a
+   * service that evaluates another script): a nested evaluation can only tighten the enclosing
+   * deadline, never extend it, and closing the scope restores the enclosing one.
    */
   public static Scope enter(long timeout) {
     final Evaluation previous = CURRENT.get();
-    CURRENT.set(new Evaluation(System.currentTimeMillis(), timeout));
+    if (timeout > 0) {
+      long deadline =
+          System.nanoTime() + Math.min(TimeUnit.MILLISECONDS.toNanos(timeout), MAX_TIMEOUT_NANOS);
+      if (previous != null && previous.deadline() - deadline < 0) {
+        deadline = previous.deadline();
+      }
+      CURRENT.set(new Evaluation(deadline));
+    }
+    // no timeout: the enclosing deadline, if any, still applies
     return () -> {
       if (previous == null) {
         CURRENT.remove();
@@ -76,12 +101,53 @@ public final class GroovySandbox {
     };
   }
 
-  /** Checks the execution timeout of the current evaluation, if any. */
+  /**
+   * Checks the execution timeout of the current evaluation, if any. Called by the compiled code on
+   * each receiver check, and at the start of each loop iteration (a loop body may contain no call),
+   * method and closure body (recursion, closures called by Java: each, times...). A call that
+   * cannot be interrupted (a long database query) fails the evaluation at the next check after it
+   * returns.
+   */
   public static void timeout() {
     final Evaluation evaluation = CURRENT.get();
-    if (evaluation != null
-        && System.currentTimeMillis() - evaluation.start() > evaluation.timeout()) {
+    if (evaluation != null && Clock.now() - evaluation.deadline() > 0) {
       throw new ScriptTimeoutException();
+    }
+  }
+
+  /** Whether the {@link Clock} thread was started (on the first timeout check). */
+  private static volatile boolean clockStarted;
+
+  /**
+   * A coarse clock: a thread stores {@link System#nanoTime()} every 10 ms, which is cheaper to read
+   * on every timeout check (a field read) than the system clock. It is started on the first check,
+   * and stopped when the application stops; the system clock is read from then on.
+   */
+  private static final class Clock {
+
+    private static volatile long now = System.nanoTime();
+    private static volatile boolean running = true;
+
+    private static final ScheduledExecutorService TICKER =
+        Executors.newSingleThreadScheduledExecutor(
+            r -> {
+              Thread t = new Thread(r, "script-timeout-clock");
+              t.setDaemon(true);
+              return t;
+            });
+
+    static {
+      TICKER.scheduleAtFixedRate(() -> now = System.nanoTime(), 10, 10, TimeUnit.MILLISECONDS);
+      clockStarted = true;
+    }
+
+    static long now() {
+      return running ? now : System.nanoTime();
+    }
+
+    static void stop() {
+      running = false;
+      TICKER.shutdownNow();
     }
   }
 
@@ -92,6 +158,7 @@ public final class GroovySandbox {
    * classes they declare) are allowed: their code is checked, and their supertypes are allowed.
    */
   public static <T> T check(T obj) {
+    timeout();
     if (obj == null) {
       return obj;
     }

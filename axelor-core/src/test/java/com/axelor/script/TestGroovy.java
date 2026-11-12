@@ -374,8 +374,47 @@ public class TestGroovy extends ScriptTest {
 
   @Test
   public void testTimeout() {
-    GroovyScriptHelper helper = new GroovyScriptHelper(context()).withTimeout(100);
-    assertThrows(
-        IllegalArgumentException.class, () -> helper.eval("while (true) { println('hello!') }"));
+    for (String code :
+        List.of(
+            "while (true) { 'hello'.length() }",
+            "long i = 0; while (i < 3_000_000_000L) { i++ }; i",
+            "def r; [1].each { long i = 0; while (i < 3_000_000_000L) { i++ }; r = i }; r",
+            "(1..300_000_000).each { }; 'done'",
+            "300_000_000.times { }; 'done'",
+            "(1..20_000_000).collect { it.toString() }.size()",
+            "def fib(n) { n < 2 ? n : fib(n - 1) + fib(n - 2) }; fib(35)",
+            "class F { def fib(n) { n < 2 ? n : fib(n - 1) + fib(n - 2) } }; new F().fib(35)",
+            "def r; try { while (true) { } } catch (e) { while (true) { } }; r",
+            "def r; try { while (true) { } } catch (e) { r = 'caught' }; r")) {
+      GroovyScriptHelper helper = new GroovyScriptHelper(context()).withTimeout(200);
+      long start = System.nanoTime();
+      Throwable ex = assertThrows(Throwable.class, () -> helper.eval(code), code);
+      assertTrue(isTimeout(ex), () -> "Expected a timeout for [" + code + "], got: " + ex);
+      long elapsed = Duration.ofNanos(System.nanoTime() - start).toMillis();
+      assertTrue(elapsed < 2_000, () -> "Stopped after " + elapsed + " ms: " + code);
+    }
+  }
+
+  // A timeout of 0 or less disables it; an enclosing deadline still applies.
+  @Test
+  public void testTimeoutDisabled() throws InterruptedException {
+    try (GroovySandbox.Scope scope = GroovySandbox.enter(0)) {
+      Thread.sleep(100);
+      GroovySandbox.timeout();
+    }
+    try (GroovySandbox.Scope outer = GroovySandbox.enter(1);
+        GroovySandbox.Scope inner = GroovySandbox.enter(-1)) {
+      Thread.sleep(100);
+      assertThrows(ScriptTimeoutException.class, GroovySandbox::timeout);
+    }
+  }
+
+  private static boolean isTimeout(Throwable t) {
+    for (Throwable c = t; c != null; c = c.getCause()) {
+      if (c instanceof ScriptTimeoutException) {
+        return true;
+      }
+    }
+    return false;
   }
 }

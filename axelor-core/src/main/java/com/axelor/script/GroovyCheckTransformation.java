@@ -9,6 +9,7 @@ import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.ClassExpression;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
@@ -34,9 +35,12 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
  * A custom groovy ast transformer to validate type of objects against the policy settings.
  *
  * <p>This transformer will transform the ctor/method/property calls by wrapping the object side in
- * a {@link GroovySandbox} check.
+ * a {@link GroovySandbox} check, which also checks the execution timeout.
  *
- * <p>It will also transform loop and if blocks and adds timeout check.
+ * <p>It also adds a timeout check ({@link GroovySandbox#timeout()}) at the start of each loop body,
+ * as a loop body may contain no call, and of each method and closure body, as they can run many
+ * times without a loop of the script (recursion, closures called by Java: {@code each}, {@code
+ * times}...).
  *
  * <p>For example:
  *
@@ -46,6 +50,8 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
  * while(true) {
  *   println('Hello')
  * }
+ *
+ * items.each { it.foo() }
  * </pre>
  *
  * would become:
@@ -57,6 +63,11 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
  *   GroovySandbox.timeout()
  *   GroovySandbox.check(this).println('Hello')
  * }
+ *
+ * GroovySandbox.check(items).each {
+ *   GroovySandbox.timeout()
+ *   GroovySandbox.check(it).foo()
+ * }
  * </pre>
  */
 @GroovyASTTransformation(phase = CompilePhase.CONVERSION)
@@ -66,12 +77,12 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
   public void visit(ASTNode[] nodes, SourceUnit source) {
 
     CheckTransformer checkTransformer = new CheckTransformer(source);
-    LoopTransformer loopTransformer = new LoopTransformer(source);
+    TimeoutTransformer timeoutTransformer = new TimeoutTransformer(source);
 
     for (ASTNode node : nodes) {
       if (node instanceof ClassNode classNode) {
         checkTransformer.visitClass(classNode);
-        loopTransformer.visitClass(classNode);
+        timeoutTransformer.visitClass(classNode);
       }
     }
   }
@@ -175,11 +186,15 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
     }
   }
 
-  static class LoopTransformer extends ClassCodeExpressionTransformer {
+  /**
+   * Adds a timeout check at the start of each loop body, method body and closure body (see the
+   * class documentation).
+   */
+  static class TimeoutTransformer extends ClassCodeExpressionTransformer {
 
     private final SourceUnit unit;
 
-    public LoopTransformer(SourceUnit unit) {
+    public TimeoutTransformer(SourceUnit unit) {
       this.unit = unit;
     }
 
@@ -204,6 +219,28 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
     public void visitDoWhileLoop(DoWhileStatement stmt) {
       super.visitDoWhileLoop(stmt);
       transformLoop(stmt);
+    }
+
+    // A method or closure body can run many times without a loop of the script: recursion, or
+    // called by Java (each, times, collect, a comparator...). Constructors are left out: super(...)
+    // or this(...) must stay their first statement, and they are checked when called.
+    @Override
+    public void visitMethod(MethodNode node) {
+      super.visitMethod(node);
+      if (!node.isAbstract() && node.getCode() != null) {
+        addTimeout(node.getCode(), node::setCode);
+      }
+    }
+
+    @Override
+    public Expression transform(Expression expr) {
+      if (expr instanceof ClosureExpression ce && ce.getCode() != null) {
+        // the closure body is not visited by the expression transformer
+        ce.getCode().visit(this);
+        addTimeout(ce.getCode(), ce::setCode);
+        return ce;
+      }
+      return super.transform(expr);
     }
 
     private <T extends LoopingStatement> void transformLoop(T stmt) {

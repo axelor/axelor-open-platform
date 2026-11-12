@@ -51,7 +51,11 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
         });
     try (GroovySandbox.Scope scope =
         timeout > 0 ? GroovySandbox.enter(timeout) : GroovySandbox.enter()) {
-      return script.run();
+      Object result = script.run();
+      // a script held in a Java call past its deadline (a long database query) can finish once the
+      // call returns, without any check: it overran all the same
+      GroovySandbox.timeout();
+      return result;
     }
   }
 }
