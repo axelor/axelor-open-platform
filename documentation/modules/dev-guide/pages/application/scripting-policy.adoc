@@ -92,6 +92,7 @@ These rules are added after any custom configuration.
 - Java Core Packages
   ** `java.lang`
   ** `java.util`
+  ** `java.util.regex`
   ** `java.time.*`
   ** `java.text`
   ** `java.math`
@@ -174,6 +175,8 @@ Groovy scripts and templates follow additional rules:
 - Classes declared in a script can only extend and implement allowed types, and cannot
   define `finalize()`.
 - Reflection is limited to the public members of allowed classes.
+- Method pointers and references (`obj.&name`, `Type::name`, `Type::new`) are checked like the
+  calls they make, and subscripts with a name (`obj['name']`) like property accesses.
 - The following methods of allowed classes are denied, as they read or change state
   shared by the whole application:
   ** `java.util.Locale.setDefault`

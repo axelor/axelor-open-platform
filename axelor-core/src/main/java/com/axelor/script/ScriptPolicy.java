@@ -26,7 +26,7 @@ class ScriptPolicy {
   private static final long DEFAULT_TIMEOUT = 5 * 60_000L; // milliseconds (5 minutes)
 
   private static final String[] ALLOW_PACKAGES = {
-    "java.lang", "java.util", "java.time.*", "java.text", "java.math",
+    "java.lang", "java.util", "java.util.regex", "java.time.*", "java.text", "java.math",
   };
 
   private static final Class<?>[] ALLOW_CLASSES = {

@@ -6,16 +6,23 @@ package com.axelor.script;
 
 import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
+import groovy.lang.Closure;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.codehaus.groovy.runtime.ComposedClosure;
+import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.MethodClosure;
+import org.codehaus.groovy.runtime.memoize.Memoize;
 
 /**
  * Runtime checks of the Groovy script sandbox.
@@ -38,8 +45,16 @@ public final class GroovySandbox {
   static final String CALL_CHECK_SPREAD = "checkSpread";
   static final String CALL_TIMEOUT = "timeout";
   static final String CALL_CONSTRUCTED = "constructed";
+  static final String CALL_CHECK_PROPERTY = "checkProperty";
+  static final String CALL_METHOD_POINTER = "methodPointer";
 
   private static final ThreadLocal<Evaluation> CURRENT = new ThreadLocal<>();
+
+  /** The closure returned by {@code trampoline()}, a class private to its package. */
+  private static final String TRAMPOLINE_CLOSURE = "groovy.lang.TrampolineClosure";
+
+  /** The closures returned by {@code memoize()} are private classes nested in {@code Memoize}. */
+  private static final String MEMOIZE_FUNCTION_PREFIX = Memoize.class.getName() + "$";
 
   private static final StackWalker STACK_WALKER =
       StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
@@ -174,11 +189,90 @@ public final class GroovySandbox {
       klass = klass.getComponentType();
     }
 
-    if (!SandboxCode.class.isAssignableFrom(klass)) {
+    if (!SandboxCode.class.isAssignableFrom(klass) && !isClosureWrapper(klass)) {
       policy().check(klass);
     }
 
     return obj;
+  }
+
+  /**
+   * Whether the class is one of the closures Groovy builds from other closures ({@code curry},
+   * {@code >>}, {@code memoize}, {@code trampoline}): calling them calls these closures, which the
+   * script holds already.
+   */
+  private static boolean isClosureWrapper(Class<?> klass) {
+    return klass == CurriedClosure.class
+        || klass == ComposedClosure.class
+        || (Closure.class.isAssignableFrom(klass)
+            && (TRAMPOLINE_CLOSURE.equals(klass.getName())
+                || klass.getName().startsWith(MEMOIZE_FUNCTION_PREFIX)));
+  }
+
+  /**
+   * Validates the owner of a property access ({@code obj.name}), as {@link #check(Object)}.
+   *
+   * <p>A property that a collection or an array does not have itself is read from each of its
+   * elements instead ({@code [a, b].name} is {@code [a.name, b.name]}), so the elements are
+   * validated as owners too. The name is {@code null} when it is computed at runtime.
+   */
+  public static <T> T checkProperty(T obj, String name) {
+    check(obj);
+    if (obj instanceof Collection<?> collection) {
+      if (name == null || !hasOwnProperty(obj, name)) {
+        collection.forEach(GroovySandbox::check);
+      }
+    } else if (obj instanceof Object[] array) {
+      if (name == null || !("length".equals(name) || hasOwnProperty(obj, name))) {
+        Arrays.asList(array).forEach(GroovySandbox::check);
+      }
+    }
+    return obj;
+  }
+
+  private static boolean hasOwnProperty(Object obj, String name) {
+    return InvokerHelper.getMetaClass(obj).hasProperty(obj, name) != null;
+  }
+
+  /**
+   * Validates the elements whose property a sandboxed subscript reads ({@code [a, b]['name']}), see
+   * {@link SandboxGroovyMethods#getAt(Collection, String)}. Trusted code is not affected.
+   */
+  static void checkElementsFromSandbox(Iterable<?> elements) {
+    Boolean sandboxed = null;
+    for (Object element : elements) {
+      if (element == null || isAllowedReceiver(element)) {
+        continue;
+      }
+      if (sandboxed == null) {
+        sandboxed = isSandboxed();
+      }
+      if (!sandboxed) {
+        return;
+      }
+      check(element);
+    }
+  }
+
+  /** Whether {@link #check(Object)} accepts the object without the reflection rules. */
+  private static boolean isAllowedReceiver(Object obj) {
+    if (obj instanceof Executable) {
+      return false;
+    }
+    Class<?> klass = obj instanceof Class<?> type ? type : obj.getClass();
+    while (klass.isArray()) {
+      klass = klass.getComponentType();
+    }
+    return SandboxCode.class.isAssignableFrom(klass) || policy().allowed(klass);
+  }
+
+  /**
+   * Returns a method pointer ({@code obj.&name}, {@code obj::name}, {@code Type::new}) whose owner
+   * was validated by {@link #check(Object)}, wrapped so that its calls are validated too (see
+   * {@link SandboxMethodPointer}).
+   */
+  public static Object methodPointer(Object pointer) {
+    return pointer instanceof MethodClosure closure ? new SandboxMethodPointer(closure) : pointer;
   }
 
   /**

@@ -335,6 +335,116 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertEquals(null, helper.eval("def l = null; l*.size()"));
   }
 
+  /** A denied object a script can get hold of: the JDK platform class loader. */
+  private static final String DENIED_OBJECT =
+      "def denied = ModuleLayer.boot().findLoader('java.sql'); ";
+
+  // A method pointer (obj.&name, obj::name, Type::new) calls the method on its owner later, when
+  // the pointer is called: the owner is checked when the pointer is created. A pointer on a class
+  // calls an instance method on its first argument, which is then checked too.
+  @Test
+  void testMethodPointersAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "def e = System.&getenv; e('PATH')");
+    assertBlockedByPolicy(helper, "def e = System::getenv; e('PATH')");
+    assertBlockedByPolicy(helper, "def g = Runtime.&getRuntime; g()");
+    assertBlockedByPolicy(helper, "def g = String.forName('java.lang.Runtime').&getRuntime; g()");
+    assertBlockedByPolicy(helper, "def mk = java.io.File::new; mk('/tmp'); 1");
+    assertBlockedByPolicy(helper, "def mk = Thread::new; mk(); 1");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "def f = denied.&getName; f()");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "def f = Object::toString; f(denied)");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].collect(Object::toString)");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "def f = denied.&getName; f.curry()()");
+    assertBlockedByPolicy(helper, "def x = 'axelor-nonexistent-binary-xyz'.&execute; x(); 1");
+    assertBlockedByPolicy(helper, "def x = this.&evaluate; x('1')");
+
+    // Allowed pointers still work.
+    assertEquals("ABC", helper.eval("def m = 'abc'.&toUpperCase; m()"));
+    assertEquals("toUpperCase", helper.eval("def m = 'abc'.&toUpperCase; m.method"));
+    assertEquals(List.of("A", "B"), helper.eval("['a', 'b'].collect(String::toUpperCase)"));
+    assertEquals(List.of(3, 6), helper.eval("def f(x) { x * 3 }; [1, 2].collect(this.&f)"));
+    assertEquals(0, helper.eval("def mk = ArrayList::new; mk().size()"));
+    assertEquals(9, helper.eval("def m = Math.&max; m.curry(9)(1)"));
+    assertEquals(
+        List.of(1, 2, 3),
+        helper.eval("def l = [3, 1, 2]; l.sort(Integer::compare as Comparator); l"));
+  }
+
+  // A subscript with a name reads or writes a property (obj['name'], obj['name'] = value), so its
+  // receiver is checked like the owner of a property, as well as the elements of a collection or
+  // an array, whose property it reads.
+  @Test
+  void testSubscriptsAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "denied['name']");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "denied?['name']");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "denied['defaultAssertionStatus'] = false; 1");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied]['name']");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "([denied] as Object[])['name']");
+    // a private field of an allowed class gives a denied object
+    assertBlockedByPolicy(
+        helper, "__bean__(com.axelor.script.policy.ScriptAppSettings).settings['properties']");
+    // replacing a metaclass removes its guard, for the whole application
+    assertBlockedByPolicy(
+        helper, "Integer.metaClass['x'] = { -> 1 }; Integer.getInteger('java.version')");
+    assertBlockedByPolicy(helper, "String.getClass()['metaClass']['x'] = { -> 1 }; 1");
+
+    // Allowed subscripts still work.
+    assertEquals(
+        List.of(1, 2, "a", List.of(1, 2)),
+        helper.eval("[[a: 1]['a'], [1, 2][1], 'abc'[0], [1, 2, 3][0..1]]"));
+    assertEquals(
+        List.of(Map.of("k", 1), List.of(5)),
+        helper.eval("def m = [:]; m['k'] = 1; def l = [0]; l[0] = 5; [m, l]"));
+    assertEquals(null, helper.eval("def m = null; m?['x']"));
+    assertEquals(List.of("a", "b"), helper.eval("[[n: 'a'], [n: 'b']]['n']"));
+    assertEquals("b", helper.eval("('abc' =~ /(b)/)[0][1]"));
+  }
+
+  // Each owner of a property chain (a.b.c) is checked, as well as the elements of a collection or
+  // an array whose property is read from each element ([a, b].name).
+  @Test
+  void testPropertyChainsAreChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "System.env.PATH");
+    assertBlockedByPolicy(helper, "java.lang.System.env.PATH");
+    assertBlockedByPolicy(helper, "def o = [a: 1]; o.\"${System.env.PATH}\"");
+    assertBlockedByPolicy(helper, "[System].env");
+    assertBlockedByPolicy(helper, "([System] as Object[]).env");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].name");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].iterator().toList().name");
+
+    // Allowed properties still work.
+    assertEquals(List.of(1, 2), helper.eval("[[a: 1], [a: 2]].a"));
+    assertEquals(false, helper.eval("[1, 2].empty"));
+    assertEquals(1, helper.eval("(['a'] as Object[]).length"));
+    assertEquals(3, helper.eval("[a: [b: [c: 3]]].a.b.c"));
+  }
+
+  // A call of a local variable (x()) is a call of its call() method, so the variable is checked
+  // like any other receiver.
+  @Test
+  void testLocalVariableCallsAreChecked() {
+    java.util.concurrent.Callable<Object> callable = () -> "called";
+    ScriptHelper helper =
+        new GroovyScriptHelper(new SimpleBindings(new java.util.HashMap<>(Map.of("c", callable))));
+
+    assertBlockedByPolicy(helper, "def x = c; x()");
+    assertBlockedByPolicy(helper, "def run(x) { x() }; run(c)");
+
+    // Closures, and the closures Groovy builds from them, can still be called.
+    assertEquals(6, helper.eval("def f = { it * 2 }; f(3)"));
+    assertEquals(6, helper.eval("def twice(g) { g(2) * 2 }; twice { it + 1 }"));
+    assertEquals(3, helper.eval("def add = { a, b -> a + b }; def inc = add.curry(1); inc(2)"));
+    assertEquals(8, helper.eval("def f = { it + 1 } >> { it * 2 }; f(3)"));
+    assertEquals(12, helper.eval("def f = { it * 2 }.memoize(); f(3) + f(3)"));
+    // a call on an explicit receiver is not a call of a local variable of the same name
+    assertEquals(2, helper.eval("def size = 3; [1, 2].size()"));
+  }
+
   // Inside a closure, calls and properties without a receiver are resolved on its delegate (or
   // owner), which the receiver checks never see. A sandboxed closure must therefore never get a
   // delegate or owner the policy denies, however it is set.

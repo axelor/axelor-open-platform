@@ -11,11 +11,15 @@ import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
+import org.codehaus.groovy.ast.expr.BinaryExpression;
 import org.codehaus.groovy.ast.expr.ClassExpression;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
+import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
+import org.codehaus.groovy.ast.expr.MethodPointerExpression;
+import org.codehaus.groovy.ast.expr.MethodReferenceExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.StaticMethodCallExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
@@ -28,13 +32,15 @@ import org.codehaus.groovy.ast.stmt.Statement;
 import org.codehaus.groovy.ast.stmt.WhileStatement;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.syntax.Types;
 import org.codehaus.groovy.transform.AbstractASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
 /**
  * A custom groovy ast transformer to validate type of objects against the policy settings.
  *
- * <p>This transformer will transform the ctor/method/property calls by wrapping the object side in
+ * <p>This transformer will transform the ctor/method/property calls, method pointers ({@code
+ * obj.&name}, {@code obj::name}) and subscripts ({@code obj[index]}) by wrapping the object side in
  * a {@link GroovySandbox} check, which also checks the execution timeout.
  *
  * <p>It also adds a timeout check ({@link GroovySandbox#timeout()}) at the start of each loop body,
@@ -113,6 +119,30 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
         new ArgumentListExpression(receiver));
   }
 
+  /**
+   * Checks the owner of a property access. A property a collection or an array does not have is
+   * read from its elements ({@code list.name}), which are then checked too, see {@link
+   * GroovySandbox#checkProperty(Object, String)}.
+   */
+  static Expression propertyReceiverCheckX(Expression receiver, PropertyExpression prop) {
+    if (prop.isSpreadSafe()) {
+      return receiverCheckX(receiver, true);
+    }
+    return sandboxCallX(
+        GroovySandbox.CALL_CHECK_PROPERTY,
+        new ArgumentListExpression(receiver, new ConstantExpression(prop.getPropertyAsString())));
+  }
+
+  /** Rebuilds a property access with a checked owner, keeping its other attributes. */
+  static PropertyExpression checkedPropertyX(
+      PropertyExpression prop, Expression receiver, Expression property) {
+    PropertyExpression res =
+        new PropertyExpression(propertyReceiverCheckX(receiver, prop), property, prop.isSafe());
+    res.setSpreadSafe(prop.isSpreadSafe());
+    res.setSourcePosition(prop);
+    return res;
+  }
+
   static class CheckTransformer extends ClassCodeExpressionTransformer {
 
     private final SourceUnit unit;
@@ -133,13 +163,33 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
         PropertyExpression prop = (PropertyExpression) super.transform(expr);
         Expression obj = prop.getObjectExpression();
         if (obj instanceof MethodCallExpression) {
-          PropertyExpression res =
-              new PropertyExpression(
-                  receiverCheckX(obj, prop.isSpreadSafe()), prop.getProperty(), prop.isSafe());
-          res.setSpreadSafe(prop.isSpreadSafe());
-          return res;
+          return checkedPropertyX(prop, obj, prop.getProperty());
         }
         return prop;
+      }
+
+      // obj.&name, obj::name, Type::new: the owner is checked when the pointer is created, and the
+      // pointer is wrapped to check the receiver of its calls (see SandboxMethodPointer)
+      if (expr instanceof MethodPointerExpression pointer) {
+        Expression owner = receiverCheckX(transform(pointer.getExpression()), false);
+        Expression name = transform(pointer.getMethodName());
+        MethodPointerExpression checked =
+            pointer instanceof MethodReferenceExpression
+                ? new MethodReferenceExpression(owner, name)
+                : new MethodPointerExpression(owner, name);
+        checked.setSourcePosition(pointer);
+        Expression res =
+            sandboxCallX(GroovySandbox.CALL_METHOD_POINTER, new ArgumentListExpression(checked));
+        res.setSourcePosition(pointer);
+        return res;
+      }
+
+      // obj[index], obj?[index] (getAt/putAt): a string index reads or writes a property of obj
+      if (expr instanceof BinaryExpression binary
+          && binary.getOperation().getType() == Types.LEFT_SQUARE_BRACKET) {
+        BinaryExpression res = (BinaryExpression) super.transform(expr);
+        res.setLeftExpression(receiverCheckX(res.getLeftExpression(), false));
+        return res;
       }
 
       if (expr instanceof ConstructorCallExpression call) {
@@ -172,6 +222,10 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
                 method.getArguments());
         res.setSafe(method.isSafe());
         res.setSpreadSafe(method.isSpreadSafe());
+        // the new call is implicit-this by default: a call on an explicit receiver must not be
+        // taken for a call of a local variable (x() is compiled as x.call())
+        res.setImplicitThis(method.isImplicitThis());
+        res.setSourcePosition(method);
         return res;
       }
 

@@ -10,6 +10,7 @@ import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ import org.codehaus.groovy.runtime.StringGroovyMethods;
  *       class, so the target class must be allowed
  *   <li>{@code addShutdownHook}: registers code run when the JVM shuts down, outside of any
  *       evaluation (no timeout), for the whole application
+ *   <li>{@code getAt} with a property name ({@code list['name']}): reads the property of each
+ *       element of a collection or an array, which must be allowed as receivers
  * </ul>
  *
  * <p>They are denied only when called from sandboxed code; otherwise they delegate to the GDK.
@@ -188,6 +191,20 @@ public final class SandboxGroovyMethods {
   public static <T> T asType(String self, Class<T> type) {
     GroovySandbox.checkConversion(type);
     return StringGroovyMethods.asType(self, type);
+  }
+
+  // DefaultGroovyMethods.getAt(..., String): the receiver itself is checked by the transformations
+
+  public static List getAt(Collection<?> self, String property) {
+    GroovySandbox.checkElementsFromSandbox(self);
+    return DefaultGroovyMethods.getAt(self, property);
+  }
+
+  public static Object getAt(Object self, String property) {
+    if (self instanceof Object[] array) {
+      GroovySandbox.checkElementsFromSandbox(Arrays.asList(array));
+    }
+    return DefaultGroovyMethods.getAt(self, property);
   }
 
   // DefaultGroovyMethods.addShutdownHook

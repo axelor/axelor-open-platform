@@ -10,6 +10,7 @@ import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
+import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.transform.AbstractASTTransformation;
@@ -18,21 +19,28 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
 /**
  * A custom Groovy AST transformer to validate property accesses against the policy settings.
  *
- * <p>This is done at a compile phase when local variables are resolved.
+ * <p>This is done at a compile phase when local variables and class names are resolved: before, a
+ * qualified class name ({@code com.axelor.example.Foo}) is still a chain of properties.
  *
  * <p>For example:
  *
  * <pre>
  * def value = foo.bar
  * def value2 = com.axelor.example.Foo.BAR
+ * def value3 = foo.bar.baz
  * </pre>
  *
  * would become:
  *
  * <pre>
- * def value = GroovySandbox.check(foo).bar
- * def value2 = GroovySandbox.check(com.axelor.example.Foo).BAR
+ * def value = GroovySandbox.checkProperty(foo, 'bar').bar
+ * def value2 = GroovySandbox.checkProperty(com.axelor.example.Foo, 'BAR').BAR
+ * def value3 = GroovySandbox.checkProperty(GroovySandbox.checkProperty(foo, 'bar').bar, 'baz').baz
  * </pre>
+ *
+ * <p>The compiler also turns a call of a local variable ({@code x()}) into a call of its {@code
+ * call} method ({@code x.call()}) in this phase, after {@link GroovyCheckTransformation} checked
+ * the receiver of {@code x()}: the variable is checked here instead.
  */
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 public class GroovyCheckPropTransformation extends AbstractASTTransformation {
@@ -67,16 +75,27 @@ public class GroovyCheckPropTransformation extends AbstractASTTransformation {
         // a call result is already checked by GroovyCheckTransformation
         if (!(obj instanceof MethodCallExpression)
             && !GroovyCheckTransformation.isSandboxCall(obj)) {
-          PropertyExpression res =
-              new PropertyExpression(
-                  GroovyCheckTransformation.receiverCheckX(obj, prop.isSpreadSafe()),
-                  prop.getProperty(),
-                  prop.isSafe());
-          res.setSpreadSafe(prop.isSpreadSafe());
-          return res;
+          // the owner first: in a chain (a.b.c), a.b is itself a property access to check
+          return GroovyCheckTransformation.checkedPropertyX(
+              prop, transform(obj), transform(prop.getProperty()));
         }
       }
+      if (expr instanceof MethodCallExpression call && isLocalVariableCall(call)) {
+        MethodCallExpression res = (MethodCallExpression) super.transform(expr);
+        res.setObjectExpression(
+            GroovyCheckTransformation.receiverCheckX(res.getObjectExpression(), false));
+        return res;
+      }
       return super.transform(expr);
+    }
+
+    /** Whether the call is a call of a local variable, {@code x()} compiled as {@code x.call()}. */
+    private static boolean isLocalVariableCall(MethodCallExpression call) {
+      return !call.isImplicitThis()
+          && "call".equals(call.getMethodAsString())
+          && call.getObjectExpression() instanceof VariableExpression variable
+          && !variable.isThisExpression()
+          && !variable.isSuperExpression();
     }
   }
 }
