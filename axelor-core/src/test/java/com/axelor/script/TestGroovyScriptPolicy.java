@@ -836,6 +836,15 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
               "Integer.getInteger('java.specification.version')",
               "Long.getLong('java.specification.version')",
               "Boolean.getBoolean('java.awt.headless')",
+              // Integer, Long and Boolean are guarded by an ExpandoMetaClass (see
+              // SandboxGuardedMethods), reached by the same routes
+              "Integer.getInteger('java.specification.version', 5)",
+              "Integer.\"get${'Integer'}\"('java.specification.version')",
+              "Integer.invokeMethod('getInteger', 'java.specification.version')",
+              "Integer.with { getInteger('java.specification.version') }",
+              "5.getInteger('java.specification.version')",
+              "def m = Integer.&getInteger; m('java.specification.version')",
+              "Integer.metaClass = null; Integer.getInteger('java.specification.version')",
               "com.axelor.common.Inflections.getInstance().plural('(.*)', 'zz')",
               "com.axelor.common.Inflections.getInstance().with { irregular('a', 'b') }")) {
         assertBlockedByPolicy(helper, code + "; 1");

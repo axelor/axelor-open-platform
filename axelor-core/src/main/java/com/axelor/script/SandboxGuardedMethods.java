@@ -6,6 +6,7 @@ package com.axelor.script;
 
 import com.axelor.common.Inflections;
 import groovy.lang.DelegatingMetaClass;
+import groovy.lang.ExpandoMetaClass;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaClassRegistry;
@@ -19,6 +20,8 @@ import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.codehaus.groovy.reflection.CachedClass;
+import org.codehaus.groovy.reflection.CachedMethod;
+import org.codehaus.groovy.reflection.ReflectionCache;
 
 /**
  * Methods of allowed classes that scripts cannot call, as they read or change state shared by the
@@ -37,6 +40,12 @@ import org.codehaus.groovy.reflection.CachedClass;
  * java.lang.Class} are reachable from any allowed class (e.g. {@code
  * Contact.getResourceAsStream(...)}). Calls on a class literal go through the metaclass of {@code
  * java.lang.Class} too, so guarding it covers them.
+ *
+ * <p>The guarding metaclass wraps the original one, so Groovy cannot cache the methods it selects:
+ * every call on a guarded class is dispatched dynamically. That is too slow for {@code Integer},
+ * {@code Long} and {@code Boolean}, used by most arithmetic and comparisons, whose guarded methods
+ * are static: they get an {@link ExpandoMetaClass}, which Groovy caches like the original
+ * metaclass, where the guarded methods are replaced by a {@link GuardedMetaMethod}.
  */
 final class SandboxGuardedMethods {
 
@@ -66,6 +75,14 @@ final class SandboxGuardedMethods {
                   "getModule"),
           Module.class, Set.of("getResourceAsStream", "getClassLoader"));
 
+  /**
+   * Guarded classes on the hot paths of scripts (arithmetic, comparisons), whose guarded methods
+   * are all static: their guarded methods are replaced in an {@link ExpandoMetaClass}, see {@link
+   * #guardStatic}.
+   */
+  private static final Set<Class<?>> STATIC_GUARDS =
+      Set.of(Integer.class, Long.class, Boolean.class);
+
   /** Public JDK subclasses inheriting a guarded static method. */
   private static final Map<Class<?>, Class<?>> SUBCLASSES =
       Map.of(SimpleTimeZone.class, TimeZone.class);
@@ -86,8 +103,36 @@ final class SandboxGuardedMethods {
   /** Installs the guarding metaclasses. */
   static void install() {
     MetaClassRegistry registry = GroovySystem.getMetaClassRegistry();
-    METHODS.forEach((type, names) -> guard(registry, type, names));
+    METHODS.forEach(
+        (type, names) -> {
+          if (STATIC_GUARDS.contains(type)) {
+            guardStatic(registry, type, names);
+          } else {
+            guard(registry, type, names);
+          }
+        });
     SUBCLASSES.forEach((type, parent) -> guard(registry, type, METHODS.get(parent)));
+  }
+
+  /**
+   * Replaces the guarded static methods of the class (all their overloads) by a {@link
+   * GuardedMetaMethod}, in an {@link ExpandoMetaClass}: Groovy selects and caches the other methods
+   * as with the original metaclass. The methods are registered before the metaclass is initialized,
+   * and it cannot be changed afterwards.
+   */
+  private static void guardStatic(MetaClassRegistry registry, Class<?> type, Set<String> names) {
+    if (registry.getMetaClass(type) instanceof ExpandoMetaClass current
+        && current.getExpandoMethods().stream().anyMatch(GuardedMetaMethod.class::isInstance)) {
+      return;
+    }
+    ExpandoMetaClass metaClass = new ExpandoMetaClass(type, false, false);
+    for (CachedMethod method : ReflectionCache.getCachedClass(type).getMethods()) {
+      if (method.isStatic() && names.contains(method.getName())) {
+        metaClass.registerInstanceMethod(new GuardedMetaMethod(method));
+      }
+    }
+    metaClass.initialize();
+    registry.setMetaClass(type, metaClass);
   }
 
   private static void guard(MetaClassRegistry registry, Class<?> type, Set<String> names) {
