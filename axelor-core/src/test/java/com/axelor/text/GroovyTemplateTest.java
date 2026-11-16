@@ -14,6 +14,7 @@ import com.axelor.common.ResourceUtils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,33 @@ public class GroovyTemplateTest extends TemplateScriptTest {
 
     String output = template.make(vars).render();
     assertEquals(SPECIAL_OUTPUT_SIMPLE, output);
+  }
+
+  // A template is compiled once and its compiled form shared by all its renderings: each one uses
+  // its own values, and the variables a rendering assigns do not reach the next ones.
+  @Test
+  public void testCompiledTemplatesAreShared() throws Exception {
+    Templates templates = new GroovyTemplates();
+
+    for (String prefix : List.of("", SPECIAL_PREFIX)) {
+      Template template =
+          templates.fromText(prefix + "<% if (assign) { secret = name } %>${secret}");
+
+      String first = template.make(new HashMap<>(Map.of("assign", true, "name", "first"))).render();
+      assertTrue(first.endsWith("first"), () -> "Unexpected output: " + first);
+
+      // the variable assigned by the first rendering is not seen by the second one
+      String second =
+          template
+              .make(new HashMap<>(Map.of("assign", false, "name", "second", "secret", "none")))
+              .render();
+      assertTrue(second.endsWith("none"), () -> "Variable shared between renderings: " + second);
+    }
+
+    var engine = com.axelor.script.GroovyScriptSupport.createStringTemplateEngine();
+    assertTrue(
+        GroovyTemplates.compile(engine, "${a}") == GroovyTemplates.compile(engine, "${a}"),
+        "Expected the template to be compiled once");
   }
 
   @Test

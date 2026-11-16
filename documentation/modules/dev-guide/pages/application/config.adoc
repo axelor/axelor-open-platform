@@ -296,8 +296,8 @@ See {url-tomcat-jndi}[Tomcat documentation] for more details.
 | `application.multi-tenancy` | enable multi-tenancy | false
 | `application.config-provider` | `if-feature` custom class |
 | `application.domain-blocklist-pattern` | pattern to validate domain expressions |
-| `application.script.cache.size` | Groovy scripts cache size | 500
-| `application.script.cache.expire-time` | Groovy scripts cache entry expire time (in minutes) | 10
+| `application.script.cache.size` | Groovy scripts and templates cache size | 500
+| `application.script.cache.expire-time` | Groovy scripts and templates cache entry expire time (in minutes) | 10
 | `application.script.timeout` | Groovy/JavaScript scripts execution timeout (in milliseconds) | 300000
 | `application.permission.disable-action` | whether to not check action permissions | false
 | `application.permission.disable-relational-field` | whether to not check relational fields permissions | false

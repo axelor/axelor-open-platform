@@ -495,6 +495,9 @@ public class AxelorStreamingTemplateEngine extends StreamingTemplateEngine {
         // bind the two first parameters of the generated closure to this class and the sections
         // list
         result = chicken.curry(this, sections);
+        // as in AxelorGStringTemplateEngine (GROOVY-6521): a variable the template assigns goes to
+        // the bindings of the rendering, not to the template script, shared by all the renderings
+        result.setResolveStrategy(Closure.DELEGATE_FIRST);
       } catch (InstantiationException
           | IllegalAccessException
           | NoSuchMethodException

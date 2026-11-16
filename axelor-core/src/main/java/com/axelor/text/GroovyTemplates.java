@@ -15,6 +15,8 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.script.GroovySandbox;
 import com.axelor.script.GroovyScriptSupport;
 import com.axelor.script.ScriptBindings;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.io.CharStreams;
 import groovy.text.TemplateEngine;
 import java.io.File;
@@ -26,6 +28,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +45,55 @@ public class GroovyTemplates implements Templates {
   private static final String TEMPLATE_DIR =
       AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
   private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
+
+  private static final int DEFAULT_CACHE_SIZE = 500;
+  private static final int DEFAULT_CACHE_EXPIRE_TIME = 60;
+
+  /**
+   * The compiled templates, by engine and text, with the settings of the script cache: compiling
+   * takes almost all the time of a rendering (milliseconds, against microseconds to render a
+   * compiled template).
+   */
+  private static final Cache<TemplateKey, groovy.text.Template> TEMPLATE_CACHE =
+      Caffeine.newBuilder()
+          .maximumSize(
+              cacheSetting(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_SIZE, DEFAULT_CACHE_SIZE))
+          .expireAfterAccess(
+              cacheSetting(
+                  AvailableAppSettings.APPLICATION_SCRIPT_CACHE_EXPIRE_TIME,
+                  DEFAULT_CACHE_EXPIRE_TIME),
+              TimeUnit.MINUTES)
+          .build();
+
+  private record TemplateKey(TemplateEngine engine, String text) {}
+
+  /** Reads a setting of the script cache as {@link GroovyScriptSupport} does. */
+  private static int cacheSetting(String key, int defaultValue) {
+    int value = 0;
+    try {
+      value = Integer.parseInt(System.getProperty(key));
+    } catch (Exception e) {
+    }
+    return value > 0 ? value : defaultValue;
+  }
+
+  /**
+   * Returns the template compiled from the text by the engine, compiled once and then cached.
+   *
+   * <p>A compiled template can be rendered many times, also concurrently: each rendering clones its
+   * closures and gives them its own bindings, which also receive the variables the template
+   * assigns.
+   */
+  static groovy.text.Template compile(TemplateEngine engine, String text)
+      throws ClassNotFoundException, IOException {
+    TemplateKey key = new TemplateKey(engine, text);
+    groovy.text.Template template = TEMPLATE_CACHE.getIfPresent(key);
+    if (template == null) {
+      template = engine.createTemplate(text);
+      TEMPLATE_CACHE.put(key, template);
+    }
+    return template;
+  }
 
   class GroovyTemplate implements Template {
 
@@ -121,7 +173,7 @@ public class GroovyTemplates implements Templates {
       bindings.put("__fmt__", new FormatHelper());
 
       try {
-        final groovy.text.Template template = engine.createTemplate(text);
+        final groovy.text.Template template = compile(engine, text);
         return new Renderer() {
 
           @Override
