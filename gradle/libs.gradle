@@ -112,6 +112,10 @@ libs.jakarta_annotation = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
 libs.jdbc_postgres = "org.postgresql:postgresql:42.7.14"
 
+// ANTLR runtime for Hibernate's HQL lexer. Keep it equal to the
+// antlr4-runtime hibernate-core pulls transitively
+libs.antlr4_runtime = "org.antlr:antlr4-runtime:4.13.2"
+
 // Hibernate
 libs.hibernate = [
   "org.hibernate.orm:hibernate-core:${versions.hibernate}",

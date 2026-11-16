@@ -29,6 +29,7 @@ dependencies {
   implementation libs.jdbc_postgres
 
   api libs.hibernate
+  implementation libs.antlr4_runtime
 
   implementation libs.caffeine
   implementation libs.redisson
