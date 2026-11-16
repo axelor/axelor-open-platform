@@ -32,6 +32,7 @@ dependencies {
   implementation libs.jdbc_mysql
 
   api libs.hibernate
+  implementation libs.antlr
 
   implementation libs.caffeine
   implementation libs.flywaydb

@@ -18,22 +18,10 @@
  */
 package com.axelor.rpc.filter;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class JPQLFilter extends Filter {
-
-  private static final Pattern BLACKLIST_PATTERN =
-      AppSettings.get().get(AvailableAppSettings.APPLICATION_DOMAIN_BLOCKLIST_PATTERN, null) == null
-          ? null
-          : Pattern.compile(
-              AppSettings.get()
-                  .get(AvailableAppSettings.APPLICATION_DOMAIN_BLOCKLIST_PATTERN)
-                  .trim(),
-              Pattern.CASE_INSENSITIVE);
 
   private String jpql;
 
@@ -44,10 +32,16 @@ public class JPQLFilter extends Filter {
     this.params = params;
   }
 
+  /**
+   * A filter from a domain the client may have written.
+   *
+   * <p>The domain is joined to other filters, the permission filter among them, as text, so it is
+   * validated by {@link DomainValidator} first: a domain such as {@code 1=1)) OR ((1=1} would
+   * otherwise close the parentheses it is wrapped in and OR its way past whatever is ANDed after
+   * it.
+   */
   public static JPQLFilter forDomain(String jpql, Object... params) {
-    if (BLACKLIST_PATTERN != null && BLACKLIST_PATTERN.matcher(jpql).find()) {
-      throw new IllegalArgumentException("Invalid domain, filter uses blacklisted keywords.");
-    }
+    DomainValidator.validate(jpql);
     return new JPQLFilter(jpql, params);
   }
 

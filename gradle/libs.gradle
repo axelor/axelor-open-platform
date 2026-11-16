@@ -94,6 +94,10 @@ libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
 libs.jdbc_postgres = "org.postgresql:postgresql:42.7.14"
 libs.jdbc_mysql = "com.mysql:mysql-connector-j:8.4.0"
 
+// ANTLR runtime for Hibernate's HQL lexer. Keep it equal to the
+// antlr hibernate-core pulls transitively
+libs.antlr = "antlr:antlr:2.7.7"
+
 // Hibernate
 libs.hibernate = [
   "org.hibernate:hibernate-core:${versions.hibernate}",
