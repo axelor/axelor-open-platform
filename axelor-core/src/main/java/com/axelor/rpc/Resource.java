@@ -1495,8 +1495,24 @@ public class Resource<T extends Model> {
 
     @SuppressWarnings("all")
     Map<String, Object> values = (Map) data.get(0);
+    Mapper mapper = Mapper.of(model);
+
     for (Map.Entry<String, Object> entry : values.entrySet()) {
-      if (!perms.canWrite(AuthUtils.getUser(), model.getName(), entry.getKey())) {
+      String fieldName = entry.getKey();
+      Property property = mapper.getProperty(fieldName);
+
+      if (property == null) {
+        throw new IllegalArgumentException("No such field: " + fieldName);
+      }
+
+      if (property.isPrimary()
+          || property.isVersion()
+          || property.isTransient()
+          || property.isCollection()) {
+        throw new IllegalArgumentException("Field cannot be mass updated: " + fieldName);
+      }
+
+      if (!perms.canWrite(AuthUtils.getUser(), model.getName(), fieldName)) {
         final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
         throw new UnauthorizedException(cause.getMessage(), cause);
       }
