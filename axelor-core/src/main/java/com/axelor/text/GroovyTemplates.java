@@ -6,7 +6,6 @@ package com.axelor.text;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
@@ -25,7 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +46,21 @@ public class GroovyTemplates implements Templates {
       GroovyScriptSupport.createStreamingTemplateEngine();
 
   private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
-  private static final String TEMPLATE_DIR =
-      AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
+
+  /** The folder of the files that templates can include ({@code template.search-dir}). */
+  static final Path TEMPLATE_DIR =
+      Paths.get(
+              AppSettings.get()
+                  .getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR))
+          .toAbsolutePath()
+          .normalize();
+
+  /** The classpath folder of the resources that templates can include. */
+  static final String INCLUDE_RESOURCE_DIR = "templates/";
+
+  /** The extension of the classpath resources that templates can include. */
+  static final String INCLUDE_RESOURCE_EXTENSION = ".tmpl";
+
   private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
 
   private static final int DEFAULT_CACHE_SIZE = 500;
@@ -95,6 +112,27 @@ public class GroovyTemplates implements Templates {
     return template;
   }
 
+  /**
+   * Checks an include name, and returns it with {@code /} as separator ({@code \}, the separator on
+   * Windows, is converted), so that the same name works on every system.
+   *
+   * <p>Rejects a name that could reach outside of the template folder or of the {@code templates}
+   * resources: it must be a relative path of names, without {@code .} or {@code ..}, or colon (URL
+   * schemes such as {@code classpath:}, drive letters).
+   */
+  static String checkIncludeName(String name) {
+    String path = name.replace('\\', '/');
+    boolean valid =
+        path.indexOf(':') < 0
+            && path.indexOf('\0') < 0
+            && Arrays.stream(path.split("/", -1))
+                .noneMatch(part -> part.isEmpty() || ".".equals(part) || "..".equals(part));
+    if (!valid) {
+      throw new IllegalArgumentException(String.format("Invalid template include: '%s'", name));
+    }
+    return path;
+  }
+
   class GroovyTemplate implements Template {
 
     private String text;
@@ -108,27 +146,38 @@ public class GroovyTemplates implements Templates {
       return text.indexOf("<?mso-application") > -1;
     }
 
+    /**
+     * Reads an included template ({@code {{< name >}}}): the file of that name in the template
+     * folder ({@code template.search-dir}), or else the {@code .tmpl} resource of that name in the
+     * {@code templates} folder of the classpath.
+     *
+     * @throws IllegalArgumentException if the name is not valid (see {@link
+     *     GroovyTemplates#checkIncludeName(String)}), or there is no such template
+     */
     private String read(String included) throws IOException {
+      String name = checkIncludeName(included);
 
-      Reader reader = null;
-      File file = FileUtils.getFile(TEMPLATE_DIR, included);
-      if (file.isFile()) {
-        reader = new FileReader(file);
-      } else {
-        InputStream stream = ResourceUtils.getResourceStream(included);
-        if (stream != null) {
-          reader = new InputStreamReader(stream);
+      Path file = TEMPLATE_DIR.resolve(name).normalize();
+      if (file.startsWith(TEMPLATE_DIR) && Files.isRegularFile(file)) {
+        try (Reader reader = new FileReader(file.toFile())) {
+          return CharStreams.toString(reader);
         }
       }
 
-      if (reader == null) {
-        return "";
+      InputStream stream =
+          name.endsWith(INCLUDE_RESOURCE_EXTENSION)
+              ? ResourceUtils.getResourceStream(INCLUDE_RESOURCE_DIR + name)
+              : null;
+      if (stream == null) {
+        // the setting rather than the folder: the message can reach users
+        throw new IllegalArgumentException(
+            String.format(
+                "Template include not found: '%s' (in template.search-dir, or as a .tmpl resource"
+                    + " in templates/)",
+                included));
       }
-
-      try {
+      try (Reader reader = new InputStreamReader(stream)) {
         return CharStreams.toString(reader);
-      } finally {
-        reader.close();
       }
     }
 
@@ -158,6 +207,7 @@ public class GroovyTemplates implements Templates {
           String include = read(matcher.group(1));
           builder.append(process(include));
         } catch (IOException e) {
+          throw new UncheckedIOException(e);
         }
       }
       builder.append(text.substring(position));

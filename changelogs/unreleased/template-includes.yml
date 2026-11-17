@@ -1,0 +1,19 @@
+---
+title: Read included Groovy templates from the template folder or the `templates` resources
+type: change
+description: |
+  A template included with `{{< name >}}` is now read from:
+
+  - the template folder (`template.search-dir`): the file of that name, inside that folder
+  - otherwise the classpath: the `.tmpl` resource of that name in the `templates` folder
+    (`{{< invoice/header.tmpl >}}` reads `templates/invoice/header.tmpl`)
+
+  The name must be a relative path, with `/` or `\` as separator, without `.` or `..` parts or
+  colon, otherwise the template fails.
+
+  An included template that is not found, or cannot be read, now fails the template, instead of
+  being replaced by nothing.
+
+  Templates including classpath resources must be updated: move the included resources into
+  the `templates` folder of the resources, with the `.tmpl` extension, and name them relative
+  to that folder in the includes.

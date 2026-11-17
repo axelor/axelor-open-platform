@@ -7,6 +7,7 @@ package com.axelor.text;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,9 +15,12 @@ import com.axelor.common.ResourceUtils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 public class GroovyTemplateTest extends TemplateScriptTest {
@@ -73,8 +77,9 @@ public class GroovyTemplateTest extends TemplateScriptTest {
     }
 
     var engine = com.axelor.script.GroovyScriptSupport.createStringTemplateEngine();
-    assertTrue(
-        GroovyTemplates.compile(engine, "${a}") == GroovyTemplates.compile(engine, "${a}"),
+    assertSame(
+        GroovyTemplates.compile(engine, "${a}"),
+        GroovyTemplates.compile(engine, "${a}"),
         "Expected the template to be compiled once");
   }
 
@@ -93,6 +98,72 @@ public class GroovyTemplateTest extends TemplateScriptTest {
     assertFalse(output.contains("{{<"));
     assertTrue(output.contains("This is nested 1"));
     assertTrue(output.contains("This is nested 2"));
+  }
+
+  private String renderInclude(String name) {
+    return new GroovyTemplates().fromText("[{{<" + name + ">}}]").make(vars).render();
+  }
+
+  // A file of any extension can be included from the template folder (template.search-dir).
+  @Test
+  void testIncludeFromTemplateDir() throws Exception {
+    Files.createDirectories(GroovyTemplates.TEMPLATE_DIR);
+    Path file = GroovyTemplates.TEMPLATE_DIR.resolve("include-" + UUID.randomUUID() + ".html");
+    try {
+      Files.writeString(file, "Included: ${message}");
+      assertEquals("[Included: Hello World!!!]", renderInclude(file.getFileName().toString()));
+    } finally {
+      Files.deleteIfExists(file);
+    }
+  }
+
+  // The name cannot leave the template folder or the templates resources.
+  @Test
+  void testIncludeNameIsChecked() {
+    for (String name :
+        List.of(
+            "",
+            "../include.tmpl",
+            "test/../../include.tmpl",
+            "./test/nested2.tmpl",
+            "test//nested2.tmpl",
+            "test/",
+            "/etc/hosts",
+            "classpath:templates/test/nested2.tmpl",
+            "C:/include.tmpl",
+            "..\\include.tmpl",
+            "test\\..\\..\\include.tmpl",
+            "\\include.tmpl")) {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> renderInclude(name),
+          () -> "Include accepted: " + name);
+    }
+  }
+
+  // Only the .tmpl resources of the templates folder of the classpath can be included, any other
+  // include fails as not found.
+  @Test
+  void testIncludedResourcesAreLimited() {
+    assertEquals("[This is nested 2: Hello World!!!]", renderInclude("test/nested2.tmpl"));
+    // the Windows separator works too
+    assertEquals("[This is nested 2: Hello World!!!]", renderInclude("test\\nested2.tmpl"));
+
+    for (String name :
+        List.of(
+            "axelor-config.properties", // outside of templates, not .tmpl
+            "com/axelor/text/include-test.tmpl", // outside of templates
+            "test/not-a-template.txt", // not .tmpl
+            "test/missing.tmpl")) { // does not exist
+      IllegalArgumentException e =
+          assertThrows(
+              IllegalArgumentException.class,
+              () -> renderInclude(name),
+              () -> "Resource included: " + name);
+      assertTrue(
+          e.getMessage().startsWith("Template include not found"),
+          () -> "Unexpected error for " + name + ": " + e.getMessage());
+    }
   }
 
   @Test
