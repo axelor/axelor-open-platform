@@ -11,6 +11,7 @@ import com.axelor.db.Repository;
 import com.axelor.db.ValueEnum;
 import com.axelor.inject.Beans;
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -89,7 +90,9 @@ class ScriptPolicy {
     // writes files: new Formatter('/path/to/file')
     Formatter.class,
     // reads any stream, file or channel given to it (the stream itself is not allowed)
-    Scanner.class
+    Scanner.class,
+    // allowed as an Iterable, and reads or writes files through the groovy-nio extension methods
+    Path.class
   };
 
   private final List<String> allowPackages;
