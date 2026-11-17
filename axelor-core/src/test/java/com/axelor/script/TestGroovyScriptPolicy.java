@@ -1105,6 +1105,15 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
 
     // File read via coercion (receiver is java.io.File): ResourceGroovyMethods.getText(File).
     assertBlockedByPolicy(helper, "('" + missingPath + "' as File).text");
+
+    // Map implementations that read local files, classpath resources or URLs by path.
+    assertBlockedByPolicy(
+        helper, "org.apache.shiro.config.Ini.fromResourcePath('file:" + missingPath + "')");
+    assertBlockedByPolicy(
+        helper,
+        "new org.apache.shiro.config.Ini().loadFromPath('classpath:axelor-config.properties')");
+    assertBlockedByPolicy(
+        helper, "new org.apache.velocity.util.ExtProperties('" + missingPath + "')");
   }
 
   // A nested evaluation escapes the sandbox entirely: Script.evaluate(String) / Eval / new

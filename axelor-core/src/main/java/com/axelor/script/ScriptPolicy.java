@@ -72,7 +72,20 @@ class ScriptPolicy {
     com.axelor.rpc.ActionResponse.class
   };
 
-  private static final String[] DENY_PACKAGES = {};
+  private static final String[] DENY_PACKAGES = {
+    // Short term, see the note in DENY_CLASSES: libraries axelor-core does not compile against.
+    // BeanMap calls the getters and setters of any object given to it
+    "org.apache.commons.beanutils",
+    "org.apache.commons.collections",
+    "org.springframework.cglib.beans",
+    // event loop and executor groups: start threads running script code
+    "io.netty.channel.*",
+    "io.netty.util.concurrent",
+    // ServiceLoaderIterator instantiates service providers (ServiceLoader.load is guarded)
+    "org.apache.commons.compress.utils",
+    // ExtProperties (a Hashtable/Map) reads any key=value file given by path
+    "org.apache.velocity.util",
+  };
 
   private static final Class<?>[] DENY_CLASSES = {
     Class.class,
@@ -92,7 +105,19 @@ class ScriptPolicy {
     // reads any stream, file or channel given to it (the stream itself is not allowed)
     Scanner.class,
     // allowed as an Iterable, and reads or writes files through the groovy-nio extension methods
-    Path.class
+    Path.class,
+
+    // Short term, until the class-level and nested class rules are reworked: the interfaces of
+    // ALLOW_CLASSES (Map, Iterable...) allow any class implementing them, and a nested class is
+    // checked as its top-level class, which lets these classes in (see also DENY_PACKAGES).
+    // UIDefaults.ProxyLazyValue calls any public static method or constructor by name
+    javax.swing.UIDefaults.class,
+    // BeanContextSupport.instantiateChild instantiates any class by name
+    java.beans.beancontext.BeanContext.class,
+    // its builder reads any file given by path
+    org.apache.commons.csv.CSVParser.class,
+    // allowed as a Map; reads local files, classpath resources and URLs by path
+    org.apache.shiro.config.Ini.class
   };
 
   private final List<String> allowPackages;
