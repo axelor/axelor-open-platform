@@ -141,7 +141,7 @@ public class XMLViews {
 
   public static ObjectViews unmarshal(InputStream stream) throws JAXBException {
     synchronized (unmarshaller) {
-      return (ObjectViews) unmarshaller.unmarshal(stream);
+      return (ObjectViews) SecureUnmarshal.unmarshal(unmarshaller, stream);
     }
   }
 
@@ -149,7 +149,7 @@ public class XMLViews {
     Reader reader = new StringReader(prepareXML(xml));
 
     synchronized (unmarshaller) {
-      return (ObjectViews) unmarshaller.unmarshal(reader);
+      return (ObjectViews) SecureUnmarshal.unmarshal(unmarshaller, reader);
     }
   }
 
@@ -243,7 +243,9 @@ public class XMLViews {
     if (!xml.trim().startsWith("<?xml")) xml = prepareXML(xml);
 
     StringReader reader = new StringReader(xml);
-    return (ObjectViews) unmarshaller.unmarshal(reader);
+    synchronized (unmarshaller) {
+      return (ObjectViews) SecureUnmarshal.unmarshal(unmarshaller, reader);
+    }
   }
 
   public static Map<String, Object> findViews(String model, Map<String, String> views) {

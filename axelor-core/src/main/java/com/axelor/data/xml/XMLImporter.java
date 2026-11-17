@@ -188,6 +188,9 @@ public class XMLImporter implements Importer {
           protected XMLInputFactory createInputFactory() {
             XMLInputFactory factory = super.createInputFactory();
             factory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
+            // data files can be uploaded: never load their DTD or external entities
+            factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
             return factory;
           }
         };

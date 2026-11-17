@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -50,35 +51,40 @@ public class XMLUtils {
 
   private static final String PROPERTY_UNSUPPORTED = "Property {} is not supported.";
 
+  private static final String EXTERNAL_GENERAL_ENTITIES =
+      "http://xml.org/sax/features/external-general-entities";
+  private static final String EXTERNAL_PARAMETER_ENTITIES =
+      "http://xml.org/sax/features/external-parameter-entities";
+  private static final String LOAD_EXTERNAL_DTD =
+      "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+
   // DocumentBuilder block
 
   /**
    * Returns properly configured {@link DocumentBuilderFactory} with security features and no
-   * external DTD and schema access.
+   * external DTD, entity and schema access.
+   *
+   * <p>The factory is always the JDK implementation: a parser found on the classpath (such as
+   * Apache Xerces) may silently ignore some of these settings, and a document could then read local
+   * files or reach other hosts through an external entity.
    *
    * @param namespaceAware whether the returned factory is to provide support for XML namespaces
    * @return configured {@link DocumentBuilderFactory}
+   * @throws IllegalStateException if a security setting is not supported
    */
   public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean namespaceAware) {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newDefaultInstance();
     factory.setNamespaceAware(namespaceAware);
 
     try {
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    } catch (ParserConfigurationException ignore) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.FEATURE_SECURE_PROCESSING);
-    }
-
-    try {
+      factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+      factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+      factory.setFeature(LOAD_EXTERNAL_DTD, false);
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    } catch (IllegalArgumentException ignore) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.ACCESS_EXTERNAL_DTD);
-    }
-
-    try {
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-    } catch (IllegalArgumentException ignore) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
+    } catch (ParserConfigurationException | IllegalArgumentException e) {
+      throw new IllegalStateException("Unable to secure the XML parser", e);
     }
 
     return factory;
@@ -96,48 +102,63 @@ public class XMLUtils {
   // SAXParser block
 
   /**
-   * Returns properly configured {@link SAXParserFactory} with security features.
+   * Returns properly configured {@link SAXParserFactory} with security features and no external DTD
+   * and entity access.
+   *
+   * <p>The factory is always the JDK implementation, see {@link
+   * #createDocumentBuilderFactory(Boolean)}.
    *
    * @param namespaceAware whether the returned factory is to provide support for XML namespaces
    * @return configured {@link SAXParserFactory}
+   * @throws IllegalStateException if a security setting is not supported
    */
   public static SAXParserFactory createSAXParserFactory(Boolean namespaceAware) {
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory = SAXParserFactory.newDefaultInstance();
     factory.setNamespaceAware(namespaceAware);
 
     try {
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+      factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+      factory.setFeature(LOAD_EXTERNAL_DTD, false);
     } catch (SAXNotRecognizedException
         | ParserConfigurationException
-        | SAXNotSupportedException ignore) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.FEATURE_SECURE_PROCESSING);
+        | SAXNotSupportedException e) {
+      throw new IllegalStateException("Unable to secure the XML parser", e);
     }
 
     return factory;
   }
 
   /**
-   * Returns properly configured {@link SAXParser} with security features and no external DTD and
-   * schema access.
+   * Returns properly configured {@link SAXParser} with security features and no external DTD,
+   * entity and schema access.
    *
    * @return configured {@link SAXParser}
    */
   public static SAXParser createSAXParser() throws ParserConfigurationException, SAXException {
     SAXParser parser = createSAXParserFactory(false).newSAXParser();
-
-    try {
-      parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.ACCESS_EXTERNAL_DTD);
-    }
-
-    try {
-      parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-    } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-      LOG.trace(PROPERTY_UNSUPPORTED, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
-    }
-
+    parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     return parser;
+  }
+
+  // StAX block
+
+  /**
+   * Returns a {@link XMLInputFactory} that refuses DTDs and external entities.
+   *
+   * <p>A document read with it can't declare entities, so a reference such as {@code &xxe;} fails
+   * instead of pulling in a local file or a remote resource.
+   *
+   * @return configured {@link XMLInputFactory}
+   * @throws IllegalArgumentException if the StAX implementation doesn't support these settings
+   */
+  public static XMLInputFactory createXMLInputFactory() {
+    XMLInputFactory factory = XMLInputFactory.newInstance();
+    factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    return factory;
   }
 
   // XPath block
