@@ -63,6 +63,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.OptimisticLockException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1787,69 +1788,96 @@ public class Resource<T extends Model> {
     Response response = new Response();
 
     Mapper mapper = Mapper.of(model);
-    Map<String, Object> data = request.getData();
+    Map<String, Object> requestData = request.getData();
 
-    String name = request.getFields().getFirst();
-
-    if (name == null) {
-      name = "id";
+    final Long id = findId(requestData);
+    if (id == null || id <= 0L) {
+      response.setStatus(Response.STATUS_FAILURE);
+      return response;
     }
 
-    // never fetch password fields, fall back to the record name
-    final Property requested = findProperty(model, name);
-    if (requested != null && requested.isPassword()) {
-      final Property nameField = mapper.getNameField();
-      name = nameField != null && !nameField.isPassword() ? nameField.getName() : "id";
-    }
+    security.get().check(JpaSecurity.CAN_READ, model, id);
 
-    Property property = null;
-    try {
-      property = mapper.getProperty(name);
-    } catch (Exception e) {
-    }
+    final List<String> fields = request.getFields();
+    String name = fields == null || fields.isEmpty() ? null : fields.getFirst();
 
     String selectName = null;
 
-    if (property == null && name.indexOf('.') > -1) {
-      JsonFunction func = JsonFunction.fromPath(name);
-      Property p = mapper.getProperty(func.getField());
-      if (p != null && p.isJson()) {
-        selectName = func.toString();
+    // validate the requested name: it must resolve to a single field
+    if (StringUtils.notBlank(name)) {
+      Property prop =
+          mapper.getProperty(name.indexOf('.') > 0 ? name.substring(0, name.indexOf('.')) : name);
+      if (prop == null || prop.isPassword()) {
+        response.setStatus(Response.STATUS_FAILURE);
+        return response;
+      }
+      if (prop.isJson()) {
+        // the attribute may carry a type cast (e.g. attrs.weight::decimal); strip it before lookup
+        String attribute = name.substring(name.indexOf('.') + 1);
+        final int cast = attribute.indexOf("::");
+        if (cast > -1) {
+          attribute = attribute.substring(0, cast);
+        }
+        Map<String, Object> jsonFields = MetaStore.findJsonFields(model.getName(), prop.getName());
+        final Map<String, Object> jsonField = (Map<String, Object>) jsonFields.get(attribute);
+        // reject unknown json fields as well as relational ones (reference or collection)
+        if (jsonField == null || jsonField.containsKey("target")) {
+          response.setStatus(Response.STATUS_FAILURE);
+          return response;
+        }
+        try {
+          selectName = JsonFunction.fromPath(name).toString();
+        } catch (Exception e) {
+          response.setStatus(Response.STATUS_FAILURE);
+          return response;
+        }
+      } else if (!(prop.isTransient()
+          || prop.isCollection()
+          || prop.isReference()
+          || prop.isImage()
+          || prop.getType() == PropertyType.TEXT
+          || prop.getType() == PropertyType.BINARY)) {
+        selectName = "self." + prop.getName();
       } else {
-        selectName = "self.%s".formatted(name);
+        response.setStatus(Response.STATUS_FAILURE);
+        return response;
       }
     }
 
-    if (property == null && selectName == null) {
-      property = mapper.getNameField();
-      if (property != null && property.isPassword()) {
-        property = null;
+    // fall back to the record's name field when no valid name is given
+    if (selectName == null) {
+      final Property nameField = mapper.getNameField();
+      if (nameField != null && !nameField.isPassword()) {
+        name = nameField.getName();
+        selectName = "self." + name;
+      } else {
+        name = "id";
+        selectName = "self.id";
       }
-    }
-
-    if (property != null && selectName == null) {
-      selectName = "self." + property.getName();
-      name = property.getName();
     }
 
     Request req = newRequest(null);
     req.setFields(Lists.newArrayList(selectName));
-    req.setRecords(Lists.newArrayList(data));
+    req.setRecords(Lists.newArrayList(requestData));
 
     firePreRequestEvent(RequestEvent.FETCH_NAME, req);
 
-    if (selectName != null) {
-      String qs =
-          "SELECT %s FROM %s self WHERE self.id = :id".formatted(selectName, model.getSimpleName());
+    String qs =
+        "SELECT %s FROM %s self WHERE self.id = :id".formatted(selectName, model.getSimpleName());
 
-      jakarta.persistence.Query query = JPA.em().createQuery(qs);
-      QueryBinder.of(query).setCacheable().setReadOnly().bind(data);
+    jakarta.persistence.Query query = JPA.em().createQuery(qs);
+    QueryBinder.of(query).setCacheable().setReadOnly().bind("id", id);
 
-      Object value = query.getSingleResult();
-      data.put(name, value);
+    final Map<String, Object> responseData = new HashMap<>();
+    responseData.put("id", id);
+
+    try {
+      responseData.put(name, query.getSingleResult());
+      response.setData(List.of(removePasswordFields(responseData, model)));
+    } catch (NoResultException e) {
+      response.setData(List.of());
     }
 
-    response.setData(List.of(removePasswordFields(data, model)));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.FETCH_NAME, req, response);
