@@ -74,7 +74,7 @@ public class GroovyCheckPropTransformation extends AbstractASTTransformation {
         Expression obj = prop.getObjectExpression();
         // a call result is already checked by GroovyCheckTransformation
         if (!(obj instanceof MethodCallExpression)
-            && !GroovyCheckTransformation.isSandboxCall(obj)) {
+            && !GroovyCheckTransformation.isReceiverCheck(obj)) {
           // the owner first: in a chain (a.b.c), a.b is itself a property access to check
           return GroovyCheckTransformation.checkedPropertyX(
               prop, transform(obj), transform(prop.getProperty()));

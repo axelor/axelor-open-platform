@@ -432,6 +432,9 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, "([System] as Object[]).env");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].name");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].iterator().toList().name");
+    // a constructed object is checked as the owner of its properties
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "new ArrayList([denied]).name");
+    assertBlockedByPolicy(helper, "new ArrayList([System]).env");
     // nested containers are checked at any depth
     assertBlockedByPolicy(helper, "[[System]].env");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[[denied]].name");
@@ -466,6 +469,7 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertEquals(false, helper.eval("[1, 2].empty"));
     assertEquals(1, helper.eval("(['a'] as Object[]).length"));
     assertEquals(3, helper.eval("[a: [b: [c: 3]]].a.b.c"));
+    assertEquals(false, helper.eval("new ArrayList([1]).empty"));
   }
 
   // A call of a local variable (x()) is a call of its call() method, so the variable is checked
