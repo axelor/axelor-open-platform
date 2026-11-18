@@ -327,11 +327,20 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, "[System].iterator()*.env");
     assertBlockedByPolicy(helper, "def l = [System]; l*.env");
 
+    // A spread element that is a collection or an array reads the property of its elements.
+    assertBlockedByPolicy(helper, "[[System]]*.env");
+    assertBlockedByPolicy(helper, "[[[System]]]*.env");
+    assertBlockedByPolicy(helper, "[[System]].iterator()*.env");
+    assertBlockedByPolicy(helper, "[[System] as Object[]]*.env");
+    assertBlockedByPolicy(helper, "[[System]]*.\"${'env'}\"");
+
     // Allowed spreads still work.
     assertEquals(List.of("1", "2"), helper.eval("[1, 2]*.toString()"));
     assertEquals(List.of("A", "B"), helper.eval("['a', 'b'].iterator()*.toUpperCase()"));
     assertEquals(List.of(1, 2), helper.eval("['a', 'bb']*.length()"));
     assertEquals(List.of("a"), helper.eval("[a: 1].entrySet()*.key"));
+    assertEquals(List.of(List.of(1), List.of(2)), helper.eval("[[[a: 1]], [[a: 2]]]*.a"));
+    assertEquals(List.of(1, 2), helper.eval("[[1], [1, 2]]*.size()"));
     assertEquals(null, helper.eval("def l = null; l*.size()"));
   }
 
@@ -382,6 +391,12 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, DENIED_OBJECT + "denied?['name']");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "denied['defaultAssertionStatus'] = false; 1");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied]['name']");
+    // nested containers are checked at any depth
+    assertBlockedByPolicy(helper, "[[System]]['env']");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[[denied]]['name']");
+    assertBlockedByPolicy(helper, "[[[System]]]['env']");
+    assertBlockedByPolicy(helper, "([[System]] as Object[])['env']");
+    assertBlockedByPolicy(helper, "[[System] as Object[]]['env']");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "([denied] as Object[])['name']");
     // a private field of an allowed class gives a denied object
     assertBlockedByPolicy(
@@ -400,6 +415,7 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
         helper.eval("def m = [:]; m['k'] = 1; def l = [0]; l[0] = 5; [m, l]"));
     assertEquals(null, helper.eval("def m = null; m?['x']"));
     assertEquals(List.of("a", "b"), helper.eval("[[n: 'a'], [n: 'b']]['n']"));
+    assertEquals(List.of(List.of("a"), List.of("b")), helper.eval("[[[n: 'a']], [[n: 'b']]]['n']"));
     assertEquals("b", helper.eval("('abc' =~ /(b)/)[0][1]"));
   }
 
@@ -416,9 +432,37 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, "([System] as Object[]).env");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].name");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].iterator().toList().name");
+    // nested containers are checked at any depth
+    assertBlockedByPolicy(helper, "[[System]].env");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "[[denied]].name");
+    assertBlockedByPolicy(helper, "[[[System]]].env");
+    assertBlockedByPolicy(helper, "[[System] as Object[]].env");
+    assertBlockedByPolicy(helper, "([[System]] as Object[]).env");
+    assertBlockedByPolicy(helper, "new ArrayList([[System]].env).flatten()[0].get('USER')");
+    // a property the collection only sets, or keeps in a field Groovy cannot read (that of a
+    // package not opened, such as java.util.concurrent to this test JVM), is read from each element
+    assertBlockedByPolicy(
+        helper,
+        "class C extends ArrayList { void setEnv(x) {} }; def c = new C(); c << System; c.env");
+    assertBlockedByPolicy(helper, DENIED_OBJECT + "def v = new Vector([denied]); v.size");
+    assertBlockedByPolicy(
+        helper, "def l = new java.util.concurrent.CopyOnWriteArrayList([System]); l.lock");
+    // a field Groovy can read is read from the collection itself, as Groovy does (java.util is
+    // opened to this test JVM, as by Tomcat)
+    assertEquals(
+        1,
+        helper.eval(
+            "class C extends ArrayList { private env = 1 }; def c = new C(); c << System; c.env"));
+    assertEquals(1, helper.eval("[System].size"));
+    assertEquals(2, helper.eval("[1, 2].size"));
 
     // Allowed properties still work.
     assertEquals(List.of(1, 2), helper.eval("[[a: 1], [a: 2]].a"));
+    assertEquals(List.of(List.of(1), List.of(2)), helper.eval("[[[a: 1]], [[a: 2]]].a"));
+    // a nested container with the property reads its own
+    assertEquals(List.of(1), helper.eval("[['a'] as Object[]].length"));
+    // a collection containing itself does not loop forever (a computed name checks the elements)
+    assertEquals(false, helper.eval("def l = []; l << l; l.\"${'empty'}\""));
     assertEquals(false, helper.eval("[1, 2].empty"));
     assertEquals(1, helper.eval("(['a'] as Object[]).length"));
     assertEquals(3, helper.eval("[a: [b: [c: 3]]].a.b.c"));

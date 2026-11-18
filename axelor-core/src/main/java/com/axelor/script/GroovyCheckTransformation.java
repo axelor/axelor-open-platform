@@ -122,14 +122,15 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
   /**
    * Checks the owner of a property access. A property a collection or an array does not have is
    * read from its elements ({@code list.name}), which are then checked too, see {@link
-   * GroovySandbox#checkProperty(Object, String)}.
+   * GroovySandbox#checkProperty(Object, String)}, also for each element of a spread ({@code
+   * recv*.name}), see {@link GroovySandbox#checkSpreadProperty(Object, String)}.
    */
   static Expression propertyReceiverCheckX(Expression receiver, PropertyExpression prop) {
-    if (prop.isSpreadSafe()) {
-      return receiverCheckX(receiver, true);
-    }
+    // a spread reads the property of each element, which may itself be a collection or an array
     return sandboxCallX(
-        GroovySandbox.CALL_CHECK_PROPERTY,
+        prop.isSpreadSafe()
+            ? GroovySandbox.CALL_CHECK_SPREAD_PROPERTY
+            : GroovySandbox.CALL_CHECK_PROPERTY,
         new ArgumentListExpression(receiver, new ConstantExpression(prop.getPropertyAsString())));
   }
 

@@ -196,13 +196,13 @@ public final class SandboxGroovyMethods {
   // DefaultGroovyMethods.getAt(..., String): the receiver itself is checked by the transformations
 
   public static List getAt(Collection<?> self, String property) {
-    GroovySandbox.checkElementsFromSandbox(self);
+    GroovySandbox.checkElementsFromSandbox(self, self, property);
     return DefaultGroovyMethods.getAt(self, property);
   }
 
   public static Object getAt(Object self, String property) {
     if (self instanceof Object[] array) {
-      GroovySandbox.checkElementsFromSandbox(Arrays.asList(array));
+      GroovySandbox.checkElementsFromSandbox(array, Arrays.asList(array), property);
     }
     return DefaultGroovyMethods.getAt(self, property);
   }
