@@ -6,6 +6,8 @@ package com.axelor.script;
 
 import groovy.lang.Binding;
 import groovy.lang.Closure;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Base class of the closures compiled by {@link GroovyScriptSupport}.
@@ -18,7 +20,8 @@ import groovy.lang.Closure;
  * <p>This class ensures that a sandboxed closure never holds such a delegate or owner: they can
  * only be changed through {@link #setDelegate(Object)} (used by {@code with}, {@code c.delegate =
  * ...}, {@code c['delegate'] = ...}, etc.) and {@link #rehydrate(Object, Object, Object)}, which
- * validate them against the policy.
+ * validate them against the policy. A collection or an array is validated with its elements, also
+ * when a property is resolved on it, as its elements can be changed later.
  *
  * <p>The closures Groovy builds from a sandboxed closure ({@code curry}, {@code >>}, {@code
  * memoize}, {@code trampoline}...) are sandboxed too, see {@link SandboxClosureWrapper}.
@@ -156,11 +159,54 @@ public abstract class SandboxClosure<V> extends Closure<V> implements SandboxCod
     return SandboxClosureWrapper.wrap(super.trampoline());
   }
 
+  // A collection or an array delegate (or owner) reads a property from each of its elements, which
+  // can be added after it was set (l = []; c.delegate = l; l << System): they are validated when a
+  // property is resolved on it.
+
+  /** The properties of the closure itself, not resolved on its owner or delegate. */
+  private static final Set<String> CLOSURE_PROPERTIES =
+      Set.of(
+          "delegate",
+          "owner",
+          "maximumNumberOfParameters",
+          "parameterTypes",
+          "metaClass",
+          "class",
+          "directive",
+          "resolveStrategy",
+          "thisObject");
+
+  @Override
+  public Object getProperty(String property) {
+    if (!CLOSURE_PROPERTIES.contains(property)) {
+      checkResolvedProperty(property);
+    }
+    return super.getProperty(property);
+  }
+
+  /** Validates the owners of a property resolved on the delegate or owner, as a property chain. */
+  private void checkResolvedProperty(String property) {
+    final int strategy = getResolveStrategy();
+    if (strategy != OWNER_ONLY && strategy != TO_SELF) {
+      checkContainer(getDelegate(), property);
+    }
+    if (strategy != DELEGATE_ONLY && strategy != TO_SELF) {
+      checkContainer(getOwner(), property);
+    }
+  }
+
+  private static void checkContainer(Object target, String property) {
+    if (target instanceof Collection<?> || target instanceof Object[]) {
+      GroovySandbox.checkProperty(target, property);
+    }
+  }
+
   private static void checkResolveTarget(Object target) {
     // the variables of a template are provided by a Binding delegate
     if (target instanceof Binding) {
       return;
     }
-    GroovySandbox.check(target);
+    // a collection or an array is validated with its elements, whose properties are resolved
+    GroovySandbox.checkProperty(target, null);
   }
 }

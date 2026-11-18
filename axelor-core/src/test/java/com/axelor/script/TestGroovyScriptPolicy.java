@@ -518,6 +518,20 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     // Nested closure, resolved through its owner's delegate.
     assertBlockedByPolicy(
         helper, "def c = { -> { -> getenv('HOME') }() }; c.delegate = System; c()");
+
+    // A collection or an array delegate (or owner) reads a property from each of its elements.
+    assertBlockedByPolicy(
+        helper, "def c = { -> env }; c.resolveStrategy = 1; c.delegate = [System]; c()");
+    assertBlockedByPolicy(
+        helper,
+        "def c = { -> env }; c.resolveStrategy = 1; c.delegate = [System] as Object[]; c()");
+    assertBlockedByPolicy(
+        helper, "def c = { -> env }; c.resolveStrategy = 1; c.delegate = [[System]]; c()");
+    assertBlockedByPolicy(helper, "{ -> env }.rehydrate(null, [System], null)()");
+    // the elements are changed after it was set as the delegate
+    assertBlockedByPolicy(
+        helper,
+        "def l = []; def c = { -> env }; c.resolveStrategy = 1; c.delegate = l; l << System; c()");
   }
 
   // The closures Groovy builds from a closure (curry, >>, memoize, trampoline...) resolve their
@@ -632,6 +646,9 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
             "def c = { -> name.toUpperCase() }; c.resolveStrategy = 1;"
                 + " c.delegate = [name: 'x']; c()"));
     assertEquals(1, helper.eval("def c = { -> 1 }; c.rehydrate([1], null, null)()"));
+    assertEquals(List.of(1, 2), helper.eval("[[a: 1], [a: 2]].with { a }"));
+    // a delegate containing itself does not loop forever
+    assertEquals(1, helper.eval("def l = []; l << l; def c = { -> 1 }; c.delegate = l; c()"));
 
     // Iteration and collection methods.
     assertEquals(10, helper.eval("[1, 2, 3].collect { it * 2 }.findAll { it > 2 }.sum()"));
