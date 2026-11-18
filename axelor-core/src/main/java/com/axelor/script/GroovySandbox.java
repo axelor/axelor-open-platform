@@ -6,7 +6,6 @@ package com.axelor.script;
 
 import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
-import groovy.lang.Closure;
 import groovy.lang.MetaBeanProperty;
 import groovy.lang.MetaProperty;
 import java.lang.reflect.Executable;
@@ -26,11 +25,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import org.codehaus.groovy.reflection.CachedField;
-import org.codehaus.groovy.runtime.ComposedClosure;
-import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.MethodClosure;
-import org.codehaus.groovy.runtime.memoize.Memoize;
 import org.codehaus.groovy.runtime.metaclass.MultipleSetterProperty;
 
 /**
@@ -59,12 +55,6 @@ public final class GroovySandbox {
   static final String CALL_METHOD_POINTER = "methodPointer";
 
   private static final ThreadLocal<Evaluation> CURRENT = new ThreadLocal<>();
-
-  /** The closure returned by {@code trampoline()}, a class private to its package. */
-  private static final String TRAMPOLINE_CLOSURE = "groovy.lang.TrampolineClosure";
-
-  /** The closures returned by {@code memoize()} are private classes nested in {@code Memoize}. */
-  private static final String MEMOIZE_FUNCTION_PREFIX = Memoize.class.getName() + "$";
 
   private static final StackWalker STACK_WALKER =
       StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
@@ -199,24 +189,11 @@ public final class GroovySandbox {
       klass = klass.getComponentType();
     }
 
-    if (!SandboxCode.class.isAssignableFrom(klass) && !isClosureWrapper(klass)) {
+    if (!SandboxCode.class.isAssignableFrom(klass)) {
       policy().check(klass);
     }
 
     return obj;
-  }
-
-  /**
-   * Whether the class is one of the closures Groovy builds from other closures ({@code curry},
-   * {@code >>}, {@code memoize}, {@code trampoline}): calling them calls these closures, which the
-   * script holds already.
-   */
-  private static boolean isClosureWrapper(Class<?> klass) {
-    return klass == CurriedClosure.class
-        || klass == ComposedClosure.class
-        || (Closure.class.isAssignableFrom(klass)
-            && (TRAMPOLINE_CLOSURE.equals(klass.getName())
-                || klass.getName().startsWith(MEMOIZE_FUNCTION_PREFIX)));
   }
 
   /**

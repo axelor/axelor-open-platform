@@ -20,6 +20,7 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.axelor.test.db.Contact;
 import groovy.lang.Closure;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -517,6 +518,95 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     // Nested closure, resolved through its owner's delegate.
     assertBlockedByPolicy(
         helper, "def c = { -> { -> getenv('HOME') }() }; c.delegate = System; c()");
+  }
+
+  // The closures Groovy builds from a closure (curry, >>, memoize, trampoline...) resolve their
+  // properties and calls without a receiver on their own delegate and owner, which must be allowed
+  // as those of any sandboxed closure.
+  @Test
+  void testClosureWrapperDelegateMustBeAllowed() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }.memoize(); c.delegate = System; c.resolveStrategy = 1; c.env");
+    // memoizeAtMost, memoizeAtLeast and memoizeBetween build another class than memoize
+    assertBlockedByPolicy(
+        helper,
+        "def c = { -> 1 }.memoizeAtMost(1); c.delegate = System; c.resolveStrategy = 1; c.env");
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }.trampoline(); c.delegate = System; c.resolveStrategy = 1; c.env");
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }.memoize().rehydrate(System, System, System); c.env");
+    assertBlockedByPolicy(
+        helper, "def c = { x -> x }.curry(1).rehydrate(System, System, System); c.env");
+    assertBlockedByPolicy(
+        helper, "def c = ({ -> 1 } >> { -> 2 }).rehydrate(System, System, System); c.env");
+    // the delegate field written directly
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }.memoize(); c.@delegate = System; c.resolveStrategy = 1; c.env");
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }; c.@delegate = System; c.resolveStrategy = 1; c.env");
+    assertBlockedByPolicy(
+        helper, "def c = { -> 1 }.asWritable(); c.delegate = System; c.resolveStrategy = 1; c.env");
+    // a wrapper set as a delegate, then given a denied delegate itself
+    assertBlockedByPolicy(
+        helper,
+        "def w = { -> 1 }.memoize(); def c = { -> env }; c.resolveStrategy = 1; c.delegate = w;"
+            + " w.delegate = System; w.resolveStrategy = 1; c()");
+
+    // The wrappers still work.
+    assertEquals(List.of(1, 2), helper.eval("{ a, b -> [a, b] }.rcurry(2)(1)"));
+    assertEquals(List.of(1, 2, 3), helper.eval("{ a, b, c -> [a, b, c] }.ncurry(1, 2)(1, 3)"));
+    assertEquals(8, helper.eval("def f = { it * 2 } << { it + 1 }; f(3)"));
+    assertEquals(8, helper.eval("def f = { it + 1 }.andThen { it * 2 }; f(3)"));
+    assertEquals(4, helper.eval("def f = { it * 2 }.composeSelf(); f(1)"));
+    // a curried closure sets its delegate on the closure it calls
+    assertEquals(
+        4, helper.eval("def f = { x -> size() + x }.curry(1); f.delegate = [1, 2, 3]; f()"));
+    // a copy has its own delegate and resolve strategy
+    assertEquals(
+        List.of(2, 3),
+        helper.eval(
+            "def f = { x -> size() + x }.curry(1); def a = f.clone(); a.delegate = [1];"
+                + " def b = f.clone(); b.delegate = [1, 2]; [a(), b()]"));
+    assertEquals(
+        Arrays.asList(1, null),
+        helper.eval("def f = { x, self -> v }.curry(0); [[v: 1].with(f), f(null)]"));
+    // a trampoline bounces on the trampolines its closure returns, without growing the stack
+    assertEquals(
+        50_005_000L,
+        helper.eval(
+            "def f; f = { n, acc -> n == 0 ? acc : f.trampoline(n - 1, acc + n) }.trampoline();"
+                + " f(10_000, 0L)"));
+    // a null argument and an array argument are passed unchanged
+    assertEquals(true, helper.eval("{ a, b -> [a, b] }.curry(1)(null) == [1, null]"));
+    assertEquals(null, helper.eval("{ x = 'default' -> x }.memoize()(null)"));
+    assertEquals(null, helper.eval("{ x = 'default' -> x }.trampoline()(null)"));
+    assertEquals(null, helper.eval("({ x = 'default' -> x } >> { it })(null)"));
+    assertEquals(
+        List.of(2), helper.eval("[[1, 2] as Object[]].collect({ a -> a.length }.memoize())"));
+  }
+
+  // Every method building a closure from a sandboxed closure must sandbox it (a new Groovy version
+  // may add some).
+  @Test
+  void testClosureWrappersAreSandboxed() throws Exception {
+    for (var method : Closure.class.getMethods()) {
+      if (!Closure.class.isAssignableFrom(method.getReturnType())
+          || java.lang.reflect.Modifier.isStatic(method.getModifiers())
+          // they return a copy of the closure itself
+          || List.of("dehydrate", "rehydrate").contains(method.getName())
+          // a WritableClosure is not allowed by the policy
+          || "asWritable".equals(method.getName())) {
+        continue;
+      }
+      assertEquals(
+          SandboxClosure.class,
+          SandboxClosure.class
+              .getMethod(method.getName(), method.getParameterTypes())
+              .getDeclaringClass(),
+          () -> "SandboxClosure must override " + method);
+    }
   }
 
   // Common closure usage must keep working with sandboxed closures.
