@@ -19,6 +19,7 @@
 package com.axelor.i18n;
 
 import com.axelor.app.internal.AppFilter;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -95,6 +96,9 @@ public final class L10n {
   /**
    * Format the number value.
    *
+   * <p>A {@link BigDecimal} is formatted with all its significant decimals, without trailing zeros.
+   * Other numbers are formatted with at most 3 decimals.
+   *
    * @param value the value to format
    * @param grouping whether to use grouping in format
    * @return value as formated string
@@ -103,8 +107,13 @@ public final class L10n {
     if (value == null) {
       return null;
     }
-    numberFormat.setGroupingUsed(grouping);
-    return numberFormat.format(value);
+    final NumberFormat format = (NumberFormat) numberFormat.clone();
+    format.setGroupingUsed(grouping);
+    if (value instanceof BigDecimal) {
+      final BigDecimal decimal = (BigDecimal) value;
+      format.setMaximumFractionDigits(Math.max(0, decimal.stripTrailingZeros().scale()));
+    }
+    return format.format(value);
   }
 
   /**
