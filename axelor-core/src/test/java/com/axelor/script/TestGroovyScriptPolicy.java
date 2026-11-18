@@ -420,6 +420,26 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertEquals("b", helper.eval("('abc' =~ /(b)/)[0][1]"));
   }
 
+  // Property accesses and local variable calls in closures are checked as in the script body.
+  @Test
+  void testClosureCodeIsChecked() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "{ -> System.env }()");
+    assertBlockedByPolicy(helper, "[1].collect { System.env }");
+    assertBlockedByPolicy(helper, "def l = [System]; [1].collect { l.env }");
+    assertBlockedByPolicy(helper, "{ -> [[System]].env }()");
+    assertBlockedByPolicy(helper, "{ -> { -> System.env }() }()");
+    assertBlockedByPolicy(
+        helper, "class X { def m() { [1].collect { System.env } } }; new X().m()");
+    assertBlockedByPolicy(helper, "\"${-> System.env}\".toString()");
+    assertBlockedByPolicy(helper, "def s = System; { -> def f = s.&getenv; f() }()");
+
+    // Allowed property accesses in closures still work.
+    assertEquals(List.of(1, 2), helper.eval("[[a: 1], [a: 2]].collect { it.a }"));
+    assertEquals(3, helper.eval("def m = [a: [b: 3]]; { -> m.a.b }()"));
+  }
+
   // Each owner of a property chain (a.b.c) is checked, as well as the elements of a collection or
   // an array whose property is read from each element ([a, b].name).
   @Test
@@ -483,6 +503,9 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
 
     assertBlockedByPolicy(helper, "def x = c; x()");
     assertBlockedByPolicy(helper, "def run(x) { x() }; run(c)");
+    // in closures too
+    assertBlockedByPolicy(helper, "{ -> def x = c; x() }()");
+    assertBlockedByPolicy(helper, "[1].collect { def x = c; x() }");
 
     // Closures, and the closures Groovy builds from them, can still be called.
     assertEquals(6, helper.eval("def f = { it * 2 }; f(3)"));

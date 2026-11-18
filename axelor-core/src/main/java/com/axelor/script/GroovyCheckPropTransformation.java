@@ -7,6 +7,7 @@ package com.axelor.script;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.ast.expr.ClosureExpression;
 import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
@@ -70,6 +71,13 @@ public class GroovyCheckPropTransformation extends AbstractASTTransformation {
 
     @Override
     public Expression transform(Expression expr) {
+      // the expression transformer does not visit the code of closures
+      if (expr instanceof ClosureExpression closure) {
+        if (closure.getCode() != null) {
+          closure.getCode().visit(this);
+        }
+        return closure;
+      }
       if (expr instanceof PropertyExpression prop) {
         Expression obj = prop.getObjectExpression();
         // a call result is already checked by GroovyCheckTransformation
