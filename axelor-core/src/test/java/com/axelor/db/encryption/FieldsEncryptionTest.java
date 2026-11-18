@@ -270,8 +270,9 @@ public class FieldsEncryptionTest extends BaseEncryptionTest {
 
   @Test
   @Order(10)
-  @SuppressWarnings("unchecked")
   public void passwordFieldShouldNotBeExposedByRecordName() {
+    // a password field or a relational path is not a valid name, so the request is
+    // rejected and no password value can be exposed
     for (String name : List.of("mySecureString", "createdBy.password")) {
       Map<String, Object> data = new HashMap<>();
       data.put("id", savedEntityId);
@@ -283,10 +284,9 @@ public class FieldsEncryptionTest extends BaseEncryptionTest {
       request.setFields(List.of(name));
 
       Response response = resource.getRecordName(request);
-      Map<String, Object> result = (Map<String, Object>) response.getItem(0);
 
-      assertFalse(result.containsKey("mySecureString"));
-      assertFalse(((Map<String, Object>) result.get("createdBy")).containsKey("password"));
+      assertEquals(Response.STATUS_FAILURE, response.getStatus());
+      assertNull(response.getData());
     }
   }
 
