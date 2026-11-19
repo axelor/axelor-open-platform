@@ -45,7 +45,7 @@ public final class SandboxMethodPointer extends SandboxClosure<Object> {
   }
 
   public Object doCall(Object... arguments) {
-    if (getOwner() instanceof Class<?> type
+    if (target.pointer.getOwner() instanceof Class<?> type
         && arguments != null
         && arguments.length > 0
         && type.isInstance(arguments[0])) {
