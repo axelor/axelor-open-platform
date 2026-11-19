@@ -201,7 +201,9 @@ public final class SandboxGroovyMethods {
   }
 
   public static Object getAt(Object self, String property) {
-    if (self instanceof Object[] array) {
+    if (self instanceof Collection<?> collection) {
+      GroovySandbox.checkElementsFromSandbox(collection, collection, property);
+    } else if (self instanceof Object[] array) {
       GroovySandbox.checkElementsFromSandbox(array, Arrays.asList(array), property);
     }
     return DefaultGroovyMethods.getAt(self, property);

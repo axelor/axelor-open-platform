@@ -372,6 +372,8 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
         helper,
         "def f = (Object::invokeMethod).rehydrate(null, 1, null);"
             + " f(System, 'getenv', [] as Object[])");
+    assertBlockedByPolicy(helper, "def f = Object::getAt; f([System], 'env')");
+    assertBlockedByPolicy(helper, "def f = Object::getAt; f([[System]], 'env')");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "[denied].collect(Object::toString)");
     assertBlockedByPolicy(helper, DENIED_OBJECT + "def f = denied.&getName; f.curry()()");
     assertBlockedByPolicy(helper, "def x = 'axelor-nonexistent-binary-xyz'.&execute; x(); 1");
