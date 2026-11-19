@@ -161,7 +161,8 @@ public abstract class SandboxClosure<V> extends Closure<V> implements SandboxCod
 
   // A collection or an array delegate (or owner) reads a property from each of its elements, which
   // can be added after it was set (l = []; c.delegate = l; l << System): they are validated when a
-  // property is resolved on it.
+  // property is resolved on it, and the property is read from the validated elements, see
+  // GroovySandbox.checkProperty.
 
   /** The properties of the closure itself, not resolved on its owner or delegate. */
   private static final Set<String> CLOSURE_PROPERTIES =
@@ -178,27 +179,37 @@ public abstract class SandboxClosure<V> extends Closure<V> implements SandboxCod
 
   @Override
   public Object getProperty(String property) {
-    if (!CLOSURE_PROPERTIES.contains(property)) {
-      checkResolvedProperty(property);
+    if (CLOSURE_PROPERTIES.contains(property)) {
+      return super.getProperty(property);
     }
+    final int strategy = getResolveStrategy();
+    final Object delegate = getDelegate();
+    final Object owner = getOwner();
+    final Object delegateOwner =
+        strategy != OWNER_ONLY && strategy != TO_SELF
+            ? propertyOwner(delegate, property)
+            : delegate;
+    final Object ownerOwner =
+        strategy != DELEGATE_ONLY && strategy != TO_SELF ? propertyOwner(owner, property) : owner;
+    if (delegateOwner == delegate && ownerOwner == owner) {
+      return super.getProperty(property);
+    }
+    // resolved on a copy: this closure is not changed while the property is read (the copy of a
+    // SandboxClosureWrapper validates the delegate once more, before it is replaced here)
+    final Closure<V> copy = super.rehydrate(delegateOwner, ownerOwner, getThisObject());
+    return copy instanceof SandboxClosure<V> sandboxCopy
+        ? sandboxCopy.superGetProperty(property)
+        : copy.getProperty(property);
+  }
+
+  private Object superGetProperty(String property) {
     return super.getProperty(property);
   }
 
-  /** Validates the owners of a property resolved on the delegate or owner, as a property chain. */
-  private void checkResolvedProperty(String property) {
-    final int strategy = getResolveStrategy();
-    if (strategy != OWNER_ONLY && strategy != TO_SELF) {
-      checkContainer(getDelegate(), property);
-    }
-    if (strategy != DELEGATE_ONLY && strategy != TO_SELF) {
-      checkContainer(getOwner(), property);
-    }
-  }
-
-  private static void checkContainer(Object target, String property) {
-    if (target instanceof Collection<?> || target instanceof Object[]) {
-      GroovySandbox.checkProperty(target, property);
-    }
+  private static Object propertyOwner(Object target, String property) {
+    return target instanceof Collection<?> || target instanceof Object[]
+        ? GroovySandbox.checkProperty(target, property)
+        : target;
   }
 
   private static void checkResolveTarget(Object target) {

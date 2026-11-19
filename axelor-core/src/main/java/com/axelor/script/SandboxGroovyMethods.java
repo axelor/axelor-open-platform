@@ -10,7 +10,6 @@ import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -195,18 +194,15 @@ public final class SandboxGroovyMethods {
 
   // DefaultGroovyMethods.getAt(..., String): the receiver itself is checked by the transformations
 
+  // the property is read from the elements collected (and checked) once, see GroovySandbox
   public static List getAt(Collection<?> self, String property) {
-    GroovySandbox.checkElementsFromSandbox(self, self, property);
-    return DefaultGroovyMethods.getAt(self, property);
+    return DefaultGroovyMethods.getAt(
+        GroovySandbox.propertyOwnersFromSandbox(self, property), property);
   }
 
   public static Object getAt(Object self, String property) {
-    if (self instanceof Collection<?> collection) {
-      GroovySandbox.checkElementsFromSandbox(collection, collection, property);
-    } else if (self instanceof Object[] array) {
-      GroovySandbox.checkElementsFromSandbox(array, Arrays.asList(array), property);
-    }
-    return DefaultGroovyMethods.getAt(self, property);
+    return DefaultGroovyMethods.getAt(
+        GroovySandbox.propertyOwnerFromSandbox(self, property), property);
   }
 
   // DefaultGroovyMethods.addShutdownHook

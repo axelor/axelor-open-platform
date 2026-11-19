@@ -6,7 +6,10 @@ package com.axelor.script;
 
 import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
+import groovy.lang.GroovyObject;
 import groovy.lang.MetaBeanProperty;
+import groovy.lang.MetaClass;
+import groovy.lang.MetaMethod;
 import groovy.lang.MetaProperty;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -15,16 +18,16 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 import org.codehaus.groovy.reflection.CachedField;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.codehaus.groovy.runtime.metaclass.MultipleSetterProperty;
@@ -201,24 +204,23 @@ public final class GroovySandbox {
    *
    * <p>A property that a collection or an array does not have itself is read from each of its
    * elements instead ({@code [a, b].name} is {@code [a.name, b.name]}), so the elements are
-   * validated as owners too, at any depth ({@code [[a]].name} is {@code [[a.name]]}). The name is
-   * {@code null} when it is computed at runtime.
+   * validated as owners too, at any depth ({@code [[a]].name} is {@code [[a.name]]}). They are
+   * collected in a single pass, and the property is read from them by the {@link PropertyOwners}
+   * returned in place of the container: a stateful collection could give other elements to a second
+   * iteration. The name is {@code null} when it is computed at runtime.
    */
-  public static <T> T checkProperty(T obj, String name) {
+  public static Object checkProperty(Object obj, String name) {
     check(obj);
+    return propertyOwner(obj, name, GroovySandbox::check);
+  }
+
+  /**
+   * The owner a property is read from: the object itself, or the {@link PropertyOwners} of a
+   * collection or an array whose property is read from its elements, each passed to the check.
+   */
+  private static Object propertyOwner(Object obj, String name, Consumer<Object> check) {
     final Iterable<?> elements = propertyElements(obj, name);
-    if (elements != null) {
-      forEachPropertyOwner(
-          obj,
-          elements,
-          name,
-          element -> {
-            check(element);
-            return true;
-          },
-          null);
-    }
-    return obj;
+    return elements == null ? obj : collectOwners(obj, elements, name, check, null);
   }
 
   /**
@@ -228,7 +230,11 @@ public final class GroovySandbox {
    */
   private static Iterable<?> propertyElements(Object obj, String name) {
     if (obj instanceof Collection<?> collection) {
-      return name == null || !hasOwnProperty(obj, name) ? collection : null;
+      // a property of the collection itself (looked up first: the most common, and found faster),
+      // or a collection reading any property itself, is not read from its elements
+      return (name != null && hasOwnProperty(obj, name)) || readsAnyProperty(obj)
+          ? null
+          : collection;
     }
     if (obj instanceof Object[] array) {
       return name == null || !("length".equals(name) || hasOwnProperty(obj, name))
@@ -239,34 +245,86 @@ public final class GroovySandbox {
   }
 
   /**
-   * Passes each element to the action, as well as the elements of the nested containers whose
-   * property is read from their elements, at any depth. A container is visited once, so that a
-   * container holding itself does not loop forever. Stops as soon as the action returns {@code
-   * false}, and then returns {@code false}.
+   * Collects each element, passed to the check, in a single pass: a nested container whose property
+   * is read from its elements is collected as well, at any depth. A container is visited once, so
+   * that a container holding itself does not loop forever.
    */
-  private static boolean forEachPropertyOwner(
+  private static PropertyOwners collectOwners(
       Object container,
       Iterable<?> elements,
       String name,
-      Predicate<Object> action,
-      Set<Object> visited) {
+      Consumer<Object> check,
+      Map<Object, PropertyOwners> visited) {
+    final PropertyOwners owners = new PropertyOwners(container, name);
+    if (visited != null) {
+      visited.put(container, owners);
+    }
     for (Object element : elements) {
-      if (!action.test(element)) {
-        return false;
-      }
+      check.accept(element);
       final Iterable<?> nested = propertyElements(element, name);
       if (nested == null) {
+        owners.elements.add(element);
         continue;
       }
       if (visited == null) {
-        visited = Collections.newSetFromMap(new IdentityHashMap<>());
-        visited.add(container);
+        visited = new IdentityHashMap<>();
+        visited.put(container, owners);
       }
-      if (visited.add(element) && !forEachPropertyOwner(element, nested, name, action, visited)) {
-        return false;
-      }
+      final PropertyOwners seen = visited.get(element);
+      owners.elements.add(
+          seen != null ? seen : collectOwners(element, nested, name, check, visited));
     }
-    return true;
+    return owners;
+  }
+
+  /**
+   * The validated elements of a collection or an array whose property is read from each of them, in
+   * place of the container as the owner of a property access, see {@link #checkProperty(Object,
+   * String)}.
+   *
+   * <p>The property is read from these elements as Groovy reads it from a collection, not from the
+   * container, which would be iterated again. A property the container has itself, known only at
+   * this point for a name computed at runtime, is read from the container. A property is set on the
+   * container, as Groovy does not set it on its elements.
+   */
+  static final class PropertyOwners implements GroovyObject {
+
+    private final Object container;
+
+    /** The name the elements were collected for, {@code null} when computed at runtime. */
+    private final String name;
+
+    private final List<Object> elements = new ArrayList<>();
+
+    private PropertyOwners(Object container, String name) {
+      this.container = container;
+      this.name = name;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+      // the elements were collected for this name as it is not a property of the container: not
+      // looked up again, a missing property being the slowest lookup (a nested PropertyOwners reads
+      // the property from its own elements)
+      return name.equals(this.name) || propertyElements(container, name) != null
+          ? DefaultGroovyMethods.getAt(elements, name)
+          : InvokerHelper.getProperty(container, name);
+    }
+
+    @Override
+    public void setProperty(String name, Object value) {
+      InvokerHelper.setProperty(container, name, value);
+    }
+
+    @Override
+    public MetaClass getMetaClass() {
+      return InvokerHelper.getMetaClass(PropertyOwners.class);
+    }
+
+    @Override
+    public void setMetaClass(MetaClass metaClass) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
@@ -293,6 +351,26 @@ public final class GroovySandbox {
   }
 
   /**
+   * Whether Groovy reads any property from the object itself, as {@code MetaClassImpl} does before
+   * reading it from each element of a collection: a map from its entries, and other objects through
+   * a generic {@code get(String)} method.
+   *
+   * <p>A {@link GroovyObject} overriding {@code getProperty(String)} is not taken as reading them
+   * itself: its override can read them from each element through the metaclass ({@code
+   * super.getProperty(name)}).
+   */
+  private static boolean readsAnyProperty(Object obj) {
+    if (obj instanceof Map) {
+      return true;
+    }
+    final MetaMethod get =
+        InvokerHelper.getMetaClass(obj).getMetaMethod("get", new Object[] {String.class});
+    return get != null
+        && get.getParameterTypes().length == 1
+        && get.getParameterTypes()[0].getTheClass() == String.class;
+  }
+
+  /**
    * Whether Groovy can read the field of the object: {@link CachedField#getProperty(Object)} makes
    * it accessible first ({@link CachedField#getCachedField()} does the same), and reads the
    * property from each element instead when it cannot.
@@ -303,31 +381,49 @@ public final class GroovySandbox {
   }
 
   /**
-   * Validates the elements whose property a sandboxed subscript reads ({@code [a, b]['name']}), at
-   * any depth as {@link #checkProperty(Object, String)}, see {@link
-   * SandboxGroovyMethods#getAt(Collection, String)}. Trusted code is not affected.
+   * The owner of a property a sandboxed subscript reads ({@code obj['name']}), as {@link
+   * #checkProperty(Object, String)}, see {@link SandboxGroovyMethods#getAt(Object, String)}.
+   * Trusted code is not affected: the elements are not checked.
+   *
+   * <p>The elements of a collection or an array are checked even for a property of the container
+   * itself, in case Groovy cannot read it and reads it from each element instead.
    */
-  static void checkElementsFromSandbox(Object container, Iterable<?> elements, String name) {
+  static Object propertyOwnerFromSandbox(Object obj, String name) {
+    final Consumer<Object> check = checkFromSandbox();
+    final Object owner = propertyOwner(obj, name, check);
+    if (owner == obj) {
+      final Iterable<?> elements = propertyElements(obj, null);
+      if (elements != null) {
+        collectOwners(obj, elements, name, check, null);
+      }
+    }
+    return owner;
+  }
+
+  /**
+   * The validated elements of a collection whose property a sandboxed subscript reads from each of
+   * them ({@code [a, b]['name']}), as {@link #checkProperty(Object, String)}, see {@link
+   * SandboxGroovyMethods#getAt(Collection, String)}. Trusted code is not affected: the elements are
+   * not checked.
+   */
+  static List<Object> propertyOwnersFromSandbox(Collection<?> collection, String name) {
+    return collectOwners(collection, collection, name, checkFromSandbox(), null).elements;
+  }
+
+  /** Checks the elements only when called from sandboxed code, found on the first one to check. */
+  private static Consumer<Object> checkFromSandbox() {
     final Boolean[] sandboxed = {null};
-    forEachPropertyOwner(
-        container,
-        elements,
-        name,
-        element -> {
-          if (element == null || isAllowedReceiver(element)) {
-            return true;
-          }
-          if (sandboxed[0] == null) {
-            sandboxed[0] = isSandboxed();
-          }
-          // trusted code: the rest of the elements is not walked
-          if (!sandboxed[0]) {
-            return false;
-          }
-          check(element);
-          return true;
-        },
-        null);
+    return element -> {
+      if (element == null || isAllowedReceiver(element)) {
+        return;
+      }
+      if (sandboxed[0] == null) {
+        sandboxed[0] = isSandboxed();
+      }
+      if (sandboxed[0]) {
+        check(element);
+      }
+    };
   }
 
   /** Whether {@link #check(Object)} accepts the object without the reflection rules. */

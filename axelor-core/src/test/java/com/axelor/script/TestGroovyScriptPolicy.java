@@ -428,6 +428,19 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertEquals(List.of("a", "b"), helper.eval("[[n: 'a'], [n: 'b']]['n']"));
     assertEquals(List.of(List.of("a"), List.of("b")), helper.eval("[[[n: 'a']], [[n: 'b']]]['n']"));
     assertEquals("b", helper.eval("('abc' =~ /(b)/)[0][1]"));
+    // a property of the container itself, or read from the elements as from their container
+    assertEquals(1, helper.eval("(['a'] as Object[])['length']"));
+    assertEquals(false, helper.eval("def f = Object::getAt; f([1], 'empty')"));
+    // the elements are checked even for a property of the container itself
+    assertBlockedByPolicy(helper, "def f = Object::getAt; f([System], 'empty')");
+    assertBlockedByPolicy(helper, "([System] as Object[])['length']");
+    assertEquals(List.of(List.of(1)), helper.eval("[[[first: 1]] as Object[]]['first']"));
+    // a stateful collection is iterated only once, not a second time with denied elements
+    assertEquals(
+        List.of(1),
+        helper.eval(
+            "def n = 0; def l = [iterator: { -> (n++ > 0 ? [System] : [[env: 1]]).iterator() },"
+                + " size: { 1 }] as Collection; l['env']"));
   }
 
   // Property accesses and local variable calls in closures are checked as in the script body.
@@ -507,6 +520,52 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertEquals(1, helper.eval("(['a'] as Object[]).length"));
     assertEquals(3, helper.eval("[a: [b: [c: 3]]].a.b.c"));
     assertEquals(false, helper.eval("new ArrayList([1]).empty"));
+    // a stateful collection is iterated only once, not a second time with denied elements
+    assertEquals(
+        List.of(1),
+        helper.eval(
+            "def n = 0; def l = [iterator: { -> (n++ > 0 ? [System] : [[env: 1]]).iterator() },"
+                + " size: { 1 }] as Collection; l.env"));
+    assertEquals(
+        List.of(1),
+        helper.eval(
+            "class L extends AbstractList { int n = 0; Object get(int i) { n++ > 0 ? System : [env:"
+                + " 1] }; int size() { 1 } }; new L().env"));
+    // the property is read from the elements as from their container, not as from a list holding
+    // them (a list has its own first and last properties)
+    assertEquals(List.of(1, 2), helper.eval("([[first: 1], [first: 2]] as Object[]).first"));
+    assertEquals(List.of(1), helper.eval("new HashSet([[last: 1]]).last"));
+    assertEquals(List.of(List.of(1)), helper.eval("new HashSet([[[first: 1]] as Object[]]).first"));
+    assertEquals(List.of(List.of(1)), helper.eval("[[[first: 1]] as Object[]]*.first"));
+    // a computed name is a property of the container itself when it has it
+    assertEquals(2, helper.eval("(['ab', 'c'] as Object[]).\"${'length'}\""));
+    // a property is set on the container itself
+    assertEquals(
+        5,
+        helper.eval(
+            "class C extends ArrayList { def v; void setFoo(x) { v = x } }; def c = new C();"
+                + " c.foo = 5; c.v"));
+    assertEquals(
+        5,
+        helper.eval(
+            "class C extends ArrayList { def v; void setFoo(x) { v = x } }; def c = new C();"
+                + " c.\"${'foo'}\" = 5; c.v"));
+    // a collection with a generic get(String) method reads any property itself, as in Groovy
+    assertEquals(
+        "g",
+        helper.eval(
+            "class L extends ArrayList { def get(String n) { 'g' } }; def l = new L(); l << System;"
+                + " l.env"));
+    assertEquals(
+        "g",
+        helper.eval(
+            "class L extends ArrayList { def get(String n) { 'g' } }; def l = new L(); l << System;"
+                + " l.\"${'env'}\""));
+    // an override of getProperty can read the property from each element: they are checked
+    assertBlockedByPolicy(
+        helper,
+        "class L extends ArrayList { Object getProperty(String n) { super.getProperty(n) } };"
+            + " def l = new L(); l << System; l.env");
   }
 
   // A call of a local variable (x()) is a call of its call() method, so the variable is checked
@@ -571,6 +630,30 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(
         helper,
         "def l = []; def c = { -> env }; c.resolveStrategy = 1; c.delegate = l; l << System; c()");
+    assertBlockedByPolicy(
+        helper,
+        "def n = 0; def l = [iterator: { -> (n++ > 0 ? [System] : [[env: 1]]).iterator() }, size:"
+            + " { 1 }] as Collection; def c = { -> env }; c.resolveStrategy = 1; c.delegate = l;"
+            + " c()");
+    assertEquals(
+        List.of(1),
+        helper.eval(
+            "def n = 0; def l = [iterator: { -> (n++ > 1 ? [System] : [[env: 1]]).iterator() },"
+                + " size: { 1 }] as Collection; def c = { -> env }; c.resolveStrategy = 1;"
+                + " c.delegate = l; c()"));
+    // the property is read from the elements as from their container
+    assertEquals(
+        List.of(1, 2),
+        helper.eval(
+            "def c = { -> first }; c.resolveStrategy = 1;"
+                + " c.delegate = [[first: 1], [first: 2]] as Object[]; c()"));
+    // the closure itself is not changed while the property is resolved
+    assertEquals(
+        "LinkedHashMap",
+        helper.eval(
+            "class E { def c; def getA() { c.delegate = [[a: 9]]; 1 } }; def e = new E();"
+                + " def c = { -> a }; e.c = c; c.resolveStrategy = 1; c.delegate = [e]; c();"
+                + " c.delegate[0].getClass().simpleName"));
   }
 
   // The closures Groovy builds from a closure (curry, >>, memoize, trampoline...) resolve their
