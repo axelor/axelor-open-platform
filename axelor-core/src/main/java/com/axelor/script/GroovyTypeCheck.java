@@ -105,6 +105,7 @@ class GroovyTypeCheck extends CompilationCustomizer {
         check(node.getReturnType(), node.getLineNumber());
       }
       check(node.getParameters());
+      visitInitialExpressions(node.getParameters());
       super.visitConstructorOrMethod(node, isConstructor);
     }
 
@@ -141,7 +142,20 @@ class GroovyTypeCheck extends CompilationCustomizer {
     @Override
     public void visitClosureExpression(ClosureExpression expression) {
       check(expression.getParameters());
+      visitInitialExpressions(expression.getParameters());
       super.visitClosureExpression(expression);
+    }
+
+    // The default values of parameters (def f(x = expr), { x = expr -> }) are code too, but
+    // ClassCodeVisitorSupport only visits the code of methods and closures, not their parameters.
+    private void visitInitialExpressions(Parameter[] parameters) {
+      if (parameters != null) {
+        for (Parameter parameter : parameters) {
+          if (parameter.hasInitialExpression()) {
+            parameter.getInitialExpression().visit(this);
+          }
+        }
+      }
     }
 
     @Override

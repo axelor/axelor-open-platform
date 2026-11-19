@@ -442,10 +442,16 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
         helper, "class X { def m() { [1].collect { System.env } } }; new X().m()");
     assertBlockedByPolicy(helper, "\"${-> System.env}\".toString()");
     assertBlockedByPolicy(helper, "def s = System; { -> def f = s.&getenv; f() }()");
+    assertBlockedByPolicy(helper, "{ x = System.getenv('PATH') -> x }()");
+    assertBlockedByPolicy(helper, "{ x = System.env -> x }()");
+    assertBlockedByPolicy(helper, "((x = System.getenv('PATH')) -> x)()");
+    assertBlockedByPolicy(helper, "[1].collect { a, b = System.env -> b }");
+    assertBlockedByPolicy(helper, "{ x = { -> System.env }() -> x }()");
 
     // Allowed property accesses in closures still work.
     assertEquals(List.of(1, 2), helper.eval("[[a: 1], [a: 2]].collect { it.a }"));
     assertEquals(3, helper.eval("def m = [a: [b: 3]]; { -> m.a.b }()"));
+    assertEquals("A", helper.eval("{ x = 'a'.toUpperCase() -> x }()"));
   }
 
   // Each owner of a property chain (a.b.c) is checked, as well as the elements of a collection or
@@ -748,6 +754,9 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     assertBlockedByPolicy(helper, "class X { @SuppressWarnings('x') String p }; 1");
     assertBlockedByPolicy(helper, "class X { @SuppressWarnings('x') private String f }; 1");
     assertBlockedByPolicy(helper, "class X { X(@SuppressWarnings('x') String p) {} }; 1");
+    assertBlockedByPolicy(
+        helper, "def f(x = { @SuppressWarnings('x') def y = 1; y }()) { x }; f()");
+    assertBlockedByPolicy(helper, "{ x = { @SuppressWarnings('x') def y = 1; y }() -> x }()");
 
     // The parser drops annotations on a for-in loop variable and on a catch parameter: they never
     // reach the compiler, so they cannot trigger a transformation.
@@ -1167,7 +1176,13 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
               "new java.io.FileOutputStream[][] { new java.io.FileOutputStream[] { ["
                   + path
                   + "] } }",
-              "def a = new Formatter[] { [" + path + "] }")) {
+              "def a = new Formatter[] { [" + path + "] }",
+              // default parameter values
+              "def g(x = (java.io.FileOutputStream) [" + path + "]) { x }; g()",
+              "def g(x = { java.io.FileOutputStream o = [" + path + "]; o }()) { x }; g()",
+              "class X { X(x = (java.io.FileOutputStream) [" + path + "]) {} }; new X()",
+              "{ x = (java.io.FileOutputStream) [" + path + "] -> x }()",
+              "((x = (java.io.FileOutputStream) [" + path + "]) -> x)()")) {
         assertBlockedByPolicy(helper, code + "; 1");
         assertFalse(java.nio.file.Files.exists(file), () -> "File created by: " + code);
       }
@@ -1187,6 +1202,8 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
           2026, helper.eval("java.time.LocalDate d = java.time.LocalDate.of(2026, 1, 2); d.year"));
       assertEquals(3, helper.eval("class P { int x; P(int x) { this.x = x } }; P p = [3]; p.x"));
       assertEquals(12, helper.eval("'12' as Integer"));
+      assertEquals(2, helper.eval("def g(x = (List) [1, 2]) { x.size() }; g()"));
+      assertEquals(2, helper.eval("{ x = { -> List l = [1, 2]; l }() -> x.size() }()"));
       assertEquals(2, helper.eval("new ArrayList([1, 2]).size()"));
       assertEquals(
           List.of("a", "b"), Arrays.asList((Object[]) helper.eval("new String[] { 'a', 'b' }")));

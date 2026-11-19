@@ -73,6 +73,7 @@ public class GroovyCheckPropTransformation extends AbstractASTTransformation {
     public Expression transform(Expression expr) {
       // the expression transformer does not visit the code of closures
       if (expr instanceof ClosureExpression closure) {
+        GroovyCheckTransformation.transformParameters(closure, this);
         if (closure.getCode() != null) {
           closure.getCode().visit(this);
         }

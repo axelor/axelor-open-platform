@@ -11,6 +11,7 @@ import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.BinaryExpression;
 import org.codehaus.groovy.ast.expr.ClassExpression;
@@ -158,6 +159,23 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
     return res;
   }
 
+  /**
+   * Transforms the default value expressions of a closure's parameters ({@code { x = expr -> ...
+   * }}): {@link ClosureExpression#transformExpression} returns the closure unchanged without
+   * visiting its parameters or body.
+   */
+  static void transformParameters(
+      ClosureExpression closure, ClassCodeExpressionTransformer transformer) {
+    Parameter[] parameters = closure.getParameters();
+    if (parameters != null) {
+      for (Parameter parameter : parameters) {
+        if (parameter.hasInitialExpression()) {
+          parameter.setInitialExpression(transformer.transform(parameter.getInitialExpression()));
+        }
+      }
+    }
+  }
+
   static class CheckTransformer extends ClassCodeExpressionTransformer {
 
     private final SourceUnit unit;
@@ -245,6 +263,7 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
       }
 
       if (expr instanceof ClosureExpression ce) {
+        transformParameters(ce, this);
         if (ce.getCode() != null) {
           ce.getCode().visit(this);
         }
@@ -303,10 +322,13 @@ public class GroovyCheckTransformation extends AbstractASTTransformation {
 
     @Override
     public Expression transform(Expression expr) {
-      if (expr instanceof ClosureExpression ce && ce.getCode() != null) {
-        // the closure body is not visited by the expression transformer
-        ce.getCode().visit(this);
-        addTimeout(ce.getCode(), ce::setCode);
+      if (expr instanceof ClosureExpression ce) {
+        transformParameters(ce, this);
+        if (ce.getCode() != null) {
+          // the closure body is not visited by the expression transformer
+          ce.getCode().visit(this);
+          addTimeout(ce.getCode(), ce::setCode);
+        }
         return ce;
       }
       return super.transform(expr);

@@ -209,6 +209,7 @@ class GroovyAnnotationCheck extends CompilationCustomizer {
     @Override
     protected void visitConstructorOrMethod(MethodNode node, boolean isConstructor) {
       reject(node.getParameters(), module);
+      visitInitialExpressions(node.getParameters());
       super.visitConstructorOrMethod(node, isConstructor);
     }
 
@@ -222,7 +223,20 @@ class GroovyAnnotationCheck extends CompilationCustomizer {
     @Override
     public void visitClosureExpression(ClosureExpression expression) {
       reject(expression.getParameters(), module);
+      visitInitialExpressions(expression.getParameters());
       super.visitClosureExpression(expression);
+    }
+
+    // The default values of parameters (def f(x = expr), { x = expr -> }) are code too, but
+    // ClassCodeVisitorSupport only visits the code of methods and closures, not their parameters.
+    private void visitInitialExpressions(Parameter[] parameters) {
+      if (parameters != null) {
+        for (Parameter parameter : parameters) {
+          if (parameter.hasInitialExpression()) {
+            parameter.getInitialExpression().visit(this);
+          }
+        }
+      }
     }
 
     // The parser currently drops annotations on for-in variables and catch parameters, checked in
