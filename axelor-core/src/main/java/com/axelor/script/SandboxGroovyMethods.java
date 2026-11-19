@@ -144,52 +144,52 @@ public final class SandboxGroovyMethods {
   // DefaultGroovyMethods.asType, StringGroovyMethods.asType
 
   public static <T> T asType(Iterable<?> self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Collection<?> self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Object[] self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Closure<?> self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Map<?, ?> self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Number self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(Object self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return DefaultGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(CharSequence self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return StringGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(GString self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return StringGroovyMethods.asType(self, type);
   }
 
   public static <T> T asType(String self, Class<T> type) {
-    GroovySandbox.checkConversion(type);
+    GroovySandbox.checkConversion(type, self);
     return StringGroovyMethods.asType(self, type);
   }
 

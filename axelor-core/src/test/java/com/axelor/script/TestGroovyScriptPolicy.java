@@ -1190,6 +1190,29 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
     }
   }
 
+  // A map or a closure converted to an abstract class is a proxy subclass of it: its constructor
+  // runs, and the proxy can be passed to code expecting an instance of that class.
+  @Test
+  void testDeniedAbstractClassesAreNotProxied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+
+    assertBlockedByPolicy(helper, "[:] as ClassLoader; 1");
+    assertBlockedByPolicy(helper, "[:] as Closure; 1");
+    assertBlockedByPolicy(helper, "[read: { -> -1 }] as java.io.InputStream; 1");
+    assertBlockedByPolicy(helper, "{ -> -1 } as java.io.InputStream; 1");
+    assertBlockedByPolicy(helper, "java.io.InputStream s = { -> -1 }; 1");
+    assertBlockedByPolicy(helper, "def s; s = { -> -1 }.asType(java.io.InputStream); 1");
+
+    // Interfaces, Closure itself, and abstract classes the policy allows, can still be converted
+    // to.
+    assertEquals(
+        1,
+        helper.eval(
+            "Closure c = { 1 }; def c2 = { 1 } as Closure; Runnable r = { }; [run: { }] as"
+                + " Runnable; { 1 } as Comparator; c2()"));
+    assertEquals(1, helper.eval("TimerTask t = { }; [run: { }] as TimerTask; 1"));
+  }
+
   // Groovy categories and mixins expose methods of any class (e.g. System.getenv, GroovyShell)
   // on allow-listed receivers, so the receiver check does not apply to them.
   @Test

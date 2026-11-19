@@ -362,10 +362,14 @@ public final class GroovySandbox {
 
   /**
    * Denies a conversion ({@code as}, {@code asType}) from sandboxed code to a class the policy does
-   * not allow: Groovy converts a list or map by calling a constructor of the target class.
+   * not allow: Groovy converts a list or map by calling a constructor of the target class, and a
+   * map or a closure to an abstract class by constructing a proxy subclass of it.
    */
-  static void checkConversion(Class<?> type) {
-    if (type == null || !isConstructible(type) || policy().allowed(type)) {
+  static void checkConversion(Class<?> type, Object value) {
+    if (type == null
+        || type.isInstance(value)
+        || !isConstructible(type)
+        || policy().allowed(type)) {
       return;
     }
     if (isSandboxed()) {
@@ -375,8 +379,9 @@ public final class GroovySandbox {
   }
 
   /**
-   * Whether a conversion to the type may construct it: an interface or an abstract class cannot be
-   * constructed (a map or closure is converted to a proxy). Sandbox classes are checked by the
+   * Whether a conversion to the type may construct it or a proxy subclass of it: concrete classes
+   * are constructed from lists or maps, and abstract classes are proxied from maps or closures.
+   * Interfaces and primitives cannot be constructed this way; sandbox classes are checked by the
    * policy themselves.
    */
   static boolean isConstructible(Class<?> type) {
@@ -386,7 +391,6 @@ public final class GroovySandbox {
     }
     return !klass.isPrimitive()
         && !klass.isInterface()
-        && !Modifier.isAbstract(klass.getModifiers())
         && !SandboxCode.class.isAssignableFrom(klass);
   }
 
