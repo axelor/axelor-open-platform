@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
@@ -117,7 +118,10 @@ class ScriptPolicy {
     // its builder reads any file given by path
     org.apache.commons.csv.CSVParser.class,
     // allowed as a Map; reads local files, classpath resources and URLs by path
-    org.apache.shiro.config.Ini.class
+    org.apache.shiro.config.Ini.class,
+    // allowed as a List; its getProperty reads a property from each element through a metaclass
+    // scripts can replace (setMetaClass), unchecked
+    groovy.lang.Sequence.class
   };
 
   private final List<String> allowPackages;
@@ -214,7 +218,8 @@ class ScriptPolicy {
     Class<?> cls = getTopClass(klass);
 
     if (denyClasses.stream().anyMatch(x -> x.isAssignableFrom(cls))
-        || denyPackages.stream().anyMatch(x -> match(x, pkg))) {
+        || denyPackages.stream().anyMatch(x -> match(x, pkg))
+        || isCollectionProxy(cls)) {
       return false;
     }
 
@@ -227,6 +232,25 @@ class ScriptPolicy {
     return Model.class.isAssignableFrom(cls)
         || Repository.class.isAssignableFrom(cls)
         || ValueEnum.class.isAssignableFrom(cls);
+  }
+
+  /** The class loader of the proxy classes Groovy generates, not public. */
+  private static final String PROXY_LOADER =
+      "org.codehaus.groovy.runtime.ProxyGeneratorAdapter$InnerLoader";
+
+  /**
+   * Whether the class is a collection proxy Groovy generates when it converts a map or a closure to
+   * a class, explicitly ({@code [size: { 1 }] as ArrayList}) or implicitly, to a variable or
+   * parameter type ({@code ForwardingList l = { -> list }}). It would be allowed as its collection
+   * supertype, but it is a {@code GroovyObject} whose metaclass reads a property it does not have
+   * from each of its elements, unchecked ({@code l.getProperty('env')}), unlike the collections
+   * declared in scripts (see {@link GroovySandbox.CollectionMetaClass}).
+   */
+  private static boolean isCollectionProxy(Class<?> klass) {
+    final ClassLoader loader = klass.getClassLoader();
+    return loader != null
+        && Collection.class.isAssignableFrom(klass)
+        && PROXY_LOADER.equals(loader.getClass().getName());
   }
 
   private static Class<?> getTopClass(Class<?> klass) {

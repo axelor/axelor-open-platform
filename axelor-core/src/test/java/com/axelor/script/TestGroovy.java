@@ -321,17 +321,21 @@ public class TestGroovy extends ScriptTest {
     assertEquals(List.of(1), result);
   }
 
+  // Sequence is denied: its getProperty reads a property from each element, unchecked
   @Test
   void testSequence() {
     GroovyScriptHelper helper = new GroovyScriptHelper(context());
-    Object result =
-        helper.eval(
-            """
-            def s = ((1..2) as Sequence)
-            s.add(3)
-            s
-            """);
-    assertEquals(List.of(1, 2, 3), result);
+    Throwable ex =
+        assertThrows(
+            Throwable.class,
+            () ->
+                helper.eval(
+                    """
+                    def s = ((1..2) as Sequence)
+                    s.add(3)
+                    s
+                    """));
+    assertTrue(ex.getMessage().contains("groovy.lang.Sequence"), ex::toString);
   }
 
   @Test

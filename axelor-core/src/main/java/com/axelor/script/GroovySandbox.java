@@ -6,7 +6,9 @@ package com.axelor.script;
 
 import com.axelor.event.Observes;
 import com.axelor.events.ShutdownEvent;
+import groovy.lang.DelegatingMetaClass;
 import groovy.lang.GroovyObject;
+import groovy.lang.GroovySystem;
 import groovy.lang.MetaBeanProperty;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaMethod;
@@ -26,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.codehaus.groovy.reflection.CachedField;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -208,6 +211,11 @@ public final class GroovySandbox {
    * collected in a single pass, and the property is read from them by the {@link PropertyOwners}
    * returned in place of the container: a stateful collection could give other elements to a second
    * iteration. The name is {@code null} when it is computed at runtime.
+   *
+   * <p>A collection overriding {@code getProperty(String)} reads its properties through its
+   * override, which is called as in Groovy: a collection declared in a script has its elements
+   * checked by its metaclass (see {@link #readsThroughOverride(Object)}), and the elements of
+   * another one are checked here first.
    */
   public static Object checkProperty(Object obj, String name) {
     check(obj);
@@ -219,8 +227,13 @@ public final class GroovySandbox {
    * collection or an array whose property is read from its elements, each passed to the check.
    */
   private static Object propertyOwner(Object obj, String name, Consumer<Object> check) {
-    final Iterable<?> elements = propertyElements(obj, name);
-    return elements == null ? obj : collectOwners(obj, elements, name, check, null);
+    final Iterable<?> elements = ownerElements(obj, name);
+    if (elements == null) {
+      return obj;
+    }
+    final PropertyOwners owners = collectOwners(obj, elements, name, check, null);
+    // its override of getProperty is called once its elements are checked
+    return overridesGetProperty(obj) ? obj : owners;
   }
 
   /**
@@ -245,6 +258,46 @@ public final class GroovySandbox {
   }
 
   /**
+   * The elements whose property is read in place of the object's, as {@link
+   * #propertyElements(Object, String)}, except for an object reading its properties through its own
+   * {@code getProperty(String)}, which is called instead.
+   */
+  private static Iterable<?> ownerElements(Object obj, String name) {
+    return readsThroughOverride(obj) ? null : propertyElements(obj, name);
+  }
+
+  /**
+   * Whether Groovy reads the properties of the object through an override of {@code
+   * getProperty(String)} that its metaclass checks: a collection declared in a script, whose {@link
+   * CollectionMetaClass} validates the elements the override reads from ({@code
+   * super.getProperty(name)}). Its override is called as in Groovy, rather than the property being
+   * read from its elements.
+   */
+  private static boolean readsThroughOverride(Object obj) {
+    return overridesGetProperty(obj)
+        && ((GroovyObject) obj).getMetaClass() instanceof CollectionMetaClass;
+  }
+
+  /** Whether the classes override the default {@link GroovyObject#getProperty(String)}. */
+  private static final ClassValue<Boolean> GET_PROPERTY_OVERRIDES =
+      new ClassValue<>() {
+        @Override
+        protected Boolean computeValue(Class<?> type) {
+          try {
+            return type.getMethod("getProperty", String.class).getDeclaringClass()
+                != GroovyObject.class;
+          } catch (NoSuchMethodException e) {
+            return false;
+          }
+        }
+      };
+
+  /** Whether the object overrides the default {@link GroovyObject#getProperty(String)}. */
+  private static boolean overridesGetProperty(Object obj) {
+    return obj instanceof GroovyObject && GET_PROPERTY_OVERRIDES.get(obj.getClass());
+  }
+
+  /**
    * Collects each element, passed to the check, in a single pass: a nested container whose property
    * is read from its elements is collected as well, at any depth. A container is visited once, so
    * that a container holding itself does not loop forever.
@@ -261,7 +314,7 @@ public final class GroovySandbox {
     }
     for (Object element : elements) {
       check.accept(element);
-      final Iterable<?> nested = propertyElements(element, name);
+      final Iterable<?> nested = ownerElements(element, name);
       if (nested == null) {
         owners.elements.add(element);
         continue;
@@ -271,8 +324,10 @@ public final class GroovySandbox {
         visited.put(container, owners);
       }
       final PropertyOwners seen = visited.get(element);
-      owners.elements.add(
-          seen != null ? seen : collectOwners(element, nested, name, check, visited));
+      final PropertyOwners collected =
+          seen != null ? seen : collectOwners(element, nested, name, check, visited);
+      // an element overriding getProperty is read through its override, see checkProperty
+      owners.elements.add(overridesGetProperty(element) ? element : collected);
     }
     return owners;
   }
@@ -357,7 +412,7 @@ public final class GroovySandbox {
    *
    * <p>A {@link GroovyObject} overriding {@code getProperty(String)} is not taken as reading them
    * itself: its override can read them from each element through the metaclass ({@code
-   * super.getProperty(name)}).
+   * super.getProperty(name)}), see {@link #readsThroughOverride(Object)}.
    */
   private static boolean readsAnyProperty(Object obj) {
     if (obj instanceof Map) {
@@ -378,6 +433,76 @@ public final class GroovySandbox {
   private static boolean isReadable(CachedField field, Object obj) {
     final Field reflected = field.getCachedField();
     return reflected.canAccess(Modifier.isStatic(reflected.getModifiers()) ? null : obj);
+  }
+
+  /**
+   * The metaclass of the collections declared in scripts, returned by their {@code getMetaClass()}
+   * (see {@link GroovyClassCheck}).
+   */
+  private static final ClassValue<MetaClass> COLLECTION_META_CLASSES =
+      new ClassValue<>() {
+        @Override
+        protected MetaClass computeValue(Class<?> type) {
+          return new CollectionMetaClass(GroovySystem.getMetaClassRegistry().getMetaClass(type));
+        }
+      };
+
+  /**
+   * The metaclass of a collection declared in a script, see {@link CollectionMetaClass}. Called by
+   * the {@code getMetaClass()} method {@link GroovyClassCheck} adds to these classes.
+   */
+  public static MetaClass collectionMetaClass(Object collection) {
+    return COLLECTION_META_CLASSES.get(collection.getClass());
+  }
+
+  /**
+   * The metaclass of a collection declared in a script: it validates the elements a property is
+   * read from, as {@link #checkProperty(Object, String)}, and reads it from the validated elements.
+   *
+   * <p>A property access in a script is checked where it is written, but Groovy also reads a
+   * property through the metaclass from other places, unchecked: {@code getProperty(name)} (called
+   * directly, by {@code invokeMethod} or a method pointer, or from an override as {@code
+   * super.getProperty(name)}), and the properties a method of the class reads on {@code this}
+   * ({@code def m() { name }}). For a collection, the metaclass reads a property it does not have
+   * from each of its elements, so they are validated here. Trusted code is not affected.
+   *
+   * <p>The elements of the collection itself are always validated here, even when its class
+   * overrides {@code getProperty(String)}: the override reads them through this metaclass.
+   */
+  static final class CollectionMetaClass extends DelegatingMetaClass {
+
+    private CollectionMetaClass(MetaClass delegate) {
+      super(delegate);
+      initialize();
+    }
+
+    @Override
+    public Object getProperty(Object object, String property) {
+      return readProperty(object, property, () -> super.getProperty(object, property));
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object getProperty(
+        Class sender,
+        Object receiver,
+        String property,
+        boolean isCallToSuper,
+        boolean fromInsideClass) {
+      return readProperty(
+          receiver,
+          property,
+          () -> super.getProperty(sender, receiver, property, isCallToSuper, fromInsideClass));
+    }
+
+    private static Object readProperty(Object obj, String name, Supplier<Object> read) {
+      final Iterable<?> elements = propertyElements(obj, name);
+      if (elements == null) {
+        return read.get();
+      }
+      return DefaultGroovyMethods.getAt(
+          collectOwners(obj, elements, name, checkFromSandbox(), null).elements, name);
+    }
   }
 
   /**

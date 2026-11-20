@@ -20,6 +20,7 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.axelor.test.db.Contact;
 import groovy.lang.Closure;
+import groovy.lang.GroovyClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -566,6 +567,168 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
         helper,
         "class L extends ArrayList { Object getProperty(String n) { super.getProperty(n) } };"
             + " def l = new L(); l << System; l.env");
+  }
+
+  // Groovy also reads the properties of an object through its metaclass, outside of the property
+  // accesses the transformations check: a collection declared in a script reads a property it does
+  // not have from each of its elements, which its metaclass checks.
+  @Test
+  void testCollectionMetaClassChecksElements() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    String list = "class L extends ArrayList {}; def l = new L(); l << System; ";
+
+    assertBlockedByPolicy(helper, list + "l.getProperty('env')");
+    assertBlockedByPolicy(helper, list + "l.invokeMethod('getProperty', 'env')");
+    assertBlockedByPolicy(helper, list + "def f = l.&getProperty; f('env')");
+    assertBlockedByPolicy(helper, list + "l.\"${'getProperty'}\"('env')");
+    assertBlockedByPolicy(helper, list + "l.with { getProperty('env') }");
+    // a property read by a method of the class on itself
+    assertBlockedByPolicy(
+        helper,
+        "class L extends ArrayList { def m() { env } }; def l = new L(); l << System; l.m()");
+    // an override of getProperty
+    assertBlockedByPolicy(
+        helper,
+        "class L extends ArrayList { Object getProperty(String n) { super.getProperty(n) } };"
+            + " def l = new L(); l << System; l.getProperty('env')");
+    String override =
+        "class L extends ArrayList { Object getProperty(String n) { super.getProperty(n) } };"
+            + " def l = new L(); l << System; ";
+    assertBlockedByPolicy(helper, override + "l.\"${'env'}\"");
+    assertBlockedByPolicy(helper, override + "l.with { env }");
+    assertBlockedByPolicy(helper, override + "[l].env");
+    assertBlockedByPolicy(helper, override + "[l]*.env");
+    // a subclass, an anonymous class, an instance created by a static field
+    assertBlockedByPolicy(
+        helper,
+        "class L extends ArrayList {}; class M extends L {}; def l = new M(); l << System;"
+            + " l.getProperty('env')");
+    assertBlockedByPolicy(helper, "def l = new ArrayList() {}; l << System; l.getProperty('env')");
+    assertBlockedByPolicy(
+        helper,
+        "class L extends ArrayList { static L I = new L() }; L.I << System; L.I.getProperty('env')");
+    // the metaclass cannot be replaced by the class
+    assertBlockedByPolicy(
+        helper, "class L extends ArrayList { groovy.lang.MetaClass getMetaClass() { null } }; 1");
+    // a Groovy collection reading the property from its elements
+    assertBlockedByPolicy(helper, "def l = new groovy.lang.Sequence(); l << System; l.env");
+
+    // Allowed properties still work.
+    String maps = "class L extends ArrayList {}; def l = new L(); l << [a: 1] << [a: 2]; ";
+    assertEquals(List.of(1, 2), helper.eval(maps + "l.getProperty('a')"));
+    assertEquals(List.of(1, 2), helper.eval(maps + "l.a"));
+    assertEquals(List.of(1, 2), helper.eval(maps + "l.with { getProperty('a') }"));
+    assertEquals(false, helper.eval(maps + "l.getProperty('empty')"));
+    assertEquals(
+        1, helper.eval("class L extends ArrayList { def x = 1 }; new L().getProperty('x')"));
+    assertEquals(
+        List.of(1),
+        helper.eval(
+            "class L extends ArrayList { def m() { a } }; def l = new L(); l << [a: 1]; l.m()"));
+    assertEquals(
+        2,
+        helper.eval(
+            "class L extends ArrayList { def m() { size() } }; def l = new L(); l << 1 << 2; l.m()"));
+    // an override of getProperty is called, as in Groovy, rather than reading from the elements
+    String custom =
+        "class L extends ArrayList { Object getProperty(String n) { 'custom' } };"
+            + " def l = new L(); l << [x: 1]; ";
+    assertEquals("custom", helper.eval(custom + "l.x"));
+    assertEquals("custom", helper.eval(custom + "l.\"${'x'}\""));
+    assertEquals("custom", helper.eval(custom + "l.with { x }"));
+    assertEquals(List.of("custom"), helper.eval(custom + "[l].x"));
+    assertEquals(List.of("custom"), helper.eval(custom + "[l]*.x"));
+  }
+
+  // A trusted collection overriding getProperty (not compiled by the sandbox) is read through its
+  // override, as in Groovy, once its elements are checked.
+  @Test
+  @SuppressWarnings("unchecked")
+  void testTrustedCollectionGetPropertyOverride() throws Exception {
+    List<Object> trusted;
+    try (GroovyClassLoader loader = new GroovyClassLoader()) {
+      trusted =
+          (List<Object>)
+              loader
+                  .parseClass(
+                      "class T extends ArrayList { Object getProperty(String n) { 'trusted:' + n } }")
+                  .getDeclaredConstructor()
+                  .newInstance();
+    }
+    trusted.add(Map.of("a", 1));
+    SimpleBindings bindings = new SimpleBindings();
+    bindings.put("t", trusted);
+    ScriptHelper helper = new GroovyScriptHelper(bindings);
+
+    assertEquals("trusted:a", helper.eval("t.a"));
+    assertEquals("trusted:a", helper.eval("t.\"${'a'}\""));
+    assertEquals("trusted:a", helper.eval("t.with { a }"));
+    assertEquals(List.of("trusted:a"), helper.eval("[t].a"));
+    assertEquals(List.of("trusted:a"), helper.eval("[t]['a']"));
+    assertEquals(List.of("trusted:a"), SandboxGroovyMethods.getAt(List.of(trusted), "a"));
+    // its elements are still checked
+    assertBlockedByPolicy(helper, "t << System; t.a");
+  }
+
+  // Groovy converts a map or a closure to a class by generating a proxy subclass of it, whose
+  // metaclass reads a property a collection does not have from each of its elements, unchecked: a
+  // collection proxy is denied, however it was converted.
+  @Test
+  void testCollectionProxyDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    String list = "def l = [get: { int i -> System }, size: { 1 }] as AbstractList; ";
+
+    assertBlockedByPolicy(helper, list + "l.getProperty('env')");
+    assertBlockedByPolicy(helper, list + "l.invokeMethod('getProperty', 'env')");
+    assertBlockedByPolicy(helper, list + "def f = l.&getProperty; f('env')");
+    assertBlockedByPolicy(helper, list + "l.\"${'getProperty'}\"('env')");
+    assertBlockedByPolicy(helper, list + "[l].env");
+    assertBlockedByPolicy(
+        helper,
+        "def l = [get: { int i -> System }, size: { 1 }].asType(AbstractList);"
+            + " l.getProperty('env')");
+    assertBlockedByPolicy(
+        helper,
+        "def l = [iterator: { -> [System].iterator() }, size: { 1 }] as AbstractSet;"
+            + " l.getProperty('env')");
+    // a concrete class
+    assertBlockedByPolicy(
+        helper, "def l = [size: { 1 }] as ArrayList; l << System; l.getProperty('env')");
+    // a closure converted to an abstract class with a single abstract method, implicitly too
+    assertBlockedByPolicy(
+        helper,
+        "def l = { -> [System] } as com.google.common.collect.ForwardingList; l.getProperty('env')");
+    assertBlockedByPolicy(
+        helper,
+        "com.google.common.collect.ForwardingList l = { -> [System] }; l.getProperty('env')");
+    assertBlockedByPolicy(
+        helper,
+        "def f(com.google.common.collect.ForwardingCollection c) { c.getProperty('env') };"
+            + " f({ -> [System] })");
+
+    // A conversion to a script interface is a JDK proxy, sandboxed code as the interface is: the
+    // interface cannot extend GroovyObject, whose getProperty reads through an unchecked metaclass.
+    assertBlockedByPolicy(
+        helper,
+        "interface G extends Collection, GroovyObject {};"
+            + " def l = [iterator: { -> [System].iterator() }, size: { 1 }] as G;"
+            + " l.getProperty('env')");
+    assertBlockedByPolicy(helper, "interface G extends GroovyObject {}; 1");
+    assertBlockedByPolicy(helper, "interface G extends GroovyInterceptable {}; 1");
+
+    // Conversions not generating a collection proxy still work.
+    assertEquals(
+        1, helper.eval("([iterator: { -> [1].iterator() }, size: { 1 }] as Collection).size()"));
+    assertEquals(1, helper.eval("def l = [:] as ArrayList; l << 1; l.size()"));
+    assertEquals(
+        1,
+        helper.eval(
+            "interface G extends Collection {};"
+                + " ([iterator: { -> [1].iterator() }, size: { 1 }] as G).size()"));
+    assertBlockedByPolicy(
+        helper,
+        "interface G extends Collection {};"
+            + " def l = [iterator: { -> [System].iterator() }, size: { 1 }] as G; l.env");
   }
 
   // A call of a local variable (x()) is a call of its call() method, so the variable is checked
