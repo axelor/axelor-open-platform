@@ -7,6 +7,7 @@ package com.axelor.script;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,11 +22,15 @@ import com.axelor.rpc.Response;
 import com.axelor.test.db.Contact;
 import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovySystem;
+import groovy.lang.MetaClass;
+import groovy.lang.MetaClassRegistry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 import javax.script.SimpleBindings;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.junit.jupiter.api.Test;
@@ -729,6 +734,33 @@ class TestGroovyScriptPolicy extends AbstractScriptPolicyTest {
         helper,
         "interface G extends Collection {};"
             + " def l = [iterator: { -> [System].iterator() }, size: { 1 }] as G; l.env");
+  }
+
+  // groovy.util.NodeList, allowed as a List, has a static setMetaClass(Class, MetaClass) replacing
+  // the metaclass of any class for the whole JVM: it is denied.
+  @Test
+  void testNodeListDenied() {
+    ScriptHelper helper = new GroovyScriptHelper(new SimpleBindings());
+    MetaClassRegistry registry = GroovySystem.getMetaClassRegistry();
+    MetaClass before = registry.getMetaClass(UUID.class);
+    try {
+      assertBlockedByPolicy(helper, "groovy.util.NodeList.setMetaClass(UUID, null); 1");
+      assertBlockedByPolicy(helper, "def c = groovy.util.NodeList; c.setMetaClass(UUID, null); 1");
+      assertBlockedByPolicy(helper, "groovy.util.NodeList.&setMetaClass(UUID, null); 1");
+      assertBlockedByPolicy(helper, "new groovy.util.NodeList().setMetaClass(UUID, null); 1");
+      assertBlockedByPolicy(helper, "new groovy.util.NodeList() << 1; 1");
+      assertBlockedByPolicy(
+          helper, "class L extends groovy.util.NodeList {}; L.setMetaClass(UUID, null); 1");
+      assertBlockedByPolicy(
+          helper,
+          "class L extends groovy.util.NodeList { static f() { setMetaClass(UUID, null) } };"
+              + " L.f(); 1");
+      assertSame(before, registry.getMetaClass(UUID.class));
+    } finally {
+      if (registry.getMetaClass(UUID.class) != before) {
+        registry.setMetaClass(UUID.class, before);
+      }
+    }
   }
 
   // A call of a local variable (x()) is a call of its call() method, so the variable is checked

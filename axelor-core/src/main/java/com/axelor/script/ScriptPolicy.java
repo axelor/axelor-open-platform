@@ -121,7 +121,10 @@ class ScriptPolicy {
     org.apache.shiro.config.Ini.class,
     // allowed as a List; its getProperty reads a property from each element through a metaclass
     // scripts can replace (setMetaClass), unchecked
-    groovy.lang.Sequence.class
+    groovy.lang.Sequence.class,
+    // allowed as a List; its static setMetaClass(Class, MetaClass) replaces the metaclass of any
+    // class for the whole JVM
+    groovy.util.NodeList.class
   };
 
   private final List<String> allowPackages;
