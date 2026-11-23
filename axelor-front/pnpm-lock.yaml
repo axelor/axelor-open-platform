@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: 0.7.7
-        version: 0.7.7(@popperjs/core@2.11.8)(@types/node@24.19.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
+        specifier: 0.7.8
+        version: 0.7.8(@popperjs/core@2.11.8)(@types/node@24.19.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)
       '@babel/standalone':
         specifier: ^7.29.2
         version: 7.29.2
@@ -220,8 +220,8 @@ packages:
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
-  '@axelor/ui@0.7.7':
-    resolution: {integrity: sha512-xn8i/aZ1OAE/WSnV0r7e8IkzyXyR2AT6tIBf7I6JcRP2Ty22dHDtSroHoLNr0bBgf7z4p+g3zqqpP9ZC+ilNcA==}
+  '@axelor/ui@0.7.8':
+    resolution: {integrity: sha512-sL/UsLNI9ZWDncRR7nNbTXDqxzOROJ7FPAOzKWy85j8UfZoCl+HTCr1NNS5w6IogbX8vXirR6jWsQdjkxVPDNg==}
     engines: {node: '>=24.13.0'}
     peerDependencies:
       react: ^19.2.4
@@ -2785,18 +2785,6 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
-  react-redux@9.2.0:
-    resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
-    peerDependencies:
-      '@types/react': ^18.2.25 || ^19
-      react: ^18.0 || ^19
-      redux: ^5.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      redux:
-        optional: true
-
   react-redux@9.3.1:
     resolution: {integrity: sha512-vxMLT0lalUjbZPkoTepWyKAZbjIIFssNx/CEL9lTfwQBU6XpkGSmCNdcCIrkOBUgB68uftZMnbXVb6DwGnhRKQ==}
     peerDependencies:
@@ -3427,7 +3415,7 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@axelor/ui@0.7.7(@popperjs/core@2.11.8)(@types/node@24.19.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
+  '@axelor/ui@0.7.8(@popperjs/core@2.11.8)(@types/node@24.19.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(scheduler@0.27.0)':
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@floating-ui/react': 0.27.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -3868,7 +3856,7 @@ snapshots:
       raf-schd: 4.0.3
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      react-redux: 9.2.0(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1)
+      react-redux: 9.3.1(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1)
       redux: 5.0.1
     transitivePeerDependencies:
       - '@types/react'
@@ -6264,15 +6252,6 @@ snapshots:
   react-is@17.0.2: {}
 
   react-is@18.3.1: {}
-
-  react-redux@9.2.0(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1):
-    dependencies:
-      '@types/use-sync-external-store': 0.0.6
-      react: 19.2.4
-      use-sync-external-store: 1.6.0(react@19.2.4)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      redux: 5.0.1
 
   react-redux@9.3.1(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1):
     dependencies:
