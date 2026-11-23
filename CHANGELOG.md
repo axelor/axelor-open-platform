@@ -1,3 +1,27 @@
+## 7.4.15 (2026-11-23)
+
+#### Fix
+
+* Fix decimal values rounded to 3 digits in grid export
+
+  <details>
+  
+  Decimal values were rounded to 3 decimals when exporting records from a grid view. They are now
+  exported with all their significant decimals, without trailing zeros (`60.9512000000` is
+  exported as `60.9512`).
+  
+  `L10n.format(Number)` now formats `BigDecimal` values the same way. Other number types are
+  still formatted with at most 3 decimals.
+  
+  </details>
+
+#### Security
+
+* Fix domains validation
+* Fix record name web service
+* Restrict REST download service to file fields
+* Fix mass update fields validation
+
 ## 7.4.14 (2026-11-02)
 
 #### Feature
