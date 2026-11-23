@@ -77,8 +77,14 @@ class ScriptPolicy {
     // Short term, see the note in DENY_CLASSES: libraries axelor-core does not compile against.
     // BeanMap calls the getters and setters of any object given to it
     "org.apache.commons.beanutils",
-    "org.apache.commons.collections",
     "org.springframework.cglib.beans",
+    // BeanMap as above, and map.MultiValueMap.decorate(Map, Class) instantiates any class: the
+    // whole of commons-collections 3, whose sub-packages are all one level deep
+    "org.apache.commons.collections.*",
+    // MultiValueMap.multiValueMap(Map, Class) instantiates any class
+    "org.apache.commons.collections4.map",
+    // AutoPopulatingList(Class) instantiates any class
+    "org.springframework.util",
     // event loop and executor groups: start threads running script code
     "io.netty.channel.*",
     "io.netty.util.concurrent",
@@ -124,7 +130,9 @@ class ScriptPolicy {
     groovy.lang.Sequence.class,
     // allowed as a List; its static setMetaClass(Class, MetaClass) replaces the metaclass of any
     // class for the whole JVM
-    groovy.util.NodeList.class
+    groovy.util.NodeList.class,
+    // allowed as an Iterable; load(Class) instantiates service providers, as ServiceLoader.load
+    org.jboss.resteasy.spi.PriorityServiceLoader.class
   };
 
   private final List<String> allowPackages;
