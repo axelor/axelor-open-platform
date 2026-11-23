@@ -57,6 +57,7 @@ import {
   getWidget,
   nextId,
   processView,
+  resetFormWidgetsState,
 } from "./utils";
 
 import styles from "./form-editors.module.scss";
@@ -1241,11 +1242,12 @@ const RecordEditor = memo(function RecordEditor({
   const resetStates = useAtomCallback(
     useCallback(
       (get, set, event: Event) => {
-        if (event instanceof CustomEvent && event.detail === tab.id) {
+        if (event instanceof CustomEvent && event.detail?.tabId === tab.id) {
+          const { isReload } = event.detail;
           set(editorFormAtom, (prev) => {
             return {
               ...prev,
-              states: {},
+              states: isReload ? resetFormWidgetsState(prev.states) : {},
               statesByName: {},
             };
           });

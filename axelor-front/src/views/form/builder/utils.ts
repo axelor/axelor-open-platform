@@ -804,3 +804,18 @@ export function resetFormDummyFieldsState(
       {},
     );
 }
+
+export function resetFormWidgetsState(states: FormState["states"]) {
+  // Keep only evaluated hidden attrs to avoid showIf/hideIf flicker when the
+  // caller has determined this is a reload of the same logical record.
+  return Object.entries(states).reduce(
+    (acc, [uid, state]) => {
+      const { hidden } = state.attrs ?? {};
+      if (!isUndefined(hidden)) {
+        acc[uid] = { attrs: { hidden } };
+      }
+      return acc;
+    },
+    {} as FormState["states"],
+  );
+}

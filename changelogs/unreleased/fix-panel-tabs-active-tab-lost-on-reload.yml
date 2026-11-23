@@ -1,0 +1,7 @@
+---
+title: Fix panel-tabs losing active tab on record reload
+type: fix
+description: |
+  When the tabs of a `panel-tabs` widget used `showIf`/`hideIf`, reloading the record (for example
+  with the refresh button or an action that reloads it) could display another tab. The tab header
+  could also stay highlighted on a tab other than the one displayed.

@@ -37,7 +37,11 @@ import {
 import { showErrors, useGetErrors } from "@/views/form/builder/form-errors";
 import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
-import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
+import {
+  processOriginal,
+  processSaveValues,
+  resetFormWidgetsState,
+} from "@/views/form/builder/utils";
 import { useViewConfirmDirty, useViewTab } from "@/view-containers/views/scope";
 import { useGridExpandableContext, useGridContext } from "./scope";
 import { useSingleClickHandler } from "@/hooks/use-button";
@@ -239,7 +243,10 @@ export function ExpandableFormView({
           ...state,
           ...(!fromAction &&
             hasFetched && {
-              states: {},
+              states:
+                Boolean(state.record.id) && state.record.id === record.id
+                  ? resetFormWidgetsState(state.states)
+                  : {},
               statesByName: {},
             }),
           record,

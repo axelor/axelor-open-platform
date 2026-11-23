@@ -79,6 +79,7 @@ import {
   processOriginal,
   processSaveValues,
   resetFormDummyFieldsState,
+  resetFormWidgetsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
@@ -582,8 +583,15 @@ const FormContainer = memo(function FormContainer({
           recordRef.current = record;
         }
 
+        // same, already-persisted record being reloaded, as opposed to
+        // navigating to a different record or starting a new unsaved one
+        const isReload =
+          Boolean(prev.record.id) && prev.record.id === record.id;
+
         if (!keepStates) {
-          const event = new CustomEvent("form:reset-states", { detail: tabId });
+          const event = new CustomEvent("form:reset-states", {
+            detail: { tabId, isReload },
+          });
           document.dispatchEvent(event);
         }
 
@@ -607,7 +615,10 @@ const FormContainer = memo(function FormContainer({
                   prev.statesByName,
                 ),
               }
-            : { states: {}, statesByName: {} }),
+            : {
+                states: isReload ? resetFormWidgetsState(prev.states) : {},
+                statesByName: {},
+              }),
           record,
           original: { ...record },
         });
@@ -1148,7 +1159,10 @@ const FormContainer = memo(function FormContainer({
           const state = get(formAtom);
           set(formAtom, {
             ...state,
-            states: {},
+            states:
+              Boolean(state.record.id) && state.record.id === record.id
+                ? resetFormWidgetsState(state.states)
+                : {},
             statesByName: {},
             record,
             dirty: false,

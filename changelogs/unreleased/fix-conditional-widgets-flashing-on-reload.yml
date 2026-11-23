@@ -1,0 +1,11 @@
+---
+title: Fix widgets with showIf/hideIf flashing on record reload
+type: fix
+description: |
+  Reloading a record (for example with the refresh button or an action that reloads it) briefly hid
+  every widget using `showIf`/`hideIf` until its condition was evaluated again, in forms, popups,
+  relational field editors and expandable grid rows. These widgets now keep their visibility while
+  the same record is reloaded, until their condition is evaluated again.
+
+  Attributes set by actions (`action-attrs`, `setAttr`, view attributes) are still reset on reload
+  and must be applied again in `onLoad`, as before. Opening another record still resets everything.
