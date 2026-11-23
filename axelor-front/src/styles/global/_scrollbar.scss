@@ -5,7 +5,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bs-border-color);
+  background: var(--ax-theme-shell-scrollbar-color);
   background-clip: padding-box;
   border: 0;
   border-radius: calc((6px / 3) * 2);
