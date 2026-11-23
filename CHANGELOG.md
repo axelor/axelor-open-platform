@@ -1,3 +1,78 @@
+## 8.2.7 (2026-11-23)
+
+#### Change
+
+* Read included Groovy templates from the template folder or the `templates` resources
+
+  <details>
+  
+  A template included with `{{< name >}}` is now read from:
+  
+  - the template folder (`template.search-dir`): the file of that name, inside that folder
+  - otherwise the classpath: the `.tmpl` resource of that name in the `templates` folder
+    (`{{< invoice/header.tmpl >}}` reads `templates/invoice/header.tmpl`)
+  
+  The name must be a relative path, with `/` or `\` as separator, without `.` or `..` parts or
+  colon, otherwise the template fails.
+  
+  An included template that is not found, or cannot be read, now fails the template, instead of
+  being replaced by nothing.
+  
+  Templates including classpath resources must be updated: move the included resources into
+  the `templates` folder of the resources, with the `.tmpl` extension, and name them relative
+  to that folder in the includes.
+  
+  </details>
+
+#### Fix
+
+* Fix decimal values rounded to 3 digits in grid export
+
+  <details>
+  
+  Decimal values were rounded to 3 decimals when exporting records from a grid view. They are now
+  exported with all their significant decimals, without trailing zeros (`60.9512000000` is
+  exported as `60.9512`).
+  
+  `L10n.format(Number)` now formats `BigDecimal` values the same way. Other number types are
+  still formatted with at most 3 decimals.
+  
+  </details>
+
+* Fix theme scrollbar color not applied
+* Fix panel-tabs losing active tab on record reload
+
+  <details>
+  
+  When the tabs of a `panel-tabs` widget used `showIf`/`hideIf`, reloading the record (for example
+  with the refresh button or an action that reloads it) could display another tab. The tab header
+  could also stay highlighted on a tab other than the one displayed.
+  
+  </details>
+
+* Fix widgets with showIf/hideIf flashing on record reload
+
+  <details>
+  
+  Reloading a record (for example with the refresh button or an action that reloads it) briefly hid
+  every widget using `showIf`/`hideIf` until its condition was evaluated again, in forms, popups,
+  relational field editors and expandable grid rows. These widgets now keep their visibility while
+  the same record is reloaded, until their condition is evaluated again.
+  
+  Attributes set by actions (`action-attrs`, `setAttr`, view attributes) are still reset on reload
+  and must be applied again in `onLoad`, as before. Opening another record still resets everything.
+  
+  </details>
+
+#### Security
+
+* Fix domains validation
+* Fix record name web service
+* Fix Groovy script sandbox bypass
+* Restrict REST download service to file fields
+* Fix mass update fields validation
+* Protect XML parsing against external entities (XXE)
+
 ## 8.2.6 (2026-11-02)
 
 #### Change
